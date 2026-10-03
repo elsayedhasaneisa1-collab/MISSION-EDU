@@ -17,8 +17,10 @@ a{color:inherit;text-decoration:none}
 .glass{background:linear-gradient(180deg,rgba(21,31,56,.72),rgba(11,17,34,.62));border:1px solid var(--border);border-radius:var(--r);backdrop-filter:blur(16px);box-shadow:var(--sh)}
 .h1{font-size:clamp(24px,4vw,32px);font-weight:900;letter-spacing:-.7px}
 .h2{font-size:20px;font-weight:800}
-.sm{font-size:12.5px}.xs{font-size:11.5px}
-.muted{color:var(--muted)}.txt2{color:var(--txt2)}
+.sm{font-size:12.5px}
+.xs{font-size:11.5px}
+.muted{color:var(--muted)}
+.txt2{color:var(--txt2)}
 .grad{background:linear-gradient(100deg,#5aa9ff,#a78bfa 55%,#22d3ee);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .flex{display:flex}.between{justify-content:space-between}.center{align-items:center}.col{flex-direction:column}.wrap{flex-wrap:wrap}
 .g6{gap:6px}.g8{gap:8px}.g12{gap:12px}.g16{gap:16px}
@@ -56,6 +58,7 @@ select.input{cursor:pointer;appearance:none;padding-inline-start:38px;background
 .check-box{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-size:11px;flex-shrink:0;margin-top:2px}
 .check-box.ok{background:var(--green);color:#fff}
 .check-box.no{background:rgba(255,255,255,.08);color:var(--muted)}
+.phone-prefix{background:rgba(10,16,32,.72);border:1.5px solid var(--border);border-radius:13px;padding:13px 14px;font-weight:700;font-size:14px;color:var(--txt2);white-space:nowrap;display:flex;align-items:center;gap:6px}
 .toast-host{position:fixed;bottom:26px;inset-inline-start:26px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:min(420px,92vw)}
 .toast{pointer-events:auto;min-width:280px;padding:14px 16px 16px;border-radius:16px;background:linear-gradient(135deg,rgba(21,31,56,.98),rgba(11,17,34,.98));border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.65);animation:slideIn .4s cubic-bezier(.2,.8,.3,1);position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:12px}
 .toast.out{animation:fadeOut .3s forwards}
@@ -137,12 +140,13 @@ function strengthInfo(s){
 
 function RegisterPage(){
   const DB=window.MissionDB;
-  const [form,setForm]=useState({name:'',email:'',password:'',confirm:'',gradeId:''});
+  const [form,setForm]=useState({name:'',phone:'',password:'',confirm:'',gradeId:''});
   const [busy,setBusy]=useState(false);
   const [err,setErr]=useState('');
   const [showPass,setShowPass]=useState(false);
   const [grades,setGrades]=useState([]);
   const [checking,setChecking]=useState(true);
+  const [loadErr,setLoadErr]=useState('');
   const nameRef=useRef(null);
 
   useEffect(()=>{
@@ -155,10 +159,18 @@ function RegisterPage(){
       }
       try{
         const sb=await DB.getClient();
-        const {data}=await sb.from('grades').select('*').order('created_at');
-        setGrades(data||[]);
-        if(data?.length) setForm(f=>({...f,gradeId:data[0].id}));
-      }catch(e){}
+        const {data,error}=await sb.from('grades').select('*').order('created_at');
+        if(error){
+          setLoadErr('تعذّر تحميل الصفوف الدراسية');
+        } else if(!data||data.length===0){
+          setLoadErr('لا توجد صفوف دراسية. تواصل مع الإدارة.');
+        } else {
+          setGrades(data);
+          setForm(f=>({...f,gradeId:data[0].id}));
+        }
+      }catch(e){
+        setLoadErr('تعذّر الاتصال بقاعدة البيانات');
+      }
       setChecking(false);
       setTimeout(()=>nameRef.current?.focus(),200);
     })();
@@ -168,14 +180,14 @@ function RegisterPage(){
   const sInfo=strengthInfo(strength);
   const pwOk=form.password.length>=6;
   const matchOk=form.password&&form.password===form.confirm;
-  const emailOk=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
+  const phoneOk=form.phone.replace(/\D/g,'').length>=8;
   const nameOk=form.name.trim().length>=3;
 
   const submit=async e=>{
     e.preventDefault();
     setErr('');
     if(!nameOk){setErr('الاسم يجب أن يكون 3 أحرف على الأقل');return;}
-    if(!emailOk){setErr('البريد الإلكتروني غير صالح');return;}
+    if(!phoneOk){setErr('رقم الهاتف غير صالح');return;}
     if(!pwOk){setErr('كلمة المرور يجب أن تكون 6 أحرف على الأقل');return;}
     if(!matchOk){setErr('كلمتا المرور غير متطابقتين');return;}
     if(!form.gradeId){setErr('اختر الصف الدراسي');return;}
@@ -184,9 +196,10 @@ function RegisterPage(){
     try{
       const u=await DB.register({
         name:form.name,
-        email:form.email,
+        phone:form.phone.replace(/\D/g,''),
         password:form.password,
-        gradeId:form.gradeId
+        gradeId:form.gradeId,
+        countryCode:'+20'
       });
       window.__toast?.('مرحبًا بك ' + u.name.split(' ')[0],'ok','تم إنشاء الحساب');
       setTimeout(()=>DB.redirectByRole(u),600);
@@ -212,6 +225,8 @@ function RegisterPage(){
       <div className="h2 mb6">إنشاء حساب جديد</div>
       <div className="sm muted mb20">املأ البيانات التالية للبدء</div>
 
+      {loadErr&&<div className="pill pill-r mb16" style={{width:'100%',justifyContent:'center',padding:'10px 14px'}}>⚠️ {loadErr}</div>}
+
       <form onSubmit={submit}>
         <div className="field">
           <label className="lbl">الاسم الكامل</label>
@@ -219,11 +234,25 @@ function RegisterPage(){
         </div>
 
         <div className="field">
-          <label className="lbl">البريد الإلكتروني</label>
-          <input className="input" type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} placeholder="you@example.com" autoComplete="email" dir="ltr"/>
+          <label className="lbl">رقم الهاتف</label>
+          <div style={{display:'flex',gap:8}}>
+            <div className="phone-prefix"><span>🇪🇬</span><span>+20</span></div>
+            <input
+              className="input"
+              type="tel"
+              inputMode="numeric"
+              value={form.phone}
+              onChange={e=>setForm({...form,phone:e.target.value.replace(/\D/g,'').slice(0,11)})}
+              placeholder="1xxxxxxxxx"
+              autoComplete="tel"
+              dir="ltr"
+              style={{flex:1,textAlign:'left'}}
+            />
+          </div>
+          <div className="xs muted mt6">مثال: 1012345678</div>
         </div>
 
-        {grades.length>0&&(
+        {grades.length>0 && (
           <div className="field">
             <label className="lbl">الصف الدراسي</label>
             <select className="input" value={form.gradeId} onChange={e=>setForm({...form,gradeId:e.target.value})}>
@@ -235,8 +264,20 @@ function RegisterPage(){
         <div className="field">
           <label className="lbl">كلمة المرور</label>
           <div style={{position:'relative'}}>
-            <input className="input" type={showPass?'text':'password'} value={form.password} onChange={e=>setForm({...form,password:e.target.value})} placeholder="6 أحرف على الأقل" autoComplete="new-password" style={{paddingInlineStart:44}}/>
-            <button type="button" onClick={()=>setShowPass(v=>!v)} style={{position:'absolute',insetInlineStart:12,top:'50%',transform:'translateY(-50%)',fontSize:16,opacity:.6,color:'var(--txt)'}}>{showPass?'🙈':'👁'}</button>
+            <input
+              className="input"
+              type={showPass?'text':'password'}
+              value={form.password}
+              onChange={e=>setForm({...form,password:e.target.value})}
+              placeholder="6 أحرف على الأقل"
+              autoComplete="new-password"
+              style={{paddingInlineStart:44}}
+            />
+            <button
+              type="button"
+              onClick={()=>setShowPass(v=>!v)}
+              style={{position:'absolute',insetInlineStart:12,top:'50%',transform:'translateY(-50%)',fontSize:16,opacity:.6,color:'var(--txt)'}}
+            >{showPass?'🙈':'👁'}</button>
           </div>
           {form.password&&<>
             <div className="strength"><div className="strength-f" style={{width:sInfo.width,background:sInfo.color}}/></div>
@@ -246,7 +287,14 @@ function RegisterPage(){
 
         <div className="field">
           <label className="lbl">تأكيد كلمة المرور</label>
-          <input className="input" type={showPass?'text':'password'} value={form.confirm} onChange={e=>setForm({...form,confirm:e.target.value})} placeholder="أعد كتابة كلمة المرور" autoComplete="new-password"/>
+          <input
+            className="input"
+            type={showPass?'text':'password'}
+            value={form.confirm}
+            onChange={e=>setForm({...form,confirm:e.target.value})}
+            placeholder="أعد كتابة كلمة المرور"
+            autoComplete="new-password"
+          />
         </div>
 
         <div className="mb16">
@@ -255,8 +303,8 @@ function RegisterPage(){
             <span className="sm">الاسم 3 أحرف على الأقل</span>
           </div>
           <div className="check-row">
-            <div className={`check-box ${emailOk?'ok':'no'}`}>{emailOk?'✓':''}</div>
-            <span className="sm">بريد إلكتروني صالح</span>
+            <div className={`check-box ${phoneOk?'ok':'no'}`}>{phoneOk?'✓':''}</div>
+            <span className="sm">رقم هاتف صالح (8 أرقام على الأقل)</span>
           </div>
           <div className="check-row">
             <div className={`check-box ${pwOk?'ok':'no'}`}>{pwOk?'✓':''}</div>
@@ -270,7 +318,7 @@ function RegisterPage(){
 
         {err&&<div className="pill pill-r mb16" style={{width:'100%',justifyContent:'center',padding:'10px 14px'}}>⚠️ {err}</div>}
 
-        <button type="submit" className="btn btn-p btn-block btn-lg" disabled={busy}>
+        <button type="submit" className="btn btn-p btn-block btn-lg" disabled={busy||!!loadErr}>
           {busy?<><span className="spinner"></span> جارٍ الإنشاء...</>:'إنشاء الحساب →'}
         </button>
       </form>

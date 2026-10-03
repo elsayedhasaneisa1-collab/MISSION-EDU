@@ -17,11 +17,13 @@ a{color:inherit;text-decoration:none}
 .glass{background:linear-gradient(180deg,rgba(21,31,56,.72),rgba(11,17,34,.62));border:1px solid var(--border);border-radius:var(--r);backdrop-filter:blur(16px);box-shadow:var(--sh)}
 .h1{font-size:clamp(24px,4vw,32px);font-weight:900;letter-spacing:-.7px}
 .h2{font-size:20px;font-weight:800}
-.sm{font-size:12.5px}.xs{font-size:11.5px}
-.muted{color:var(--muted)}.txt2{color:var(--txt2)}
+.sm{font-size:12.5px}
+.xs{font-size:11.5px}
+.muted{color:var(--muted)}
+.txt2{color:var(--txt2)}
 .grad{background:linear-gradient(100deg,#5aa9ff,#a78bfa 55%,#22d3ee);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .flex{display:flex}.between{justify-content:space-between}.center{align-items:center}.col{flex-direction:column}.wrap{flex-wrap:wrap}
-.g8{gap:8px}.g12{gap:12px}.g16{gap:16px}
+.g6{gap:6px}.g8{gap:8px}.g12{gap:12px}.g16{gap:16px}
 .mt6{margin-top:6px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
 .mb6{margin-bottom:6px}.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:13px 22px;border-radius:14px;font-weight:700;font-size:14.5px;transition:.24s;white-space:nowrap;color:var(--txt)}
@@ -48,6 +50,7 @@ a{color:inherit;text-decoration:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 .divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-size:11.5px;font-weight:600}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.phone-prefix{background:rgba(10,16,32,.72);border:1.5px solid var(--border);border-radius:13px;padding:13px 14px;font-weight:700;font-size:14px;color:var(--txt2);white-space:nowrap;display:flex;align-items:center;gap:6px}
 .toast-host{position:fixed;bottom:26px;inset-inline-start:26px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:min(420px,92vw)}
 .toast{pointer-events:auto;min-width:280px;padding:14px 16px 16px;border-radius:16px;background:linear-gradient(135deg,rgba(21,31,56,.98),rgba(11,17,34,.98));border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.65);animation:slideIn .4s cubic-bezier(.2,.8,.3,1);position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:12px}
 .toast.out{animation:fadeOut .3s forwards}
@@ -113,13 +116,13 @@ function Toast({data,onClose}){
 
 function LoginPage(){
   const DB=window.MissionDB;
-  const [email,setEmail]=useState('');
+  const [phone,setPhone]=useState('');
   const [password,setPassword]=useState('');
   const [busy,setBusy]=useState(false);
   const [err,setErr]=useState('');
   const [showPass,setShowPass]=useState(false);
   const [checking,setChecking]=useState(true);
-  const emailRef=useRef(null);
+  const phoneRef=useRef(null);
 
   useEffect(()=>{
     (async ()=>{
@@ -130,17 +133,19 @@ function LoginPage(){
         DB.clearSession();
       }
       setChecking(false);
-      setTimeout(()=>emailRef.current?.focus(),200);
+      setTimeout(()=>phoneRef.current?.focus(),200);
     })();
   },[]);
 
   const submit=async e=>{
     e.preventDefault();
     setErr('');
-    if(!email||!password){setErr('يرجى تعبئة جميع الحقول');return;}
+    const cleanPhone=phone.replace(/\D/g,'');
+    if(!cleanPhone||!password){setErr('يرجى تعبئة جميع الحقول');return;}
+    if(cleanPhone.length<8){setErr('رقم الهاتف غير صالح');return;}
     setBusy(true);
     try{
-      const u=await DB.login(email,password);
+      const u=await DB.login(cleanPhone,password,'+20');
       window.__toast?.('مرحبًا بك ' + u.name.split(' ')[0],'ok','تم تسجيل الدخول');
       setTimeout(()=>DB.redirectByRole(u),500);
     }catch(ex){
@@ -163,19 +168,46 @@ function LoginPage(){
 
     <div className="glass" style={{padding:26}}>
       <div className="h2 mb6">تسجيل الدخول</div>
-      <div className="sm muted mb20">أدخل بياناتك للوصول إلى لوحتك</div>
+      <div className="sm muted mb20">أدخل رقم هاتفك وكلمة المرور</div>
 
       <form onSubmit={submit}>
         <div className="field">
-          <label className="lbl">البريد الإلكتروني</label>
-          <input ref={emailRef} className="input" type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" dir="ltr"/>
+          <label className="lbl">رقم الهاتف</label>
+          <div style={{display:'flex',gap:8}}>
+            <div className="phone-prefix"><span>🇪🇬</span><span>+20</span></div>
+            <input
+              ref={phoneRef}
+              className="input"
+              type="tel"
+              inputMode="numeric"
+              value={phone}
+              onChange={e=>setPhone(e.target.value.replace(/\D/g,'').slice(0,11))}
+              placeholder="1xxxxxxxxx"
+              autoComplete="tel"
+              dir="ltr"
+              style={{flex:1,textAlign:'left'}}
+            />
+          </div>
+          <div className="xs muted mt6">مثال: 1012345678</div>
         </div>
 
         <div className="field">
           <label className="lbl">كلمة المرور</label>
           <div style={{position:'relative'}}>
-            <input className="input" type={showPass?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••" autoComplete="current-password" style={{paddingInlineStart:44}}/>
-            <button type="button" onClick={()=>setShowPass(v=>!v)} style={{position:'absolute',insetInlineStart:12,top:'50%',transform:'translateY(-50%)',fontSize:16,opacity:.6,color:'var(--txt)'}}>{showPass?'🙈':'👁'}</button>
+            <input
+              className="input"
+              type={showPass?'text':'password'}
+              value={password}
+              onChange={e=>setPassword(e.target.value)}
+              placeholder="••••••"
+              autoComplete="current-password"
+              style={{paddingInlineStart:44}}
+            />
+            <button
+              type="button"
+              onClick={()=>setShowPass(v=>!v)}
+              style={{position:'absolute',insetInlineStart:12,top:'50%',transform:'translateY(-50%)',fontSize:16,opacity:.6,color:'var(--txt)'}}
+            >{showPass?'🙈':'👁'}</button>
           </div>
         </div>
 
