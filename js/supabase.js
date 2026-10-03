@@ -2,7 +2,7 @@ import { createClient } from
   "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 const SUPABASE_URL =
-  "https://szuvpbdwixezecxnykjn.supabase.co/auth/v1/verify?token=9908700656028a6fa7a143456179ddb611cf2fcfcbbbfa59704b03d8&type=signup&redirect_to=http://localhost:3000";
+  "https://szuvpbdwixezecxnykjn.supabase.co";
 
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_NgBzisUuNn6Gdz9PE1XgWg_EYlC5zta";
