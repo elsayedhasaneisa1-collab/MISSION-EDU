@@ -1,0 +1,243 @@
+const SUPABASE_URL = "https://szuvpbdwixezecxnykjn.supabase.co";
+const SUPABASE_KEY = "sb_publishable_NgBzisUuNn6Gdz9PE1XgWg_EYlC5zta";
+
+let _client = null;
+
+async function getClient(){
+  if (_client) return _client;
+  if (!window.supabase){
+    await new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+      s.onload = res;
+      s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+  _client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false }
+  });
+  return _client;
+}
+
+const uid = (p='') => p + Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4);
+const today = () => new Date().toISOString().slice(0,10);
+const daysBetween = (a,b) => Math.round((new Date(b) - new Date(a)) / 86400000);
+const fmt = (n) => new Intl.NumberFormat('ar-EG').format(n||0);
+const pct = (a,b) => b ? Math.round((a/b)*100) : 0;
+
+function setSession(userId){
+  sessionStorage.setItem('me_session', userId);
+  sessionStorage.setItem('me_session_at', Date.now().toString());
+}
+function getSessionId(){ return sessionStorage.getItem('me_session'); }
+function clearSession(){ sessionStorage.removeItem('me_session'); sessionStorage.removeItem('me_session_at'); }
+
+const API = {
+  uid, today, daysBetween, fmt, pct,
+  getSessionId, clearSession,
+
+  async login(email, password, expectedRole){
+    const sb = await getClient();
+    const e = email.toLowerCase().trim();
+    const { data, error } = await sb.from('users').select('*').eq('email', e).maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!data) throw new Error('البريد الإلكتروني غير مسجل');
+    if (data.password !== password) throw new Error('كلمة المرور غير صحيحة');
+    if (data.active === false) throw new Error('الحساب موقوف. تواصل مع الإدارة.');
+
+    if (expectedRole && data.role !== expectedRole){
+      throw new Error(expectedRole === 'admin'
+        ? 'هذا الحساب ليس حساب إدارة — استخدم صفحة تسجيل الطلاب'
+        : 'هذا الحساب ليس حساب طالب — استخدم صفحة دخول الإدارة');
+    }
+
+    const t = today();
+    let streak = data.streak || 0;
+    if (data.last_active && data.last_active !== t){
+      const d = daysBetween(data.last_active, t);
+      streak = d === 1 ? streak + 1 : 1;
+    } else if (!data.last_active) streak = 1;
+
+    const { data: updated } = await sb.from('users')
+      .update({ last_active: t, streak })
+      .eq('id', data.id).select().single();
+
+    setSession(data.id);
+    API.trackActivity({
+      userId:data.id, userName:data.name, userRole:data.role,
+      type:'login', target:data.name, details:{ streak }
+    });
+
+    return updated;
+  },
+
+  async register({ name, email, password, gradeId, role }){
+    if (!name || !email || !password) throw new Error('يرجى تعبئة جميع الحقول');
+    if (password.length < 6) throw new Error('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('البريد الإلكتروني غير صالح');
+
+    const sb = await getClient();
+    const e = email.toLowerCase().trim();
+    const finalRole = role === 'admin' ? 'admin' : 'student';
+
+    const { data: exist } = await sb.from('users').select('id').eq('email', e).maybeSingle();
+    if (exist) throw new Error('البريد الإلكتروني مستخدم بالفعل');
+
+    const { data: roleRow } = await sb.from('roles').select('id').eq('name', finalRole).maybeSingle();
+
+    const u = {
+      id: uid('u_'), email: e, password, name: name.trim(),
+      role: finalRole,
+      role_id: roleRow?.id || (finalRole === 'admin' ? 'role_admin' : 'role_student'),
+      avatar: finalRole === 'admin' ? '👑' : '🧑‍🎓',
+      grade_id: finalRole === 'student' ? (gradeId || '') : null,
+      xp: 0, streak: 1, last_active: today(),
+      created_at: Date.now(), active: true,
+      all_subjects: finalRole === 'student',
+      access_subjects: [],
+      completed_lessons: [],
+      completed_missions: [],
+      achievements: []
+    };
+
+    const { data, error } = await sb.from('users').insert([u]).select().single();
+    if (error) throw new Error(error.message);
+
+    setSession(u.id);
+    API.trackActivity({
+      userId: u.id, userName: u.name, userRole: u.role,
+      type:'register', target: u.name, details:{ role: u.role }
+    });
+
+    return data;
+  },
+
+  async createAdmin({ name, email, password }){
+    return API.register({ name, email, password, role: 'admin' });
+  },
+
+  async getUser(id){
+    const sb = await getClient();
+    const { data } = await sb.from('users').select('*').eq('id', id).maybeSingle();
+    return data;
+  },
+
+  async countUsers(){
+    const sb = await getClient();
+    const { count } = await sb.from('users').select('*', { count:'exact', head:true });
+    return count || 0;
+  },
+
+  async loadRoles(){
+    const sb = await getClient();
+    const { data } = await sb.from('roles').select('*');
+    return data || [];
+  },
+
+  async loadAll(){
+    const sb = await getClient();
+    const tables = ['users','grades','subjects','units','lessons','questions',
+                    'exams','missions','achievements','levels','notifications','activity','roles'];
+    const results = await Promise.all(tables.map(t =>
+      sb.from(t).select('*').order('created_at', { ascending: false }).limit(3000)
+    ));
+    const db = {};
+    tables.forEach((t, i) => { db[t] = results[i].error ? [] : (results[i].data || []); });
+    return db;
+  },
+
+  async save(table, item){
+    const sb = await getClient();
+    const record = item.id ? item : { ...item, id: uid(table.slice(0,3)+'_'), created_at: Date.now() };
+    if (record.id && !record.created_at) record.created_at = Date.now();
+    const { data, error } = await sb.from(table).upsert(record).select().single();
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
+  async remove(table, id){
+    const sb = await getClient();
+    const { error } = await sb.from(table).delete().eq('id', id);
+    if (error) throw new Error(error.message);
+  },
+
+  async updateUser(id, patch){
+    const sb = await getClient();
+    const { data, error } = await sb.from('users').update(patch).eq('id', id).select().single();
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
+  async getTop10(){
+    const sb = await getClient();
+    const { data } = await sb.from('users').select('*')
+      .eq('role','student').eq('active', true)
+      .order('xp', { ascending: false }).limit(10);
+    return data || [];
+  },
+
+  async trackActivity({ userId, userName, userRole, type, target, details }){
+    try {
+      const sb = await getClient();
+      await sb.from('activity').insert([{
+        id: uid('act_'), user_id: userId, user_name: userName,
+        user_role: userRole || 'student', type, target: target || '',
+        details: details || {}, at: Date.now(), created_at: Date.now()
+      }]);
+    } catch(e){}
+  },
+
+  async saveAttempt({ userId, examId, score, total, pct, passed, answers }){
+    const sb = await getClient();
+    const row = { id: uid('att_'), user_id: userId, exam_id: examId,
+      score, total, pct, passed, answers, at: Date.now(), created_at: Date.now() };
+    const { data, error } = await sb.from('exam_attempts').insert([row]).select().single();
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
+  async getAttempts(userId){
+    const sb = await getClient();
+    const { data } = await sb.from('exam_attempts').select('*').eq('user_id', userId).order('at', {ascending:false});
+    return data || [];
+  },
+
+  async saveError({ userId, questionId, given, correct, lessonId }){
+    const sb = await getClient();
+    const { data: exist } = await sb.from('user_errors')
+      .select('*').eq('user_id', userId).eq('question_id', questionId).maybeSingle();
+    if (exist){
+      return API.save('user_errors', { ...exist, given, correct, count: (exist.count||1)+1, at: Date.now() });
+    }
+    return API.save('user_errors', {
+      id: uid('err_'), user_id: userId, question_id: questionId,
+      given, correct, lesson_id: lessonId, count: 1, at: Date.now(), created_at: Date.now()
+    });
+  },
+
+  async getErrors(userId){
+    const sb = await getClient();
+    const { data } = await sb.from('user_errors').select('*').eq('user_id', userId).order('at', {ascending:false});
+    return data || [];
+  },
+
+  ytId(url){
+    if (!url) return '';
+    const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([\w-]{11})/);
+    return m ? m[1] : url.trim();
+  },
+  vimeoId(url){
+    if (!url) return '';
+    const m = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+    return m ? m[1] : url.trim();
+  },
+
+  redirectByRole(user){
+    if (!user) { window.location.href = 'login.html'; return; }
+    if (user.role === 'admin') window.location.href = 'admin.html';
+    else window.location.href = 'student.html';
+  }
+};
+
+window.MissionDB = API;

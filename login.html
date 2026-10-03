@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>تسجيل الدخول | MISSION EDU</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--red:#ef4444;--amber:#f59e0b;--violet:#8b5cf6;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.45)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(47,125,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(139,92,246,.14),transparent 60%),radial-gradient(800px 500px at 50% 115%,rgba(6,182,212,.09),transparent 60%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;line-height:1.7;display:flex;align-items:center;justify-content:center;padding:20px}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:rgba(90,140,230,.25);border-radius:20px}
+button,input,select,textarea{font-family:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+a{color:inherit;text-decoration:none}
+.glass{background:linear-gradient(180deg,rgba(21,31,56,.72),rgba(11,17,34,.62));border:1px solid var(--border);border-radius:var(--r);backdrop-filter:blur(16px);box-shadow:var(--sh)}
+.h1{font-size:clamp(24px,4vw,32px);font-weight:900;letter-spacing:-.7px}
+.h2{font-size:20px;font-weight:800}
+.h3{font-size:16px;font-weight:800}
+.h4{font-size:14.5px;font-weight:700}
+.sm{font-size:12.5px}.xs{font-size:11.5px}
+.muted{color:var(--muted)}.txt2{color:var(--txt2)}
+.grad{background:linear-gradient(100deg,#5aa9ff,#a78bfa 55%,#22d3ee);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.flex{display:flex}.between{justify-content:space-between}.center{align-items:center}.col{flex-direction:column}.wrap{flex-wrap:wrap}
+.g6{gap:6px}.g8{gap:8px}.g12{gap:12px}.g16{gap:16px}
+.mt6{margin-top:6px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
+.mb6{margin-bottom:6px}.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:13px 22px;border-radius:14px;font-weight:700;font-size:14.5px;transition:.24s;white-space:nowrap;color:var(--txt)}
+.btn:active{transform:scale(.97)}
+.btn-p{background:linear-gradient(135deg,#2f7dff,#1f5fd6);color:#fff;box-shadow:0 10px 28px rgba(47,125,255,.36)}
+.btn-p:hover:not(:disabled){box-shadow:0 14px 38px rgba(47,125,255,.55);transform:translateY(-2px)}
+.btn-s{background:rgba(255,255,255,.05);color:var(--txt2);border:1px solid var(--border)}
+.btn-s:hover{background:rgba(255,255,255,.09);color:var(--txt)}
+.btn-block{width:100%}
+.btn:disabled{opacity:.42;cursor:not-allowed}
+.btn-lg{padding:15px 32px;font-size:16px;border-radius:16px}
+.input,select.input{width:100%;padding:13px 16px;border-radius:13px;background:rgba(10,16,32,.72);border:1.5px solid var(--border);outline:none;font-size:14.5px;transition:.22s;color:var(--txt)}
+.input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.12)}
+.lbl{display:block;font-size:12.5px;font-weight:700;color:var(--txt2);margin-bottom:7px}
+.field{margin-bottom:14px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:40px;font-size:12px;font-weight:700;border:1px solid transparent}
+.pill-r{background:rgba(239,68,68,.14);color:#fca5a5;border-color:rgba(239,68,68,.32)}
+.pill-b{background:rgba(47,125,255,.15);color:#7db6ff;border-color:rgba(47,125,255,.28)}
+.pill-g{background:rgba(34,197,94,.14);color:#6ee7a0;border-color:rgba(34,197,94,.28)}
+.role-tabs{display:flex;gap:6px;padding:5px;background:rgba(255,255,255,.03);border-radius:13px;margin-bottom:20px}
+.role-tab{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px 12px;border-radius:11px;font-weight:700;font-size:13.5px;color:var(--txt2);transition:.22s;background:transparent;border:1px solid transparent}
+.role-tab:hover{color:var(--txt);background:rgba(47,125,255,.06)}
+.role-tab.on{background:linear-gradient(90deg,rgba(47,125,255,.22),rgba(47,125,255,.06));border-color:var(--blue);color:#fff;box-shadow:0 4px 20px rgba(47,125,255,.20)}
+.role-tab .ico{font-size:18px}
+.brand-logo{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;font-size:30px;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 12px 34px rgba(47,125,255,.45);font-weight:900}
+.login-wrap{width:100%;max-width:460px;animation:fu .5s cubic-bezier(.2,.8,.3,1)}
+@keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:none}}
+@keyframes fadeOut{to{opacity:0;transform:translateX(-30px)}}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.link{color:var(--blue2);font-weight:700;transition:.2s}
+.link:hover{color:#a5c9ff;text-decoration:underline}
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-size:11.5px;font-weight:600}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.toast-host{position:fixed;bottom:26px;inset-inline-start:26px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:min(420px,92vw)}
+.toast{pointer-events:auto;min-width:280px;padding:14px 16px 16px;border-radius:16px;background:linear-gradient(135deg,rgba(21,31,56,.98),rgba(11,17,34,.98));border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.65);animation:slideIn .4s cubic-bezier(.2,.8,.3,1);position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:12px}
+.toast.out{animation:fadeOut .3s forwards}
+.toast-ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex-shrink:0}
+.toast-body{flex:1;min-width:0}
+.toast-title{font-weight:800;font-size:13.5px;margin-bottom:3px}
+.toast-msg{font-size:12.5px;color:var(--txt2);line-height:1.55}
+.toast-bar{position:absolute;bottom:0;inset-inline:0;height:3px;background:rgba(255,255,255,.06)}
+.toast-bar-f{height:100%;transition:width linear}
+.toast.ok .toast-ico{background:rgba(34,197,94,.18);color:#6ee7a0}
+.toast.ok .toast-bar-f{background:linear-gradient(90deg,#16a34a,#4ade80)}
+.toast.err .toast-ico{background:rgba(239,68,68,.18);color:#fca5a5}
+.toast.err .toast-bar-f{background:linear-gradient(90deg,#dc2626,#f87171)}
+.toast.warn .toast-ico{background:rgba(245,158,11,.18);color:#fcd34d}
+.toast.warn .toast-bar-f{background:linear-gradient(90deg,#d97706,#fbbf24)}
+.toast.info .toast-ico{background:rgba(47,125,255,.18);color:#7db6ff}
+.toast.info .toast-bar-f{background:linear-gradient(90deg,#2f7dff,#5aa9ff)}
+@media(max-width:520px){.role-tab{font-size:12.5px;padding:10px 8px}.brand-logo{width:56px;height:56px;font-size:26px}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="db.js"></script>
+<script type="text/babel" data-presets="react">
+const {useState,useEffect,useCallback,useRef} = React;
+
+function ToastHost(){
+  const [items,setItems]=useState([]);
+  const push=useCallback((msg,type='info',title,duration=3800)=>{
+    const id=window.MissionDB.uid('t_');
+    const titles={ok:'تم بنجاح',err:'خطأ',warn:'تنبيه',info:'معلومة'};
+    setItems(x=>[...x,{id,msg,type,title:title||titles[type]||'',duration}]);
+  },[]);
+  window.__toast=push;
+  const remove=useCallback(id=>setItems(x=>x.filter(t=>t.id!==id)),[]);
+  return <div className="toast-host">{items.map(t=><Toast key={t.id} data={t} onClose={()=>remove(t.id)}/>)}</div>;
+}
+function Toast({data,onClose}){
+  const [out,setOut]=useState(false);const [p,setP]=useState(100);
+  useEffect(()=>{const s=Date.now();const t=setInterval(()=>{const v=Math.max(0,100-((Date.now()-s)/data.duration)*100);setP(v);if(v<=0){clearInterval(t);setOut(true);setTimeout(onClose,280);}},40);return()=>clearInterval(t);},[]);
+  const icons={ok:'✓',err:'✕',warn:'!',info:'i'};
+  return <div className={`toast ${data.type} ${out?'out':''}`}>
+    <div className="toast-ico">{icons[data.type]}</div>
+    <div className="toast-body">{data.title&&<div className="toast-title">{data.title}</div>}<div className="toast-msg">{data.msg}</div></div>
+    <div className="toast-bar"><div className="toast-bar-f" style={{width:`${p}%`,transitionDuration:'40ms'}}/></div>
+  </div>;
+}
+
+function LoginPage(){
+  const DB=window.MissionDB;
+  const [role,setRole]=useState('student');
+  const [email,setEmail]=useState('');
+  const [password,setPassword]=useState('');
+  const [busy,setBusy]=useState(false);
+  const [err,setErr]=useState('');
+  const [showPass,setShowPass]=useState(false);
+  const [checking,setChecking]=useState(true);
+  const emailRef=useRef(null);
+
+  useEffect(()=>{
+    (async ()=>{
+      const sid=DB.getSessionId();
+      if(sid){
+        const u=await DB.getUser(sid);
+        if(u) return DB.redirectByRole(u);
+      }
+      setChecking(false);
+      setTimeout(()=>emailRef.current?.focus(),200);
+    })();
+  },[]);
+
+  const submit=async e=>{
+    e.preventDefault();setErr('');
+    if(!email||!password){setErr('يرجى تعبئة جميع الحقول');return;}
+    setBusy(true);
+    try{
+      const u=await DB.login(email,password,role);
+      window.__toast?.('مرحبًا بك ' + u.name.split(' ')[0],'ok','تم تسجيل الدخول');
+      setTimeout(()=>DB.redirectByRole(u),500);
+    }catch(ex){
+      setErr(ex.message);
+      window.__toast?.(ex.message,'err');
+      setBusy(false);
+    }
+  };
+
+  if(checking) return <div style={{color:'var(--muted)'}}>جارٍ التحقق...</div>;
+
+  return <div className="login-wrap">
+    <div className="flex col center mb20" style={{gap:14,textAlign:'center'}}>
+      <div className="brand-logo">🚀</div>
+      <div>
+        <div className="h1 grad">MISSION EDU</div>
+        <div className="sm muted mt6">منصة تعليمية تحوّل المنهج إلى مهام</div>
+      </div>
+    </div>
+
+    <div className="glass" style={{padding:26}}>
+      <div className="h2 mb6">تسجيل الدخول</div>
+      <div className="sm muted mb20">اختر نوع الحساب ثم أدخل بياناتك</div>
+
+      <div className="role-tabs">
+        <button type="button" className={`role-tab ${role==='student'?'on':''}`} onClick={()=>{setRole('student');setErr('');}}>
+          <span className="ico">🧑‍🎓</span> طالب
+        </button>
+        <button type="button" className={`role-tab ${role==='admin'?'on':''}`} onClick={()=>{setRole('admin');setErr('');}}>
+          <span className="ico">👑</span> مدير
+        </button>
+      </div>
+
+      <form onSubmit={submit}>
+        <div className="field">
+          <label className="lbl">البريد الإلكتروني</label>
+          <input ref={emailRef} className="input" type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder={role==='admin'?'admin@example.com':'student@example.com'} autoComplete="email" dir="ltr"/>
+        </div>
+
+        <div className="field">
+          <label className="lbl">كلمة المرور</label>
+          <div style={{position:'relative'}}>
+            <input className="input" type={showPass?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••" autoComplete="current-password" style={{paddingInlineStart:44}}/>
+            <button type="button" onClick={()=>setShowPass(v=>!v)} style={{position:'absolute',insetInlineStart:12,top:'50%',transform:'translateY(-50%)',fontSize:16,opacity:.6,color:'var(--txt)'}}>{showPass?'🙈':'👁'}</button>
+          </div>
+        </div>
+
+        {err&&<div className="pill pill-r mb16" style={{width:'100%',justifyContent:'center',padding:'10px 14px'}}>⚠️ {err}</div>}
+
+        <button type="submit" className="btn btn-p btn-block btn-lg" disabled={busy}>
+          {busy?<><span className="spinner"></span> جارٍ الدخول...</>:'دخول →'}
+        </button>
+      </form>
+
+      <div className="divider">ليس لديك حساب؟</div>
+
+      <a href="register.html" className="btn btn-s btn-block">
+        <span>✚</span> إنشاء حساب جديد
+      </a>
+    </div>
+
+    <div className="mt16" style={{textAlign:'center'}}>
+      <div className="xs muted">بالمتابعة أنت توافق على شروط الاستخدام وسياسة الخصوصية</div>
+    </div>
+  </div>;
+}
+
+function App(){
+  return <><ToastHost/><LoginPage/></>;
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
