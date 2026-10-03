@@ -47,25 +47,13 @@ const setSession = (userId) => {
   } catch (e) {}
 };
 const getSessionId = () => {
-  try {
-    return sessionStorage.getItem("me_session");
-  } catch (e) {
-    return null;
-  }
+  try { return sessionStorage.getItem("me_session"); } catch (e) { return null; }
 };
 const clearSession = () => {
   try {
     sessionStorage.removeItem("me_session");
     sessionStorage.removeItem("me_session_at");
   } catch (e) {}
-};
-
-const basePath = () => {
-  const p = window.location.pathname;
-  if (p.includes("/admin/")) return "..";
-  if (p.includes("/student/")) return "..";
-  if (p.includes("/auth/")) return "..";
-  return ".";
 };
 
 const TELEGRAM_BOT_TOKEN = "8608883224:AAHKSjsJ3NZQ_lGCsbFlIS3vxNqKskgIZi8";
@@ -84,14 +72,12 @@ const sendToTelegram = async (message) => {
       })
     });
     return res.ok;
-  } catch (e) {
-    return false;
-  }
+  } catch (e) { return false; }
 };
 
 const API = {
   uid, today, daysBetween, fmt, pct,
-  getSessionId, clearSession, setSession, getClient, basePath,
+  getSessionId, clearSession, setSession, getClient,
   hashPassword, sendToTelegram,
 
   async login(phone, password, countryCode = "+20") {
@@ -100,8 +86,7 @@ const API = {
     if (!cleanPhone) throw new Error("رقم الهاتف مطلوب");
 
     const { data, error } = await sb
-      .from("users")
-      .select("*")
+      .from("users").select("*")
       .eq("phone", cleanPhone)
       .eq("country_code", countryCode)
       .maybeSingle();
@@ -124,9 +109,7 @@ const API = {
     const { data: updated } = await sb
       .from("users")
       .update({ last_active: t, streak })
-      .eq("id", data.id)
-      .select()
-      .single();
+      .eq("id", data.id).select().single();
 
     setSession(data.id);
     API.trackActivity({
@@ -145,20 +128,15 @@ const API = {
     if (cleanPhone.length < 8) throw new Error("رقم الهاتف غير صالح");
 
     const sb = await getClient();
-
     const { data: exist } = await sb
-      .from("users")
-      .select("id")
+      .from("users").select("id")
       .eq("phone", cleanPhone)
       .eq("country_code", countryCode)
       .maybeSingle();
     if (exist) throw new Error("رقم الهاتف مستخدم بالفعل");
 
     const { data: roleRow } = await sb
-      .from("roles")
-      .select("id")
-      .eq("name", "student")
-      .maybeSingle();
+      .from("roles").select("id").eq("name", "student").maybeSingle();
 
     const hashed = await hashPassword(password);
 
@@ -174,16 +152,10 @@ const API = {
       role_id: roleRow ? roleRow.id : "role_student",
       avatar: "🧑‍🎓",
       grade_id: gradeId || "",
-      xp: 0,
-      streak: 1,
-      last_active: today(),
-      created_at: Date.now(),
-      active: true,
-      all_subjects: true,
-      access_subjects: [],
-      completed_lessons: [],
-      completed_missions: [],
-      achievements: []
+      xp: 0, streak: 1, last_active: today(),
+      created_at: Date.now(), active: true,
+      all_subjects: true, access_subjects: [],
+      completed_lessons: [], completed_missions: [], achievements: []
     };
 
     const { data, error } = await sb.from("users").insert([u]).select().single();
@@ -205,39 +177,26 @@ const API = {
       const sb = await getClient();
       const { data } = await sb.from("users").select("*").eq("id", id).maybeSingle();
       return data || null;
-    } catch (e) {
-      return null;
-    }
+    } catch (e) { return null; }
   },
 
   async countUsers() {
     try {
       const sb = await getClient();
-      const { count } = await sb
-        .from("users")
-        .select("*", { count: "exact", head: true });
+      const { count } = await sb.from("users").select("*", { count: "exact", head: true });
       return count || 0;
-    } catch (e) {
-      return 0;
-    }
+    } catch (e) { return 0; }
   },
 
   async loadAll() {
     const sb = await getClient();
-    const tables = [
-      "users", "grades", "subjects", "units", "lessons", "questions",
-      "exams", "missions", "achievements", "levels", "notifications",
-      "activity", "roles"
-    ];
+    const tables = ["users","grades","subjects","units","lessons","questions",
+                    "exams","missions","achievements","levels","notifications","activity","roles"];
     const results = await Promise.all(
-      tables.map((t) =>
-        sb.from(t).select("*").order("created_at", { ascending: false }).limit(3000)
-      )
+      tables.map((t) => sb.from(t).select("*").order("created_at", { ascending: false }).limit(3000))
     );
     const db = {};
-    tables.forEach((t, i) => {
-      db[t] = results[i].error ? [] : results[i].data || [];
-    });
+    tables.forEach((t, i) => { db[t] = results[i].error ? [] : results[i].data || []; });
     return db;
   },
 
@@ -258,12 +217,7 @@ const API = {
 
   async updateUser(id, patch) {
     const sb = await getClient();
-    const { data, error } = await sb
-      .from("users")
-      .update(patch)
-      .eq("id", id)
-      .select()
-      .single();
+    const { data, error } = await sb.from("users").update(patch).eq("id", id).select().single();
     if (error) throw new Error(error.message);
     return data;
   },
@@ -271,17 +225,11 @@ const API = {
   async getTop10() {
     try {
       const sb = await getClient();
-      const { data } = await sb
-        .from("users")
-        .select("*")
-        .eq("role", "student")
-        .eq("active", true)
-        .order("xp", { ascending: false })
-        .limit(10);
+      const { data } = await sb.from("users").select("*")
+        .eq("role", "student").eq("active", true)
+        .order("xp", { ascending: false }).limit(10);
       return data || [];
-    } catch (e) {
-      return [];
-    }
+    } catch (e) { return []; }
   },
 
   async trackActivity({ userId, userName, userRole, type, target, details }) {
@@ -289,14 +237,11 @@ const API = {
       const sb = await getClient();
       await sb.from("activity").insert([{
         id: uid("act_"),
-        user_id: userId,
-        user_name: userName,
+        user_id: userId, user_name: userName,
         user_role: userRole || "student",
-        type,
-        target: target || "",
+        type, target: target || "",
         details: details || {},
-        at: Date.now(),
-        created_at: Date.now()
+        at: Date.now(), created_at: Date.now()
       }]);
     } catch (e) {}
   },
@@ -304,18 +249,11 @@ const API = {
   async saveAttempt({ userId, examId, score, total, pct, passed, answers }) {
     const sb = await getClient();
     const row = {
-      id: uid("att_"),
-      user_id: userId,
-      exam_id: examId,
+      id: uid("att_"), user_id: userId, exam_id: examId,
       score, total, pct, passed, answers,
-      at: Date.now(),
-      created_at: Date.now()
+      at: Date.now(), created_at: Date.now()
     };
-    const { data, error } = await sb
-      .from("exam_attempts")
-      .insert([row])
-      .select()
-      .single();
+    const { data, error } = await sb.from("exam_attempts").insert([row]).select().single();
     if (error) throw new Error(error.message);
     return data;
   },
@@ -324,43 +262,27 @@ const API = {
     if (!userId) return [];
     try {
       const sb = await getClient();
-      const { data } = await sb
-        .from("exam_attempts")
-        .select("*")
-        .eq("user_id", userId)
-        .order("at", { ascending: false });
+      const { data } = await sb.from("exam_attempts").select("*")
+        .eq("user_id", userId).order("at", { ascending: false });
       return data || [];
-    } catch (e) {
-      return [];
-    }
+    } catch (e) { return []; }
   },
 
   async saveError({ userId, questionId, given, correct, lessonId }) {
     const sb = await getClient();
-    const { data: exist } = await sb
-      .from("user_errors")
-      .select("*")
-      .eq("user_id", userId)
-      .eq("question_id", questionId)
-      .maybeSingle();
+    const { data: exist } = await sb.from("user_errors").select("*")
+      .eq("user_id", userId).eq("question_id", questionId).maybeSingle();
 
     if (exist) {
       return API.save("user_errors", {
-        ...exist,
-        given,
-        correct,
-        count: (exist.count || 1) + 1,
-        at: Date.now()
+        ...exist, given, correct,
+        count: (exist.count || 1) + 1, at: Date.now()
       });
     }
     return API.save("user_errors", {
-      id: uid("err_"),
-      user_id: userId,
-      question_id: questionId,
-      lesson_id: lessonId,
-      given, correct, count: 1,
-      at: Date.now(),
-      created_at: Date.now()
+      id: uid("err_"), user_id: userId, question_id: questionId,
+      lesson_id: lessonId, given, correct, count: 1,
+      at: Date.now(), created_at: Date.now()
     });
   },
 
@@ -368,15 +290,10 @@ const API = {
     if (!userId) return [];
     try {
       const sb = await getClient();
-      const { data } = await sb
-        .from("user_errors")
-        .select("*")
-        .eq("user_id", userId)
-        .order("at", { ascending: false });
+      const { data } = await sb.from("user_errors").select("*")
+        .eq("user_id", userId).order("at", { ascending: false });
       return data || [];
-    } catch (e) {
-      return [];
-    }
+    } catch (e) { return []; }
   },
 
   async reportIssue({ userName, userPhone, message }) {
@@ -393,9 +310,7 @@ const API = {
         id: uid("rep_"),
         user_name: userName || "غير معروف",
         user_phone: userPhone || "—",
-        message,
-        sent_to_telegram: true,
-        created_at: Date.now()
+        message, sent_to_telegram: true, created_at: Date.now()
       }]);
     } catch (e) {}
 
@@ -426,21 +341,11 @@ const API = {
     }
   },
 
-  gotoLogin() {
-    window.location.replace("./auth/login.html");
-  },
-  gotoRegister() {
-    window.location.replace("./auth/register.html");
-  },
-  gotoAdmin() {
-    window.location.replace("./admin/index.html");
-  },
-  gotoStudent() {
-    window.location.replace("./student/index.html");
-  },
-  gotoHome() {
-    window.location.replace("./index.html");
-  }
+  gotoLogin() { window.location.replace("./auth/login.html"); },
+  gotoRegister() { window.location.replace("./auth/register.html"); },
+  gotoAdmin() { window.location.replace("./admin/index.html"); },
+  gotoStudent() { window.location.replace("./student/index.html"); },
+  gotoHome() { window.location.replace("./index.html"); }
 };
 
 window.MissionDB = API;
