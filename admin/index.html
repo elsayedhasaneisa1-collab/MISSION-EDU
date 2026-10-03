@@ -1,1 +1,917 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin | MISSION EDU</title><link rel="stylesheet" href="../css/theme.css"><link rel="stylesheet" href="../css/components.css"><link rel="stylesheet" href="../css/responsive.css"></head><body><main class="content standalone"><div class="page-head"><div><span class="eyebrow">CONTROL CENTER</span><h1>لوحة الإدارة</h1></div><span class="badge admin">ADMIN</span></div><div class="stats-grid"><article class="stat"><span>الطلاب</span><strong id="students">—</strong></article><article class="stat"><span>الدورات</span><strong id="courses">—</strong></article><article class="stat"><span>السجلات</span><strong id="logs">—</strong></article></div><section class="panel"><h2>Security Center</h2><ul class="security-list"><li>✓ التحقق من الجلسة</li><li>✓ صلاحيات RLS في قاعدة البيانات</li><li>✓ تسجيل عمليات الإدارة</li><li>✓ عدم استخدام Service Role داخل المتصفح</li></ul></section><a href="../index.html">الرئيسية</a></main><script type="module" src="../js/admin.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>MISSION EDU — لوحة الأدمن</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#8b5cf6;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.45)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(47,125,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(139,92,246,.14),transparent 60%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;line-height:1.7}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:rgba(90,140,230,.25);border-radius:20px}
+button,input,select,textarea{font-family:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+ul{list-style:none}
+.glass{background:linear-gradient(180deg,rgba(21,31,56,.72),rgba(11,17,34,.62));border:1px solid var(--border);border-radius:var(--r);backdrop-filter:blur(16px);box-shadow:var(--sh)}
+.glass-s{background:rgba(21,31,56,.62);border:1px solid var(--border);border-radius:var(--rs)}
+.hv{transition:.28s cubic-bezier(.2,.8,.3,1)}
+.hv:hover{transform:translateY(-4px);border-color:var(--border2)}
+.app{display:flex;min-height:100vh}
+.sidebar{width:264px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;padding:18px 12px;display:flex;flex-direction:column;gap:6px;background:linear-gradient(180deg,rgba(9,14,29,.94),rgba(6,9,20,.9));border-inline-start:1px solid var(--border);z-index:60}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.content{padding:22px 26px 100px;max-width:1440px;width:100%;margin:0 auto;animation:fu .5s}
+@keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:none}}
+@keyframes fadeOut{to{opacity:0;transform:translateX(-30px)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.brand{display:flex;align-items:center;gap:11px;padding:8px 10px 16px}
+.brand-logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:22px;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 8px 26px rgba(47,125,255,.45);font-weight:900}
+.brand-name{font-weight:900;font-size:17px}
+.brand-sub{font-size:10.5px;color:var(--muted);font-weight:600}
+.nav-i{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:13px;color:var(--txt2);font-size:14px;font-weight:600;transition:.22s;width:100%;text-align:right;position:relative}
+.nav-i:hover{background:rgba(47,125,255,.09);color:var(--txt)}
+.nav-i.on{background:linear-gradient(90deg,rgba(47,125,255,.22),rgba(47,125,255,.03));color:#fff}
+.nav-i.on::before{content:'';position:absolute;inset-inline-end:0;top:22%;height:56%;width:3px;border-radius:4px;background:linear-gradient(180deg,#2f7dff,#8b5cf6);box-shadow:0 0 12px var(--blue)}
+.nav-ico{font-size:16px;width:22px;text-align:center}
+.nav-gt{font-size:10.5px;font-weight:800;color:var(--muted);letter-spacing:1px;padding:14px 14px 4px}
+.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:12px 26px;background:rgba(6,9,20,.72);backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
+.search{flex:1;max-width:520px;display:flex;align-items:center;gap:10px;background:rgba(18,26,48,.7);border:1px solid var(--border);border-radius:14px;padding:8px 14px}
+.search input{flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--txt)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:11px 20px;border-radius:13px;font-weight:700;font-size:14px;transition:.24s;white-space:nowrap;color:var(--txt)}
+.btn:active{transform:scale(.97)}
+.btn-p{background:linear-gradient(135deg,#2f7dff,#1f5fd6);color:#fff;box-shadow:0 10px 28px rgba(47,125,255,.36)}
+.btn-p:hover{box-shadow:0 14px 38px rgba(47,125,255,.55);transform:translateY(-2px)}
+.btn-s{background:rgba(255,255,255,.05);color:var(--txt2);border:1px solid var(--border)}
+.btn-s:hover{background:rgba(255,255,255,.09);color:var(--txt)}
+.btn-ok{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff}
+.btn-dn{background:rgba(239,68,68,.14);color:#fca5a5;border:1px solid rgba(239,68,68,.32)}
+.btn-dn:hover{background:rgba(239,68,68,.24)}
+.btn-sm{padding:7px 13px;font-size:12.5px;border-radius:10px}
+.btn-block{width:100%}
+.btn:disabled{opacity:.42;cursor:not-allowed}
+.h1{font-size:clamp(21px,3.2vw,30px);font-weight:900;letter-spacing:-.7px}
+.h2{font-size:clamp(17px,2.3vw,22px);font-weight:800}
+.h3{font-size:16px;font-weight:800}
+.h4{font-size:14.5px;font-weight:700}
+.muted{color:var(--muted)}
+.txt2{color:var(--txt2)}
+.sm{font-size:12.5px}
+.xs{font-size:11.5px}
+.grad{background:linear-gradient(100deg,#5aa9ff,#a78bfa 55%,#22d3ee);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.flex{display:flex}.between{justify-content:space-between}.center{align-items:center}
+.wrap{flex-wrap:wrap}.col{flex-direction:column}
+.g6{gap:6px}.g8{gap:8px}.g12{gap:12px}.g16{gap:16px}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
+.mb6{margin-bottom:6px}.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:40px;font-size:11.5px;font-weight:700;border:1px solid transparent}
+.pill-b{background:rgba(47,125,255,.15);color:#7db6ff;border-color:rgba(47,125,255,.28)}
+.pill-g{background:rgba(34,197,94,.14);color:#6ee7a0;border-color:rgba(34,197,94,.28)}
+.pill-a{background:rgba(245,158,11,.14);color:#fcd34d;border-color:rgba(245,158,11,.28)}
+.pill-r{background:rgba(239,68,68,.14);color:#fca5a5;border-color:rgba(239,68,68,.28)}
+.pill-v{background:rgba(139,92,246,.15);color:#c4b5fd;border-color:rgba(139,92,246,.28)}
+.pill-y{background:rgba(255,255,255,.06);color:var(--muted);border-color:var(--border)}
+.bar{height:9px;border-radius:20px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar-f{height:100%;border-radius:20px;transition:width .8s cubic-bezier(.2,.8,.3,1);position:relative;overflow:hidden}
+.bar-f::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);background-size:400px 100%;animation:shimmer 2.4s infinite linear}
+.bar-b{background:linear-gradient(90deg,#2f7dff,#5aa9ff)}
+.input,select.input,textarea.input{width:100%;padding:11px 14px;border-radius:12px;background:rgba(10,16,32,.72);border:1.5px solid var(--border);outline:none;font-size:14px;transition:.22s;color:var(--txt)}
+.input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.12)}
+select.input{cursor:pointer;appearance:none;padding-left:38px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237f93b8' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:left 14px center}
+textarea.input{resize:vertical;min-height:80px;font-family:inherit}
+.lbl{display:block;font-size:12.5px;font-weight:700;color:var(--txt2);margin-bottom:6px}
+.stat-n{font-size:clamp(21px,3vw,28px);font-weight:900;letter-spacing:-1px;line-height:1.1}
+.stat-l{font-size:11.5px;color:var(--muted);font-weight:600}
+.div{height:1px;background:var(--border);margin:14px 0}
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th{text-align:right;padding:10px 12px;color:var(--muted);font-weight:700;font-size:11.5px;border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl td{padding:11px 12px;border-bottom:1px solid rgba(90,140,230,.08);vertical-align:middle}
+.tbl tr:hover td{background:rgba(47,125,255,.045)}
+.sx{overflow-x:auto}
+.avatar{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:14px;background:linear-gradient(140deg,#2f7dff,#8b5cf6);color:#fff;flex-shrink:0}
+.icon-btn{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid var(--border);transition:.2s;font-size:16px;color:var(--txt)}
+.icon-btn:hover{background:rgba(47,125,255,.15);border-color:var(--border2)}
+.toast-host{position:fixed;bottom:26px;inset-inline-start:26px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:min(440px,92vw)}
+.toast{pointer-events:auto;min-width:280px;padding:14px 16px 16px;border-radius:16px;background:linear-gradient(135deg,rgba(21,31,56,.98),rgba(11,17,34,.98));border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.65);animation:slideIn .4s cubic-bezier(.2,.8,.3,1);position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:12px}
+.toast.out{animation:fadeOut .3s forwards}
+.toast-ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex-shrink:0}
+.toast-body{flex:1;min-width:0}
+.toast-title{font-weight:800;font-size:13.5px;margin-bottom:3px}
+.toast-msg{font-size:12.5px;color:var(--txt2);line-height:1.55;word-break:break-word}
+.toast-bar{position:absolute;bottom:0;inset-inline:0;height:3px;background:rgba(255,255,255,.06)}
+.toast-bar-f{height:100%;transition:width linear}
+.toast-close{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font-size:12px;color:var(--muted);background:rgba(255,255,255,.05);flex-shrink:0}
+.toast.ok .toast-ico{background:rgba(34,197,94,.18);color:#6ee7a0}
+.toast.ok .toast-bar-f{background:linear-gradient(90deg,#16a34a,#4ade80)}
+.toast.err .toast-ico{background:rgba(239,68,68,.18);color:#fca5a5}
+.toast.err .toast-bar-f{background:linear-gradient(90deg,#dc2626,#f87171)}
+.toast.warn .toast-ico{background:rgba(245,158,11,.18);color:#fcd34d}
+.toast.warn .toast-bar-f{background:linear-gradient(90deg,#d97706,#fbbf24)}
+.toast.info .toast-ico{background:rgba(47,125,255,.18);color:#7db6ff}
+.toast.info .toast-bar-f{background:linear-gradient(90deg,#2f7dff,#5aa9ff)}
+.modal-bg{position:fixed;inset:0;background:rgba(3,5,12,.78);backdrop-filter:blur(8px);z-index:900;display:grid;place-items:center;padding:18px;overflow-y:auto}
+.modal{width:100%;max-width:600px;max-height:90vh;overflow-y:auto;padding:22px;animation:pop .32s}
+.modal.wide{max-width:820px}
+.mbar{display:none}
+.hero{padding:24px;border-radius:22px;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(47,125,255,.18),rgba(139,92,246,.12) 50%,rgba(6,182,212,.08));border:1px solid var(--border)}
+.vid-preview{aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;border:1px solid var(--border);position:relative;margin-top:10px}
+.vid-preview iframe,.vid-preview video{width:100%;height:100%;border:0;display:block;object-fit:contain}
+.act-row{display:flex;gap:12px;padding:12px;border-radius:13px;background:rgba(255,255,255,.03);border:1px solid var(--border);align-items:flex-start}
+.act-ico{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:18px;flex-shrink:0;background:rgba(47,125,255,.14);color:#7db6ff}
+.empty{text-align:center;padding:52px 20px;color:var(--muted)}
+.empty-ico{font-size:52px;opacity:.35;margin-bottom:14px}
+.loading{display:grid;place-items:center;min-height:100vh;font-size:18px;color:var(--muted)}
+.spinner{width:48px;height:48px;border:3px solid rgba(90,140,230,.2);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:14px}
+.rank{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-weight:900;font-size:15px;flex-shrink:0}
+.rank-1{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000}
+.rank-2{background:linear-gradient(135deg,#cbd5e1,#94a3b8);color:#000}
+.rank-3{background:linear-gradient(135deg,#d97706,#b45309);color:#fff}
+.rank-x{background:rgba(255,255,255,.06);color:var(--muted)}
+@media(max-width:1080px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:860px){
+  .sidebar{position:fixed;inset-inline-end:0;top:0;transform:translateX(-105%);transition:transform .34s cubic-bezier(.2,.8,.3,1);width:280px;box-shadow:-20px 0 60px rgba(0,0,0,.7)}
+  .sidebar.open{transform:translateX(0)!important}
+  .mbar{display:flex}
+  .content{padding:14px 14px 90px}
+  .topbar{padding:10px 14px}
+  .g2,.g3,.g4{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../db.js"></script>
+<script type="text/babel" data-presets="react">
+const {useState,useEffect,useMemo,useCallback,useRef,createContext,useContext}=React;
+const DB=window.MissionDB;
+
+const ToastCtx=createContext(null);
+function ToastProvider({children}){
+  const [items,setItems]=useState([]);
+  const push=useCallback((msg,type='info',title,duration=3800)=>{
+    const id=DB.uid('t_');
+    const titles={ok:'تم بنجاح',err:'خطأ',warn:'تنبيه',info:'معلومة'};
+    setItems(x=>[...x,{id,msg,type,title:title||titles[type]||'',duration}]);
+  },[]);
+  const remove=useCallback(id=>setItems(x=>x.filter(t=>t.id!==id)),[]);
+  return <ToastCtx.Provider value={{push,ok:(m,t)=>push(m,'ok',t),err:(m,t)=>push(m,'err',t),warn:(m,t)=>push(m,'warn',t),info:(m,t)=>push(m,'info',t)}}>
+    {children}
+    <div className="toast-host">{items.map(t=><Toast key={t.id} data={t} onClose={()=>remove(t.id)}/>)}</div>
+  </ToastCtx.Provider>;
+}
+function Toast({data,onClose}){
+  const [out,setOut]=useState(false);const [progress,setProgress]=useState(100);
+  useEffect(()=>{const start=Date.now();const t=setInterval(()=>{const p=Math.max(0,100-((Date.now()-start)/data.duration)*100);setProgress(p);if(p<=0){clearInterval(t);setOut(true);setTimeout(onClose,280);}},40);return()=>clearInterval(t);},[]);
+  const icons={ok:'✓',err:'✕',warn:'!',info:'i'};
+  return <div className={`toast ${data.type} ${out?'out':''}`}>
+    <div className="toast-ico">{icons[data.type]}</div>
+    <div className="toast-body">{data.title&&<div className="toast-title">{data.title}</div>}<div className="toast-msg">{data.msg}</div></div>
+    <button className="toast-close" onClick={()=>{setOut(true);setTimeout(onClose,280);}}>✕</button>
+    <div className="toast-bar"><div className="toast-bar-f" style={{width:`${progress}%`,transitionDuration:'40ms'}}/></div>
+  </div>;
+}
+const useToast=()=>useContext(ToastCtx);
+
+const AppCtx=createContext(null);
+const useApp=()=>useContext(AppCtx);
+
+function AppProvider({children}){
+  const [db,setDb]=useState({users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[]});
+  const [currentUser,setCurrentUser]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const toast=useToast();
+
+  const reload=useCallback(async ()=>{
+    try{
+      const data=await DB.loadAll();
+      setDb(data);
+    }catch(e){console.warn(e);}
+  },[]);
+
+  useEffect(()=>{
+    (async ()=>{
+      try{
+        const sid=DB.getSessionId();
+        if(!sid){window.location.replace('../auth/login.html');return;}
+        const u=await DB.getUser(sid);
+        if(!u||u.active===false){DB.clearSession();window.location.replace('../auth/login.html');return;}
+        if(u.role!=='admin'){window.location.replace('../student/index.html');return;}
+        setCurrentUser(u);
+        await reload();
+      }catch(e){}
+      setLoading(false);
+    })();
+  },[]);
+
+  const logout=useCallback(()=>{
+    DB.clearSession();
+    window.location.replace('../auth/login.html');
+  },[]);
+
+  const save=useCallback(async (table,item)=>{
+    const saved=await DB.save(table,item);
+    await reload();
+    return saved;
+  },[]);
+
+  const remove=useCallback(async (table,id)=>{
+    await DB.remove(table,id);
+    await reload();
+  },[]);
+
+  const getLevel=useCallback((xp)=>{
+    const ls=[...db.levels].sort((a,b)=>a.xp-b.xp);
+    if(ls.length===0) return {current:{level:1,name:'مبتدئ',xp:0},next:null};
+    let cur=ls[0],next=null;
+    for(let i=0;i<ls.length;i++){if(xp>=ls[i].xp){cur=ls[i];next=ls[i+1]||null;}}
+    return {current:cur,next};
+  },[db.levels]);
+
+  return <AppCtx.Provider value={{
+    db,currentUser,loading,logout,reload,save,remove,getLevel,toast,
+    subject:id=>db.subjects.find(s=>s.id===id),
+    unit:id=>db.units.find(u=>u.id===id),
+    lesson:id=>db.lessons.find(l=>l.id===id),
+    exam:id=>db.exams.find(e=>e.id===id),
+    question:id=>db.questions.find(q=>q.id===id),
+    grade:id=>db.grades.find(g=>g.id===id)
+  }}>{children}</AppCtx.Provider>;
+}
+
+function Modal({title,children,onClose,wide}){
+  return <div className="modal-bg" onClick={e=>e.target===e.currentTarget&&onClose?.()}>
+    <div className={`glass modal ${wide?'wide':''}`}>
+      <div className="flex between center mb16"><div className="h3">{title}</div><button className="icon-btn" onClick={onClose}>✕</button></div>
+      {children}
+    </div>
+  </div>;
+}
+function Stat({label,value,icon,color='var(--blue)',sub}){
+  return <div className="glass-s hv" style={{padding:16}}>
+    <div className="flex between center mb8"><div className="stat-l">{label}</div><div style={{fontSize:20,opacity:.7}}>{icon}</div></div>
+    <div className="stat-n" style={{color}}>{value}</div>
+    {sub&&<div className="xs muted mt8">{sub}</div>}
+  </div>;
+}
+function Field({label,children,hint}){
+  return <div className="mb12"><label className="lbl">{label}</label>{children}{hint&&<div className="xs muted mt8" style={{opacity:.8}}>{hint}</div>}</div>;
+}
+function Empty({icon='📭',title,desc}){
+  return <div className="empty"><div className="empty-ico">{icon}</div><div className="h4 txt2 mb8">{title}</div>{desc&&<div className="sm">{desc}</div>}</div>;
+}
+
+function VideoEditor({value,onChange}){
+  const v=value||{type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true};
+  const set=(k,val)=>onChange({...v,[k]:val});
+  const types=[
+    {id:'youtube',label:'YouTube',icon:'📺',hint:'رابط YouTube عادي أو youtu.be'},
+    {id:'vimeo',label:'Vimeo',icon:'🎬',hint:'رابط Vimeo'},
+    {id:'mp4',label:'ملف MP4',icon:'🎥',hint:'رابط فيديو مباشر .mp4'},
+    {id:'external',label:'رابط خارجي',icon:'🔗',hint:'رابط embed iframe'}
+  ];
+  const placeholder={youtube:'https://www.youtube.com/watch?v=xxxxx',vimeo:'https://vimeo.com/123456789',mp4:'https://example.com/video.mp4',external:'https://example.com/embed/xxxx'}[v.type];
+  return <div className="glass-s" style={{padding:14,borderColor:'var(--border2)'}}>
+    <div className="h4 mb12">🎬 إعدادات الفيديو</div>
+    <Field label="نوع الفيديو">
+      <div className="flex wrap g6">
+        {types.map(t=><button key={t.id} type="button" onClick={()=>set('type',t.id)} style={{padding:'8px 14px',borderRadius:30,background:v.type===t.id?'rgba(47,125,255,.18)':'rgba(255,255,255,.05)',border:`1px solid ${v.type===t.id?'var(--blue)':'var(--border)'}`,fontSize:12.5,fontWeight:700,color:'var(--txt)'}}>{t.icon} {t.label}</button>)}
+      </div>
+    </Field>
+    <Field label="الرابط" hint={types.find(t=>t.id===v.type)?.hint}>
+      <input className="input" value={v.url} onChange={e=>set('url',e.target.value)} placeholder={placeholder}/>
+    </Field>
+    {(v.type==='youtube'||v.type==='vimeo'||v.type==='mp4')&&<Field label="صورة الغلاف"><input className="input" value={v.poster||''} onChange={e=>set('poster',e.target.value)} placeholder="https://example.com/poster.jpg"/></Field>}
+    <div className="flex wrap g16 mt8 mb12">
+      <label className="flex center g8" style={{cursor:'pointer'}}><input type="checkbox" checked={!!v.allowDownload} onChange={e=>set('allowDownload',e.target.checked)}/><span className="sm">السماح بالتحميل</span></label>
+      <label className="flex center g8" style={{cursor:'pointer'}}><input type="checkbox" checked={v.allowExternal!==false} onChange={e=>set('allowExternal',e.target.checked)}/><span className="sm">عرض في نافذة خارجية</span></label>
+    </div>
+    {v.url&&<div className="vid-preview">
+      {v.type==='youtube'&&(()=>{const id=DB.ytId(v.url);return id?<iframe src={`https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1`} allowFullScreen/>:<div style={{color:'#666',display:'grid',placeItems:'center',height:'100%'}}>رابط غير صالح</div>;})()}
+      {v.type==='vimeo'&&(()=>{const id=DB.vimeoId(v.url);return id?<iframe src={`https://player.vimeo.com/video/${id}?byline=0&portrait=0`} allowFullScreen/>:<div style={{color:'#666',display:'grid',placeItems:'center',height:'100%'}}>رابط غير صالح</div>;})()}
+      {v.type==='mp4'&&<video src={v.url} poster={v.poster} controls playsInline/>}
+      {v.type==='external'&&<iframe src={v.url} allowFullScreen/>}
+    </div>}
+  </div>;
+}
+
+function Sidebar({items,active,onNav,open,onClose}){
+  return <>
+    {open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.5)',zIndex:55}}/>}
+    <aside className={`sidebar ${open?'open':''}`}>
+      <div className="brand"><div className="brand-logo">👑</div><div><div className="brand-name">MISSION EDU</div><div className="brand-sub">لوحة الإدارة</div></div></div>
+      {items.map((g,gi)=><div key={gi}>
+        {g.title&&<div className="nav-gt">{g.title}</div>}
+        {g.items.map(it=><button key={it.id} className={`nav-i ${active===it.id?'on':''}`} onClick={()=>{onNav(it.id);onClose?.();}}>
+          <span className="nav-ico">{it.icon}</span><span>{it.label}</span>
+          {it.badge!=null&&<span className="pill pill-b" style={{marginInlineStart:'auto'}}>{it.badge}</span>}
+        </button>)}
+      </div>)}
+    </aside>
+  </>;
+}
+
+function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick}){
+  const [q,setQ]=useState('');
+  const [open,setOpen]=useState(false);
+  useEffect(()=>{
+    if(!q.trim()){setOpen(false);return;}
+    setOpen(true);
+    const t=setTimeout(()=>onSearch?.(q),150);
+    return()=>clearTimeout(t);
+  },[q]);
+  return <div className="topbar">
+    <button className="icon-btn mbar" onClick={onMenu}>☰</button>
+    <div style={{position:'relative',flex:1,maxWidth:520}}>
+      <div className="search"><span style={{fontSize:15,opacity:.7}}>🔍</span><input value={q} onChange={e=>setQ(e.target.value)} placeholder="ابحث..."/>{q&&<button onClick={()=>{setQ('');setOpen(false);}} style={{opacity:.6,color:'var(--txt)'}}>✕</button>}</div>
+      {open&&searchResults?.length>0&&<div className="glass" style={{position:'absolute',top:'calc(100% + 8px)',insetInline:0,padding:8,zIndex:80,maxHeight:340,overflowY:'auto'}}>
+        {searchResults.slice(0,10).map((r,i)=><button key={i} className="nav-i" onClick={()=>{onResultClick(r);setQ('');setOpen(false);}}>
+          <span className="nav-ico">{r.icon}</span><div style={{flex:1,textAlign:'right'}}><div style={{fontSize:13.5}}>{r.title}</div><div className="xs muted">{r.type}</div></div>
+        </button>)}
+      </div>}
+    </div>
+    <div className="flex center g8" style={{marginInlineStart:'auto'}}>
+      <div className="glass-s" style={{padding:'5px 12px',display:'flex',alignItems:'center',gap:8}}><div className="avatar" style={{width:32,height:32,fontSize:15}}>{user.avatar||'👑'}</div></div>
+      <button className="icon-btn" onClick={onLogout}>🚪</button>
+    </div>
+  </div>;
+}
+
+function Dashboard(){
+  const app=useApp();
+  const students=app.db.users.filter(u=>u.role==='student');
+  const active=students.filter(s=>s.active!==false).length;
+  const totalLessons=app.db.lessons.filter(l=>l.published!==false).length;
+  let totalDone=0;
+  students.forEach(s=>{totalDone+=(s.completed_lessons||[]).length;});
+  const avgProgress=students.length&&totalLessons?Math.round((totalDone/(students.length*totalLessons))*100):0;
+  const top10=useMemo(()=>[...students].sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,10),[students]);
+  const recentAct=app.db.activity.slice(0,8);
+  const actLabel={login:'تسجيل دخول',register:'تسجيل جديد',lesson_view:'فتح درس',lesson_complete:'أكمل درس',exam_start:'بدأ اختبار',exam_submit:'أنهى اختبار',video_play:'شاهد فيديو',video_25:'25%',video_50:'50%',video_75:'75%',video_complete:'أكمل الفيديو',mission_complete:'أكمل مهمة',achievement_unlock:'فتح إنجاز'};
+  return <>
+    <div className="hero mb16"><div><div className="h2 mb6">لوحة تحكم الأدمن 👑</div><div className="sm txt2">إدارة كاملة لكل محتوى المنصة</div></div></div>
+    <div className="grid g4 mb16">
+      <Stat label="إجمالي الطلاب" value={DB.fmt(students.length)} icon="🧑‍🎓" color="#5aa9ff"/>
+      <Stat label="الطلاب النشطون" value={DB.fmt(active)} icon="✅" color="#22c55e"/>
+      <Stat label="عدد المواد" value={DB.fmt(app.db.subjects.length)} icon="📚" color="#f59e0b"/>
+      <Stat label="عدد الدروس" value={DB.fmt(app.db.lessons.length)} icon="📖" color="#8b5cf6"/>
+      <Stat label="الوحدات" value={DB.fmt(app.db.units.length)} icon="🗂" color="#06b6d4"/>
+      <Stat label="الاختبارات" value={DB.fmt(app.db.exams.length)} icon="📝" color="#ec4899"/>
+      <Stat label="المهام" value={DB.fmt(app.db.missions.length)} icon="🎯" color="#22c55e"/>
+      <Stat label="متوسط التقدم" value={`${avgProgress}%`} icon="📈" color="#2f7dff"/>
+    </div>
+    <div className="grid g2 mb16">
+      <div className="glass" style={{padding:18}}>
+        <div className="h4 mb12">🏅 المتصدرون العشرة</div>
+        {top10.length===0?<Empty icon="🏅" title="لا يوجد طلاب بعد"/>:
+          top10.map((s,i)=>{
+            const {current}=app.getLevel(s.xp||0);
+            return <div key={s.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid rgba(90,140,230,.08)'}}>
+              <div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div>
+              <div className="avatar" style={{width:34,height:34,fontSize:14}}>{s.avatar||'👤'}</div>
+              <div style={{flex:1}}><div className="sm">{s.name}</div><div className="xs muted">Lv {current.level} — {current.name}</div></div>
+              <span className="pill pill-b">{DB.fmt(s.xp||0)} XP</span>
+            </div>;
+          })
+        }
+      </div>
+      <div className="glass" style={{padding:18}}>
+        <div className="h4 mb12">📡 آخر الأنشطة</div>
+        {recentAct.length===0?<Empty title="لا يوجد نشاط"/>:
+          recentAct.map(a=><div key={a.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid rgba(90,140,230,.08)'}}>
+            <div className="act-ico">📌</div>
+            <div style={{flex:1}}><div className="sm">{a.user_name}</div><div className="xs muted">{actLabel[a.type]||a.type}{a.target?` — ${a.target}`:''}</div></div>
+            <div className="xs muted">{new Date(a.at).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})}</div>
+          </div>)
+        }
+      </div>
+    </div>
+  </>;
+}
+
+function ActivityLog(){
+  const app=useApp();
+  const [filter,setFilter]=useState('all');
+  const [studentFilter,setStudentFilter]=useState('all');
+  const students=app.db.users.filter(u=>u.role==='student');
+  const typeFilters=[{id:'all',label:'الكل',icon:'📌'},{id:'lesson_view',label:'دروس',icon:'👁'},{id:'video_play',label:'فيديو',icon:'▶️'},{id:'video_complete',label:'إكمال فيديو',icon:'🎬'},{id:'exam_start',label:'بدء اختبار',icon:'📝'},{id:'exam_submit',label:'إنهاء اختبار',icon:'📤'},{id:'mission_complete',label:'مهام',icon:'🎯'},{id:'login',label:'دخول',icon:'🔓'}];
+  let list=[...app.db.activity];
+  if(filter!=='all') list=list.filter(a=>a.type===filter);
+  if(studentFilter!=='all') list=list.filter(a=>a.user_id===studentFilter);
+  const actLabel={login:'تسجيل دخول',register:'تسجيل جديد',lesson_view:'فتح درس',lesson_complete:'أكمل درس',exam_start:'بدأ اختبار',exam_submit:'أنهى اختبار',video_play:'شاهد فيديو',video_25:'25%',video_50:'50%',video_75:'75%',video_complete:'أكمل الفيديو',mission_complete:'أكمل مهمة',achievement_unlock:'فتح إنجاز'};
+  return <>
+    <div className="flex between center mb16 wrap g8">
+      <div className="h2">📡 سجل النشاط</div>
+      <select className="input" style={{maxWidth:220}} value={studentFilter} onChange={e=>setStudentFilter(e.target.value)}>
+        <option value="all">كل الطلاب</option>
+        {students.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
+      </select>
+    </div>
+    <div className="flex wrap g6 mb16">
+      {typeFilters.map(f=><button key={f.id} onClick={()=>setFilter(f.id)} style={{padding:'8px 14px',borderRadius:30,background:filter===f.id?'rgba(47,125,255,.18)':'rgba(255,255,255,.05)',border:`1px solid ${filter===f.id?'var(--blue)':'var(--border)'}`,fontSize:12.5,fontWeight:700,color:'var(--txt)'}}>{f.icon} {f.label}</button>)}
+    </div>
+    <div className="glass" style={{padding:16}}>
+      {list.length===0?<Empty icon="📡" title="لا يوجد نشاط"/>:
+        <div className="flex col g8">
+          {list.slice(0,200).map(a=><div key={a.id} className="act-row">
+            <div className="act-ico">📌</div>
+            <div style={{flex:1,minWidth:0}}>
+              <div className="flex between center wrap g8">
+                <div><div className="sm" style={{fontWeight:700}}>{a.user_name}</div><div className="xs muted">{actLabel[a.type]||a.type}{a.target?` — ${a.target}`:''}</div></div>
+                <div className="xs muted">{new Date(a.at).toLocaleString('ar-EG',{dateStyle:'short',timeStyle:'short'})}</div>
+              </div>
+            </div>
+          </div>)}
+        </div>
+      }
+    </div>
+  </>;
+}
+
+function Crud({title,collection,defaultItem,fields,columns}){
+  const app=useApp();
+  const [editing,setEditing]=useState(null);
+  const [form,setForm]=useState({});
+  const [busy,setBusy]=useState(false);
+  const openNew=()=>{setForm(defaultItem());setEditing('new');};
+  const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
+  const save=async ()=>{
+    setBusy(true);
+    try{
+      await app.save(collection,form);
+      app.toast.ok(editing==='new'?'تمت الإضافة':'تم الحفظ');
+      setEditing(null);
+    }catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
+  const del=async id=>{
+    if(!confirm('تأكيد الحذف؟')) return;
+    try{await app.remove(collection,id);app.toast.warn('تم الحذف');}
+    catch(e){app.toast.err(e.message);}
+  };
+  const items=app.db[collection]||[];
+  return <>
+    <div className="flex between center mb16"><div className="h2">{title}</div><button className="btn btn-p" onClick={openNew}>+ إضافة</button></div>
+    <div className="glass" style={{padding:14}}>
+      {items.length===0?<Empty title="لا توجد بيانات"/>:
+        <div className="sx"><table className="tbl">
+          <thead><tr>{columns.map((c,i)=><th key={i}>{c.label}</th>)}<th>إجراءات</th></tr></thead>
+          <tbody>{items.map(it=><tr key={it.id}>
+            {columns.map((c,i)=><td key={i}>{c.render?c.render(it,app):it[c.key]}</td>)}
+            <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(it)}>✏️</button><button className="btn btn-dn btn-sm" onClick={()=>del(it.id)}>🗑</button></div></td>
+          </tr>)}</tbody>
+        </table></div>
+      }
+    </div>
+    {editing!==null&&<Modal title={editing==='new'?'إضافة':'تعديل'} onClose={()=>setEditing(null)} wide>
+      <div className="grid g2">
+        {fields.map(f=><div key={f.key} style={{gridColumn:f.full?'span 2':'span 1'}}>
+          <Field label={f.label} hint={f.hint}>
+            {f.type==='textarea'?<textarea className="input" value={form[f.key]||''} onChange={e=>setForm({...form,[f.key]:e.target.value})}/>:
+             f.type==='number'?<input type="number" className="input" value={form[f.key]??''} onChange={e=>setForm({...form,[f.key]:+e.target.value})}/>:
+             f.type==='select'?<select className="input" value={form[f.key]||''} onChange={e=>setForm({...form,[f.key]:e.target.value})}>
+               <option value="">— اختر —</option>
+               {(typeof f.options==='function'?f.options(app):f.options).map(o=><option key={o.value} value={o.value}>{o.label}</option>)}
+             </select>:
+             f.type==='list'?<textarea className="input" placeholder="سطر لكل عنصر" value={(form[f.key]||[]).join('\n')} onChange={e=>setForm({...form,[f.key]:e.target.value.split('\n').filter(Boolean)})}/>:
+             f.type==='bool'?<label className="flex center g8" style={{cursor:'pointer'}}><input type="checkbox" checked={!!form[f.key]} onChange={e=>setForm({...form,[f.key]:e.target.checked})}/><span className="sm">{form[f.key]?'مفعّل':'معطّل'}</span></label>:
+             <input className="input" value={form[f.key]||''} onChange={e=>setForm({...form,[f.key]:e.target.value})}/>}
+          </Field>
+        </div>)}
+      </div>
+      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
+    </Modal>}
+  </>;
+}
+
+function GradesPage(){return <Crud title="🏫 إدارة الصفوف" collection="grades" defaultItem={()=>({name:'',desc:''})} fields={[{key:'name',label:'اسم الصف'},{key:'desc',label:'الوصف',type:'textarea',full:true}]} columns={[{key:'name',label:'الاسم'},{key:'desc',label:'الوصف'}]}/>;}
+
+function SubjectsPage(){
+  const app=useApp();
+  return <Crud title="📚 إدارة المواد" collection="subjects" defaultItem={()=>({name:'',desc:'',icon:'📚',color:'#2f7dff',sort_order:1,grade_id:''})} fields={[
+    {key:'name',label:'اسم المادة'},{key:'icon',label:'الأيقونة'},{key:'color',label:'اللون'},{key:'sort_order',label:'الترتيب',type:'number'},
+    {key:'grade_id',label:'الصف',type:'select',options:a=>a.db.grades.map(g=>({value:g.id,label:g.name}))},{key:'desc',label:'الوصف',type:'textarea',full:true}
+  ]} columns={[
+    {label:'',render:s=><span style={{fontSize:20}}>{s.icon}</span>},{key:'name',label:'الاسم'},{key:'sort_order',label:'الترتيب'},{label:'الصف',render:(s,a)=>a.grade(s.grade_id)?.name||'—'}
+  ]}/>;
+}
+
+function UnitsPage(){
+  const app=useApp();
+  return <Crud title="🗂 إدارة الوحدات" collection="units" defaultItem={()=>({name:'',desc:'',sort_order:1,subject_id:''})} fields={[
+    {key:'name',label:'اسم الوحدة'},{key:'sort_order',label:'الترتيب',type:'number'},{key:'subject_id',label:'المادة',type:'select',options:a=>a.db.subjects.map(s=>({value:s.id,label:s.name}))},{key:'desc',label:'الوصف',type:'textarea',full:true}
+  ]} columns={[
+    {key:'name',label:'الاسم'},{label:'المادة',render:u=>app.subject(u.subject_id)?.name||'—'},{key:'sort_order',label:'الترتيب'}
+  ]}/>;
+}
+
+function LessonsPage(){
+  const app=useApp();
+  const [editing,setEditing]=useState(null);
+  const [form,setForm]=useState({});
+  const [busy,setBusy]=useState(false);
+  const openNew=()=>{setForm({title:'',desc:'',summary:'',video:{type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true},duration:15,xp:20,sort_order:1,unit_id:'',published:true,key_points:[],examples:[],notes:'',pdfs:[]});setEditing('new');};
+  const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(!c.video)c.video={type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true};if(!c.key_points)c.key_points=[];setForm(c);setEditing(it.id);};
+  const save=async ()=>{
+    if(!form.title) return app.toast.warn('العنوان مطلوب');
+    if(!form.unit_id) return app.toast.warn('اختر الوحدة');
+    setBusy(true);
+    try{await app.save('lessons',form);app.toast.ok(editing==='new'?'تمت الإضافة':'تم الحفظ');setEditing(null);}
+    catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
+  const del=async id=>{if(!confirm('حذف الدرس؟'))return;try{await app.remove('lessons',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
+  const badge=l=>{if(!l.video||!l.video.url)return <span className="pill pill-y">لا فيديو</span>;const map={youtube:'📺 YouTube',vimeo:'🎬 Vimeo',mp4:'🎥 MP4',external:'🔗 خارجي'};return <span className="pill pill-b">{map[l.video.type]||l.video.type}</span>;};
+  return <>
+    <div className="flex between center mb16"><div className="h2">📖 إدارة الدروس</div><button className="btn btn-p" onClick={openNew}>+ درس جديد</button></div>
+    <div className="glass" style={{padding:14}}>
+      {app.db.lessons.length===0?<Empty title="لا توجد دروس"/>:
+        <div className="sx"><table className="tbl">
+          <thead><tr><th>الدرس</th><th>الوحدة</th><th>الفيديو</th><th>XP</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+          <tbody>{app.db.lessons.map(l=><tr key={l.id}>
+            <td><b>{l.title}</b></td><td className="sm">{app.unit(l.unit_id)?.name||'—'}</td><td>{badge(l)}</td><td>{l.xp}</td>
+            <td>{l.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td>
+            <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(l)}>✏️</button><button className="btn btn-dn btn-sm" onClick={()=>del(l.id)}>🗑</button></div></td>
+          </tr>)}</tbody>
+        </table></div>
+      }
+    </div>
+    {editing!==null&&<Modal title={editing==='new'?'درس جديد':'تعديل الدرس'} onClose={()=>setEditing(null)} wide>
+      <div className="grid g2">
+        <Field label="عنوان الدرس"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
+        <Field label="الوحدة"><select className="input" value={form.unit_id||''} onChange={e=>setForm({...form,unit_id:e.target.value})}><option value="">— اختر —</option>{app.db.units.map(u=><option key={u.id} value={u.id}>{app.subject(u.subject_id)?.name} — {u.name}</option>)}</select></Field>
+        <Field label="المدة (دقيقة)"><input type="number" className="input" value={form.duration||15} onChange={e=>setForm({...form,duration:+e.target.value})}/></Field>
+        <Field label="XP"><input type="number" className="input" value={form.xp||20} onChange={e=>setForm({...form,xp:+e.target.value})}/></Field>
+        <Field label="الترتيب"><input type="number" className="input" value={form.sort_order||1} onChange={e=>setForm({...form,sort_order:+e.target.value})}/></Field>
+        <Field label="الحالة"><select className="input" value={form.published!==false?'1':'0'} onChange={e=>setForm({...form,published:e.target.value==='1'})}><option value="1">منشور</option><option value="0">مخفي</option></select></Field>
+        <Field label="وصف الدرس" full><textarea className="input" value={form.desc||''} onChange={e=>setForm({...form,desc:e.target.value})}/></Field>
+      </div>
+      <div className="mb12"><VideoEditor value={form.video} onChange={v=>setForm({...form,video:v})}/></div>
+      <Field label="ملخص الدرس" full><textarea className="input" value={form.summary||''} onChange={e=>setForm({...form,summary:e.target.value})}/></Field>
+      <Field label="النقاط المهمة" full hint="سطر لكل نقطة"><textarea className="input" value={(form.key_points||[]).join('\n')} onChange={e=>setForm({...form,key_points:e.target.value.split('\n').filter(Boolean)})}/></Field>
+      <Field label="ملاحظات" full><textarea className="input" value={form.notes||''} onChange={e=>setForm({...form,notes:e.target.value})}/></Field>
+      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
+    </Modal>}
+  </>;
+}
+
+function QuestionsPage(){
+  const app=useApp();
+  const [editing,setEditing]=useState(null);
+  const [form,setForm]=useState({});
+  const [busy,setBusy]=useState(false);
+  const openNew=()=>{setForm({text:'',options:['','','',''],correct:[0],explanation:'',lesson_id:'',difficulty:'medium',xp:10,type:'mcq'});setEditing('new');};
+  const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
+  const save=async ()=>{
+    if(!form.text||!form.lesson_id) return app.toast.warn('النص والدرس مطلوبان');
+    const lesson=app.lesson(form.lesson_id);
+    const unit_id=lesson?.unit_id||'';
+    const subject_id=app.unit(unit_id)?.subject_id||'';
+    setBusy(true);
+    try{await app.save('questions',{...form,unit_id,subject_id});app.toast.ok('تم الحفظ');setEditing(null);}
+    catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
+  const del=async id=>{if(!confirm('حذف السؤال؟'))return;try{await app.remove('questions',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
+  return <>
+    <div className="flex between center mb16"><div className="h2">❓ بنك الأسئلة</div><button className="btn btn-p" onClick={openNew}>+ سؤال جديد</button></div>
+    <div className="glass" style={{padding:14}}>
+      {app.db.questions.length===0?<Empty title="لا توجد أسئلة"/>:
+        <div className="sx"><table className="tbl">
+          <thead><tr><th>السؤال</th><th>الدرس</th><th>الصعوبة</th><th>XP</th><th>إجراءات</th></tr></thead>
+          <tbody>{app.db.questions.map(q=><tr key={q.id}>
+            <td style={{maxWidth:340}}>{q.text.slice(0,80)}{q.text.length>80?'...':''}</td>
+            <td className="sm">{app.lesson(q.lesson_id)?.title||'—'}</td>
+            <td><span className={`pill ${q.difficulty==='easy'?'pill-g':q.difficulty==='hard'?'pill-r':'pill-a'}`}>{q.difficulty}</span></td>
+            <td>{q.xp}</td>
+            <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(q)}>✏️</button><button className="btn btn-dn btn-sm" onClick={()=>del(q.id)}>🗑</button></div></td>
+          </tr>)}</tbody>
+        </table></div>
+      }
+    </div>
+    {editing!==null&&<Modal title={editing==='new'?'سؤال جديد':'تعديل السؤال'} onClose={()=>setEditing(null)} wide>
+      <Field label="نص السؤال"><textarea className="input" value={form.text||''} onChange={e=>setForm({...form,text:e.target.value})}/></Field>
+      <Field label="الخيارات">
+        {(form.options||[]).map((op,i)=><div key={i} className="flex g8 mb6 center">
+          <button type="button" className={`btn btn-sm ${form.correct?.includes(i)?'btn-ok':'btn-s'}`} onClick={()=>setForm({...form,correct:[i]})}>{['أ','ب','ج','د'][i]}</button>
+          <input className="input" value={op} onChange={e=>{const o=[...form.options];o[i]=e.target.value;setForm({...form,options:o});}}/>
+        </div>)}
+      </Field>
+      <Field label="شرح الإجابة"><textarea className="input" value={form.explanation||''} onChange={e=>setForm({...form,explanation:e.target.value})}/></Field>
+      <div className="grid g2">
+        <Field label="الدرس"><select className="input" value={form.lesson_id||''} onChange={e=>setForm({...form,lesson_id:e.target.value})}><option value="">— اختر —</option>{app.db.lessons.map(l=><option key={l.id} value={l.id}>{l.title}</option>)}</select></Field>
+        <Field label="الصعوبة"><select className="input" value={form.difficulty||'medium'} onChange={e=>setForm({...form,difficulty:e.target.value})}><option value="easy">سهل</option><option value="medium">متوسط</option><option value="hard">صعب</option></select></Field>
+        <Field label="XP"><input type="number" className="input" value={form.xp||10} onChange={e=>setForm({...form,xp:+e.target.value})}/></Field>
+      </div>
+      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
+    </Modal>}
+  </>;
+}
+
+function ExamsPage(){
+  const app=useApp();
+  const [editing,setEditing]=useState(null);
+  const [form,setForm]=useState({});
+  const [busy,setBusy]=useState(false);
+  const openNew=()=>{setForm({title:'',subject_id:'',unit_id:'',lesson_ids:[],question_ids:[],duration:15,pass_score:60,max_attempts:3,xp:50,published:true,sort_order:1});setEditing('new');};
+  const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
+  const save=async ()=>{
+    if(!form.title||!form.subject_id) return app.toast.warn('العنوان والمادة مطلوبان');
+    if(!form.question_ids||form.question_ids.length===0) return app.toast.warn('اختر سؤالاً على الأقل');
+    setBusy(true);
+    try{await app.save('exams',form);app.toast.ok('تم الحفظ');setEditing(null);}
+    catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
+  const del=async id=>{if(!confirm('حذف الاختبار؟'))return;try{await app.remove('exams',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
+  const availQ=form.unit_id?app.db.questions.filter(q=>q.unit_id===form.unit_id):app.db.questions;
+  return <>
+    <div className="flex between center mb16"><div className="h2">📝 إدارة الاختبارات</div><button className="btn btn-p" onClick={openNew}>+ اختبار جديد</button></div>
+    <div className="glass" style={{padding:14}}>
+      {app.db.exams.length===0?<Empty title="لا توجد اختبارات"/>:
+        <div className="sx"><table className="tbl">
+          <thead><tr><th>العنوان</th><th>المادة</th><th>الأسئلة</th><th>النجاح</th><th>إجراءات</th></tr></thead>
+          <tbody>{app.db.exams.map(e=><tr key={e.id}>
+            <td>{e.title}</td><td className="sm">{app.subject(e.subject_id)?.name||'—'}</td>
+            <td>{(e.question_ids||[]).length}</td><td>{e.pass_score}%</td>
+            <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(e)}>✏️</button><button className="btn btn-dn btn-sm" onClick={()=>del(e.id)}>🗑</button></div></td>
+          </tr>)}</tbody>
+        </table></div>
+      }
+    </div>
+    {editing!==null&&<Modal title={editing==='new'?'اختبار جديد':'تعديل الاختبار'} onClose={()=>setEditing(null)} wide>
+      <Field label="اسم الاختبار"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
+      <div className="grid g2">
+        <Field label="المادة"><select className="input" value={form.subject_id||''} onChange={e=>setForm({...form,subject_id:e.target.value,unit_id:''})}><option value="">— اختر —</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field>
+        <Field label="الوحدة"><select className="input" value={form.unit_id||''} onChange={e=>setForm({...form,unit_id:e.target.value,question_ids:[]})}><option value="">— اختر —</option>{app.db.units.filter(u=>!form.subject_id||u.subject_id===form.subject_id).map(u=><option key={u.id} value={u.id}>{u.name}</option>)}</select></Field>
+        <Field label="المدة (دقيقة)"><input type="number" className="input" value={form.duration||15} onChange={e=>setForm({...form,duration:+e.target.value})}/></Field>
+        <Field label="درجة النجاح %"><input type="number" className="input" value={form.pass_score||60} onChange={e=>setForm({...form,pass_score:+e.target.value})}/></Field>
+        <Field label="عدد المحاولات"><input type="number" className="input" value={form.max_attempts||3} onChange={e=>setForm({...form,max_attempts:+e.target.value})}/></Field>
+        <Field label="XP"><input type="number" className="input" value={form.xp||50} onChange={e=>setForm({...form,xp:+e.target.value})}/></Field>
+      </div>
+      <Field label={`الأسئلة (${(form.question_ids||[]).length} مختار)`}>
+        <div className="glass-s" style={{padding:10,maxHeight:260,overflowY:'auto'}}>
+          {availQ.length===0?<div className="sm muted">لا توجد أسئلة</div>:
+            availQ.map(q=>{const on=(form.question_ids||[]).includes(q.id);return <label key={q.id} className="flex center g8 mb6" style={{padding:6,cursor:'pointer'}}>
+              <input type="checkbox" checked={on} onChange={()=>setForm({...form,question_ids:on?(form.question_ids||[]).filter(x=>x!==q.id):[...(form.question_ids||[]),q.id]})}/>
+              <span className="sm" style={{flex:1}}>{q.text.slice(0,80)}</span>
+            </label>;})
+          }
+        </div>
+      </Field>
+      <label className="flex center g8 mt12"><input type="checkbox" checked={form.published!==false} onChange={e=>setForm({...form,published:e.target.checked})}/><span className="sm">منشور</span></label>
+      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
+    </Modal>}
+  </>;
+}
+
+function MissionsPage(){
+  const app=useApp();
+  const [editing,setEditing]=useState(null);
+  const [form,setForm]=useState({});
+  const [busy,setBusy]=useState(false);
+  const openNew=()=>{setForm({title:'',desc:'',subject_id:'',required_lessons:[],required_exam_id:'',xp:100,sort_order:1});setEditing('new');};
+  const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
+  const save=async ()=>{
+    if(!form.title||!form.subject_id) return app.toast.warn('العنوان والمادة مطلوبان');
+    setBusy(true);
+    try{await app.save('missions',form);app.toast.ok('تم الحفظ');setEditing(null);}
+    catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
+  const del=async id=>{if(!confirm('حذف المهمة؟'))return;try{await app.remove('missions',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
+  return <>
+    <div className="flex between center mb16"><div className="h2">🎯 إدارة المهام</div><button className="btn btn-p" onClick={openNew}>+ مهمة جديدة</button></div>
+    <div className="glass" style={{padding:14}}>
+      {app.db.missions.length===0?<Empty title="لا توجد مهام"/>:
+        <div className="sx"><table className="tbl">
+          <thead><tr><th>العنوان</th><th>المادة</th><th>XP</th><th>إجراءات</th></tr></thead>
+          <tbody>{app.db.missions.map(m=><tr key={m.id}>
+            <td>{m.title}</td><td className="sm">{app.subject(m.subject_id)?.name||'—'}</td><td>{m.xp}</td>
+            <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(m)}>✏️</button><button className="btn btn-dn btn-sm" onClick={()=>del(m.id)}>🗑</button></div></td>
+          </tr>)}</tbody>
+        </table></div>
+      }
+    </div>
+    {editing!==null&&<Modal title={editing==='new'?'مهمة جديدة':'تعديل المهمة'} onClose={()=>setEditing(null)} wide>
+      <Field label="عنوان المهمة"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
+      <Field label="الوصف"><textarea className="input" value={form.desc||''} onChange={e=>setForm({...form,desc:e.target.value})}/></Field>
+      <div className="grid g2">
+        <Field label="المادة"><select className="input" value={form.subject_id||''} onChange={e=>setForm({...form,subject_id:e.target.value})}><option value="">— اختر —</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field>
+        <Field label="XP"><input type="number" className="input" value={form.xp||100} onChange={e=>setForm({...form,xp:+e.target.value})}/></Field>
+        <Field label="الترتيب"><input type="number" className="input" value={form.sort_order||1} onChange={e=>setForm({...form,sort_order:+e.target.value})}/></Field>
+        <Field label="الاختبار المطلوب"><select className="input" value={form.required_exam_id||''} onChange={e=>setForm({...form,required_exam_id:e.target.value||null})}><option value="">— بدون —</option>{app.db.exams.filter(e=>!form.subject_id||e.subject_id===form.subject_id).map(e=><option key={e.id} value={e.id}>{e.title}</option>)}</select></Field>
+      </div>
+      <Field label="الدروس المطلوبة">
+        <div className="glass-s" style={{padding:10,maxHeight:220,overflowY:'auto'}}>
+          {app.db.lessons.filter(l=>{const un=app.unit(l.unit_id);return !form.subject_id||un?.subject_id===form.subject_id;}).map(l=>{
+            const on=(form.required_lessons||[]).includes(l.id);
+            return <label key={l.id} className="flex center g8 mb6" style={{cursor:'pointer'}}>
+              <input type="checkbox" checked={on} onChange={()=>setForm({...form,required_lessons:on?(form.required_lessons||[]).filter(x=>x!==l.id):[...(form.required_lessons||[]),l.id]})}/>
+              <span className="sm">{l.title}</span>
+            </label>;
+          })}
+        </div>
+      </Field>
+      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
+    </Modal>}
+  </>;
+}
+
+function AchievementsPage(){
+  return <Crud title="🏆 إدارة الإنجازات" collection="achievements" defaultItem={()=>({title:'',desc:'',icon:'🏆',type:'lessons',threshold:1})} fields={[
+    {key:'title',label:'الاسم'},{key:'icon',label:'الأيقونة'},
+    {key:'type',label:'النوع',type:'select',options:[{value:'lessons',label:'عدد الدروس'},{value:'exams',label:'عدد الاختبارات'},{value:'mission',label:'عدد المهام'},{value:'streak',label:'سلسلة الأيام'},{value:'xp',label:'مجموع XP'},{value:'highScore',label:'أعلى نسبة'}]},
+    {key:'threshold',label:'القيمة',type:'number'},{key:'desc',label:'الوصف',type:'textarea',full:true}
+  ]} columns={[
+    {label:'',render:a=><span style={{fontSize:20}}>{a.icon}</span>},{key:'title',label:'الاسم'},{key:'type',label:'النوع'},{key:'threshold',label:'القيمة'}
+  ]}/>;
+}
+
+function LevelsPage(){
+  return <Crud title="📈 إدارة المستويات" collection="levels" defaultItem={()=>({level:1,name:'',xp:0,reward:''})} fields={[
+    {key:'level',label:'رقم المستوى',type:'number'},{key:'name',label:'الاسم'},{key:'xp',label:'XP المطلوب',type:'number'},{key:'reward',label:'المكافأة'}
+  ]} columns={[
+    {key:'level',label:'المستوى'},{key:'name',label:'الاسم'},{key:'xp',label:'XP'},{key:'reward',label:'المكافأة'}
+  ]}/>;
+}
+
+function StudentsPage(){
+  const app=useApp();
+  const [editing,setEditing]=useState(null);
+  const [form,setForm]=useState({});
+  const [q,setQ]=useState('');
+  const [busy,setBusy]=useState(false);
+  const list=app.db.users.filter(u=>u.role==='student'&&(u.name.toLowerCase().includes(q.toLowerCase())||u.email.toLowerCase().includes(q.toLowerCase())));
+  const open=s=>{setForm(JSON.parse(JSON.stringify(s)));setEditing(s.id);};
+  const save=async ()=>{
+    setBusy(true);
+    try{await DB.updateUser(editing,{name:form.name,email:form.email,xp:form.xp,grade_id:form.grade_id,all_subjects:form.all_subjects,access_subjects:form.access_subjects||[]});await app.reload();app.toast.ok('تم الحفظ');setEditing(null);}
+    catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
+  const toggle=async s=>{
+    try{await DB.updateUser(s.id,{active:!s.active});await app.reload();app.toast.warn(s.active!==false?'تم الإيقاف':'تم التفعيل');}
+    catch(e){app.toast.err(e.message);}
+  };
+  return <>
+    <div className="flex between center mb16 wrap g8">
+      <div className="h2">🧑‍🎓 إدارة الطلاب</div>
+      <input className="input" style={{maxWidth:260}} placeholder="🔍 بحث..." value={q} onChange={e=>setQ(e.target.value)}/>
+    </div>
+    <div className="glass" style={{padding:14}}>
+      <div className="sx"><table className="tbl">
+        <thead><tr><th>الطالب</th><th>البريد</th><th>XP</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+        <tbody>{list.map(s=><tr key={s.id}>
+          <td><div className="flex center g8"><div className="avatar" style={{width:30,height:30,fontSize:14}}>{s.avatar||'👤'}</div><span>{s.name}</span></div></td>
+          <td className="sm muted">{s.email}</td><td><b>{DB.fmt(s.xp||0)}</b></td>
+          <td>{s.active!==false?<span className="pill pill-g">نشط</span>:<span className="pill pill-r">موقوف</span>}</td>
+          <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>open(s)}>✏️</button><button className={`btn btn-sm ${s.active!==false?'btn-dn':'btn-ok'}`} onClick={()=>toggle(s)}>{s.active!==false?'إيقاف':'تفعيل'}</button></div></td>
+        </tr>)}</tbody>
+      </table></div>
+    </div>
+    {editing&&<Modal title={`تعديل: ${form.name}`} onClose={()=>setEditing(null)} wide>
+      <div className="grid g2">
+        <Field label="الاسم"><input className="input" value={form.name||''} onChange={e=>setForm({...form,name:e.target.value})}/></Field>
+        <Field label="البريد"><input className="input" value={form.email||''} onChange={e=>setForm({...form,email:e.target.value})}/></Field>
+        <Field label="XP"><input type="number" className="input" value={form.xp||0} onChange={e=>setForm({...form,xp:+e.target.value})}/></Field>
+        <Field label="الصف"><select className="input" value={form.grade_id||''} onChange={e=>setForm({...form,grade_id:e.target.value})}><option value="">— اختر —</option>{app.db.grades.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></Field>
+      </div>
+      <Field label="صلاحيات الوصول">
+        <label className="flex center g8 mb12" style={{cursor:'pointer'}}><input type="checkbox" checked={!!form.all_subjects} onChange={e=>setForm({...form,all_subjects:e.target.checked})}/><span className="sm">جميع المواد</span></label>
+        {!form.all_subjects&&<div className="flex wrap g6">{app.db.subjects.map(s=>{const on=(form.access_subjects||[]).includes(s.id);return <button key={s.id} type="button" onClick={()=>{const cur=form.access_subjects||[];setForm({...form,access_subjects:on?cur.filter(x=>x!==s.id):[...cur,s.id]});}} style={{padding:'8px 14px',borderRadius:30,background:on?'rgba(47,125,255,.18)':'rgba(255,255,255,.05)',border:`1px solid ${on?'var(--blue)':'var(--border)'}`,fontSize:12.5,fontWeight:700,color:'var(--txt)'}}>{s.icon} {s.name}</button>;})}</div>}
+      </Field>
+      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
+    </Modal>}
+  </>;
+}
+
+function NotificationsPage(){
+  const app=useApp();
+  const [form,setForm]=useState({title:'',body:'',target:'all'});
+  const [busy,setBusy]=useState(false);
+  const send=async ()=>{
+    if(!form.title||!form.body) return app.toast.warn('أدخل العنوان والنص');
+    setBusy(true);
+    try{await app.save('notifications',{...form,read_by:[]});app.toast.ok('تم الإرسال');setForm({title:'',body:'',target:'all'});}
+    catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
+  const del=async id=>{if(!confirm('حذف؟'))return;try{await app.remove('notifications',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
+  return <>
+    <div className="h2 mb16">🔔 الإشعارات</div>
+    <div className="grid g2">
+      <div className="glass" style={{padding:20}}>
+        <div className="h4 mb12">📤 إرسال إشعار</div>
+        <Field label="العنوان"><input className="input" value={form.title} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
+        <Field label="النص"><textarea className="input" value={form.body} onChange={e=>setForm({...form,body:e.target.value})}/></Field>
+        <Field label="المستهدفون"><select className="input" value={form.target} onChange={e=>setForm({...form,target:e.target.value})}>
+          <option value="all">كل الطلاب</option>
+          {app.db.users.filter(u=>u.role==='student').map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
+        </select></Field>
+        <button className="btn btn-p btn-block" onClick={send} disabled={busy}>{busy?'جارٍ...':'📤 إرسال'}</button>
+      </div>
+      <div className="glass" style={{padding:20}}>
+        <div className="h4 mb12">📬 آخر الإشعارات</div>
+        {app.db.notifications.slice(0,10).map(n=><div key={n.id} className="glass-s mb8" style={{padding:12,display:'flex',gap:10,alignItems:'flex-start'}}>
+          <div style={{flex:1}}>
+            <div className="h4" style={{fontSize:14}}>{n.title}</div>
+            <div className="xs muted">{n.body}</div>
+            <div className="xs mt6" style={{color:'var(--blue2)'}}>← {n.target==='all'?'كل الطلاب':app.db.users.find(u=>u.id===n.target)?.name||'—'}</div>
+          </div>
+          <button className="btn btn-dn btn-sm" onClick={()=>del(n.id)}>🗑</button>
+        </div>)}
+      </div>
+    </div>
+  </>;
+}
+
+function SettingsPage(){
+  const app=useApp();
+  return <>
+    <div className="h2 mb16">⚙️ الإعدادات</div>
+    <div className="glass" style={{padding:20,maxWidth:640}}>
+      <div className="h4 mb12">🔌 معلومات الاتصال</div>
+      <div className="glass-s mb12" style={{padding:12}}>
+        <div className="xs muted">Supabase URL</div>
+        <div className="xs" style={{wordBreak:'break-all'}}>https://szuvpbdwixezecxnykjn.supabase.co</div>
+      </div>
+      <div className="grid g3 mb16">
+        <Stat label="المستخدمون" value={app.db.users.length} icon="👥"/>
+        <Stat label="سجل النشاط" value={app.db.activity.length} icon="📡"/>
+        <Stat label="الإشعارات" value={app.db.notifications.length} icon="🔔"/>
+      </div>
+    </div>
+  </>;
+}
+
+function AdminApp(){
+  const app=useApp();
+  const [tab,setTab]=useState('dashboard');
+  const [sidebarOpen,setSidebarOpen]=useState(false);
+  const [searchResults,setSearchResults]=useState([]);
+  const user=app.currentUser;
+  const items=[
+    {title:'الرئيسية',items:[{id:'dashboard',icon:'📊',label:'لوحة التحكم'},{id:'activity',icon:'📡',label:'سجل النشاط'}]},
+    {title:'المحتوى',items:[
+      {id:'grades',icon:'🏫',label:'الصفوف'},{id:'subjects',icon:'📚',label:'المواد'},{id:'units',icon:'🗂',label:'الوحدات'},
+      {id:'lessons',icon:'📖',label:'الدروس'},{id:'questions',icon:'❓',label:'بنك الأسئلة'},{id:'exams',icon:'📝',label:'الاختبارات'},{id:'missions',icon:'🎯',label:'المهام'}
+    ]},
+    {title:'التحفيز',items:[{id:'achievements',icon:'🏆',label:'الإنجازات'},{id:'levels',icon:'📈',label:'المستويات'}]},
+    {title:'المستخدمون',items:[{id:'students',icon:'🧑‍🎓',label:'الطلاب'},{id:'notifications',icon:'🔔',label:'الإشعارات'},{id:'settings',icon:'⚙️',label:'الإعدادات'}]}
+  ];
+  const onSearch=q=>{
+    const lc=q.toLowerCase(),res=[];
+    app.db.users.filter(x=>x.name.toLowerCase().includes(lc)||x.email.toLowerCase().includes(lc)).slice(0,5).forEach(s=>res.push({type:'مستخدم',icon:'👤',title:s.name,nav:'students'}));
+    app.db.subjects.filter(s=>s.name.toLowerCase().includes(lc)).forEach(s=>res.push({type:'مادة',icon:s.icon||'📚',title:s.name,nav:'subjects'}));
+    app.db.lessons.filter(l=>l.title.toLowerCase().includes(lc)).slice(0,5).forEach(l=>res.push({type:'درس',icon:'📖',title:l.title,nav:'lessons'}));
+    app.db.exams.filter(e=>e.title.toLowerCase().includes(lc)).slice(0,5).forEach(e=>res.push({type:'اختبار',icon:'📝',title:e.title,nav:'exams'}));
+    setSearchResults(res);
+  };
+  return <div className="app">
+    <Sidebar items={items} active={tab} onNav={setTab} open={sidebarOpen} onClose={()=>setSidebarOpen(false)}/>
+    <div className="main">
+      <Topbar user={user} onMenu={()=>setSidebarOpen(true)} onLogout={app.logout} onSearch={onSearch} searchResults={searchResults} onResultClick={r=>setTab(r.nav)}/>
+      <div className="content">
+        {tab==='dashboard'&&<Dashboard/>}
+        {tab==='activity'&&<ActivityLog/>}
+        {tab==='grades'&&<GradesPage/>}
+        {tab==='subjects'&&<SubjectsPage/>}
+        {tab==='units'&&<UnitsPage/>}
+        {tab==='lessons'&&<LessonsPage/>}
+        {tab==='questions'&&<QuestionsPage/>}
+        {tab==='exams'&&<ExamsPage/>}
+        {tab==='missions'&&<MissionsPage/>}
+        {tab==='achievements'&&<AchievementsPage/>}
+        {tab==='levels'&&<LevelsPage/>}
+        {tab==='students'&&<StudentsPage/>}
+        {tab==='notifications'&&<NotificationsPage/>}
+        {tab==='settings'&&<SettingsPage/>}
+      </div>
+    </div>
+  </div>;
+}
+
+function Root(){
+  const app=useApp();
+  if(app.loading) return <div className="loading"><div className="spinner"></div>جارٍ التحميل...</div>;
+  if(!app.currentUser) return null;
+  if(app.currentUser.role!=='admin') return null;
+  return <AdminApp/>;
+}
+
+function App(){return <ToastProvider><AppProvider><Root/></AppProvider></ToastProvider>;}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
