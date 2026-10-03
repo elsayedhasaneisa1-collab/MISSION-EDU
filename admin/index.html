@@ -3,8 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>MISSION EDU — لوحة الأدمن</title>
+<meta name="theme-color" content="#04060e" />
+<title>MISSION EDU — لوحة الإدارة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
 <style>
 :root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#8b5cf6;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.45)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -23,21 +26,19 @@ ul{list-style:none}
 .main{flex:1;min-width:0;display:flex;flex-direction:column}
 .content{padding:22px 26px 100px;max-width:1440px;width:100%;margin:0 auto;animation:fu .5s}
 @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@keyframes pu{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
 @keyframes slideIn{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:none}}
 @keyframes fadeOut{to{opacity:0;transform:translateX(-30px)}}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
-@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes sp{to{transform:rotate(360deg)}}
 .brand{display:flex;align-items:center;gap:11px;padding:8px 10px 16px}
-.brand-logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:22px;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 8px 26px rgba(47,125,255,.45);font-weight:900}
+.brand-logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 8px 26px rgba(47,125,255,.45)}
 .brand-name{font-weight:900;font-size:17px}
 .brand-sub{font-size:10.5px;color:var(--muted);font-weight:600}
 .nav-i{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:13px;color:var(--txt2);font-size:14px;font-weight:600;transition:.22s;width:100%;text-align:right;position:relative}
 .nav-i:hover{background:rgba(47,125,255,.09);color:var(--txt)}
 .nav-i.on{background:linear-gradient(90deg,rgba(47,125,255,.22),rgba(47,125,255,.03));color:#fff}
-.nav-i.on::before{content:'';position:absolute;inset-inline-end:0;top:22%;height:56%;width:3px;border-radius:4px;background:linear-gradient(180deg,#2f7dff,#8b5cf6);box-shadow:0 0 12px var(--blue)}
-.nav-ico{font-size:16px;width:22px;text-align:center}
+.nav-i.on::before{content:'';position:absolute;inset-inline-end:0;top:22%;height:56%;width:3px;border-radius:4px;background:linear-gradient(180deg,#2f7dff,#8b5cf6)}
+.nav-ico{font-size:16px;width:22px;text-align:center;display:flex;justify-content:center}
 .nav-gt{font-size:10.5px;font-weight:800;color:var(--muted);letter-spacing:1px;padding:14px 14px 4px}
 .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:12px 26px;background:rgba(6,9,20,.72);backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
 .search{flex:1;max-width:520px;display:flex;align-items:center;gap:10px;background:rgba(18,26,48,.7);border:1px solid var(--border);border-radius:14px;padding:8px 14px}
@@ -80,8 +81,7 @@ ul{list-style:none}
 .pill-v{background:rgba(139,92,246,.15);color:#c4b5fd;border-color:rgba(139,92,246,.28)}
 .pill-y{background:rgba(255,255,255,.06);color:var(--muted);border-color:var(--border)}
 .bar{height:9px;border-radius:20px;background:rgba(255,255,255,.07);overflow:hidden}
-.bar-f{height:100%;border-radius:20px;transition:width .8s cubic-bezier(.2,.8,.3,1);position:relative;overflow:hidden}
-.bar-f::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);background-size:400px 100%;animation:shimmer 2.4s infinite linear}
+.bar-f{height:100%;border-radius:20px;transition:width .8s}
 .bar-b{background:linear-gradient(90deg,#2f7dff,#5aa9ff)}
 .input,select.input,textarea.input{width:100%;padding:11px 14px;border-radius:12px;background:rgba(10,16,32,.72);border:1.5px solid var(--border);outline:none;font-size:14px;transition:.22s;color:var(--txt)}
 .input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.12)}
@@ -99,13 +99,30 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 .avatar{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:14px;background:linear-gradient(140deg,#2f7dff,#8b5cf6);color:#fff;flex-shrink:0}
 .icon-btn{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid var(--border);transition:.2s;font-size:16px;color:var(--txt)}
 .icon-btn:hover{background:rgba(47,125,255,.15);border-color:var(--border2)}
+.modal-bg{position:fixed;inset:0;background:rgba(3,5,12,.82);backdrop-filter:blur(8px);z-index:900;display:grid;place-items:center;padding:18px;overflow-y:auto}
+.modal{width:100%;max-width:600px;max-height:90vh;overflow-y:auto;padding:22px;animation:pu .3s}
+.modal.wide{max-width:820px}
+.hero{padding:24px;border-radius:22px;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(47,125,255,.18),rgba(139,92,246,.12) 50%,rgba(6,182,212,.08));border:1px solid var(--border)}
+.empty{text-align:center;padding:52px 20px;color:var(--muted)}
+.empty-ico{font-size:52px;opacity:.35;margin-bottom:14px}
+.loading{display:grid;place-items:center;min-height:100vh;font-size:18px;color:var(--muted)}
+.spinner{width:48px;height:48px;border:3px solid rgba(90,140,230,.2);border-top-color:var(--blue);border-radius:50%;animation:sp 1s linear infinite;margin-bottom:14px}
+.rank{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-weight:900;font-size:15px;flex-shrink:0}
+.rank-1{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000}
+.rank-2{background:linear-gradient(135deg,#cbd5e1,#94a3b8);color:#000}
+.rank-3{background:linear-gradient(135deg,#d97706,#b45309);color:#fff}
+.rank-x{background:rgba(255,255,255,.06);color:var(--muted)}
+.vid-preview{aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;border:1px solid var(--border);position:relative;margin-top:10px}
+.vid-preview iframe,.vid-preview video{width:100%;height:100%;border:0;display:block;object-fit:contain}
+.act-row{display:flex;gap:12px;padding:12px;border-radius:13px;background:rgba(255,255,255,.03);border:1px solid var(--border);align-items:flex-start}
+.act-ico{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:18px;flex-shrink:0;background:rgba(47,125,255,.14);color:#7db6ff}
 .toast-host{position:fixed;bottom:26px;inset-inline-start:26px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:min(440px,92vw)}
-.toast{pointer-events:auto;min-width:280px;padding:14px 16px 16px;border-radius:16px;background:linear-gradient(135deg,rgba(21,31,56,.98),rgba(11,17,34,.98));border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.65);animation:slideIn .4s cubic-bezier(.2,.8,.3,1);position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:12px}
+.toast{pointer-events:auto;min-width:280px;padding:14px 16px 16px;border-radius:16px;background:linear-gradient(135deg,rgba(21,31,56,.98),rgba(11,17,34,.98));border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.65);animation:slideIn .4s;position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:12px}
 .toast.out{animation:fadeOut .3s forwards}
 .toast-ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex-shrink:0}
 .toast-body{flex:1;min-width:0}
 .toast-title{font-weight:800;font-size:13.5px;margin-bottom:3px}
-.toast-msg{font-size:12.5px;color:var(--txt2);line-height:1.55;word-break:break-word}
+.toast-msg{font-size:12.5px;color:var(--txt2);line-height:1.55}
 .toast-bar{position:absolute;bottom:0;inset-inline:0;height:3px;background:rgba(255,255,255,.06)}
 .toast-bar-f{height:100%;transition:width linear}
 .toast-close{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font-size:12px;color:var(--muted);background:rgba(255,255,255,.05);flex-shrink:0}
@@ -117,27 +134,28 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 .toast.warn .toast-bar-f{background:linear-gradient(90deg,#d97706,#fbbf24)}
 .toast.info .toast-ico{background:rgba(47,125,255,.18);color:#7db6ff}
 .toast.info .toast-bar-f{background:linear-gradient(90deg,#2f7dff,#5aa9ff)}
-.modal-bg{position:fixed;inset:0;background:rgba(3,5,12,.78);backdrop-filter:blur(8px);z-index:900;display:grid;place-items:center;padding:18px;overflow-y:auto}
-.modal{width:100%;max-width:600px;max-height:90vh;overflow-y:auto;padding:22px;animation:pop .32s}
-.modal.wide{max-width:820px}
 .mbar{display:none}
-.hero{padding:24px;border-radius:22px;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(47,125,255,.18),rgba(139,92,246,.12) 50%,rgba(6,182,212,.08));border:1px solid var(--border)}
-.vid-preview{aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;border:1px solid var(--border);position:relative;margin-top:10px}
-.vid-preview iframe,.vid-preview video{width:100%;height:100%;border:0;display:block;object-fit:contain}
-.act-row{display:flex;gap:12px;padding:12px;border-radius:13px;background:rgba(255,255,255,.03);border:1px solid var(--border);align-items:flex-start}
-.act-ico{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:18px;flex-shrink:0;background:rgba(47,125,255,.14);color:#7db6ff}
-.empty{text-align:center;padding:52px 20px;color:var(--muted)}
-.empty-ico{font-size:52px;opacity:.35;margin-bottom:14px}
-.loading{display:grid;place-items:center;min-height:100vh;font-size:18px;color:var(--muted)}
-.spinner{width:48px;height:48px;border:3px solid rgba(90,140,230,.2);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:14px}
-.rank{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-weight:900;font-size:15px;flex-shrink:0}
-.rank-1{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000}
-.rank-2{background:linear-gradient(135deg,#cbd5e1,#94a3b8);color:#000}
-.rank-3{background:linear-gradient(135deg,#d97706,#b45309);color:#fff}
-.rank-x{background:rgba(255,255,255,.06);color:var(--muted)}
+.footer-dev{display:flex;justify-content:center;gap:10px;padding:24px 20px 16px;margin-top:40px;border-top:1px solid rgba(90,140,230,.12);position:relative;flex-wrap:wrap}
+.footer-dev::before{content:"";position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:120px;height:1px;background:linear-gradient(90deg,transparent,#2f7dff,transparent)}
+.dev-btn,.tg-btn{display:inline-flex;align-items:center;gap:9px;padding:10px 20px;border-radius:50px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .32s cubic-bezier(.2,.8,.3,1);border:1px solid}
+.dev-btn{background:linear-gradient(135deg,rgba(47,125,255,.15),rgba(139,92,246,.15));border-color:rgba(90,140,230,.3);color:var(--txt);position:relative;overflow:hidden}
+.dev-btn::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);transform:translateX(-100%);transition:transform .7s}
+.dev-btn:hover::before{transform:translateX(100%)}
+.dev-btn:hover{background:linear-gradient(135deg,rgba(47,125,255,.28),rgba(139,92,246,.28));border-color:#2f7dff;transform:translateY(-2px);box-shadow:0 12px 32px rgba(47,125,255,.35)}
+.dev-name b{background:linear-gradient(90deg,#5aa9ff,#a78bfa,#22d3ee,#5aa9ff);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 3s linear infinite;font-weight:900;letter-spacing:.3px}
+@keyframes shine{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+.tg-btn{background:rgba(34,158,217,.12);border-color:rgba(34,158,217,.3);color:#7dd3fc}
+.tg-btn:hover{background:rgba(34,158,217,.22);border-color:#229ed9;color:#fff;transform:translateY(-2px);box-shadow:0 10px 26px rgba(34,158,217,.3)}
+.success-msg{padding:14px;border-radius:12px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.35);color:#6ee7a0;font-size:13px;font-weight:700;text-align:center}
+.close-x{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid rgba(90,140,230,.2);color:var(--txt);cursor:pointer;font-size:14px}
+.close-x:hover{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);color:#fca5a5}
+.modal textarea{width:100%;min-height:110px;padding:12px 14px;border-radius:12px;background:rgba(10,16,32,.72);border:1.5px solid rgba(90,140,230,.2);color:var(--txt);font-family:inherit;font-size:14px;outline:none;resize:vertical;transition:.22s}
+.modal textarea:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.13)}
+.modal .actions{display:flex;gap:8px;margin-top:16px}
+.modal .btn{flex:1;padding:11px 18px;border-radius:12px;font-weight:700;font-size:13.5px;cursor:pointer;border:none;font-family:inherit;transition:.22s}
 @media(max-width:1080px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:860px){
-  .sidebar{position:fixed;inset-inline-end:0;top:0;transform:translateX(-105%);transition:transform .34s cubic-bezier(.2,.8,.3,1);width:280px;box-shadow:-20px 0 60px rgba(0,0,0,.7)}
+  .sidebar{position:fixed;inset-inline-end:0;top:0;transform:translateX(-105%);transition:transform .34s;width:280px;box-shadow:-20px 0 60px rgba(0,0,0,.7)}
   .sidebar.open{transform:translateX(0)!important}
   .mbar{display:flex}
   .content{padding:14px 14px 90px}
@@ -165,14 +183,22 @@ function ToastProvider({children}){
     setItems(x=>[...x,{id,msg,type,title:title||titles[type]||'',duration}]);
   },[]);
   const remove=useCallback(id=>setItems(x=>x.filter(t=>t.id!==id)),[]);
-  return <ToastCtx.Provider value={{push,ok:(m,t)=>push(m,'ok',t),err:(m,t)=>push(m,'err',t),warn:(m,t)=>push(m,'warn',t),info:(m,t)=>push(m,'info',t)}}>
+  return <ToastCtx.Provider value={{ok:(m,t)=>push(m,'ok',t),err:(m,t)=>push(m,'err',t),warn:(m,t)=>push(m,'warn',t),info:(m,t)=>push(m,'info',t)}}>
     {children}
     <div className="toast-host">{items.map(t=><Toast key={t.id} data={t} onClose={()=>remove(t.id)}/>)}</div>
   </ToastCtx.Provider>;
 }
 function Toast({data,onClose}){
   const [out,setOut]=useState(false);const [progress,setProgress]=useState(100);
-  useEffect(()=>{const start=Date.now();const t=setInterval(()=>{const p=Math.max(0,100-((Date.now()-start)/data.duration)*100);setProgress(p);if(p<=0){clearInterval(t);setOut(true);setTimeout(onClose,280);}},40);return()=>clearInterval(t);},[]);
+  useEffect(()=>{
+    const start=Date.now();
+    const t=setInterval(()=>{
+      const p=Math.max(0,100-((Date.now()-start)/data.duration)*100);
+      setProgress(p);
+      if(p<=0){clearInterval(t);setOut(true);setTimeout(onClose,280);}
+    },40);
+    return()=>clearInterval(t);
+  },[]);
   const icons={ok:'✓',err:'✕',warn:'!',info:'i'};
   return <div className={`toast ${data.type} ${out?'out':''}`}>
     <div className="toast-ico">{icons[data.type]}</div>
@@ -193,10 +219,7 @@ function AppProvider({children}){
   const toast=useToast();
 
   const reload=useCallback(async ()=>{
-    try{
-      const data=await DB.loadAll();
-      setDb(data);
-    }catch(e){console.warn(e);}
+    try{const data=await DB.loadAll();setDb(data);}catch(e){}
   },[]);
 
   useEffect(()=>{
@@ -214,22 +237,16 @@ function AppProvider({children}){
     })();
   },[]);
 
-  const logout=useCallback(()=>{
-    DB.clearSession();
-    window.location.replace('../auth/login.html');
-  },[]);
-
+  const logout=useCallback(()=>{DB.clearSession();window.location.replace('../auth/login.html');},[]);
   const save=useCallback(async (table,item)=>{
     const saved=await DB.save(table,item);
     await reload();
     return saved;
-  },[]);
-
+  },[reload]);
   const remove=useCallback(async (table,id)=>{
     await DB.remove(table,id);
     await reload();
-  },[]);
-
+  },[reload]);
   const getLevel=useCallback((xp)=>{
     const ls=[...db.levels].sort((a,b)=>a.xp-b.xp);
     if(ls.length===0) return {current:{level:1,name:'مبتدئ',xp:0},next:null};
@@ -249,23 +266,62 @@ function AppProvider({children}){
   }}>{children}</AppCtx.Provider>;
 }
 
+const Icon=({name,size=18,color='currentColor'})=>{
+  const p={width:size,height:size,viewBox:'0 0 24 24',fill:'none',stroke:color,strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round'};
+  const paths={
+    dashboard:<><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></>,
+    activity:<><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></>,
+    school:<><path d="M14 22v-4a2 2 0 1 0-4 0v4"/><path d="m18 10 4 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8l4-2"/><path d="M18 5v17"/><path d="m4 6 8-4 8 4"/><path d="M6 5v17"/><circle cx="12" cy="9" r="2"/></>,
+    book:<><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></>,
+    folder:<><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></>,
+    file:<><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></>,
+    help:<><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></>,
+    clipboard:<><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></>,
+    target:<><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></>,
+    trophy:<><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></>,
+    trend:<><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></>,
+    users:<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>,
+    bell:<><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></>,
+    settings:<><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></>,
+    logout:<><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></>,
+    plus:<><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></>,
+    edit:<><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></>,
+    trash:<><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></>,
+    menu:<><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></>,
+    search:<><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></>,
+    close:<><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>,
+    check:<><polyline points="20 6 9 17 4 12"/></>,
+    video:<><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></>,
+    link:<><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></>,
+    user:<><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></>,
+    award:<><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></>
+  };
+  return <svg {...p}>{paths[name]}</svg>;
+};
+
 function Modal({title,children,onClose,wide}){
-  return <div className="modal-bg" onClick={e=>e.target===e.currentTarget&&onClose?.()}>
+  return <div className="modal-bg" onClick={e=>e.target===e.currentTarget&&onClose()}>
     <div className={`glass modal ${wide?'wide':''}`}>
-      <div className="flex between center mb16"><div className="h3">{title}</div><button className="icon-btn" onClick={onClose}>✕</button></div>
+      <div className="flex between center mb16">
+        <div className="h3">{title}</div>
+        <button className="icon-btn" onClick={onClose}><Icon name="close" size={16}/></button>
+      </div>
       {children}
     </div>
   </div>;
 }
 function Stat({label,value,icon,color='var(--blue)',sub}){
   return <div className="glass-s hv" style={{padding:16}}>
-    <div className="flex between center mb8"><div className="stat-l">{label}</div><div style={{fontSize:20,opacity:.7}}>{icon}</div></div>
+    <div className="flex between center mb8">
+      <div className="stat-l">{label}</div>
+      <div style={{color}}>{typeof icon==='string'?<Icon name={icon} size={20}/>:icon}</div>
+    </div>
     <div className="stat-n" style={{color}}>{value}</div>
     {sub&&<div className="xs muted mt8">{sub}</div>}
   </div>;
 }
 function Field({label,children,hint}){
-  return <div className="mb12"><label className="lbl">{label}</label>{children}{hint&&<div className="xs muted mt8" style={{opacity:.8}}>{hint}</div>}</div>;
+  return <div className="mb12"><label className="lbl">{label}</label>{children}{hint&&<div className="xs muted mt8">{hint}</div>}</div>;
 }
 function Empty({icon='📭',title,desc}){
   return <div className="empty"><div className="empty-ico">{icon}</div><div className="h4 txt2 mb8">{title}</div>{desc&&<div className="sm">{desc}</div>}</div>;
@@ -275,14 +331,14 @@ function VideoEditor({value,onChange}){
   const v=value||{type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true};
   const set=(k,val)=>onChange({...v,[k]:val});
   const types=[
-    {id:'youtube',label:'YouTube',icon:'📺',hint:'رابط YouTube عادي أو youtu.be'},
+    {id:'youtube',label:'YouTube',icon:'📺',hint:'رابط YouTube أو youtu.be'},
     {id:'vimeo',label:'Vimeo',icon:'🎬',hint:'رابط Vimeo'},
-    {id:'mp4',label:'ملف MP4',icon:'🎥',hint:'رابط فيديو مباشر .mp4'},
-    {id:'external',label:'رابط خارجي',icon:'🔗',hint:'رابط embed iframe'}
+    {id:'mp4',label:'MP4',icon:'🎥',hint:'رابط مباشر .mp4'},
+    {id:'external',label:'خارجي',icon:'🔗',hint:'رابط embed'}
   ];
   const placeholder={youtube:'https://www.youtube.com/watch?v=xxxxx',vimeo:'https://vimeo.com/123456789',mp4:'https://example.com/video.mp4',external:'https://example.com/embed/xxxx'}[v.type];
   return <div className="glass-s" style={{padding:14,borderColor:'var(--border2)'}}>
-    <div className="h4 mb12">🎬 إعدادات الفيديو</div>
+    <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="video" size={16}/> إعدادات الفيديو</div>
     <Field label="نوع الفيديو">
       <div className="flex wrap g6">
         {types.map(t=><button key={t.id} type="button" onClick={()=>set('type',t.id)} style={{padding:'8px 14px',borderRadius:30,background:v.type===t.id?'rgba(47,125,255,.18)':'rgba(255,255,255,.05)',border:`1px solid ${v.type===t.id?'var(--blue)':'var(--border)'}`,fontSize:12.5,fontWeight:700,color:'var(--txt)'}}>{t.icon} {t.label}</button>)}
@@ -291,10 +347,10 @@ function VideoEditor({value,onChange}){
     <Field label="الرابط" hint={types.find(t=>t.id===v.type)?.hint}>
       <input className="input" value={v.url} onChange={e=>set('url',e.target.value)} placeholder={placeholder}/>
     </Field>
-    {(v.type==='youtube'||v.type==='vimeo'||v.type==='mp4')&&<Field label="صورة الغلاف"><input className="input" value={v.poster||''} onChange={e=>set('poster',e.target.value)} placeholder="https://example.com/poster.jpg"/></Field>}
+    {(v.type==='youtube'||v.type==='vimeo'||v.type==='mp4')&&<Field label="صورة الغلاف (اختياري)"><input className="input" value={v.poster||''} onChange={e=>set('poster',e.target.value)} placeholder="https://..."/></Field>}
     <div className="flex wrap g16 mt8 mb12">
       <label className="flex center g8" style={{cursor:'pointer'}}><input type="checkbox" checked={!!v.allowDownload} onChange={e=>set('allowDownload',e.target.checked)}/><span className="sm">السماح بالتحميل</span></label>
-      <label className="flex center g8" style={{cursor:'pointer'}}><input type="checkbox" checked={v.allowExternal!==false} onChange={e=>set('allowExternal',e.target.checked)}/><span className="sm">عرض في نافذة خارجية</span></label>
+      <label className="flex center g8" style={{cursor:'pointer'}}><input type="checkbox" checked={v.allowExternal!==false} onChange={e=>set('allowExternal',e.target.checked)}/><span className="sm">فتح في نافذة خارجية</span></label>
     </div>
     {v.url&&<div className="vid-preview">
       {v.type==='youtube'&&(()=>{const id=DB.ytId(v.url);return id?<iframe src={`https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1`} allowFullScreen/>:<div style={{color:'#666',display:'grid',placeItems:'center',height:'100%'}}>رابط غير صالح</div>;})()}
@@ -309,11 +365,15 @@ function Sidebar({items,active,onNav,open,onClose}){
   return <>
     {open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.5)',zIndex:55}}/>}
     <aside className={`sidebar ${open?'open':''}`}>
-      <div className="brand"><div className="brand-logo">👑</div><div><div className="brand-name">MISSION EDU</div><div className="brand-sub">لوحة الإدارة</div></div></div>
+      <div className="brand">
+        <div className="brand-logo"><Icon name="trophy" size={22} color="#fff"/></div>
+        <div><div className="brand-name">MISSION EDU</div><div className="brand-sub">لوحة الإدارة</div></div>
+      </div>
       {items.map((g,gi)=><div key={gi}>
         {g.title&&<div className="nav-gt">{g.title}</div>}
         {g.items.map(it=><button key={it.id} className={`nav-i ${active===it.id?'on':''}`} onClick={()=>{onNav(it.id);onClose?.();}}>
-          <span className="nav-ico">{it.icon}</span><span>{it.label}</span>
+          <span className="nav-ico"><Icon name={it.icon} size={16}/></span>
+          <span>{it.label}</span>
           {it.badge!=null&&<span className="pill pill-b" style={{marginInlineStart:'auto'}}>{it.badge}</span>}
         </button>)}
       </div>)}
@@ -322,18 +382,16 @@ function Sidebar({items,active,onNav,open,onClose}){
 }
 
 function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick}){
-  const [q,setQ]=useState('');
-  const [open,setOpen]=useState(false);
-  useEffect(()=>{
-    if(!q.trim()){setOpen(false);return;}
-    setOpen(true);
-    const t=setTimeout(()=>onSearch?.(q),150);
-    return()=>clearTimeout(t);
-  },[q]);
+  const [q,setQ]=useState('');const [open,setOpen]=useState(false);
+  useEffect(()=>{if(!q.trim()){setOpen(false);return;}setOpen(true);const t=setTimeout(()=>onSearch?.(q),150);return()=>clearTimeout(t);},[q]);
   return <div className="topbar">
-    <button className="icon-btn mbar" onClick={onMenu}>☰</button>
+    <button className="icon-btn mbar" onClick={onMenu}><Icon name="menu" size={16}/></button>
     <div style={{position:'relative',flex:1,maxWidth:520}}>
-      <div className="search"><span style={{fontSize:15,opacity:.7}}>🔍</span><input value={q} onChange={e=>setQ(e.target.value)} placeholder="ابحث..."/>{q&&<button onClick={()=>{setQ('');setOpen(false);}} style={{opacity:.6,color:'var(--txt)'}}>✕</button>}</div>
+      <div className="search">
+        <Icon name="search" size={15} color="var(--muted)"/>
+        <input value={q} onChange={e=>setQ(e.target.value)} placeholder="ابحث..."/>
+        {q&&<button onClick={()=>{setQ('');setOpen(false);}} style={{opacity:.6,color:'var(--txt)'}}><Icon name="close" size={14}/></button>}
+      </div>
       {open&&searchResults?.length>0&&<div className="glass" style={{position:'absolute',top:'calc(100% + 8px)',insetInline:0,padding:8,zIndex:80,maxHeight:340,overflowY:'auto'}}>
         {searchResults.slice(0,10).map((r,i)=><button key={i} className="nav-i" onClick={()=>{onResultClick(r);setQ('');setOpen(false);}}>
           <span className="nav-ico">{r.icon}</span><div style={{flex:1,textAlign:'right'}}><div style={{fontSize:13.5}}>{r.title}</div><div className="xs muted">{r.type}</div></div>
@@ -342,7 +400,7 @@ function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick}){
     </div>
     <div className="flex center g8" style={{marginInlineStart:'auto'}}>
       <div className="glass-s" style={{padding:'5px 12px',display:'flex',alignItems:'center',gap:8}}><div className="avatar" style={{width:32,height:32,fontSize:15}}>{user.avatar||'👑'}</div></div>
-      <button className="icon-btn" onClick={onLogout}>🚪</button>
+      <button className="icon-btn" onClick={onLogout}><Icon name="logout" size={16}/></button>
     </div>
   </div>;
 }
@@ -359,20 +417,20 @@ function Dashboard(){
   const recentAct=app.db.activity.slice(0,8);
   const actLabel={login:'تسجيل دخول',register:'تسجيل جديد',lesson_view:'فتح درس',lesson_complete:'أكمل درس',exam_start:'بدأ اختبار',exam_submit:'أنهى اختبار',video_play:'شاهد فيديو',video_25:'25%',video_50:'50%',video_75:'75%',video_complete:'أكمل الفيديو',mission_complete:'أكمل مهمة',achievement_unlock:'فتح إنجاز'};
   return <>
-    <div className="hero mb16"><div><div className="h2 mb6">لوحة تحكم الأدمن 👑</div><div className="sm txt2">إدارة كاملة لكل محتوى المنصة</div></div></div>
+    <div className="hero mb16"><div><div className="h2 mb6">لوحة تحكم الأدمن</div><div className="sm txt2">إدارة كاملة لكل محتوى المنصة</div></div></div>
     <div className="grid g4 mb16">
-      <Stat label="إجمالي الطلاب" value={DB.fmt(students.length)} icon="🧑‍🎓" color="#5aa9ff"/>
-      <Stat label="الطلاب النشطون" value={DB.fmt(active)} icon="✅" color="#22c55e"/>
-      <Stat label="عدد المواد" value={DB.fmt(app.db.subjects.length)} icon="📚" color="#f59e0b"/>
-      <Stat label="عدد الدروس" value={DB.fmt(app.db.lessons.length)} icon="📖" color="#8b5cf6"/>
-      <Stat label="الوحدات" value={DB.fmt(app.db.units.length)} icon="🗂" color="#06b6d4"/>
-      <Stat label="الاختبارات" value={DB.fmt(app.db.exams.length)} icon="📝" color="#ec4899"/>
-      <Stat label="المهام" value={DB.fmt(app.db.missions.length)} icon="🎯" color="#22c55e"/>
-      <Stat label="متوسط التقدم" value={`${avgProgress}%`} icon="📈" color="#2f7dff"/>
+      <Stat label="إجمالي الطلاب" value={DB.fmt(students.length)} icon="users" color="#5aa9ff"/>
+      <Stat label="الطلاب النشطون" value={DB.fmt(active)} icon="check" color="#22c55e"/>
+      <Stat label="عدد المواد" value={DB.fmt(app.db.subjects.length)} icon="book" color="#f59e0b"/>
+      <Stat label="عدد الدروس" value={DB.fmt(app.db.lessons.length)} icon="file" color="#8b5cf6"/>
+      <Stat label="الوحدات" value={DB.fmt(app.db.units.length)} icon="folder" color="#06b6d4"/>
+      <Stat label="الاختبارات" value={DB.fmt(app.db.exams.length)} icon="clipboard" color="#ec4899"/>
+      <Stat label="المهام" value={DB.fmt(app.db.missions.length)} icon="target" color="#22c55e"/>
+      <Stat label="متوسط التقدم" value={`${avgProgress}%`} icon="trend" color="#2f7dff"/>
     </div>
     <div className="grid g2 mb16">
       <div className="glass" style={{padding:18}}>
-        <div className="h4 mb12">🏅 المتصدرون العشرة</div>
+        <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="award" size={16}/> المتصدرون العشرة</div>
         {top10.length===0?<Empty icon="🏅" title="لا يوجد طلاب بعد"/>:
           top10.map((s,i)=>{
             const {current}=app.getLevel(s.xp||0);
@@ -386,10 +444,10 @@ function Dashboard(){
         }
       </div>
       <div className="glass" style={{padding:18}}>
-        <div className="h4 mb12">📡 آخر الأنشطة</div>
+        <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="activity" size={16}/> آخر الأنشطة</div>
         {recentAct.length===0?<Empty title="لا يوجد نشاط"/>:
           recentAct.map(a=><div key={a.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid rgba(90,140,230,.08)'}}>
-            <div className="act-ico">📌</div>
+            <div className="act-ico"><Icon name="activity" size={16}/></div>
             <div style={{flex:1}}><div className="sm">{a.user_name}</div><div className="xs muted">{actLabel[a.type]||a.type}{a.target?` — ${a.target}`:''}</div></div>
             <div className="xs muted">{new Date(a.at).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})}</div>
           </div>)
@@ -404,27 +462,27 @@ function ActivityLog(){
   const [filter,setFilter]=useState('all');
   const [studentFilter,setStudentFilter]=useState('all');
   const students=app.db.users.filter(u=>u.role==='student');
-  const typeFilters=[{id:'all',label:'الكل',icon:'📌'},{id:'lesson_view',label:'دروس',icon:'👁'},{id:'video_play',label:'فيديو',icon:'▶️'},{id:'video_complete',label:'إكمال فيديو',icon:'🎬'},{id:'exam_start',label:'بدء اختبار',icon:'📝'},{id:'exam_submit',label:'إنهاء اختبار',icon:'📤'},{id:'mission_complete',label:'مهام',icon:'🎯'},{id:'login',label:'دخول',icon:'🔓'}];
+  const typeFilters=[{id:'all',label:'الكل'},{id:'lesson_view',label:'دروس'},{id:'video_play',label:'فيديو'},{id:'exam_start',label:'بدء اختبار'},{id:'exam_submit',label:'إنهاء اختبار'},{id:'mission_complete',label:'مهام'},{id:'login',label:'دخول'}];
   let list=[...app.db.activity];
   if(filter!=='all') list=list.filter(a=>a.type===filter);
   if(studentFilter!=='all') list=list.filter(a=>a.user_id===studentFilter);
   const actLabel={login:'تسجيل دخول',register:'تسجيل جديد',lesson_view:'فتح درس',lesson_complete:'أكمل درس',exam_start:'بدأ اختبار',exam_submit:'أنهى اختبار',video_play:'شاهد فيديو',video_25:'25%',video_50:'50%',video_75:'75%',video_complete:'أكمل الفيديو',mission_complete:'أكمل مهمة',achievement_unlock:'فتح إنجاز'};
   return <>
     <div className="flex between center mb16 wrap g8">
-      <div className="h2">📡 سجل النشاط</div>
+      <div className="h2">سجل النشاط</div>
       <select className="input" style={{maxWidth:220}} value={studentFilter} onChange={e=>setStudentFilter(e.target.value)}>
         <option value="all">كل الطلاب</option>
         {students.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
       </select>
     </div>
     <div className="flex wrap g6 mb16">
-      {typeFilters.map(f=><button key={f.id} onClick={()=>setFilter(f.id)} style={{padding:'8px 14px',borderRadius:30,background:filter===f.id?'rgba(47,125,255,.18)':'rgba(255,255,255,.05)',border:`1px solid ${filter===f.id?'var(--blue)':'var(--border)'}`,fontSize:12.5,fontWeight:700,color:'var(--txt)'}}>{f.icon} {f.label}</button>)}
+      {typeFilters.map(f=><button key={f.id} onClick={()=>setFilter(f.id)} style={{padding:'8px 14px',borderRadius:30,background:filter===f.id?'rgba(47,125,255,.18)':'rgba(255,255,255,.05)',border:`1px solid ${filter===f.id?'var(--blue)':'var(--border)'}`,fontSize:12.5,fontWeight:700,color:'var(--txt)'}}>{f.label}</button>)}
     </div>
     <div className="glass" style={{padding:16}}>
       {list.length===0?<Empty icon="📡" title="لا يوجد نشاط"/>:
         <div className="flex col g8">
           {list.slice(0,200).map(a=><div key={a.id} className="act-row">
-            <div className="act-ico">📌</div>
+            <div className="act-ico"><Icon name="activity" size={16}/></div>
             <div style={{flex:1,minWidth:0}}>
               <div className="flex between center wrap g8">
                 <div><div className="sm" style={{fontWeight:700}}>{a.user_name}</div><div className="xs muted">{actLabel[a.type]||a.type}{a.target?` — ${a.target}`:''}</div></div>
@@ -447,11 +505,8 @@ function Crud({title,collection,defaultItem,fields,columns}){
   const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
   const save=async ()=>{
     setBusy(true);
-    try{
-      await app.save(collection,form);
-      app.toast.ok(editing==='new'?'تمت الإضافة':'تم الحفظ');
-      setEditing(null);
-    }catch(e){app.toast.err(e.message);}
+    try{await app.save(collection,form);app.toast.ok(editing==='new'?'تمت الإضافة':'تم الحفظ');setEditing(null);}
+    catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
   const del=async id=>{
@@ -461,14 +516,17 @@ function Crud({title,collection,defaultItem,fields,columns}){
   };
   const items=app.db[collection]||[];
   return <>
-    <div className="flex between center mb16"><div className="h2">{title}</div><button className="btn btn-p" onClick={openNew}>+ إضافة</button></div>
+    <div className="flex between center mb16"><div className="h2">{title}</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> إضافة</button></div>
     <div className="glass" style={{padding:14}}>
       {items.length===0?<Empty title="لا توجد بيانات"/>:
         <div className="sx"><table className="tbl">
           <thead><tr>{columns.map((c,i)=><th key={i}>{c.label}</th>)}<th>إجراءات</th></tr></thead>
           <tbody>{items.map(it=><tr key={it.id}>
             {columns.map((c,i)=><td key={i}>{c.render?c.render(it,app):it[c.key]}</td>)}
-            <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(it)}>✏️</button><button className="btn btn-dn btn-sm" onClick={()=>del(it.id)}>🗑</button></div></td>
+            <td><div className="flex g6">
+              <button className="btn btn-s btn-sm" onClick={()=>openEdit(it)}><Icon name="edit" size={13}/></button>
+              <button className="btn btn-dn btn-sm" onClick={()=>del(it.id)}><Icon name="trash" size={13}/></button>
+            </div></td>
           </tr>)}</tbody>
         </table></div>
       }
@@ -489,7 +547,10 @@ function Crud({title,collection,defaultItem,fields,columns}){
           </Field>
         </div>)}
       </div>
-      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
+      <div className="flex g8 mt16">
+        <button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button>
+        <button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button>
+      </div>
     </Modal>}
   </>;
 }
@@ -533,7 +594,7 @@ function LessonsPage(){
   const del=async id=>{if(!confirm('حذف الدرس؟'))return;try{await app.remove('lessons',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
   const badge=l=>{if(!l.video||!l.video.url)return <span className="pill pill-y">لا فيديو</span>;const map={youtube:'📺 YouTube',vimeo:'🎬 Vimeo',mp4:'🎥 MP4',external:'🔗 خارجي'};return <span className="pill pill-b">{map[l.video.type]||l.video.type}</span>;};
   return <>
-    <div className="flex between center mb16"><div className="h2">📖 إدارة الدروس</div><button className="btn btn-p" onClick={openNew}>+ درس جديد</button></div>
+    <div className="flex between center mb16"><div className="h2">📖 إدارة الدروس</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> درس جديد</button></div>
     <div className="glass" style={{padding:14}}>
       {app.db.lessons.length===0?<Empty title="لا توجد دروس"/>:
         <div className="sx"><table className="tbl">
@@ -541,7 +602,7 @@ function LessonsPage(){
           <tbody>{app.db.lessons.map(l=><tr key={l.id}>
             <td><b>{l.title}</b></td><td className="sm">{app.unit(l.unit_id)?.name||'—'}</td><td>{badge(l)}</td><td>{l.xp}</td>
             <td>{l.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td>
-            <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(l)}>✏️</button><button className="btn btn-dn btn-sm" onClick={()=>del(l.id)}>🗑</button></div></td>
+            <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(l)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(l.id)}><Icon name="trash" size={13}/></button></div></td>
           </tr>)}</tbody>
         </table></div>
       }
@@ -584,7 +645,7 @@ function QuestionsPage(){
   };
   const del=async id=>{if(!confirm('حذف السؤال؟'))return;try{await app.remove('questions',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
   return <>
-    <div className="flex between center mb16"><div className="h2">❓ بنك الأسئلة</div><button className="btn btn-p" onClick={openNew}>+ سؤال جديد</button></div>
+    <div className="flex between center mb16"><div className="h2">❓ بنك الأسئلة</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> سؤال جديد</button></div>
     <div className="glass" style={{padding:14}}>
       {app.db.questions.length===0?<Empty title="لا توجد أسئلة"/>:
         <div className="sx"><table className="tbl">
@@ -594,7 +655,7 @@ function QuestionsPage(){
             <td className="sm">{app.lesson(q.lesson_id)?.title||'—'}</td>
             <td><span className={`pill ${q.difficulty==='easy'?'pill-g':q.difficulty==='hard'?'pill-r':'pill-a'}`}>{q.difficulty}</span></td>
             <td>{q.xp}</td>
-            <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(q)}>✏️</button><button className="btn btn-dn btn-sm" onClick={()=>del(q.id)}>🗑</button></div></td>
+            <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(q)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(q.id)}><Icon name="trash" size={13}/></button></div></td>
           </tr>)}</tbody>
         </table></div>
       }
@@ -636,7 +697,7 @@ function ExamsPage(){
   const del=async id=>{if(!confirm('حذف الاختبار؟'))return;try{await app.remove('exams',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
   const availQ=form.unit_id?app.db.questions.filter(q=>q.unit_id===form.unit_id):app.db.questions;
   return <>
-    <div className="flex between center mb16"><div className="h2">📝 إدارة الاختبارات</div><button className="btn btn-p" onClick={openNew}>+ اختبار جديد</button></div>
+    <div className="flex between center mb16"><div className="h2">📝 إدارة الاختبارات</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> اختبار جديد</button></div>
     <div className="glass" style={{padding:14}}>
       {app.db.exams.length===0?<Empty title="لا توجد اختبارات"/>:
         <div className="sx"><table className="tbl">
@@ -644,7 +705,7 @@ function ExamsPage(){
           <tbody>{app.db.exams.map(e=><tr key={e.id}>
             <td>{e.title}</td><td className="sm">{app.subject(e.subject_id)?.name||'—'}</td>
             <td>{(e.question_ids||[]).length}</td><td>{e.pass_score}%</td>
-            <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(e)}>✏️</button><button className="btn btn-dn btn-sm" onClick={()=>del(e.id)}>🗑</button></div></td>
+            <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(e)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(e.id)}><Icon name="trash" size={13}/></button></div></td>
           </tr>)}</tbody>
         </table></div>
       }
@@ -691,14 +752,14 @@ function MissionsPage(){
   };
   const del=async id=>{if(!confirm('حذف المهمة؟'))return;try{await app.remove('missions',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
   return <>
-    <div className="flex between center mb16"><div className="h2">🎯 إدارة المهام</div><button className="btn btn-p" onClick={openNew}>+ مهمة جديدة</button></div>
+    <div className="flex between center mb16"><div className="h2">🎯 إدارة المهام</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> مهمة جديدة</button></div>
     <div className="glass" style={{padding:14}}>
       {app.db.missions.length===0?<Empty title="لا توجد مهام"/>:
         <div className="sx"><table className="tbl">
           <thead><tr><th>العنوان</th><th>المادة</th><th>XP</th><th>إجراءات</th></tr></thead>
           <tbody>{app.db.missions.map(m=><tr key={m.id}>
             <td>{m.title}</td><td className="sm">{app.subject(m.subject_id)?.name||'—'}</td><td>{m.xp}</td>
-            <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(m)}>✏️</button><button className="btn btn-dn btn-sm" onClick={()=>del(m.id)}>🗑</button></div></td>
+            <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(m)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(m.id)}><Icon name="trash" size={13}/></button></div></td>
           </tr>)}</tbody>
         </table></div>
       }
@@ -752,12 +813,14 @@ function StudentsPage(){
   const [form,setForm]=useState({});
   const [q,setQ]=useState('');
   const [busy,setBusy]=useState(false);
-  const list=app.db.users.filter(u=>u.role==='student'&&(u.name.toLowerCase().includes(q.toLowerCase())||u.email.toLowerCase().includes(q.toLowerCase())));
+  const list=app.db.users.filter(u=>u.role==='student'&&(u.name.toLowerCase().includes(q.toLowerCase())||(u.phone||'').includes(q)));
   const open=s=>{setForm(JSON.parse(JSON.stringify(s)));setEditing(s.id);};
   const save=async ()=>{
     setBusy(true);
-    try{await DB.updateUser(editing,{name:form.name,email:form.email,xp:form.xp,grade_id:form.grade_id,all_subjects:form.all_subjects,access_subjects:form.access_subjects||[]});await app.reload();app.toast.ok('تم الحفظ');setEditing(null);}
-    catch(e){app.toast.err(e.message);}
+    try{
+      await DB.updateUser(editing,{name:form.name,phone:form.phone,xp:form.xp,grade_id:form.grade_id,all_subjects:form.all_subjects,access_subjects:form.access_subjects||[]});
+      await app.reload();app.toast.ok('تم الحفظ');setEditing(null);
+    }catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
   const toggle=async s=>{
@@ -766,24 +829,25 @@ function StudentsPage(){
   };
   return <>
     <div className="flex between center mb16 wrap g8">
-      <div className="h2">🧑‍🎓 إدارة الطلاب</div>
+      <div className="h2">إدارة الطلاب</div>
       <input className="input" style={{maxWidth:260}} placeholder="🔍 بحث..." value={q} onChange={e=>setQ(e.target.value)}/>
     </div>
     <div className="glass" style={{padding:14}}>
       <div className="sx"><table className="tbl">
-        <thead><tr><th>الطالب</th><th>البريد</th><th>XP</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+        <thead><tr><th>الطالب</th><th>الهاتف</th><th>XP</th><th>الحالة</th><th>إجراءات</th></tr></thead>
         <tbody>{list.map(s=><tr key={s.id}>
           <td><div className="flex center g8"><div className="avatar" style={{width:30,height:30,fontSize:14}}>{s.avatar||'👤'}</div><span>{s.name}</span></div></td>
-          <td className="sm muted">{s.email}</td><td><b>{DB.fmt(s.xp||0)}</b></td>
+          <td className="sm muted" dir="ltr">{(s.country_code||'+20')}{s.phone||''}</td>
+          <td><b>{DB.fmt(s.xp||0)}</b></td>
           <td>{s.active!==false?<span className="pill pill-g">نشط</span>:<span className="pill pill-r">موقوف</span>}</td>
-          <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>open(s)}>✏️</button><button className={`btn btn-sm ${s.active!==false?'btn-dn':'btn-ok'}`} onClick={()=>toggle(s)}>{s.active!==false?'إيقاف':'تفعيل'}</button></div></td>
+          <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>open(s)}><Icon name="edit" size={13}/></button><button className={`btn btn-sm ${s.active!==false?'btn-dn':'btn-ok'}`} onClick={()=>toggle(s)}>{s.active!==false?'إيقاف':'تفعيل'}</button></div></td>
         </tr>)}</tbody>
       </table></div>
     </div>
     {editing&&<Modal title={`تعديل: ${form.name}`} onClose={()=>setEditing(null)} wide>
       <div className="grid g2">
         <Field label="الاسم"><input className="input" value={form.name||''} onChange={e=>setForm({...form,name:e.target.value})}/></Field>
-        <Field label="البريد"><input className="input" value={form.email||''} onChange={e=>setForm({...form,email:e.target.value})}/></Field>
+        <Field label="الهاتف"><input className="input" value={form.phone||''} onChange={e=>setForm({...form,phone:e.target.value})}/></Field>
         <Field label="XP"><input type="number" className="input" value={form.xp||0} onChange={e=>setForm({...form,xp:+e.target.value})}/></Field>
         <Field label="الصف"><select className="input" value={form.grade_id||''} onChange={e=>setForm({...form,grade_id:e.target.value})}><option value="">— اختر —</option>{app.db.grades.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></Field>
       </div>
@@ -809,10 +873,10 @@ function NotificationsPage(){
   };
   const del=async id=>{if(!confirm('حذف؟'))return;try{await app.remove('notifications',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
   return <>
-    <div className="h2 mb16">🔔 الإشعارات</div>
+    <div className="h2 mb16">الإشعارات</div>
     <div className="grid g2">
       <div className="glass" style={{padding:20}}>
-        <div className="h4 mb12">📤 إرسال إشعار</div>
+        <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="bell" size={16}/> إرسال إشعار</div>
         <Field label="العنوان"><input className="input" value={form.title} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
         <Field label="النص"><textarea className="input" value={form.body} onChange={e=>setForm({...form,body:e.target.value})}/></Field>
         <Field label="المستهدفون"><select className="input" value={form.target} onChange={e=>setForm({...form,target:e.target.value})}>
@@ -822,16 +886,29 @@ function NotificationsPage(){
         <button className="btn btn-p btn-block" onClick={send} disabled={busy}>{busy?'جارٍ...':'📤 إرسال'}</button>
       </div>
       <div className="glass" style={{padding:20}}>
-        <div className="h4 mb12">📬 آخر الإشعارات</div>
+        <div className="h4 mb12">آخر الإشعارات</div>
         {app.db.notifications.slice(0,10).map(n=><div key={n.id} className="glass-s mb8" style={{padding:12,display:'flex',gap:10,alignItems:'flex-start'}}>
           <div style={{flex:1}}>
             <div className="h4" style={{fontSize:14}}>{n.title}</div>
             <div className="xs muted">{n.body}</div>
             <div className="xs mt6" style={{color:'var(--blue2)'}}>← {n.target==='all'?'كل الطلاب':app.db.users.find(u=>u.id===n.target)?.name||'—'}</div>
           </div>
-          <button className="btn btn-dn btn-sm" onClick={()=>del(n.id)}>🗑</button>
+          <button className="btn btn-dn btn-sm" onClick={()=>del(n.id)}><Icon name="trash" size={13}/></button>
         </div>)}
       </div>
+    </div>
+  </>;
+}
+
+function ReportsPage(){
+  const app=useApp();
+  return <>
+    <div className="h2 mb16">📨 البلاغات المرسلة</div>
+    <div className="glass" style={{padding:20}}>
+      <div className="sm muted mb16">البلاغات تُرسل مباشرة إلى بوت Telegram. لا تظهر هنا إلا إذا سجلتها في جدول <code>reports</code>.</div>
+      <a href="https://t.me" target="_blank" className="btn btn-p" style={{textDecoration:'none'}}>
+        <Icon name="link" size={15}/> فتح Telegram
+      </a>
     </div>
   </>;
 }
@@ -839,20 +916,40 @@ function NotificationsPage(){
 function SettingsPage(){
   const app=useApp();
   return <>
-    <div className="h2 mb16">⚙️ الإعدادات</div>
+    <div className="h2 mb16">الإعدادات</div>
     <div className="glass" style={{padding:20,maxWidth:640}}>
-      <div className="h4 mb12">🔌 معلومات الاتصال</div>
+      <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="settings" size={16}/> معلومات النظام</div>
       <div className="glass-s mb12" style={{padding:12}}>
         <div className="xs muted">Supabase URL</div>
         <div className="xs" style={{wordBreak:'break-all'}}>https://szuvpbdwixezecxnykjn.supabase.co</div>
       </div>
       <div className="grid g3 mb16">
-        <Stat label="المستخدمون" value={app.db.users.length} icon="👥"/>
-        <Stat label="سجل النشاط" value={app.db.activity.length} icon="📡"/>
-        <Stat label="الإشعارات" value={app.db.notifications.length} icon="🔔"/>
+        <Stat label="المستخدمون" value={app.db.users.length} icon="users"/>
+        <Stat label="سجل النشاط" value={app.db.activity.length} icon="activity"/>
+        <Stat label="الإشعارات" value={app.db.notifications.length} icon="bell"/>
       </div>
     </div>
   </>;
+}
+
+function Footer(){
+  return <div className="footer-dev">
+    <button className="dev-btn" onClick={()=>window.open("https://wa.me/201550802408?text="+encodeURIComponent("مرحبًا، أريد الاستفسار عن منصة MISSION EDU"),"_blank")}>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+      <span className="dev-name">Developed by <b>EL-sayed Hasan</b></span>
+    </button>
+    <button className="tg-btn" onClick={()=>{
+      const msg=prompt("اكتب مشكلتك بالتفصيل:");
+      if(msg&&msg.length>=5){DB.reportIssue({userName:window.MissionDB?.userName||"أدمن",userPhone:"—",message:msg});}
+    }}>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+      </svg>
+      <span>بلاغ</span>
+    </button>
+  </div>;
 }
 
 function AdminApp(){
@@ -862,20 +959,20 @@ function AdminApp(){
   const [searchResults,setSearchResults]=useState([]);
   const user=app.currentUser;
   const items=[
-    {title:'الرئيسية',items:[{id:'dashboard',icon:'📊',label:'لوحة التحكم'},{id:'activity',icon:'📡',label:'سجل النشاط'}]},
+    {title:'الرئيسية',items:[{id:'dashboard',icon:'dashboard',label:'لوحة التحكم'},{id:'activity',icon:'activity',label:'سجل النشاط'}]},
     {title:'المحتوى',items:[
-      {id:'grades',icon:'🏫',label:'الصفوف'},{id:'subjects',icon:'📚',label:'المواد'},{id:'units',icon:'🗂',label:'الوحدات'},
-      {id:'lessons',icon:'📖',label:'الدروس'},{id:'questions',icon:'❓',label:'بنك الأسئلة'},{id:'exams',icon:'📝',label:'الاختبارات'},{id:'missions',icon:'🎯',label:'المهام'}
+      {id:'grades',icon:'school',label:'الصفوف'},{id:'subjects',icon:'book',label:'المواد'},{id:'units',icon:'folder',label:'الوحدات'},
+      {id:'lessons',icon:'file',label:'الدروس'},{id:'questions',icon:'help',label:'بنك الأسئلة'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'missions',icon:'target',label:'المهام'}
     ]},
-    {title:'التحفيز',items:[{id:'achievements',icon:'🏆',label:'الإنجازات'},{id:'levels',icon:'📈',label:'المستويات'}]},
-    {title:'المستخدمون',items:[{id:'students',icon:'🧑‍🎓',label:'الطلاب'},{id:'notifications',icon:'🔔',label:'الإشعارات'},{id:'settings',icon:'⚙️',label:'الإعدادات'}]}
+    {title:'التحفيز',items:[{id:'achievements',icon:'trophy',label:'الإنجازات'},{id:'levels',icon:'trend',label:'المستويات'}]},
+    {title:'المستخدمون',items:[{id:'students',icon:'users',label:'الطلاب'},{id:'notifications',icon:'bell',label:'الإشعارات'},{id:'reports',icon:'link',label:'البلاغات'},{id:'settings',icon:'settings',label:'الإعدادات'}]}
   ];
   const onSearch=q=>{
     const lc=q.toLowerCase(),res=[];
-    app.db.users.filter(x=>x.name.toLowerCase().includes(lc)||x.email.toLowerCase().includes(lc)).slice(0,5).forEach(s=>res.push({type:'مستخدم',icon:'👤',title:s.name,nav:'students'}));
+    app.db.users.filter(x=>x.name.toLowerCase().includes(lc)||(x.phone||'').includes(lc)).slice(0,5).forEach(s=>res.push({type:'مستخدم',icon:<Icon name="user" size={16}/>,title:s.name,nav:'students'}));
     app.db.subjects.filter(s=>s.name.toLowerCase().includes(lc)).forEach(s=>res.push({type:'مادة',icon:s.icon||'📚',title:s.name,nav:'subjects'}));
-    app.db.lessons.filter(l=>l.title.toLowerCase().includes(lc)).slice(0,5).forEach(l=>res.push({type:'درس',icon:'📖',title:l.title,nav:'lessons'}));
-    app.db.exams.filter(e=>e.title.toLowerCase().includes(lc)).slice(0,5).forEach(e=>res.push({type:'اختبار',icon:'📝',title:e.title,nav:'exams'}));
+    app.db.lessons.filter(l=>l.title.toLowerCase().includes(lc)).slice(0,5).forEach(l=>res.push({type:'درس',icon:<Icon name="file" size={16}/>,title:l.title,nav:'lessons'}));
+    app.db.exams.filter(e=>e.title.toLowerCase().includes(lc)).slice(0,5).forEach(e=>res.push({type:'اختبار',icon:<Icon name="clipboard" size={16}/>,title:e.title,nav:'exams'}));
     setSearchResults(res);
   };
   return <div className="app">
@@ -896,7 +993,9 @@ function AdminApp(){
         {tab==='levels'&&<LevelsPage/>}
         {tab==='students'&&<StudentsPage/>}
         {tab==='notifications'&&<NotificationsPage/>}
+        {tab==='reports'&&<ReportsPage/>}
         {tab==='settings'&&<SettingsPage/>}
+        <Footer/>
       </div>
     </div>
   </div>;
