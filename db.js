@@ -28,24 +28,36 @@ const fmt = (n) => new Intl.NumberFormat("ar-EG").format(n || 0);
 const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
 
 const hashPassword = async (password) => {
-  const enc = new TextEncoder();
-  const data = enc.encode(password + "::me::salt::" + SUPABASE_URL);
-  const buf = await crypto.subtle.digest("SHA-256", data);
-  return Array.from(new Uint8Array(buf))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+  try {
+    const enc = new TextEncoder();
+    const data = enc.encode(password + "::me::salt::" + SUPABASE_URL);
+    const buf = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(buf))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+  } catch (e) {
+    return password;
+  }
 };
 
 const setSession = (userId) => {
-  sessionStorage.setItem("me_session", userId);
-  sessionStorage.setItem("me_session_at", Date.now().toString());
-  sessionStorage.setItem("me_session_sig", btoa(userId + "::" + Date.now()).slice(0, 32));
+  try {
+    sessionStorage.setItem("me_session", userId);
+    sessionStorage.setItem("me_session_at", Date.now().toString());
+  } catch (e) {}
 };
-const getSessionId = () => sessionStorage.getItem("me_session");
+const getSessionId = () => {
+  try {
+    return sessionStorage.getItem("me_session");
+  } catch (e) {
+    return null;
+  }
+};
 const clearSession = () => {
-  sessionStorage.removeItem("me_session");
-  sessionStorage.removeItem("me_session_at");
-  sessionStorage.removeItem("me_session_sig");
+  try {
+    sessionStorage.removeItem("me_session");
+    sessionStorage.removeItem("me_session_at");
+  } catch (e) {}
 };
 
 const basePath = () => {
@@ -62,7 +74,7 @@ const TELEGRAM_CHAT_ID = "7114350905";
 const sendToTelegram = async (message) => {
   try {
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-    await fetch(url, {
+    const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -71,7 +83,7 @@ const sendToTelegram = async (message) => {
         parse_mode: "HTML"
       })
     });
-    return true;
+    return res.ok;
   } catch (e) {
     return false;
   }
@@ -135,14 +147,18 @@ const API = {
     const sb = await getClient();
 
     const { data: exist } = await sb
-      .from("users").select("id")
+      .from("users")
+      .select("id")
       .eq("phone", cleanPhone)
       .eq("country_code", countryCode)
       .maybeSingle();
     if (exist) throw new Error("رقم الهاتف مستخدم بالفعل");
 
     const { data: roleRow } = await sb
-      .from("roles").select("id").eq("name", "student").maybeSingle();
+      .from("roles")
+      .select("id")
+      .eq("name", "student")
+      .maybeSingle();
 
     const hashed = await hashPassword(password);
 
@@ -155,13 +171,19 @@ const API = {
       password_hash: hashed,
       name: name.trim(),
       role: "student",
-      role_id: roleRow?.id || "role_student",
+      role_id: roleRow ? roleRow.id : "role_student",
       avatar: "🧑‍🎓",
       grade_id: gradeId || "",
-      xp: 0, streak: 1, last_active: today(),
-      created_at: Date.now(), active: true,
-      all_subjects: true, access_subjects: [],
-      completed_lessons: [], completed_missions: [], achievements: []
+      xp: 0,
+      streak: 1,
+      last_active: today(),
+      created_at: Date.now(),
+      active: true,
+      all_subjects: true,
+      access_subjects: [],
+      completed_lessons: [],
+      completed_missions: [],
+      achievements: []
     };
 
     const { data, error } = await sb.from("users").insert([u]).select().single();
@@ -179,17 +201,25 @@ const API = {
 
   async getUser(id) {
     if (!id) return null;
-    const sb = await getClient();
-    const { data } = await sb.from("users").select("*").eq("id", id).maybeSingle();
-    return data || null;
+    try {
+      const sb = await getClient();
+      const { data } = await sb.from("users").select("*").eq("id", id).maybeSingle();
+      return data || null;
+    } catch (e) {
+      return null;
+    }
   },
 
   async countUsers() {
-    const sb = await getClient();
-    const { count } = await sb
-      .from("users")
-      .select("*", { count: "exact", head: true });
-    return count || 0;
+    try {
+      const sb = await getClient();
+      const { count } = await sb
+        .from("users")
+        .select("*", { count: "exact", head: true });
+      return count || 0;
+    } catch (e) {
+      return 0;
+    }
   },
 
   async loadAll() {
@@ -229,21 +259,29 @@ const API = {
   async updateUser(id, patch) {
     const sb = await getClient();
     const { data, error } = await sb
-      .from("users").update(patch).eq("id", id).select().single();
+      .from("users")
+      .update(patch)
+      .eq("id", id)
+      .select()
+      .single();
     if (error) throw new Error(error.message);
     return data;
   },
 
   async getTop10() {
-    const sb = await getClient();
-    const { data } = await sb
-      .from("users")
-      .select("*")
-      .eq("role", "student")
-      .eq("active", true)
-      .order("xp", { ascending: false })
-      .limit(10);
-    return data || [];
+    try {
+      const sb = await getClient();
+      const { data } = await sb
+        .from("users")
+        .select("*")
+        .eq("role", "student")
+        .eq("active", true)
+        .order("xp", { ascending: false })
+        .limit(10);
+      return data || [];
+    } catch (e) {
+      return [];
+    }
   },
 
   async trackActivity({ userId, userName, userRole, type, target, details }) {
@@ -274,19 +312,27 @@ const API = {
       created_at: Date.now()
     };
     const { data, error } = await sb
-      .from("exam_attempts").insert([row]).select().single();
+      .from("exam_attempts")
+      .insert([row])
+      .select()
+      .single();
     if (error) throw new Error(error.message);
     return data;
   },
 
   async getAttempts(userId) {
     if (!userId) return [];
-    const sb = await getClient();
-    const { data } = await sb
-      .from("exam_attempts").select("*")
-      .eq("user_id", userId)
-      .order("at", { ascending: false });
-    return data || [];
+    try {
+      const sb = await getClient();
+      const { data } = await sb
+        .from("exam_attempts")
+        .select("*")
+        .eq("user_id", userId)
+        .order("at", { ascending: false });
+      return data || [];
+    } catch (e) {
+      return [];
+    }
   },
 
   async saveError({ userId, questionId, given, correct, lessonId }) {
@@ -300,7 +346,9 @@ const API = {
 
     if (exist) {
       return API.save("user_errors", {
-        ...exist, given, correct,
+        ...exist,
+        given,
+        correct,
         count: (exist.count || 1) + 1,
         at: Date.now()
       });
@@ -318,12 +366,17 @@ const API = {
 
   async getErrors(userId) {
     if (!userId) return [];
-    const sb = await getClient();
-    const { data } = await sb
-      .from("user_errors").select("*")
-      .eq("user_id", userId)
-      .order("at", { ascending: false });
-    return data || [];
+    try {
+      const sb = await getClient();
+      const { data } = await sb
+        .from("user_errors")
+        .select("*")
+        .eq("user_id", userId)
+        .order("at", { ascending: false });
+      return data || [];
+    } catch (e) {
+      return [];
+    }
   },
 
   async reportIssue({ userName, userPhone, message }) {
@@ -333,6 +386,19 @@ const API = {
       `📱 <b>الهاتف:</b> ${userPhone || "غير معروف"}\n` +
       `🕐 <b>التاريخ:</b> ${new Date().toLocaleString("ar-EG")}\n\n` +
       `📝 <b>الرسالة:</b>\n${message}`;
+
+    try {
+      const sb = await getClient();
+      await sb.from("reports").insert([{
+        id: uid("rep_"),
+        user_name: userName || "غير معروف",
+        user_phone: userPhone || "—",
+        message,
+        sent_to_telegram: true,
+        created_at: Date.now()
+      }]);
+    } catch (e) {}
+
     return await sendToTelegram(text);
   },
 
@@ -349,23 +415,32 @@ const API = {
   },
 
   redirectByRole(user) {
-    const base = basePath();
     if (!user) {
-      window.location.href = base + "/auth/login.html";
+      window.location.replace("./auth/login.html");
       return;
     }
     if (user.role === "admin") {
-      window.location.href = base + "/admin/index.html";
+      window.location.replace("./admin/index.html");
     } else {
-      window.location.href = base + "/student/index.html";
+      window.location.replace("./student/index.html");
     }
   },
 
-  gotoLogin() { window.location.href = basePath() + "/auth/login.html"; },
-  gotoRegister() { window.location.href = basePath() + "/auth/register.html"; },
-  gotoAdmin() { window.location.href = basePath() + "/admin/index.html"; },
-  gotoStudent() { window.location.href = basePath() + "/student/index.html"; },
-  gotoHome() { window.location.href = basePath() + "/index.html"; }
+  gotoLogin() {
+    window.location.replace("./auth/login.html");
+  },
+  gotoRegister() {
+    window.location.replace("./auth/register.html");
+  },
+  gotoAdmin() {
+    window.location.replace("./admin/index.html");
+  },
+  gotoStudent() {
+    window.location.replace("./student/index.html");
+  },
+  gotoHome() {
+    window.location.replace("./index.html");
+  }
 };
 
 window.MissionDB = API;
