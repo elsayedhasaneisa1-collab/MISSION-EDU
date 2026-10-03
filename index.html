@@ -3,55 +3,197 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#04060e" />
 <title>MISSION EDU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
 <style>
-:root{--bg:#04060e;--blue:#2f7dff;--txt:#e8eefc;--muted:#7f93b8}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(47,125,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(139,92,246,.14),transparent 60%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;display:grid;place-items:center;padding:20px}
-.logo{width:80px;height:80px;border-radius:22px;display:grid;place-items:center;font-size:38px;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 14px 44px rgba(47,125,255,.5);animation:pulse 2s ease-in-out infinite;margin:0 auto}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+:root{--bg:#04060e;--blue:#2f7dff;--txt:#e8eefc;--muted:#7f93b8;--red:#ef4444}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(47,125,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(139,92,246,.14),transparent 60%),radial-gradient(800px 500px at 50% 115%,rgba(6,182,212,.09),transparent 60%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;display:grid;place-items:center;padding:20px;user-select:none;-webkit-user-select:none}
+.logo{width:88px;height:88px;border-radius:24px;display:grid;place-items:center;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 16px 50px rgba(47,125,255,.55);animation:pulse 2.2s ease-in-out infinite;margin:0 auto}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.spinner{width:44px;height:44px;border:3px solid rgba(90,140,230,.2);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;margin:24px auto 0}
-.txt{margin-top:20px;font-size:20px;font-weight:900;letter-spacing:-.5px}
-.sub{margin-top:8px;color:var(--muted);font-size:13px}
-.err{margin-top:20px;padding:14px 20px;border-radius:14px;background:rgba(239,68,68,.14);border:1px solid rgba(239,68,68,.32);color:#fca5a5;font-size:13px;font-weight:700;max-width:380px;margin-inline:auto}
+.spinner{width:48px;height:48px;border:3px solid rgba(90,140,230,.2);border-top-color:var(--blue);border-radius:50%;animation:spin .9s linear infinite;margin:26px auto 0}
+.txt{margin-top:22px;font-size:22px;font-weight:900;letter-spacing:-.5px}
+.sub{margin-top:8px;color:var(--muted);font-size:13px;font-weight:600}
+.err{margin-top:22px;padding:14px 22px;border-radius:14px;background:rgba(239,68,68,.14);border:1px solid rgba(239,68,68,.32);color:#fca5a5;font-size:13px;font-weight:700;max-width:400px;margin-inline:auto}
+.footer-dev{position:fixed;bottom:14px;left:0;right:0;display:flex;justify-content:center;gap:10px;padding:0 14px;z-index:10}
+.dev-btn,.tg-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:50px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:all .3s cubic-bezier(.2,.8,.3,1);border:1px solid;background:none}
+.dev-btn{background:linear-gradient(135deg,rgba(47,125,255,.15),rgba(139,92,246,.15));border-color:rgba(90,140,230,.3);color:var(--txt);position:relative;overflow:hidden}
+.dev-btn::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);transform:translateX(-100%);transition:transform .7s}
+.dev-btn:hover::before{transform:translateX(100%)}
+.dev-btn:hover{background:linear-gradient(135deg,rgba(47,125,255,.28),rgba(139,92,246,.28));border-color:#2f7dff;transform:translateY(-2px);box-shadow:0 12px 32px rgba(47,125,255,.35)}
+.dev-name b{background:linear-gradient(90deg,#5aa9ff,#a78bfa,#22d3ee,#5aa9ff);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 3s linear infinite;font-weight:900;letter-spacing:.3px}
+@keyframes shine{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+.tg-btn{background:rgba(34,158,217,.12);border-color:rgba(34,158,217,.3);color:#7dd3fc}
+.tg-btn:hover{background:rgba(34,158,217,.22);border-color:#229ed9;color:#fff;transform:translateY(-2px);box-shadow:0 10px 26px rgba(34,158,217,.3)}
+.modal-bg{position:fixed;inset:0;background:rgba(3,5,12,.82);backdrop-filter:blur(10px);z-index:9000;display:none;place-items:center;padding:20px}
+.modal-bg.on{display:grid;animation:fu .25s}
+.modal{width:100%;max-width:440px;background:linear-gradient(180deg,rgba(21,31,56,.98),rgba(11,17,34,.98));border:1px solid rgba(90,140,230,.3);border-radius:22px;padding:24px;box-shadow:0 24px 70px rgba(0,0,0,.7);animation:pu .3s}
+@keyframes pu{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+.modal h3{font-size:18px;font-weight:800;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.close-x{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid rgba(90,140,230,.2);color:var(--txt);cursor:pointer;font-size:14px}
+.close-x:hover{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);color:#fca5a5}
+.modal p{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6}
+.modal textarea{width:100%;min-height:110px;padding:12px 14px;border-radius:12px;background:rgba(10,16,32,.72);border:1.5px solid rgba(90,140,230,.2);color:var(--txt);font-family:inherit;font-size:14px;outline:none;resize:vertical;transition:.22s}
+.modal textarea:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.13)}
+.modal .actions{display:flex;gap:8px;margin-top:16px}
+.modal .btn{flex:1;padding:11px 18px;border-radius:12px;font-weight:700;font-size:13.5px;cursor:pointer;border:none;font-family:inherit;transition:.22s}
+.modal .btn-p{background:linear-gradient(135deg,#2f7dff,#1f5fd6);color:#fff}
+.modal .btn-p:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(47,125,255,.4)}
+.modal .btn-s{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid rgba(90,140,230,.2)}
+.modal .btn-s:hover{color:var(--txt);background:rgba(255,255,255,.09)}
+.modal .btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+.success-msg{padding:14px;border-radius:12px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.35);color:#6ee7a0;font-size:13px;font-weight:700;text-align:center}
+@media(max-width:520px){.footer-dev{flex-direction:column;align-items:center;gap:6px}}
 </style>
 </head>
 <body>
+
 <div style="text-align:center;animation:fu .5s">
-  <div class="logo">🚀</div>
+  <div class="logo">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+      <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+      <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+      <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+    </svg>
+  </div>
   <div class="txt">MISSION EDU</div>
-  <div class="sub" id="status">جارٍ التحقق من الحساب...</div>
+  <div class="sub" id="status">جارٍ التحقق من الجلسة...</div>
   <div class="spinner" id="loader"></div>
 </div>
-<script src="db.js"></script>
+
+<div class="footer-dev">
+  <button class="dev-btn" onclick="openWhatsApp()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+    <span class="dev-name">Developed by <b>EL-sayed Hasan</b></span>
+  </button>
+  <button class="tg-btn" onclick="openReport()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+    </svg>
+    <span>بلاغ</span>
+  </button>
+</div>
+
+<div class="modal-bg" id="reportModal">
+  <div class="modal">
+    <h3>
+      <span>🚨 بلاغ عن مشكلة</span>
+      <button class="close-x" onclick="closeReport()">✕</button>
+    </h3>
+    <p id="reportDesc">اكتب مشكلتك بالتفصيل وسيتم إرسالها للإدارة فورًا.</p>
+    <div id="reportBody">
+      <textarea id="reportMsg" placeholder="اكتب رسالتك هنا..."></textarea>
+      <div class="actions">
+        <button class="btn btn-p" id="reportSend" onclick="sendReport()">📤 إرسال</button>
+        <button class="btn btn-s" onclick="closeReport()">إلغاء</button>
+      </div>
+    </div>
+    <div id="reportSuccess" style="display:none">
+      <div class="success-msg">✅ تم إرسال بلاغك بنجاح، شكرًا لك!</div>
+    </div>
+  </div>
+</div>
+
 <script>
-(async ()=>{
-  const DB = window.MissionDB;
-  const statusEl = document.getElementById('status');
-  const loaderEl = document.getElementById('loader');
-  try{
+(function(){
+  const blocked = (e) => {
+    if (e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && ["I","J","C","K"].includes(e.key.toUpperCase())) ||
+        (e.ctrlKey && e.key.toUpperCase() === "U")) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  };
+  document.addEventListener("keydown", blocked, true);
+  document.addEventListener("contextmenu", (e) => e.preventDefault());
+})();
+
+function openWhatsApp(){
+  const text = encodeURIComponent("مرحبًا، أريد الاستفسار عن منصة MISSION EDU");
+  window.open("https://wa.me/201550802408?text=" + text, "_blank");
+}
+
+function openReport(){
+  document.getElementById("reportModal").classList.add("on");
+  document.getElementById("reportBody").style.display = "block";
+  document.getElementById("reportSuccess").style.display = "none";
+  document.getElementById("reportMsg").value = "";
+}
+function closeReport(){
+  document.getElementById("reportModal").classList.remove("on");
+}
+
+async function sendReport(){
+  const msg = document.getElementById("reportMsg").value.trim();
+  if (!msg || msg.length < 5) {
+    alert("يرجى كتابة رسالة واضحة (5 أحرف على الأقل)");
+    return;
+  }
+  const btn = document.getElementById("reportSend");
+  btn.disabled = true;
+  btn.textContent = "جارٍ الإرسال...";
+
+  try {
+    const DB = window.MissionDB;
+    let userName = "زائر", userPhone = "—";
     const sid = DB.getSessionId();
-    if (!sid){
-      window.location.replace('auth/login.html');
-      return;
+    if (sid) {
+      const u = await DB.getUser(sid);
+      if (u) {
+        userName = u.name || userName;
+        userPhone = (u.country_code || "+20") + (u.phone || "");
+      }
     }
+    await DB.reportIssue({ userName, userPhone, message: msg });
+    document.getElementById("reportBody").style.display = "none";
+    document.getElementById("reportSuccess").style.display = "block";
+    setTimeout(closeReport, 2200);
+  } catch (e) {
+    alert("حدث خطأ، يرجى المحاولة مرة أخرى");
+  }
+  btn.disabled = false;
+  btn.textContent = "📤 إرسال";
+}
+
+(async () => {
+  const DB = window.MissionDB;
+  const statusEl = document.getElementById("status");
+  const loaderEl = document.getElementById("loader");
+
+  const goLogin = () => window.location.replace("auth/login.html");
+
+  try {
+    const sid = DB.getSessionId();
+    if (!sid) return goLogin();
+
     const user = await DB.getUser(sid);
-    if (!user || user.active === false){
+    if (!user || user.active === false) {
       DB.clearSession();
-      window.location.replace('auth/login.html');
-      return;
+      return goLogin();
     }
-    statusEl.textContent = user.role === 'admin' ? 'جارٍ فتح لوحة الإدارة...' : 'جارٍ فتح لوحة الطالب...';
-    setTimeout(()=>DB.redirectByRole(user), 300);
-  }catch(e){
-    loaderEl.style.display = 'none';
-    statusEl.innerHTML = '<div class="err">تعذّر الاتصال بالخادم. جارٍ إعادة التوجيه...</div>';
-    setTimeout(()=>{ window.location.replace('auth/login.html'); }, 1500);
+
+    statusEl.textContent = user.role === "admin"
+      ? "جارٍ فتح لوحة الإدارة..."
+      : "جارٍ فتح لوحة الطالب...";
+
+    setTimeout(() => DB.redirectByRole(user), 350);
+  } catch (e) {
+    loaderEl.style.display = "none";
+    statusEl.innerHTML = '<div class="err">تعذّر الاتصال، جارٍ إعادة التوجيه...</div>';
+    setTimeout(goLogin, 1800);
   }
 })();
 </script>
+<script src="db.js"></script>
 </body>
 </html>
