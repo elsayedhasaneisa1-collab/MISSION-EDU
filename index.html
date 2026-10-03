@@ -103,7 +103,7 @@ body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 
   </div>
 </div>
 
-<script src="./db.js"></script>
+<script src="/db.js"></script>
 <script>
 (function(){
   const blocked = (e) => {
@@ -171,7 +171,7 @@ async function sendReport(){
   const statusEl = document.getElementById("status");
   const loaderEl = document.getElementById("loader");
 
-  const goLogin = () => window.location.replace("./auth/login.html");
+  const goLogin = () => window.location.replace("/auth/login.html");
 
   try {
     if (!DB) {

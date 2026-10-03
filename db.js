@@ -331,21 +331,21 @@ const API = {
 
   redirectByRole(user) {
     if (!user) {
-      window.location.replace("./auth/login.html");
+      window.location.replace("/auth/login.html");
       return;
     }
     if (user.role === "admin") {
-      window.location.replace("./admin/index.html");
+      window.location.replace("/admin/index.html");
     } else {
-      window.location.replace("./student/index.html");
+      window.location.replace("/student/index.html");
     }
   },
 
-  gotoLogin() { window.location.replace("./auth/login.html"); },
-  gotoRegister() { window.location.replace("./auth/register.html"); },
-  gotoAdmin() { window.location.replace("./admin/index.html"); },
-  gotoStudent() { window.location.replace("./student/index.html"); },
-  gotoHome() { window.location.replace("./index.html"); }
+  gotoLogin() { window.location.replace("/auth/login.html"); },
+  gotoRegister() { window.location.replace("/auth/register.html"); },
+  gotoAdmin() { window.location.replace("/admin/index.html"); },
+  gotoStudent() { window.location.replace("/student/index.html"); },
+  gotoHome() { window.location.replace("/index.html"); }
 };
 
 window.MissionDB = API;
