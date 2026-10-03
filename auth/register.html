@@ -240,6 +240,7 @@ select.input{cursor:pointer;appearance:none;padding-inline-start:38px;background
   </div>
 </div>
 
+<script src="../db.js"></script>
 <script>
 (function(){
   const blocked = (e) => {
@@ -346,11 +347,6 @@ function updateUI(){
   }
 }
 
-["name","phone","password","confirm"].forEach(id => {
-  document.addEventListener("input", (e) => {
-    if (e.target.id === id) updateUI();
-  });
-});
 document.addEventListener("input", (e) => {
   if (e.target.id === "phone") {
     e.target.value = e.target.value.replace(/\D/g, "").slice(0, 11);
@@ -431,6 +427,5 @@ async function handleRegister(e){
   setTimeout(() => document.getElementById("name").focus(), 200);
 })();
 </script>
-<script src="../db.js"></script>
 </body>
 </html>
