@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>إنشاء حساب | MISSION EDU</title>
+<title>تسجيل الدخول | MISSION EDU</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--red:#ef4444;--amber:#f59e0b;--violet:#8b5cf6;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.45)}
@@ -21,7 +21,7 @@ a{color:inherit;text-decoration:none}
 .muted{color:var(--muted)}.txt2{color:var(--txt2)}
 .grad{background:linear-gradient(100deg,#5aa9ff,#a78bfa 55%,#22d3ee);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .flex{display:flex}.between{justify-content:space-between}.center{align-items:center}.col{flex-direction:column}.wrap{flex-wrap:wrap}
-.g6{gap:6px}.g8{gap:8px}.g12{gap:12px}.g16{gap:16px}
+.g8{gap:8px}.g12{gap:12px}.g16{gap:16px}
 .mt6{margin-top:6px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
 .mb6{margin-bottom:6px}.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:13px 22px;border-radius:14px;font-weight:700;font-size:14.5px;transition:.24s;white-space:nowrap;color:var(--txt)}
@@ -33,15 +33,14 @@ a{color:inherit;text-decoration:none}
 .btn-block{width:100%}
 .btn:disabled{opacity:.42;cursor:not-allowed}
 .btn-lg{padding:15px 32px;font-size:16px;border-radius:16px}
-.input,select.input{width:100%;padding:13px 16px;border-radius:13px;background:rgba(10,16,32,.72);border:1.5px solid var(--border);outline:none;font-size:14.5px;transition:.22s;color:var(--txt)}
+.input{width:100%;padding:13px 16px;border-radius:13px;background:rgba(10,16,32,.72);border:1.5px solid var(--border);outline:none;font-size:14.5px;transition:.22s;color:var(--txt)}
 .input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.12)}
-select.input{cursor:pointer;appearance:none;padding-inline-start:38px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237f93b8' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:left 14px center}
 .lbl{display:block;font-size:12.5px;font-weight:700;color:var(--txt2);margin-bottom:7px}
 .field{margin-bottom:14px}
 .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:40px;font-size:12px;font-weight:700;border:1px solid transparent}
 .pill-r{background:rgba(239,68,68,.14);color:#fca5a5;border-color:rgba(239,68,68,.32)}
 .brand-logo{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;font-size:30px;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 12px 34px rgba(47,125,255,.45);font-weight:900}
-.wrap-page{width:100%;max-width:480px;animation:fu .5s cubic-bezier(.2,.8,.3,1)}
+.login-wrap{width:100%;max-width:460px;animation:fu .5s cubic-bezier(.2,.8,.3,1)}
 @keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 @keyframes slideIn{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:none}}
 @keyframes fadeOut{to{opacity:0;transform:translateX(-30px)}}
@@ -49,13 +48,6 @@ select.input{cursor:pointer;appearance:none;padding-inline-start:38px;background
 @keyframes spin{to{transform:rotate(360deg)}}
 .divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-size:11.5px;font-weight:600}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
-.strength{height:4px;border-radius:20px;background:rgba(255,255,255,.06);overflow:hidden;margin-top:8px}
-.strength-f{height:100%;border-radius:20px;transition:width .4s, background .4s}
-.strength-txt{font-size:11px;margin-top:6px;font-weight:700}
-.check-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--border);margin-bottom:8px}
-.check-box{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-size:11px;flex-shrink:0;margin-top:2px}
-.check-box.ok{background:var(--green);color:#fff}
-.check-box.no{background:rgba(255,255,255,.08);color:var(--muted)}
 .toast-host{position:fixed;bottom:26px;inset-inline-start:26px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:min(420px,92vw)}
 .toast{pointer-events:auto;min-width:280px;padding:14px 16px 16px;border-radius:16px;background:linear-gradient(135deg,rgba(21,31,56,.98),rgba(11,17,34,.98));border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.65);animation:slideIn .4s cubic-bezier(.2,.8,.3,1);position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:12px}
 .toast.out{animation:fadeOut .3s forwards}
@@ -83,7 +75,7 @@ select.input{cursor:pointer;appearance:none;padding-inline-start:38px;background
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="../db.js"></script>
 <script type="text/babel" data-presets="react">
-const {useState,useEffect,useCallback,useMemo,useRef} = React;
+const {useState,useEffect,useCallback,useRef} = React;
 
 function ToastHost(){
   const [items,setItems]=useState([]);
@@ -119,31 +111,15 @@ function Toast({data,onClose}){
   </div>;
 }
 
-function calcStrength(pw){
-  let s=0;
-  if(pw.length>=6) s++;
-  if(pw.length>=10) s++;
-  if(/[A-Z]/.test(pw)||/[\u0600-\u06FF]/.test(pw)) s++;
-  if(/[0-9]/.test(pw)) s++;
-  if(/[^A-Za-z0-9\u0600-\u06FF]/.test(pw)) s++;
-  return Math.min(s,4);
-}
-function strengthInfo(s){
-  if(s<=1) return {label:'ضعيفة',color:'#ef4444',width:'25%'};
-  if(s===2) return {label:'مقبولة',color:'#f59e0b',width:'50%'};
-  if(s===3) return {label:'جيدة',color:'#22c55e',width:'75%'};
-  return {label:'قوية',color:'#22c55e',width:'100%'};
-}
-
-function RegisterPage(){
+function LoginPage(){
   const DB=window.MissionDB;
-  const [form,setForm]=useState({name:'',email:'',password:'',confirm:'',gradeId:''});
+  const [email,setEmail]=useState('');
+  const [password,setPassword]=useState('');
   const [busy,setBusy]=useState(false);
   const [err,setErr]=useState('');
   const [showPass,setShowPass]=useState(false);
-  const [grades,setGrades]=useState([]);
   const [checking,setChecking]=useState(true);
-  const nameRef=useRef(null);
+  const emailRef=useRef(null);
 
   useEffect(()=>{
     (async ()=>{
@@ -153,43 +129,20 @@ function RegisterPage(){
         if(u&&u.active!==false) return DB.redirectByRole(u);
         DB.clearSession();
       }
-      try{
-        const sb=await DB.getClient();
-        const {data}=await sb.from('grades').select('*').order('created_at');
-        setGrades(data||[]);
-        if(data?.length) setForm(f=>({...f,gradeId:data[0].id}));
-      }catch(e){}
       setChecking(false);
-      setTimeout(()=>nameRef.current?.focus(),200);
+      setTimeout(()=>emailRef.current?.focus(),200);
     })();
   },[]);
-
-  const strength=useMemo(()=>calcStrength(form.password),[form.password]);
-  const sInfo=strengthInfo(strength);
-  const pwOk=form.password.length>=6;
-  const matchOk=form.password&&form.password===form.confirm;
-  const emailOk=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
-  const nameOk=form.name.trim().length>=3;
 
   const submit=async e=>{
     e.preventDefault();
     setErr('');
-    if(!nameOk){setErr('الاسم يجب أن يكون 3 أحرف على الأقل');return;}
-    if(!emailOk){setErr('البريد الإلكتروني غير صالح');return;}
-    if(!pwOk){setErr('كلمة المرور يجب أن تكون 6 أحرف على الأقل');return;}
-    if(!matchOk){setErr('كلمتا المرور غير متطابقتين');return;}
-    if(!form.gradeId){setErr('اختر الصف الدراسي');return;}
-
+    if(!email||!password){setErr('يرجى تعبئة جميع الحقول');return;}
     setBusy(true);
     try{
-      const u=await DB.register({
-        name:form.name,
-        email:form.email,
-        password:form.password,
-        gradeId:form.gradeId
-      });
-      window.__toast?.('مرحبًا بك ' + u.name.split(' ')[0],'ok','تم إنشاء الحساب');
-      setTimeout(()=>DB.redirectByRole(u),600);
+      const u=await DB.login(email,password);
+      window.__toast?.('مرحبًا بك ' + u.name.split(' ')[0],'ok','تم تسجيل الدخول');
+      setTimeout(()=>DB.redirectByRole(u),500);
     }catch(ex){
       setErr(ex.message);
       window.__toast?.(ex.message,'err');
@@ -197,99 +150,57 @@ function RegisterPage(){
     }
   };
 
-  if(checking) return <div style={{color:'var(--muted)'}}>جارٍ التحميل...</div>;
+  if(checking) return <div style={{color:'var(--muted)'}}>جارٍ التحقق...</div>;
 
-  return <div className="wrap-page">
+  return <div className="login-wrap">
     <div className="flex col center mb20" style={{gap:14,textAlign:'center'}}>
       <div className="brand-logo">🚀</div>
       <div>
         <div className="h1 grad">MISSION EDU</div>
-        <div className="sm muted mt6">انضم إلينا وابدأ رحلتك التعليمية</div>
+        <div className="sm muted mt6">منصة تعليمية تحوّل المنهج إلى مهام</div>
       </div>
     </div>
 
     <div className="glass" style={{padding:26}}>
-      <div className="h2 mb6">إنشاء حساب جديد</div>
-      <div className="sm muted mb20">املأ البيانات التالية للبدء</div>
+      <div className="h2 mb6">تسجيل الدخول</div>
+      <div className="sm muted mb20">أدخل بياناتك للوصول إلى لوحتك</div>
 
       <form onSubmit={submit}>
         <div className="field">
-          <label className="lbl">الاسم الكامل</label>
-          <input ref={nameRef} className="input" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="أدخل اسمك الكامل" autoComplete="name"/>
-        </div>
-
-        <div className="field">
           <label className="lbl">البريد الإلكتروني</label>
-          <input className="input" type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} placeholder="you@example.com" autoComplete="email" dir="ltr"/>
+          <input ref={emailRef} className="input" type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" dir="ltr"/>
         </div>
-
-        {grades.length>0&&(
-          <div className="field">
-            <label className="lbl">الصف الدراسي</label>
-            <select className="input" value={form.gradeId} onChange={e=>setForm({...form,gradeId:e.target.value})}>
-              {grades.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}
-            </select>
-          </div>
-        )}
 
         <div className="field">
           <label className="lbl">كلمة المرور</label>
           <div style={{position:'relative'}}>
-            <input className="input" type={showPass?'text':'password'} value={form.password} onChange={e=>setForm({...form,password:e.target.value})} placeholder="6 أحرف على الأقل" autoComplete="new-password" style={{paddingInlineStart:44}}/>
+            <input className="input" type={showPass?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••" autoComplete="current-password" style={{paddingInlineStart:44}}/>
             <button type="button" onClick={()=>setShowPass(v=>!v)} style={{position:'absolute',insetInlineStart:12,top:'50%',transform:'translateY(-50%)',fontSize:16,opacity:.6,color:'var(--txt)'}}>{showPass?'🙈':'👁'}</button>
-          </div>
-          {form.password&&<>
-            <div className="strength"><div className="strength-f" style={{width:sInfo.width,background:sInfo.color}}/></div>
-            <div className="strength-txt" style={{color:sInfo.color}}>قوة كلمة المرور: {sInfo.label}</div>
-          </>}
-        </div>
-
-        <div className="field">
-          <label className="lbl">تأكيد كلمة المرور</label>
-          <input className="input" type={showPass?'text':'password'} value={form.confirm} onChange={e=>setForm({...form,confirm:e.target.value})} placeholder="أعد كتابة كلمة المرور" autoComplete="new-password"/>
-        </div>
-
-        <div className="mb16">
-          <div className="check-row">
-            <div className={`check-box ${nameOk?'ok':'no'}`}>{nameOk?'✓':''}</div>
-            <span className="sm">الاسم 3 أحرف على الأقل</span>
-          </div>
-          <div className="check-row">
-            <div className={`check-box ${emailOk?'ok':'no'}`}>{emailOk?'✓':''}</div>
-            <span className="sm">بريد إلكتروني صالح</span>
-          </div>
-          <div className="check-row">
-            <div className={`check-box ${pwOk?'ok':'no'}`}>{pwOk?'✓':''}</div>
-            <span className="sm">كلمة المرور 6 أحرف على الأقل</span>
-          </div>
-          <div className="check-row">
-            <div className={`check-box ${matchOk?'ok':'no'}`}>{matchOk?'✓':''}</div>
-            <span className="sm">كلمتا المرور متطابقتان</span>
           </div>
         </div>
 
         {err&&<div className="pill pill-r mb16" style={{width:'100%',justifyContent:'center',padding:'10px 14px'}}>⚠️ {err}</div>}
 
         <button type="submit" className="btn btn-p btn-block btn-lg" disabled={busy}>
-          {busy?<><span className="spinner"></span> جارٍ الإنشاء...</>:'إنشاء الحساب →'}
+          {busy?<><span className="spinner"></span> جارٍ الدخول...</>:'دخول →'}
         </button>
       </form>
 
-      <div className="divider">لديك حساب بالفعل؟</div>
+      <div className="divider">ليس لديك حساب؟</div>
 
-      <a href="login.html" className="btn btn-s btn-block">
-        <span>→</span> تسجيل الدخول
+      <a href="register.html" className="btn btn-s btn-block">
+        <span>✚</span> إنشاء حساب جديد
       </a>
     </div>
 
     <div className="mt16" style={{textAlign:'center'}}>
-      <div className="xs muted">بالإنشاء أنت توافق على شروط الاستخدام وسياسة الخصوصية</div>
+      <div className="xs muted">بالمتابعة أنت توافق على شروط الاستخدام وسياسة الخصوصية</div>
     </div>
   </div>;
 }
 
 function App(){
-  return <><ToastHost/><RegisterPage/></>;
+  return <><ToastHost/><LoginPage/></>;
 }
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
