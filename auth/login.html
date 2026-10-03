@@ -7,6 +7,7 @@
 <title>تسجيل الدخول | MISSION EDU</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>">
 <style>
 :root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--red:#ef4444;--green:#22c55e;--r:20px;--rs:13px}
@@ -61,23 +62,11 @@ a{color:inherit;text-decoration:none}
 @keyframes shine{0%{background-position:0% 50%}100%{background-position:300% 50%}}
 .tg-btn{background:rgba(34,158,217,.12);border-color:rgba(34,158,217,.3);color:#7dd3fc}
 .tg-btn:hover{background:rgba(34,158,217,.22);border-color:#229ed9;color:#fff;transform:translateY(-2px);box-shadow:0 10px 26px rgba(34,158,217,.3)}
-.modal-bg{position:fixed;inset:0;background:rgba(3,5,12,.82);backdrop-filter:blur(10px);z-index:9000;display:none;place-items:center;padding:20px}
-.modal-bg.on{display:grid;animation:fu .25s}
-.modal{width:100%;max-width:440px;background:linear-gradient(180deg,rgba(21,31,56,.98),rgba(11,17,34,.98));border:1px solid rgba(90,140,230,.3);border-radius:22px;padding:24px;box-shadow:0 24px 70px rgba(0,0,0,.7);animation:pu .3s}
-.modal h3{font-size:18px;font-weight:800;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
-.close-x{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid rgba(90,140,230,.2);color:var(--txt);cursor:pointer;font-size:14px}
-.close-x:hover{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);color:#fca5a5}
-.modal p{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6}
-.modal textarea{width:100%;min-height:110px;padding:12px 14px;border-radius:12px;background:rgba(10,16,32,.72);border:1.5px solid rgba(90,140,230,.2);color:var(--txt);font-family:inherit;font-size:14px;outline:none;resize:vertical;transition:.22s}
-.modal textarea:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.13)}
-.modal .actions{display:flex;gap:8px;margin-top:16px}
-.modal .btn{flex:1;padding:11px 18px;border-radius:12px;font-weight:700;font-size:13.5px;cursor:pointer;border:none;font-family:inherit;transition:.22s}
-.modal .btn-p{background:linear-gradient(135deg,#2f7dff,#1f5fd6);color:#fff}
-.modal .btn-p:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(47,125,255,.4)}
-.modal .btn-s{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid rgba(90,140,230,.2)}
-.modal .btn-s:hover{color:var(--txt);background:rgba(255,255,255,.09)}
-.modal .btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
-.success-msg{padding:14px;border-radius:12px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.35);color:#6ee7a0;font-size:13px;font-weight:700;text-align:center}
+.swal-custom-popup{border:1px solid rgba(90,140,230,.3) !important;border-radius:22px !important;box-shadow:0 24px 70px rgba(0,0,0,.75) !important;font-family:'Tajawal','Cairo',sans-serif !important}
+.swal-custom-title{color:#e8eefc !important;font-size:20px !important;font-weight:800 !important;font-family:'Tajawal','Cairo',sans-serif !important}
+.swal-custom-input{background:rgba(10,16,32,.75) !important;border:1.5px solid rgba(90,140,230,.3) !important;color:#e8eefc !important;border-radius:12px !important;font-family:'Tajawal','Cairo',sans-serif !important}
+.swal-custom-confirm{border-radius:12px !important;font-weight:700 !important;font-family:'Tajawal','Cairo',sans-serif !important;padding:10px 24px !important}
+.swal-custom-cancel{border-radius:12px !important;font-weight:700 !important;font-family:'Tajawal','Cairo',sans-serif !important;padding:10px 24px !important}
 </style>
 </head>
 <body>
@@ -137,7 +126,7 @@ a{color:inherit;text-decoration:none}
 
     <div class="divider">ليس لديك حساب؟</div>
 
-    <a href="register.html" class="btn btn-s btn-block">
+    <a href="/auth/register.html" class="btn btn-s btn-block">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <line x1="12" y1="5" x2="12" y2="19"/>
         <line x1="5" y1="12" x2="19" y2="12"/>
@@ -153,36 +142,16 @@ a{color:inherit;text-decoration:none}
       </svg>
       <span class="dev-name">Developed by <b>EL-sayed Hasan</b></span>
     </button>
-    <button class="tg-btn" onclick="openReport()">
+    <button class="tg-btn" onclick="window.open('https://t.me/Elsayed_Hasan','_blank')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
         <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
       </svg>
-      <span>بلاغ</span>
+      <span>تواصل</span>
     </button>
   </div>
 </div>
 
-<div class="modal-bg" id="reportModal">
-  <div class="modal">
-    <h3>
-      <span>🚨 بلاغ عن مشكلة</span>
-      <button class="close-x" onclick="closeReport()">✕</button>
-    </h3>
-    <p>اكتب مشكلتك بالتفصيل وسيتم إرسالها للإدارة فورًا.</p>
-    <div id="reportBody">
-      <textarea id="reportMsg" placeholder="اكتب رسالتك هنا..."></textarea>
-      <div class="actions">
-        <button class="btn btn-p" id="reportSend" onclick="sendReport()">📤 إرسال</button>
-        <button class="btn btn-s" onclick="closeReport()">إلغاء</button>
-      </div>
-    </div>
-    <div id="reportSuccess" style="display:none">
-      <div class="success-msg">✅ تم إرسال بلاغك بنجاح، شكرًا لك!</div>
-    </div>
-  </div>
-</div>
-
-<script src="../db.js"></script>
+<script src="/db.js"></script>
 <script>
 (function(){
   const blocked = (e) => {
@@ -205,34 +174,6 @@ function togglePass(id, btn){
 }
 function openWhatsApp(){
   window.open("https://wa.me/201550802408?text=" + encodeURIComponent("مرحبًا، أريد الاستفسار عن منصة MISSION EDU"), "_blank");
-}
-function openReport(){
-  document.getElementById("reportModal").classList.add("on");
-  document.getElementById("reportBody").style.display = "block";
-  document.getElementById("reportSuccess").style.display = "none";
-  document.getElementById("reportMsg").value = "";
-}
-function closeReport(){ document.getElementById("reportModal").classList.remove("on"); }
-
-async function sendReport(){
-  const msg = document.getElementById("reportMsg").value.trim();
-  if (!msg || msg.length < 5) return alert("يرجى كتابة رسالة واضحة (5 أحرف على الأقل)");
-  const btn = document.getElementById("reportSend");
-  btn.disabled = true; btn.textContent = "جارٍ الإرسال...";
-  try {
-    const DB = window.MissionDB;
-    let userName = "زائر", userPhone = "—";
-    const sid = DB.getSessionId();
-    if (sid) {
-      const u = await DB.getUser(sid);
-      if (u) { userName = u.name || userName; userPhone = (u.country_code || "+20") + (u.phone || ""); }
-    }
-    await DB.reportIssue({ userName, userPhone, message: msg });
-    document.getElementById("reportBody").style.display = "none";
-    document.getElementById("reportSuccess").style.display = "block";
-    setTimeout(closeReport, 2200);
-  } catch (e) { alert("حدث خطأ، حاول مرة أخرى"); }
-  btn.disabled = false; btn.textContent = "📤 إرسال";
 }
 
 function showErr(msg){
