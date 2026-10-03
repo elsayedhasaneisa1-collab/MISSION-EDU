@@ -7,6 +7,7 @@
 <title>MISSION EDU — لوحة الإدارة</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
 <style>
 :root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#8b5cf6;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.45)}
@@ -146,13 +147,14 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 @keyframes shine{0%{background-position:0% 50%}100%{background-position:300% 50%}}
 .tg-btn{background:rgba(34,158,217,.12);border-color:rgba(34,158,217,.3);color:#7dd3fc}
 .tg-btn:hover{background:rgba(34,158,217,.22);border-color:#229ed9;color:#fff;transform:translateY(-2px);box-shadow:0 10px 26px rgba(34,158,217,.3)}
-.success-msg{padding:14px;border-radius:12px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.35);color:#6ee7a0;font-size:13px;font-weight:700;text-align:center}
-.close-x{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid rgba(90,140,230,.2);color:var(--txt);cursor:pointer;font-size:14px}
-.close-x:hover{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);color:#fca5a5}
-.modal textarea{width:100%;min-height:110px;padding:12px 14px;border-radius:12px;background:rgba(10,16,32,.72);border:1.5px solid rgba(90,140,230,.2);color:var(--txt);font-family:inherit;font-size:14px;outline:none;resize:vertical;transition:.22s}
-.modal textarea:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.13)}
-.modal .actions{display:flex;gap:8px;margin-top:16px}
-.modal .btn{flex:1;padding:11px 18px;border-radius:12px;font-weight:700;font-size:13.5px;cursor:pointer;border:none;font-family:inherit;transition:.22s}
+.swal-custom-popup{border:1px solid rgba(90,140,230,.3) !important;border-radius:22px !important;box-shadow:0 24px 70px rgba(0,0,0,.75) !important;font-family:'Tajawal','Cairo',sans-serif !important;backdrop-filter:blur(20px)}
+.swal-custom-title{color:#e8eefc !important;font-size:20px !important;font-weight:800 !important;font-family:'Tajawal','Cairo',sans-serif !important}
+.swal-custom-input{background:rgba(10,16,32,.75) !important;border:1.5px solid rgba(90,140,230,.3) !important;color:#e8eefc !important;border-radius:12px !important;font-family:'Tajawal','Cairo',sans-serif !important}
+.swal-custom-input:focus{border-color:#2f7dff !important;box-shadow:0 0 0 4px rgba(47,125,255,.15) !important}
+.swal-custom-confirm{border-radius:12px !important;font-weight:700 !important;font-family:'Tajawal','Cairo',sans-serif !important;padding:10px 24px !important}
+.swal-custom-cancel{border-radius:12px !important;font-weight:700 !important;font-family:'Tajawal','Cairo',sans-serif !important;padding:10px 24px !important}
+.swal2-html-container{color:#b7c6e4 !important;font-family:'Tajawal','Cairo',sans-serif !important}
+.swal2-validation-message{background:rgba(239,68,68,.15) !important;color:#fca5a5 !important;border-radius:10px !important;border:1px solid rgba(239,68,68,.3) !important;font-family:'Tajawal','Cairo',sans-serif !important}
 @media(max-width:1080px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:860px){
   .sidebar{position:fixed;inset-inline-end:0;top:0;transform:translateX(-105%);transition:transform .34s;width:280px;box-shadow:-20px 0 60px rgba(0,0,0,.7)}
@@ -169,6 +171,7 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="../db.js"></script>
 <script type="text/babel" data-presets="react">
 const {useState,useEffect,useMemo,useCallback,useRef,createContext,useContext}=React;
@@ -219,7 +222,7 @@ function AppProvider({children}){
   const toast=useToast();
 
   const reload=useCallback(async ()=>{
-    try{const data=await DB.loadAll();setDb(data);}catch(e){}
+    try{const data=await DB.loadAll();setDb(data);}catch(e){console.warn(e);}
   },[]);
 
   useEffect(()=>{
@@ -232,12 +235,32 @@ function AppProvider({children}){
         if(u.role!=='admin'){window.location.replace('../student/index.html');return;}
         setCurrentUser(u);
         await reload();
-      }catch(e){}
+      }catch(e){console.warn(e);}
       setLoading(false);
     })();
   },[]);
 
-  const logout=useCallback(()=>{DB.clearSession();window.location.replace('../auth/login.html');},[]);
+  const logout=useCallback(()=>{
+    Swal.fire({
+      title: 'تسجيل الخروج',
+      text: 'هل أنت متأكد من رغبتك في الخروج؟',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'نعم، خروج',
+      cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      background: 'linear-gradient(180deg, #151f38, #0b1122)',
+      color: '#e8eefc',
+      customClass: {popup: 'swal-custom-popup', title: 'swal-custom-title'}
+    }).then((result) => {
+      if (result.isConfirmed) {
+        DB.clearSession();
+        window.location.replace('../auth/login.html');
+      }
+    });
+  },[]);
+
   const save=useCallback(async (table,item)=>{
     const saved=await DB.save(table,item);
     await reload();
@@ -456,7 +479,6 @@ function Dashboard(){
     </div>
   </>;
 }
-
 function ActivityLog(){
   const app=useApp();
   const [filter,setFilter]=useState('all');
@@ -510,7 +532,20 @@ function Crud({title,collection,defaultItem,fields,columns}){
     setBusy(false);
   };
   const del=async id=>{
-    if(!confirm('تأكيد الحذف؟')) return;
+    const result=await Swal.fire({
+      title: 'تأكيد الحذف',
+      text: 'سيتم حذف هذا العنصر نهائيًا، هل أنت متأكد؟',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'نعم، احذف',
+      cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      background: 'linear-gradient(180deg, #151f38, #0b1122)',
+      color: '#e8eefc',
+      customClass: {popup: 'swal-custom-popup', title: 'swal-custom-title'}
+    });
+    if (!result.isConfirmed) return;
     try{await app.remove(collection,id);app.toast.warn('تم الحذف');}
     catch(e){app.toast.err(e.message);}
   };
@@ -591,7 +626,24 @@ function LessonsPage(){
     catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
-  const del=async id=>{if(!confirm('حذف الدرس؟'))return;try{await app.remove('lessons',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
+  const del=async id=>{
+    const result=await Swal.fire({
+      title: 'حذف الدرس؟',
+      text: 'لا يمكن التراجع عن هذا الإجراء',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'نعم، احذف',
+      cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      background: 'linear-gradient(180deg, #151f38, #0b1122)',
+      color: '#e8eefc',
+      customClass: {popup: 'swal-custom-popup', title: 'swal-custom-title'}
+    });
+    if (!result.isConfirmed) return;
+    try{await app.remove('lessons',id);app.toast.warn('تم الحذف');}
+    catch(e){app.toast.err(e.message);}
+  };
   const badge=l=>{if(!l.video||!l.video.url)return <span className="pill pill-y">لا فيديو</span>;const map={youtube:'📺 YouTube',vimeo:'🎬 Vimeo',mp4:'🎥 MP4',external:'🔗 خارجي'};return <span className="pill pill-b">{map[l.video.type]||l.video.type}</span>;};
   return <>
     <div className="flex between center mb16"><div className="h2">📖 إدارة الدروس</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> درس جديد</button></div>
@@ -643,7 +695,11 @@ function QuestionsPage(){
     catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
-  const del=async id=>{if(!confirm('حذف السؤال؟'))return;try{await app.remove('questions',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
+  const del=async id=>{
+    const r=await Swal.fire({title:'حذف السؤال؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+    if(!r.isConfirmed) return;
+    try{await app.remove('questions',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}
+  };
   return <>
     <div className="flex between center mb16"><div className="h2">❓ بنك الأسئلة</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> سؤال جديد</button></div>
     <div className="glass" style={{padding:14}}>
@@ -694,7 +750,11 @@ function ExamsPage(){
     catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
-  const del=async id=>{if(!confirm('حذف الاختبار؟'))return;try{await app.remove('exams',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
+  const del=async id=>{
+    const r=await Swal.fire({title:'حذف الاختبار؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+    if(!r.isConfirmed) return;
+    try{await app.remove('exams',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}
+  };
   const availQ=form.unit_id?app.db.questions.filter(q=>q.unit_id===form.unit_id):app.db.questions;
   return <>
     <div className="flex between center mb16"><div className="h2">📝 إدارة الاختبارات</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> اختبار جديد</button></div>
@@ -750,7 +810,11 @@ function MissionsPage(){
     catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
-  const del=async id=>{if(!confirm('حذف المهمة؟'))return;try{await app.remove('missions',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
+  const del=async id=>{
+    const r=await Swal.fire({title:'حذف المهمة؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+    if(!r.isConfirmed) return;
+    try{await app.remove('missions',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}
+  };
   return <>
     <div className="flex between center mb16"><div className="h2">🎯 إدارة المهام</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> مهمة جديدة</button></div>
     <div className="glass" style={{padding:14}}>
@@ -819,13 +883,33 @@ function StudentsPage(){
     setBusy(true);
     try{
       await DB.updateUser(editing,{name:form.name,phone:form.phone,xp:form.xp,grade_id:form.grade_id,all_subjects:form.all_subjects,access_subjects:form.access_subjects||[]});
-      await app.reload();app.toast.ok('تم الحفظ');setEditing(null);
+      await app.reload();
+      app.toast.ok('تم الحفظ');
+      setEditing(null);
     }catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
   const toggle=async s=>{
-    try{await DB.updateUser(s.id,{active:!s.active});await app.reload();app.toast.warn(s.active!==false?'تم الإيقاف':'تم التفعيل');}
-    catch(e){app.toast.err(e.message);}
+    const action = s.active !== false ? 'إيقاف' : 'تفعيل';
+    const r=await Swal.fire({
+      title: `${action} الحساب؟`,
+      text: `هل تريد ${action} حساب ${s.name}؟`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: `نعم، ${action}`,
+      cancelButtonText: 'إلغاء',
+      confirmButtonColor: s.active !== false ? '#ef4444' : '#22c55e',
+      cancelButtonColor: '#64748b',
+      background: 'linear-gradient(180deg, #151f38, #0b1122)',
+      color: '#e8eefc',
+      customClass: {popup: 'swal-custom-popup', title: 'swal-custom-title'}
+    });
+    if (!r.isConfirmed) return;
+    try{
+      await DB.updateUser(s.id,{active:!s.active});
+      await app.reload();
+      app.toast.warn(s.active!==false?'تم الإيقاف':'تم التفعيل');
+    }catch(e){app.toast.err(e.message);}
   };
   return <>
     <div className="flex between center mb16 wrap g8">
@@ -871,7 +955,11 @@ function NotificationsPage(){
     catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
-  const del=async id=>{if(!confirm('حذف؟'))return;try{await app.remove('notifications',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
+  const del=async id=>{
+    const r=await Swal.fire({title:'حذف الإشعار؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+    if(!r.isConfirmed) return;
+    try{await app.remove('notifications',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}
+  };
   return <>
     <div className="h2 mb16">الإشعارات</div>
     <div className="grid g2">
@@ -902,13 +990,34 @@ function NotificationsPage(){
 
 function ReportsPage(){
   const app=useApp();
+  const [reports,setReports]=useState([]);
+  const [loading,setLoading]=useState(true);
+  useEffect(()=>{
+    (async ()=>{
+      try{
+        const sb=await DB.getClient();
+        const {data}=await sb.from('reports').select('*').order('created_at',{ascending:false}).limit(50);
+        setReports(data||[]);
+      }catch(e){}
+      setLoading(false);
+    })();
+  },[]);
   return <>
-    <div className="h2 mb16">📨 البلاغات المرسلة</div>
+    <div className="h2 mb16">📨 البلاغات المستلمة</div>
     <div className="glass" style={{padding:20}}>
-      <div className="sm muted mb16">البلاغات تُرسل مباشرة إلى بوت Telegram. لا تظهر هنا إلا إذا سجلتها في جدول <code>reports</code>.</div>
-      <a href="https://t.me" target="_blank" className="btn btn-p" style={{textDecoration:'none'}}>
-        <Icon name="link" size={15}/> فتح Telegram
-      </a>
+      {loading?<div style={{textAlign:'center',padding:20}}><div className="spinner" style={{margin:'0 auto 14px'}}></div>جارٍ التحميل...</div>:
+        reports.length===0?<Empty icon="📨" title="لا توجد بلاغات"/>:
+        <div className="flex col g8">
+          {reports.map(r=><div key={r.id} className="glass-s" style={{padding:14}}>
+            <div className="flex between center mb8">
+              <div className="h4">{r.user_name}</div>
+              <span className="xs muted">{new Date(r.created_at).toLocaleString('ar-EG')}</span>
+            </div>
+            <div className="xs muted mb8" dir="ltr">📱 {r.user_phone}</div>
+            <div className="sm txt2" style={{background:'rgba(0,0,0,.2)',padding:10,borderRadius:10}}>{r.message}</div>
+          </div>)}
+        </div>
+      }
     </div>
   </>;
 }
@@ -933,6 +1042,64 @@ function SettingsPage(){
 }
 
 function Footer(){
+  const app=useApp();
+  const user=app.currentUser;
+  
+  const sendReport=async ()=>{
+    const { value: msg } = await Swal.fire({
+      title: '🚨 بلاغ عن مشكلة',
+      input: 'textarea',
+      inputLabel: 'اكتب مشكلتك بالتفصيل',
+      inputPlaceholder: 'اكتب رسالتك هنا...',
+      inputAttributes: { 'aria-label': 'اكتب رسالتك', 'dir': 'rtl' },
+      showCancelButton: true,
+      confirmButtonText: '📤 إرسال',
+      cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#2f7dff',
+      cancelButtonColor: '#64748b',
+      background: 'linear-gradient(180deg, #151f38, #0b1122)',
+      color: '#e8eefc',
+      inputValidator: (value) => {
+        if (!value || value.trim().length < 5) return 'يرجى كتابة رسالة واضحة (5 أحرف على الأقل)';
+      },
+      customClass: {
+        popup: 'swal-custom-popup',
+        title: 'swal-custom-title',
+        input: 'swal-custom-input',
+        confirmButton: 'swal-custom-confirm',
+        cancelButton: 'swal-custom-cancel'
+      }
+    });
+    
+    if (msg){
+      Swal.fire({
+        title: 'جارٍ الإرسال...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+        background: 'linear-gradient(180deg, #151f38, #0b1122)',
+        color: '#e8eefc',
+        customClass: {popup: 'swal-custom-popup'}
+      });
+      
+      const sent = await DB.reportIssue({
+        userName: user?.name || 'أدمن',
+        userPhone: (user?.country_code || '+20') + (user?.phone || '—'),
+        message: msg
+      });
+      
+      Swal.fire({
+        icon: sent ? 'success' : 'error',
+        title: sent ? '✅ تم الإرسال' : '❌ فشل الإرسال',
+        text: sent ? 'تم استلام بلاغك، شكرًا لك' : 'حدث خطأ، حاول مرة أخرى',
+        confirmButtonText: 'حسنًا',
+        confirmButtonColor: '#2f7dff',
+        background: 'linear-gradient(180deg, #151f38, #0b1122)',
+        color: '#e8eefc',
+        customClass: {popup: 'swal-custom-popup', title: 'swal-custom-title', confirmButton: 'swal-custom-confirm'}
+      });
+    }
+  };
+  
   return <div className="footer-dev">
     <button className="dev-btn" onClick={()=>window.open("https://wa.me/201550802408?text="+encodeURIComponent("مرحبًا، أريد الاستفسار عن منصة MISSION EDU"),"_blank")}>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -940,10 +1107,7 @@ function Footer(){
       </svg>
       <span className="dev-name">Developed by <b>EL-sayed Hasan</b></span>
     </button>
-    <button className="tg-btn" onClick={()=>{
-      const msg=prompt("اكتب مشكلتك بالتفصيل:");
-      if(msg&&msg.length>=5){DB.reportIssue({userName:window.MissionDB?.userName||"أدمن",userPhone:"—",message:msg});}
-    }}>
+    <button className="tg-btn" onClick={sendReport}>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
         <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
       </svg>
