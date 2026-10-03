@@ -6,7 +6,9 @@
 <meta name="theme-color" content="#04060e" />
 <title>MISSION EDU — منصة الطالب</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
 <style>
 :root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#8b5cf6;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.45)}
@@ -126,7 +128,7 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 .vid-watermark{position:absolute;bottom:14px;inset-inline-end:14px;z-index:6;font-size:11px;font-weight:700;color:rgba(255,255,255,.32);pointer-events:none;user-select:none;letter-spacing:.6px;padding:4px 10px;border-radius:20px;background:rgba(0,0,0,.35);backdrop-filter:blur(6px)}
 .vid-custom-cover{position:absolute;inset:0;z-index:4;display:grid;place-items:center;background:linear-gradient(180deg,rgba(0,0,0,.30),rgba(0,0,0,.55));cursor:pointer;transition:opacity .35s}
 .vid-custom-cover.hidden{opacity:0;pointer-events:none}
-.play-big{width:80px;height:80px;border-radius:50%;display:grid;place-items:center;font-size:30px;background:linear-gradient(140deg,#2f7dff,#8b5cf6);color:#fff;box-shadow:0 14px 44px rgba(47,125,255,.6);padding-inline-start:6px}
+.play-big{width:80px;height:80px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(140deg,#2f7dff,#8b5cf6);color:#fff;box-shadow:0 14px 44px rgba(47,125,255,.6);padding-inline-start:6px}
 .vid-meta-bar{position:absolute;bottom:0;inset-inline:0;z-index:3;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(to top,rgba(0,0,0,.75),transparent);pointer-events:none}
 .vid-progress-dot{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:rgba(255,255,255,.85);padding:3px 10px;border-radius:20px;background:rgba(0,0,0,.5)}
 .eb{display:flex;align-items:flex-start;gap:12px;padding:14px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--border)}
@@ -171,13 +173,14 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 @keyframes shine{0%{background-position:0% 50%}100%{background-position:300% 50%}}
 .tg-btn{background:rgba(34,158,217,.12);border-color:rgba(34,158,217,.3);color:#7dd3fc}
 .tg-btn:hover{background:rgba(34,158,217,.22);border-color:#229ed9;color:#fff;transform:translateY(-2px);box-shadow:0 10px 26px rgba(34,158,217,.3)}
-.success-msg{padding:14px;border-radius:12px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.35);color:#6ee7a0;font-size:13px;font-weight:700;text-align:center}
-.close-x{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid rgba(90,140,230,.2);color:var(--txt);cursor:pointer;font-size:14px}
-.close-x:hover{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);color:#fca5a5}
-.modal textarea{width:100%;min-height:110px;padding:12px 14px;border-radius:12px;background:rgba(10,16,32,.72);border:1.5px solid rgba(90,140,230,.2);color:var(--txt);font-family:inherit;font-size:14px;outline:none;resize:vertical;transition:.22s}
-.modal textarea:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.13)}
-.modal .actions{display:flex;gap:8px;margin-top:16px}
-.modal .btn{flex:1;padding:11px 18px;border-radius:12px;font-weight:700;font-size:13.5px;cursor:pointer;border:none;font-family:inherit;transition:.22s}
+.swal-custom-popup{border:1px solid rgba(90,140,230,.3) !important;border-radius:22px !important;box-shadow:0 24px 70px rgba(0,0,0,.75) !important;font-family:'Tajawal','Cairo',sans-serif !important;backdrop-filter:blur(20px)}
+.swal-custom-title{color:#e8eefc !important;font-size:20px !important;font-weight:800 !important;font-family:'Tajawal','Cairo',sans-serif !important}
+.swal-custom-input{background:rgba(10,16,32,.75) !important;border:1.5px solid rgba(90,140,230,.3) !important;color:#e8eefc !important;border-radius:12px !important;font-family:'Tajawal','Cairo',sans-serif !important}
+.swal-custom-input:focus{border-color:#2f7dff !important;box-shadow:0 0 0 4px rgba(47,125,255,.15) !important}
+.swal-custom-confirm{border-radius:12px !important;font-weight:700 !important;font-family:'Tajawal','Cairo',sans-serif !important;padding:10px 24px !important}
+.swal-custom-cancel{border-radius:12px !important;font-weight:700 !important;font-family:'Tajawal','Cairo',sans-serif !important;padding:10px 24px !important}
+.swal2-html-container{color:#b7c6e4 !important;font-family:'Tajawal','Cairo',sans-serif !important}
+.swal2-validation-message{background:rgba(239,68,68,.15) !important;color:#fca5a5 !important;border-radius:10px !important;border:1px solid rgba(239,68,68,.3) !important;font-family:'Tajawal','Cairo',sans-serif !important}
 @media(max-width:1080px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:860px){
   .sidebar{position:fixed;inset-inline-end:0;top:0;transform:translateX(-105%);transition:transform .34s;width:280px;box-shadow:-20px 0 60px rgba(0,0,0,.7)}
@@ -199,6 +202,7 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="../db.js"></script>
 <script type="text/babel" data-presets="react">
 const {useState,useEffect,useMemo,useCallback,useRef,createContext,useContext}=React;
@@ -251,7 +255,7 @@ function AppProvider({children}){
   const toast=useToast();
 
   const reload=useCallback(async ()=>{
-    try{const data=await DB.loadAll();setDb(data);}catch(e){}
+    try{const data=await DB.loadAll();setDb(data);}catch(e){console.warn(e);}
   },[]);
 
   const reloadUserData=useCallback(async ()=>{
@@ -278,12 +282,32 @@ function AppProvider({children}){
         setAttempts(a);
         setErrors(e);
         await reload();
-      }catch(e){}
+      }catch(e){console.warn(e);}
       setLoading(false);
     })();
   },[]);
 
-  const logout=useCallback(()=>{DB.clearSession();window.location.replace('../auth/login.html');},[]);
+  const logout=useCallback(()=>{
+    Swal.fire({
+      title: 'تسجيل الخروج',
+      text: 'هل أنت متأكد من رغبتك في الخروج؟',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'نعم، خروج',
+      cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      background: 'linear-gradient(180deg, #151f38, #0b1122)',
+      color: '#e8eefc',
+      customClass: {popup: 'swal-custom-popup', title: 'swal-custom-title'}
+    }).then((result) => {
+      if (result.isConfirmed) {
+        DB.clearSession();
+        window.location.replace('../auth/login.html');
+      }
+    });
+  },[]);
+
   const updateUser=useCallback(async (id,patch)=>{
     const u=await DB.updateUser(id,patch);
     setCurrentUser(u);
@@ -620,7 +644,6 @@ function Home({onNav,setSelected}){
     </div>
   </>;
 }
-
 function Subjects({setSelected,setTab}){
   const app=useApp();
   const u=app.currentUser;
@@ -1235,13 +1258,62 @@ function Profile(){
 function Footer(){
   const app=useApp();
   const u=app.currentUser;
+  
   const sendReport=async ()=>{
-    const msg=prompt("اكتب مشكلتك بالتفصيل:");
-    if(msg&&msg.length>=5){
-      await DB.reportIssue({userName:u?.name||"زائر",userPhone:(u?.country_code||"+20")+(u?.phone||""),message:msg});
-      alert("✅ تم إرسال بلاغك بنجاح");
+    const { value: msg } = await Swal.fire({
+      title: '🚨 بلاغ عن مشكلة',
+      input: 'textarea',
+      inputLabel: 'اكتب مشكلتك بالتفصيل',
+      inputPlaceholder: 'اكتب رسالتك هنا...',
+      inputAttributes: { 'aria-label': 'اكتب رسالتك', 'dir': 'rtl' },
+      showCancelButton: true,
+      confirmButtonText: '📤 إرسال',
+      cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#2f7dff',
+      cancelButtonColor: '#64748b',
+      background: 'linear-gradient(180deg, #151f38, #0b1122)',
+      color: '#e8eefc',
+      inputValidator: (value) => {
+        if (!value || value.trim().length < 5) return 'يرجى كتابة رسالة واضحة (5 أحرف على الأقل)';
+      },
+      customClass: {
+        popup: 'swal-custom-popup',
+        title: 'swal-custom-title',
+        input: 'swal-custom-input',
+        confirmButton: 'swal-custom-confirm',
+        cancelButton: 'swal-custom-cancel'
+      }
+    });
+    
+    if (msg){
+      Swal.fire({
+        title: 'جارٍ الإرسال...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+        background: 'linear-gradient(180deg, #151f38, #0b1122)',
+        color: '#e8eefc',
+        customClass: {popup: 'swal-custom-popup'}
+      });
+      
+      const sent = await DB.reportIssue({
+        userName: u?.name || 'زائر',
+        userPhone: (u?.country_code || '+20') + (u?.phone || '—'),
+        message: msg
+      });
+      
+      Swal.fire({
+        icon: sent ? 'success' : 'error',
+        title: sent ? '✅ تم الإرسال' : '❌ فشل الإرسال',
+        text: sent ? 'تم استلام بلاغك، شكرًا لك' : 'حدث خطأ، حاول مرة أخرى',
+        confirmButtonText: 'حسنًا',
+        confirmButtonColor: '#2f7dff',
+        background: 'linear-gradient(180deg, #151f38, #0b1122)',
+        color: '#e8eefc',
+        customClass: {popup: 'swal-custom-popup', title: 'swal-custom-title', confirmButton: 'swal-custom-confirm'}
+      });
     }
   };
+  
   return <div className="footer-dev">
     <button className="dev-btn" onClick={()=>window.open("https://wa.me/201550802408?text="+encodeURIComponent("مرحبًا، أريد الاستفسار عن منصة MISSION EDU"),"_blank")}>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
