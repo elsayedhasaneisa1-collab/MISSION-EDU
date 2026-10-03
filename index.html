@@ -4,184 +4,1929 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07111f">
+
 <title>MISSION EDU | منصة التعليم الذكي</title>
+
 <link rel="stylesheet" href="css/theme.css">
 <link rel="stylesheet" href="css/components.css">
 <link rel="stylesheet" href="css/responsive.css">
+
 <style>
-:root{--bg:#050b14;--panel:rgba(10,22,39,.72);--panel2:rgba(14,31,52,.88);--line:rgba(120,190,255,.16);--blue:#19aaff;--blue2:#087cff;--text:#eef7ff;--muted:#91a6ba;--danger:#ff667a;--ok:#42e6a4}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 75% 10%,rgba(25,170,255,.13),transparent 30%),radial-gradient(circle at 15% 70%,rgba(8,124,255,.09),transparent 28%),var(--bg);color:var(--text);font-family:Tahoma,Arial,sans-serif;overflow-x:hidden}.topbar{position:fixed;z-index:1000;top:14px;left:4%;right:4%;height:64px;padding:0 18px;border:1px solid var(--line);border-radius:20px;background:rgba(4,12,23,.76);backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:space-between;box-shadow:0 14px 45px rgba(0,0,0,.24)}.brand{color:#fff;text-decoration:none;font-weight:900;font-size:18px;display:flex;align-items:center;gap:10px}.brand-dot{width:12px;height:12px;border-radius:50%;background:var(--blue);box-shadow:0 0 22px var(--blue)}.top-actions{display:flex;gap:8px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 17px;border-radius:12px;border:1px solid var(--line);text-decoration:none;color:#fff;cursor:pointer;font-weight:800;transition:.22s}.btn:hover{transform:translateY(-2px);border-color:rgba(25,170,255,.5)}.btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue2));box-shadow:0 8px 28px rgba(8,124,255,.24)}.btn-ghost{background:rgba(255,255,255,.04)}.slider{height:100svh;min-height:680px;overflow-y:auto;scroll-snap-type:y mandatory;scroll-behavior:smooth}.slide{min-height:100svh;scroll-snap-align:start;display:flex;align-items:center;justify-content:center;padding:105px 7% 55px;position:relative}.slide::before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:rgba(25,170,255,.07);filter:blur(50px);top:15%;right:-180px}.hero-wrap{width:min(1100px,100%);display:grid;grid-template-columns:1.2fr .8fr;gap:42px;align-items:center}.eyebrow{display:inline-flex;padding:8px 12px;border:1px solid var(--line);border-radius:999px;color:#8fd8ff;background:rgba(25,170,255,.06);font-size:12px;font-weight:900;letter-spacing:.7px}.hero h1{font-size:clamp(38px,6vw,78px);line-height:1.04;margin:18px 0}.hero h1 span{color:var(--blue);text-shadow:0 0 28px rgba(25,170,255,.3)}.hero p{color:var(--muted);font-size:18px;line-height:1.9;max-width:690px}.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}.glass{border:1px solid var(--line);background:linear-gradient(145deg,rgba(17,37,60,.78),rgba(6,17,30,.72));backdrop-filter:blur(18px);box-shadow:0 30px 80px rgba(0,0,0,.32);border-radius:28px}.mission-card{padding:28px;position:relative;overflow:hidden}.mission-card .orbit{width:210px;height:210px;border:1px solid rgba(25,170,255,.25);border-radius:50%;margin:15px auto 25px;display:grid;place-items:center;box-shadow:inset 0 0 40px rgba(25,170,255,.07),0 0 50px rgba(25,170,255,.07)}.orbit strong{font-size:44px;color:var(--blue)}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat{padding:13px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025);text-align:center}.stat b{display:block;font-size:20px}.stat small{color:var(--muted)}.section{width:min(1080px,100%)}.section-head{text-align:center;margin-bottom:30px}.section-head h2{font-size:clamp(30px,5vw,50px);margin:8px 0}.section-head p{color:var(--muted);line-height:1.8}.features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.feature{padding:24px}.icon{width:48px;height:48px;display:grid;place-items:center;border-radius:15px;background:rgba(25,170,255,.1);border:1px solid var(--line);font-size:22px}.feature h3{margin:17px 0 9px}.feature p{color:var(--muted);line-height:1.8;margin:0}.auth-layout{width:min(950px,100%);display:grid;grid-template-columns:.85fr 1.15fr;gap:22px;align-items:stretch}.auth-info{padding:32px}.auth-info h2{font-size:38px;margin:0 0 14px}.auth-info p,.auth-info li{color:var(--muted);line-height:1.9}.auth-info ul{padding-right:20px}.auth-box{padding:28px}.tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:5px;background:rgba(255,255,255,.04);border-radius:14px;margin-bottom:20px}.tab{border:0;background:transparent;color:#9eb2c5;padding:12px;border-radius:10px;font-weight:900;cursor:pointer}.tab.active{background:rgba(25,170,255,.13);color:#fff}.form{display:none}.form.active{display:block}.field{margin:12px 0}.field label{display:block;font-size:13px;color:#b9cada;margin-bottom:7px}.field input{width:100%;height:47px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.2);color:#fff;padding:0 13px;outline:none}.field input:focus{border-color:rgba(25,170,255,.75);box-shadow:0 0 0 3px rgba(25,170,255,.08)}.form .btn{width:100%;margin-top:8px}.status{min-height:24px;margin:10px 0 0;font-size:13px;color:var(--muted);line-height:1.7}.status.ok{color:var(--ok)}.status.err{color:var(--danger)}.footer{text-align:center;color:#71879c;padding:25px;border-top:1px solid var(--line)}.footer a{color:#9bdcff;text-decoration:none}.dots{position:fixed;z-index:900;left:18px;top:50%;transform:translateY(-50%);display:grid;gap:9px}.dot{width:9px;height:9px;border-radius:50%;border:1px solid #5d7891;background:transparent;cursor:pointer}.dot.active{background:var(--blue);border-color:var(--blue);box-shadow:0 0 14px var(--blue)}.toast{position:fixed;z-index:2000;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:#0d2034;border:1px solid var(--line);padding:12px 18px;border-radius:13px;transition:.25s;box-shadow:0 15px 40px rgba(0,0,0,.3)}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}@media(max-width:800px){.topbar{left:3%;right:3%;height:58px}.top-actions .btn-ghost{display:none}.slide{padding:95px 5% 45px}.hero-wrap,.auth-layout{grid-template-columns:1fr}.hero h1{font-size:45px}.mission-card{display:none}.features{grid-template-columns:1fr}.dots{left:9px}.section-head{margin-bottom:20px}}@media(max-width:500px){.brand{font-size:15px}.top-actions .btn{min-height:38px;padding:0 12px;font-size:12px}.hero p{font-size:15px}.hero-actions .btn{width:100%}.auth-info{padding:22px}.auth-box{padding:20px}.auth-info h2{font-size:30px}}
+:root{
+  --bg:#050b14;
+  --panel:rgba(10,22,39,.72);
+  --panel2:rgba(14,31,52,.88);
+  --line:rgba(120,190,255,.16);
+  --blue:#19aaff;
+  --blue2:#087cff;
+  --text:#eef7ff;
+  --muted:#91a6ba;
+  --danger:#ff667a;
+  --ok:#42e6a4;
+}
+
+*{box-sizing:border-box}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  background:
+    radial-gradient(circle at 75% 10%,rgba(25,170,255,.13),transparent 30%),
+    radial-gradient(circle at 15% 70%,rgba(8,124,255,.09),transparent 28%),
+    var(--bg);
+  color:var(--text);
+  font-family:Tahoma,Arial,sans-serif;
+  overflow-x:hidden;
+}
+
+.topbar{
+  position:fixed;
+  z-index:1000;
+  top:14px;
+  left:4%;
+  right:4%;
+  height:64px;
+  padding:0 18px;
+  border:1px solid var(--line);
+  border-radius:20px;
+  background:rgba(4,12,23,.76);
+  backdrop-filter:blur(18px);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  box-shadow:0 14px 45px rgba(0,0,0,.24);
+}
+
+.brand{
+  color:#fff;
+  text-decoration:none;
+  font-weight:900;
+  font-size:18px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.brand-dot{
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  background:var(--blue);
+  box-shadow:0 0 22px var(--blue);
+}
+
+.top-actions{
+  display:flex;
+  gap:8px;
+}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:42px;
+  padding:0 17px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  text-decoration:none;
+  color:#fff;
+  cursor:pointer;
+  font-weight:800;
+  transition:.22s;
+}
+
+.btn:hover{
+  transform:translateY(-2px);
+  border-color:rgba(25,170,255,.5);
+}
+
+.btn-primary{
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  box-shadow:0 8px 28px rgba(8,124,255,.24);
+}
+
+.btn-ghost{
+  background:rgba(255,255,255,.04);
+}
+
+.slider{
+  height:100svh;
+  min-height:680px;
+  overflow-y:auto;
+  scroll-snap-type:y mandatory;
+  scroll-behavior:smooth;
+}
+
+.slide{
+  min-height:100svh;
+  scroll-snap-align:start;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:105px 7% 55px;
+  position:relative;
+}
+
+.slide::before{
+  content:"";
+  position:absolute;
+  width:420px;
+  height:420px;
+  border-radius:50%;
+  background:rgba(25,170,255,.07);
+  filter:blur(50px);
+  top:15%;
+  right:-180px;
+}
+
+.hero-wrap{
+  width:min(1100px,100%);
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:42px;
+  align-items:center;
+}
+
+.eyebrow{
+  display:inline-flex;
+  padding:8px 12px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  color:#8fd8ff;
+  background:rgba(25,170,255,.06);
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.7px;
+}
+
+.hero h1{
+  font-size:clamp(38px,6vw,78px);
+  line-height:1.04;
+  margin:18px 0;
+}
+
+.hero h1 span{
+  color:var(--blue);
+  text-shadow:0 0 28px rgba(25,170,255,.3);
+}
+
+.hero p{
+  color:var(--muted);
+  font-size:18px;
+  line-height:1.9;
+  max-width:690px;
+}
+
+.hero-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:26px;
+}
+
+.glass{
+  border:1px solid var(--line);
+  background:
+    linear-gradient(
+      145deg,
+      rgba(17,37,60,.78),
+      rgba(6,17,30,.72)
+    );
+  backdrop-filter:blur(18px);
+  box-shadow:0 30px 80px rgba(0,0,0,.32);
+  border-radius:28px;
+}
+
+.mission-card{
+  padding:28px;
+  position:relative;
+  overflow:hidden;
+}
+
+.mission-card .orbit{
+  width:210px;
+  height:210px;
+  border:1px solid rgba(25,170,255,.25);
+  border-radius:50%;
+  margin:15px auto 25px;
+  display:grid;
+  place-items:center;
+  box-shadow:
+    inset 0 0 40px rgba(25,170,255,.07),
+    0 0 50px rgba(25,170,255,.07);
+}
+
+.orbit strong{
+  font-size:44px;
+  color:var(--blue);
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
+}
+
+.stat{
+  padding:13px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:rgba(255,255,255,.025);
+  text-align:center;
+}
+
+.stat b{
+  display:block;
+  font-size:20px;
+}
+
+.stat small{
+  color:var(--muted);
+}
+
+.section{
+  width:min(1080px,100%);
+}
+
+.section-head{
+  text-align:center;
+  margin-bottom:30px;
+}
+
+.section-head h2{
+  font-size:clamp(30px,5vw,50px);
+  margin:8px 0;
+}
+
+.section-head p{
+  color:var(--muted);
+  line-height:1.8;
+}
+
+.features{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+
+.feature{
+  padding:24px;
+}
+
+.icon{
+  width:48px;
+  height:48px;
+  display:grid;
+  place-items:center;
+  border-radius:15px;
+  background:rgba(25,170,255,.1);
+  border:1px solid var(--line);
+  font-size:22px;
+}
+
+.feature h3{
+  margin:17px 0 9px;
+}
+
+.feature p{
+  color:var(--muted);
+  line-height:1.8;
+  margin:0;
+}
+
+.auth-layout{
+  width:min(950px,100%);
+  display:grid;
+  grid-template-columns:.85fr 1.15fr;
+  gap:22px;
+  align-items:stretch;
+}
+
+.auth-info{
+  padding:32px;
+}
+
+.auth-info h2{
+  font-size:38px;
+  margin:0 0 14px;
+}
+
+.auth-info p,
+.auth-info li{
+  color:var(--muted);
+  line-height:1.9;
+}
+
+.auth-info ul{
+  padding-right:20px;
+}
+
+.auth-box{
+  padding:28px;
+}
+
+.tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  padding:5px;
+  background:rgba(255,255,255,.04);
+  border-radius:14px;
+  margin-bottom:20px;
+}
+
+.tab{
+  border:0;
+  background:transparent;
+  color:#9eb2c5;
+  padding:12px;
+  border-radius:10px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.tab.active{
+  background:rgba(25,170,255,.13);
+  color:#fff;
+}
+
+.form{
+  display:none;
+}
+
+.form.active{
+  display:block;
+}
+
+.field{
+  margin:12px 0;
+}
+
+.field label{
+  display:block;
+  font-size:13px;
+  color:#b9cada;
+  margin-bottom:7px;
+}
+
+.field input{
+  width:100%;
+  height:47px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:rgba(0,0,0,.2);
+  color:#fff;
+  padding:0 13px;
+  outline:none;
+  direction:ltr;
+  text-align:left;
+}
+
+.field input:focus{
+  border-color:rgba(25,170,255,.75);
+  box-shadow:0 0 0 3px rgba(25,170,255,.08);
+}
+
+.phone-help{
+  color:#71879c;
+  font-size:12px;
+  margin-top:6px;
+  line-height:1.7;
+}
+
+.form .btn{
+  width:100%;
+  margin-top:8px;
+}
+
+.status{
+  min-height:24px;
+  margin:10px 0 0;
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.7;
+}
+
+.status.ok{
+  color:var(--ok);
+}
+
+.status.err{
+  color:var(--danger);
+}
+
+.otp-box{
+  display:none;
+  margin-top:18px;
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:rgba(25,170,255,.04);
+}
+
+.otp-box.show{
+  display:block;
+}
+
+.otp-title{
+  font-weight:900;
+  margin-bottom:10px;
+}
+
+.otp-input{
+  letter-spacing:8px;
+  font-size:22px;
+  text-align:center!important;
+  direction:ltr!important;
+}
+
+.back-btn{
+  background:transparent;
+  border:0;
+  color:#8fd8ff;
+  cursor:pointer;
+  margin-top:10px;
+  font-weight:800;
+}
+
+.footer{
+  text-align:center;
+  color:#71879c;
+  padding:25px;
+  border-top:1px solid var(--line);
+}
+
+.footer a{
+  color:#9bdcff;
+  text-decoration:none;
+}
+
+.dots{
+  position:fixed;
+  z-index:900;
+  left:18px;
+  top:50%;
+  transform:translateY(-50%);
+  display:grid;
+  gap:9px;
+}
+
+.dot{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  border:1px solid #5d7891;
+  background:transparent;
+  cursor:pointer;
+}
+
+.dot.active{
+  background:var(--blue);
+  border-color:var(--blue);
+  box-shadow:0 0 14px var(--blue);
+}
+
+.toast{
+  position:fixed;
+  z-index:2000;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%) translateY(20px);
+  opacity:0;
+  pointer-events:none;
+  background:#0d2034;
+  border:1px solid var(--line);
+  padding:12px 18px;
+  border-radius:13px;
+  transition:.25s;
+  box-shadow:0 15px 40px rgba(0,0,0,.3);
+}
+
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+@media(max-width:800px){
+
+  .topbar{
+    left:3%;
+    right:3%;
+    height:58px;
+  }
+
+  .top-actions .btn-ghost{
+    display:none;
+  }
+
+  .slide{
+    padding:95px 5% 45px;
+  }
+
+  .hero-wrap,
+  .auth-layout{
+    grid-template-columns:1fr;
+  }
+
+  .hero h1{
+    font-size:45px;
+  }
+
+  .mission-card{
+    display:none;
+  }
+
+  .features{
+    grid-template-columns:1fr;
+  }
+
+  .dots{
+    left:9px;
+  }
+}
+
+@media(max-width:500px){
+
+  .brand{
+    font-size:15px;
+  }
+
+  .top-actions .btn{
+    min-height:38px;
+    padding:0 12px;
+    font-size:12px;
+  }
+
+  .hero p{
+    font-size:15px;
+  }
+
+  .hero-actions .btn{
+    width:100%;
+  }
+
+  .auth-info{
+    padding:22px;
+  }
+
+  .auth-box{
+    padding:20px;
+  }
+
+  .auth-info h2{
+    font-size:30px;
+  }
+}
 </style>
 </head>
+
 <body>
+
 <header class="topbar">
-  <a class="brand" href="#home"><span class="brand-dot"></span> MISSION EDU</a>
+
+  <a class="brand" href="#home">
+    <span class="brand-dot"></span>
+    MISSION EDU
+  </a>
+
   <div class="top-actions">
     <a class="btn btn-ghost" href="#features">المميزات</a>
     <a class="btn btn-primary" href="#auth">دخول / تسجيل</a>
   </div>
+
 </header>
 
-<div class="dots" aria-label="التنقل بين الصفحات">
-  <button class="dot active" data-target="home" aria-label="الرئيسية"></button>
-  <button class="dot" data-target="features" aria-label="المميزات"></button>
-  <button class="dot" data-target="auth" aria-label="الدخول والتسجيل"></button>
+<div class="dots">
+
+  <button class="dot active"
+          data-target="home"
+          aria-label="الرئيسية"></button>
+
+  <button class="dot"
+          data-target="features"
+          aria-label="المميزات"></button>
+
+  <button class="dot"
+          data-target="auth"
+          aria-label="الدخول والتسجيل"></button>
+
 </div>
 
 <main id="slider" class="slider">
-  <section id="home" class="slide hero">
-    <div class="hero-wrap">
-      <div>
-        <span class="eyebrow">EDUCATION • MISSIONS • SECURITY</span>
-        <h1>اتعلم.<br><span>نفّذ المهمة.</span><br>طوّر مستواك.</h1>
-        <p>MISSION EDU منصة تعليمية تفاعلية تجمع الدروس والمهام والاختبارات ونظام XP والمستويات في تجربة واحدة.</p>
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="#auth">ابدأ الآن</a>
-          <a class="btn btn-ghost" href="#features">اكتشف المنصة</a>
-        </div>
+
+<section id="home" class="slide hero">
+
+  <div class="hero-wrap">
+
+    <div>
+
+      <span class="eyebrow">
+        EDUCATION • MISSIONS • SECURITY
+      </span>
+
+      <h1>
+        اتعلم.<br>
+        <span>نفّذ المهمة.</span><br>
+        طوّر مستواك.
+      </h1>
+
+      <p>
+        MISSION EDU منصة تعليمية تفاعلية تجمع الدروس
+        والمهام والاختبارات ونظام XP والمستويات في تجربة واحدة.
+      </p>
+
+      <div class="hero-actions">
+
+        <a class="btn btn-primary" href="#auth">
+          ابدأ الآن
+        </a>
+
+        <a class="btn btn-ghost" href="#features">
+          اكتشف المنصة
+        </a>
+
       </div>
-      <div class="glass mission-card">
-        <div class="orbit"><strong>XP</strong></div>
-        <div class="stats">
-          <div class="stat"><b>01</b><small>Level</small></div>
-          <div class="stat"><b>10+</b><small>Missions</small></div>
-          <div class="stat"><b>∞</b><small>Progress</small></div>
-        </div>
-      </div>
+
     </div>
-  </section>
 
-  <section id="features" class="slide">
-    <div class="section">
-      <div class="section-head">
-        <span class="eyebrow">MISSION SYSTEM</span>
-        <h2>كل حاجة في مكان واحد</h2>
-        <p>واجهة مصممة للموبايل والكمبيوتر، والتنقل بين الصفحات بيتم بسلاسة عن طريق السحب والتمرير.</p>
+    <div class="glass mission-card">
+
+      <div class="orbit">
+        <strong>XP</strong>
       </div>
-      <div class="features">
-        <article class="glass feature"><div class="icon">🎯</div><h3>المهام</h3><p>نفّذ المهام التعليمية واحصل على نقاط XP مع تقدمك.</p></article>
-        <article class="glass feature"><div class="icon">📚</div><h3>الكورسات</h3><p>الوصول إلى المحتوى التعليمي من واجهة منظمة وسهلة.</p></article>
-        <article class="glass feature"><div class="icon">🏆</div><h3>Leaderboard</h3><p>تابع مستواك وترتيبك وتقدمك داخل المنصة.</p></article>
-      </div>
-    </div>
-  </section>
 
-  <section id="auth" class="slide">
-    <div class="auth-layout">
-      <aside class="glass auth-info">
-        <span class="eyebrow">SECURE ACCESS</span>
-        <h2>ادخل مهمتك وابدأ.</h2>
-        <p>سجّل حساب طالب جديد أو ادخل بحسابك الحالي. النظام يحدد صلاحية الحساب والدور من قاعدة البيانات.</p>
-        <ul>
-          <li>حساب الطالب يبدأ بدور Student.</li>
-          <li>الحساب الموقوف لا يستطيع الدخول.</li>
-          <li>حساب Admin يتم تحويله للوحة الإدارة.</li>
-        </ul>
-      </aside>
+      <div class="stats">
 
-      <div class="glass auth-box">
-        <div class="tabs">
-          <button id="loginTab" class="tab active" type="button">تسجيل الدخول</button>
-          <button id="registerTab" class="tab" type="button">إنشاء حساب</button>
+        <div class="stat">
+          <b>01</b>
+          <small>Level</small>
         </div>
 
-        <form id="loginForm" class="form active">
-          <div class="field"><label for="loginEmail">البريد الإلكتروني</label><input id="loginEmail" type="email" autocomplete="email" required></div>
-          <div class="field"><label for="loginPassword">كلمة المرور</label><input id="loginPassword" type="password" autocomplete="current-password" required></div>
-          <button class="btn btn-primary" type="submit">دخول إلى المنصة</button>
-          <div id="loginStatus" class="status"></div>
-        </form>
+        <div class="stat">
+          <b>10+</b>
+          <small>Missions</small>
+        </div>
 
-        <form id="registerForm" class="form">
-          <div class="field"><label for="registerName">الاسم بالكامل</label><input id="registerName" type="text" autocomplete="name" minlength="2" required></div>
-          <div class="field"><label for="registerEmail">البريد الإلكتروني</label><input id="registerEmail" type="email" autocomplete="email" required></div>
-          <div class="field"><label for="registerPassword">كلمة المرور</label><input id="registerPassword" type="password" autocomplete="new-password" minlength="6" required></div>
-          <div class="field"><label for="registerPassword2">تأكيد كلمة المرور</label><input id="registerPassword2" type="password" autocomplete="new-password" minlength="6" required></div>
-          <button class="btn btn-primary" type="submit">إنشاء حساب طالب</button>
-          <div id="registerStatus" class="status"></div>
-        </form>
+        <div class="stat">
+          <b>∞</b>
+          <small>Progress</small>
+        </div>
+
       </div>
-    </div>
-  </section>
 
-  <footer class="footer">Developed by <a href="https://wa.me/201550802408" target="_blank" rel="noopener">EL-sayed Hasan ✦</a></footer>
+    </div>
+
+  </div>
+
+</section>
+
+<section id="features" class="slide">
+
+  <div class="section">
+
+    <div class="section-head">
+
+      <span class="eyebrow">
+        MISSION SYSTEM
+      </span>
+
+      <h2>
+        كل حاجة في مكان واحد
+      </h2>
+
+      <p>
+        واجهة مصممة للموبايل والكمبيوتر،
+        والتنقل بين الصفحات بيتم بسلاسة عن طريق السحب والتمرير.
+      </p>
+
+    </div>
+
+    <div class="features">
+
+      <article class="glass feature">
+
+        <div class="icon">🎯</div>
+
+        <h3>المهام</h3>
+
+        <p>
+          نفّذ المهام التعليمية واحصل على نقاط XP مع تقدمك.
+        </p>
+
+      </article>
+
+      <article class="glass feature">
+
+        <div class="icon">📚</div>
+
+        <h3>الكورسات</h3>
+
+        <p>
+          الوصول إلى المحتوى التعليمي من واجهة منظمة وسهلة.
+        </p>
+
+      </article>
+
+      <article class="glass feature">
+
+        <div class="icon">🏆</div>
+
+        <h3>Leaderboard</h3>
+
+        <p>
+          تابع مستواك وترتيبك وتقدمك داخل المنصة.
+        </p>
+
+      </article>
+
+    </div>
+
+  </div>
+
+</section>
+
+<section id="auth" class="slide">
+
+  <div class="auth-layout">
+
+    <aside class="glass auth-info">
+
+      <span class="eyebrow">
+        SECURE ACCESS
+      </span>
+
+      <h2>
+        ادخل مهمتك وابدأ.
+      </h2>
+
+      <p>
+        سجّل حساب طالب جديد باستخدام رقم الموبايل،
+        أو ادخل بحسابك الحالي.
+      </p>
+
+      <ul>
+
+        <li>
+          التسجيل برقم الهاتف.
+        </li>
+
+        <li>
+          وصول كود تحقق SMS.
+        </li>
+
+        <li>
+          الحساب الجديد يبدأ بدور Student.
+        </li>
+
+        <li>
+          الحساب الموقوف لا يستطيع الدخول.
+        </li>
+
+        <li>
+          حساب Admin يتم تحويله للوحة الإدارة.
+        </li>
+
+      </ul>
+
+    </aside>
+
+    <div class="glass auth-box">
+
+      <div class="tabs">
+
+        <button id="loginTab"
+                class="tab active"
+                type="button">
+          تسجيل الدخول
+        </button>
+
+        <button id="registerTab"
+                class="tab"
+                type="button">
+          إنشاء حساب
+        </button>
+
+      </div>
+
+      <!-- LOGIN -->
+
+      <form id="loginForm" class="form active">
+
+        <div class="field">
+
+          <label for="loginPhone">
+            رقم الهاتف
+          </label>
+
+          <input
+            id="loginPhone"
+            type="tel"
+            inputmode="tel"
+            autocomplete="tel"
+            placeholder="01xxxxxxxxx"
+            required
+          >
+
+          <div class="phone-help">
+            مثال: 01012345678
+          </div>
+
+        </div>
+
+        <div class="field">
+
+          <label for="loginPassword">
+            كلمة المرور
+          </label>
+
+          <input
+            id="loginPassword"
+            type="password"
+            autocomplete="current-password"
+            required
+          >
+
+        </div>
+
+        <button
+          id="loginBtn"
+          class="btn btn-primary"
+          type="submit"
+        >
+          دخول إلى المنصة
+        </button>
+
+        <div
+          id="loginStatus"
+          class="status">
+        </div>
+
+      </form>
+
+
+      <!-- REGISTER -->
+
+      <form id="registerForm" class="form">
+
+        <div class="field">
+
+          <label for="registerName">
+            الاسم بالكامل
+          </label>
+
+          <input
+            id="registerName"
+            type="text"
+            autocomplete="name"
+            minlength="2"
+            required
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="registerPhone">
+            رقم الهاتف
+          </label>
+
+          <input
+            id="registerPhone"
+            type="tel"
+            inputmode="tel"
+            autocomplete="tel"
+            placeholder="01xxxxxxxxx"
+            required
+          >
+
+          <div class="phone-help">
+            سيتم إرسال كود تحقق على الرقم.
+          </div>
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="registerPassword">
+            كلمة المرور
+          </label>
+
+          <input
+            id="registerPassword"
+            type="password"
+            autocomplete="new-password"
+            minlength="6"
+            required
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="registerPassword2">
+            تأكيد كلمة المرور
+          </label>
+
+          <input
+            id="registerPassword2"
+            type="password"
+            autocomplete="new-password"
+            minlength="6"
+            required
+          >
+
+        </div>
+
+
+        <button
+          id="registerBtn"
+          class="btn btn-primary"
+          type="submit"
+        >
+          إرسال كود التحقق
+        </button>
+
+        <div
+          id="registerStatus"
+          class="status">
+        </div>
+
+
+        <!-- OTP -->
+
+        <div
+          id="otpBox"
+          class="otp-box">
+
+          <div class="otp-title">
+            🔐 تأكيد رقم الهاتف
+          </div>
+
+          <div class="phone-help">
+            اكتب الكود المرسل إلى رقم هاتفك.
+          </div>
+
+          <div class="field">
+
+            <label for="otp">
+              كود التحقق
+            </label>
+
+            <input
+              id="otp"
+              class="otp-input"
+              type="text"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              maxlength="6"
+              pattern="[0-9]{6}"
+              placeholder="000000"
+            >
+
+          </div>
+
+          <button
+            id="verifyBtn"
+            class="btn btn-primary"
+            type="button"
+          >
+            تأكيد الرقم وإنشاء الحساب
+          </button>
+
+          <button
+            id="backRegisterBtn"
+            class="back-btn"
+            type="button"
+          >
+            ← تعديل رقم الهاتف
+          </button>
+
+          <div
+            id="otpStatus"
+            class="status">
+          </div>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</section>
+
+<footer class="footer">
+
+  Developed by
+
+  <a
+    href="https://wa.me/201550802408"
+    target="_blank"
+    rel="noopener">
+    EL-sayed Hasan ✦
+  </a>
+
+</footer>
+
 </main>
+
 <div id="toast" class="toast"></div>
 
+
 <script type="module">
+
 import { supabase } from "./js/supabase.js";
 
-const slider=document.getElementById("slider");
-const sections=[...document.querySelectorAll(".slide")];
-const dots=[...document.querySelectorAll(".dot")];
-const loginTab=document.getElementById("loginTab");
-const registerTab=document.getElementById("registerTab");
-const loginForm=document.getElementById("loginForm");
-const registerForm=document.getElementById("registerForm");
-const loginStatus=document.getElementById("loginStatus");
-const registerStatus=document.getElementById("registerStatus");
-const toast=document.getElementById("toast");
 
-function showToast(message){toast.textContent=message;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000)}
-function setStatus(el,msg,type=""){el.textContent=msg;el.className="status "+type}
-function switchAuth(mode){
-  const login=mode==="login";
-  loginTab.classList.toggle("active",login);registerTab.classList.toggle("active",!login);
-  loginForm.classList.toggle("active",login);registerForm.classList.toggle("active",!login);
-  document.getElementById("auth").scrollIntoView({behavior:"smooth"});
+/* =========================
+   ELEMENTS
+========================= */
+
+const slider =
+  document.getElementById("slider");
+
+const sections =
+  [...document.querySelectorAll(".slide")];
+
+const dots =
+  [...document.querySelectorAll(".dot")];
+
+const loginTab =
+  document.getElementById("loginTab");
+
+const registerTab =
+  document.getElementById("registerTab");
+
+const loginForm =
+  document.getElementById("loginForm");
+
+const registerForm =
+  document.getElementById("registerForm");
+
+const loginStatus =
+  document.getElementById("loginStatus");
+
+const registerStatus =
+  document.getElementById("registerStatus");
+
+const otpStatus =
+  document.getElementById("otpStatus");
+
+const otpBox =
+  document.getElementById("otpBox");
+
+const toast =
+  document.getElementById("toast");
+
+const registerBtn =
+  document.getElementById("registerBtn");
+
+const verifyBtn =
+  document.getElementById("verifyBtn");
+
+const backRegisterBtn =
+  document.getElementById("backRegisterBtn");
+
+
+/* =========================
+   TEMP REGISTER DATA
+========================= */
+
+let pendingPhone = "";
+let pendingName = "";
+let pendingPassword = "";
+
+
+/* =========================
+   HELPERS
+========================= */
+
+function showToast(message){
+
+  toast.textContent = message;
+
+  toast.classList.add("show");
+
+  setTimeout(()=>{
+    toast.classList.remove("show");
+  },3000);
+
 }
-loginTab.onclick=()=>switchAuth("login");
-registerTab.onclick=()=>switchAuth("register");
 
-dots.forEach(dot=>dot.addEventListener("click",()=>document.getElementById(dot.dataset.target)?.scrollIntoView({behavior:"smooth"})));
-const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){dots.forEach(d=>d.classList.toggle("active",d.dataset.target===e.target.id));}}),{root:slider,threshold:.55});
-sections.forEach(s=>observer.observe(s));
+
+function setStatus(element,message,type=""){
+
+  element.textContent = message;
+
+  element.className =
+    "status " + type;
+
+}
+
+
+function setButtonLoading(button,loading,text){
+
+  button.disabled = loading;
+
+  button.style.opacity =
+    loading ? ".65" : "1";
+
+  button.textContent =
+    loading ? "جاري التنفيذ..." : text;
+
+}
+
+
+/* =========================
+   PHONE FORMAT
+========================= */
+
+function normalizeEgyptPhone(value){
+
+  let phone =
+    String(value || "")
+    .trim()
+    .replace(/\s+/g,"")
+    .replace(/-/g,"");
+
+  /*
+    01012345678
+    01112345678
+    01212345678
+    01512345678
+  */
+
+  if(phone.startsWith("01") && phone.length === 11){
+
+    return "+20" + phone.substring(1);
+
+  }
+
+  /*
+    201012345678
+  */
+
+  if(phone.startsWith("20") && phone.length === 12){
+
+    return "+" + phone;
+
+  }
+
+  /*
+    +201012345678
+  */
+
+  if(phone.startsWith("+20") && phone.length === 13){
+
+    return phone;
+
+  }
+
+  return null;
+
+}
+
+
+/* =========================
+   AUTH TABS
+========================= */
+
+function switchAuth(mode){
+
+  const login =
+    mode === "login";
+
+  loginTab.classList.toggle(
+    "active",
+    login
+  );
+
+  registerTab.classList.toggle(
+    "active",
+    !login
+  );
+
+  loginForm.classList.toggle(
+    "active",
+    login
+  );
+
+  registerForm.classList.toggle(
+    "active",
+    !login
+  );
+
+  document
+    .getElementById("auth")
+    .scrollIntoView({
+      behavior:"smooth"
+    });
+
+}
+
+
+loginTab.onclick = () => {
+
+  switchAuth("login");
+
+};
+
+
+registerTab.onclick = () => {
+
+  switchAuth("register");
+
+};
+
+
+/* =========================
+   SLIDER DOTS
+========================= */
+
+dots.forEach(dot => {
+
+  dot.addEventListener(
+    "click",
+    () => {
+
+      document
+        .getElementById(dot.dataset.target)
+        ?.scrollIntoView({
+          behavior:"smooth"
+        });
+
+    }
+  );
+
+});
+
+
+const observer =
+  new IntersectionObserver(
+    entries => {
+
+      entries.forEach(entry => {
+
+        if(entry.isIntersecting){
+
+          dots.forEach(dot => {
+
+            dot.classList.toggle(
+              "active",
+              dot.dataset.target ===
+              entry.target.id
+            );
+
+          });
+
+        }
+
+      });
+
+    },
+    {
+      root:slider,
+      threshold:.55
+    }
+  );
+
+
+sections.forEach(section => {
+
+  observer.observe(section);
+
+});
+
+
+/* =========================
+   PROFILE REDIRECT
+========================= */
 
 async function redirectByProfile(user){
-  const {data:profile,error}=await supabase.from("profiles").select("role,status").eq("id",user.id).maybeSingle();
-  if(error){console.error(error);return {ok:false,message:"تعذر قراءة بيانات الحساب."};}
-  if(!profile){await supabase.auth.signOut();return {ok:false,message:"تم إنشاء الحساب لكن بيانات الملف الشخصي لم تُنشأ بعد. شغّل Trigger إنشاء المستخدم في Supabase."};}
-  if(profile.status!=="active"){await supabase.auth.signOut();return {ok:false,message:"الحساب غير نشط حاليًا."};}
-  location.href=profile.role==="admin"?"admin/index.html":"student/index.html";
-  return {ok:true};
-}
 
-loginForm.addEventListener("submit",async e=>{
-  e.preventDefault();setStatus(loginStatus,"جاري التحقق...");
-  const email=document.getElementById("loginEmail").value.trim();
-  const password=document.getElementById("loginPassword").value;
-  const {data,error}=await supabase.auth.signInWithPassword({email,password});
-  if(error){setStatus(loginStatus,"البريد الإلكتروني أو كلمة المرور غير صحيحة، أو أن البريد لم يتم تأكيده.","err");return;}
-  const result=await redirectByProfile(data.user);
-  if(!result.ok)setStatus(loginStatus,result.message,"err");
-});
+  if(!user){
 
-registerForm.addEventListener("submit",async e=>{
-  e.preventDefault();setStatus(registerStatus,"جاري إنشاء الحساب...");
-  const name=document.getElementById("registerName").value.trim();
-  const email=document.getElementById("registerEmail").value.trim();
-  const password=document.getElementById("registerPassword").value;
-  const password2=document.getElementById("registerPassword2").value;
-  if(password!==password2){setStatus(registerStatus,"كلمتا المرور غير متطابقتين.","err");return;}
-  const {data,error}=await supabase.auth.signUp({email,password,options:{data:{full_name:name}}});
-  if(error){setStatus(registerStatus,error.message.includes("already registered")?"هذا البريد مسجل بالفعل.":"تعذر إنشاء الحساب. تأكد من البيانات وإعدادات Supabase.","err");return;}
-  if(data.session){
-    const result=await redirectByProfile(data.user);
-    if(!result.ok)setStatus(registerStatus,result.message,"err");
-  }else{
-    setStatus(registerStatus,"تم إنشاء الحساب. افتح بريدك الإلكتروني لتأكيد الحساب، ثم سجّل الدخول.","ok");
-    registerForm.reset();
-    switchAuth("login");
-    showToast("تم إنشاء الحساب بنجاح");
+    return {
+      ok:false,
+      message:"لم يتم العثور على المستخدم."
+    };
+
   }
-});
 
-const {data:{session}}=await supabase.auth.getSession();
-if(session){
-  const result=await redirectByProfile(session.user);
-  if(!result.ok) console.warn(result.message);
+
+  const {
+    data:profile,
+    error
+  } =
+    await supabase
+      .from("profiles")
+      .select("role,status")
+      .eq("id",user.id)
+      .maybeSingle();
+
+
+  if(error){
+
+    console.error(error);
+
+    return {
+      ok:false,
+      message:"تعذر قراءة بيانات الحساب."
+    };
+
+  }
+
+
+  if(!profile){
+
+    await supabase.auth.signOut();
+
+    return {
+      ok:false,
+      message:
+        "تم إنشاء الحساب لكن بيانات الملف الشخصي لم تُنشأ. تأكد من تشغيل Trigger."
+    };
+
+  }
+
+
+  if(profile.status !== "active"){
+
+    await supabase.auth.signOut();
+
+    return {
+      ok:false,
+      message:"الحساب غير نشط حاليًا."
+    };
+
+  }
+
+
+  if(profile.role === "admin"){
+
+    location.href =
+      "admin/index.html";
+
+  }else{
+
+    location.href =
+      "student/index.html";
+
+  }
+
+
+  return {
+    ok:true
+  };
+
 }
-supabase.auth.onAuthStateChange((_event,session)=>{if(session && location.pathname.endsWith("/index.html")) redirectByProfile(session.user)});
+
+
+/* =========================
+   LOGIN
+========================= */
+
+loginForm.addEventListener(
+  "submit",
+  async event => {
+
+    event.preventDefault();
+
+
+    setStatus(
+      loginStatus,
+      "جاري تسجيل الدخول..."
+    );
+
+
+    const rawPhone =
+      document
+        .getElementById("loginPhone")
+        .value;
+
+    const password =
+      document
+        .getElementById("loginPassword")
+        .value;
+
+
+    const phone =
+      normalizeEgyptPhone(rawPhone);
+
+
+    if(!phone){
+
+      setStatus(
+        loginStatus,
+        "اكتب رقم هاتف مصري صحيح مثل 01012345678.",
+        "err"
+      );
+
+      return;
+
+    }
+
+
+    if(!password){
+
+      setStatus(
+        loginStatus,
+        "اكتب كلمة المرور.",
+        "err"
+      );
+
+      return;
+
+    }
+
+
+    const {
+      data,
+      error
+    } =
+      await supabase.auth
+        .signInWithPassword({
+
+          phone:phone,
+
+          password:password
+
+        });
+
+
+    if(error){
+
+      console.error(error);
+
+      setStatus(
+        loginStatus,
+        "رقم الهاتف أو كلمة المرور غير صحيحة.",
+        "err"
+      );
+
+      return;
+
+    }
+
+
+    const result =
+      await redirectByProfile(
+        data.user
+      );
+
+
+    if(!result.ok){
+
+      setStatus(
+        loginStatus,
+        result.message,
+        "err"
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================
+   REGISTER
+========================= */
+
+registerForm.addEventListener(
+  "submit",
+  async event => {
+
+    event.preventDefault();
+
+
+    setStatus(
+      registerStatus,
+      ""
+    );
+
+    setStatus(
+      otpStatus,
+      ""
+    );
+
+
+    const name =
+      document
+        .getElementById("registerName")
+        .value
+        .trim();
+
+
+    const rawPhone =
+      document
+        .getElementById("registerPhone")
+        .value;
+
+
+    const password =
+      document
+        .getElementById("registerPassword")
+        .value;
+
+
+    const password2 =
+      document
+        .getElementById("registerPassword2")
+        .value;
+
+
+    const phone =
+      normalizeEgyptPhone(rawPhone);
+
+
+    if(name.length < 2){
+
+      setStatus(
+        registerStatus,
+        "اكتب الاسم بالكامل.",
+        "err"
+      );
+
+      return;
+
+    }
+
+
+    if(!phone){
+
+      setStatus(
+        registerStatus,
+        "اكتب رقم هاتف مصري صحيح مثل 01012345678.",
+        "err"
+      );
+
+      return;
+
+    }
+
+
+    if(password.length < 6){
+
+      setStatus(
+        registerStatus,
+        "كلمة المرور يجب أن تكون 6 أحرف أو أكثر.",
+        "err"
+      );
+
+      return;
+
+    }
+
+
+    if(password !== password2){
+
+      setStatus(
+        registerStatus,
+        "كلمتا المرور غير متطابقتين.",
+        "err"
+      );
+
+      return;
+
+    }
+
+
+    pendingPhone =
+      phone;
+
+    pendingName =
+      name;
+
+    pendingPassword =
+      password;
+
+
+    setButtonLoading(
+      registerBtn,
+      true,
+      "إرسال كود التحقق"
+    );
+
+
+    const {
+      data,
+      error
+    } =
+      await supabase.auth.signUp({
+
+        phone:phone,
+
+        password:password,
+
+        options:{
+
+          channel:"sms",
+
+          data:{
+
+            full_name:name
+
+          }
+
+        }
+
+      });
+
+
+    setButtonLoading(
+      registerBtn,
+      false,
+      "إرسال كود التحقق"
+    );
+
+
+    if(error){
+
+      console.error(error);
+
+      setStatus(
+        registerStatus,
+        error.message ||
+        "تعذر إرسال كود التحقق.",
+        "err"
+      );
+
+      return;
+
+    }
+
+
+    /*
+      في حالة تفعيل تأكيد الهاتف:
+      Supabase يرسل OTP.
+    */
+
+    otpBox.classList.add("show");
+
+
+    setStatus(
+      registerStatus,
+      "تم إرسال كود التحقق إلى هاتفك.",
+      "ok"
+    );
+
+
+    showToast(
+      "تم إرسال كود SMS"
+    );
+
+
+    document
+      .getElementById("otp")
+      .focus();
+
+
+  }
+);
+
+
+/* =========================
+   VERIFY OTP
+========================= */
+
+verifyBtn.addEventListener(
+  "click",
+  async () => {
+
+    const token =
+      document
+        .getElementById("otp")
+        .value
+        .trim();
+
+
+    if(!pendingPhone){
+
+      setStatus(
+        otpStatus,
+        "ابدأ التسجيل أولًا.",
+        "err"
+      );
+
+      return;
+
+    }
+
+
+    if(!/^\d{6}$/.test(token)){
+
+      setStatus(
+        otpStatus,
+        "اكتب كود التحقق المكون من 6 أرقام.",
+        "err"
+      );
+
+      return;
+
+    }
+
+
+    setButtonLoading(
+      verifyBtn,
+      true,
+      "تأكيد الرقم وإنشاء الحساب"
+    );
+
+
+    const {
+      data,
+      error
+    } =
+      await supabase.auth.verifyOtp({
+
+        phone:pendingPhone,
+
+        token:token,
+
+        type:"sms"
+
+      });
+
+
+    setButtonLoading(
+      verifyBtn,
+      false,
+      "تأكيد الرقم وإنشاء الحساب"
+    );
+
+
+    if(error){
+
+      console.error(error);
+
+      setStatus(
+        otpStatus,
+        "كود التحقق غير صحيح أو انتهت صلاحيته.",
+        "err"
+      );
+
+      return;
+
+    }
+
+
+    if(!data.user){
+
+      setStatus(
+        otpStatus,
+        "تم التحقق لكن لم يتم العثور على الحساب.",
+        "err"
+      );
+
+      return;
+
+    }
+
+
+    setStatus(
+      otpStatus,
+      "تم تأكيد الرقم بنجاح، جاري فتح الحساب...",
+      "ok"
+    );
+
+
+    showToast(
+      "تم تأكيد رقم الهاتف"
+    );
+
+
+    /*
+      ننتظر لحظة بسيطة حتى يكون
+      Trigger إنشاء profile جاهزًا.
+    */
+
+    await new Promise(
+      resolve => setTimeout(resolve,700)
+    );
+
+
+    const result =
+      await redirectByProfile(
+        data.user
+      );
+
+
+    if(!result.ok){
+
+      setStatus(
+        otpStatus,
+        result.message,
+        "err"
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================
+   BACK TO PHONE
+========================= */
+
+backRegisterBtn.addEventListener(
+  "click",
+  () => {
+
+    pendingPhone = "";
+    pendingName = "";
+    pendingPassword = "";
+
+    otpBox.classList.remove("show");
+
+    document
+      .getElementById("otp")
+      .value = "";
+
+    setStatus(
+      otpStatus,
+      ""
+    );
+
+    setStatus(
+      registerStatus,
+      ""
+    );
+
+    document
+      .getElementById("registerPhone")
+      .focus();
+
+  }
+);
+
+
+/* =========================
+   EXISTING SESSION
+========================= */
+
+const {
+  data:{
+    session
+  }
+} =
+  await supabase.auth.getSession();
+
+
+if(session){
+
+  const result =
+    await redirectByProfile(
+      session.user
+    );
+
+  if(!result.ok){
+
+    console.warn(
+      result.message
+    );
+
+  }
+
+}
+
+
+/* =========================
+   AUTH STATE
+========================= */
+
+supabase.auth.onAuthStateChange(
+  (_event,session) => {
+
+    if(
+      session &&
+      (
+        location.pathname.endsWith(
+          "/index.html"
+        )
+        ||
+        location.pathname === "/"
+      )
+    ){
+
+      redirectByProfile(
+        session.user
+      );
+
+    }
+
+  }
+);
+
 </script>
+
 </body>
 </html>
