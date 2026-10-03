@@ -3,238 +3,197 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>تسجيل الدخول | MISSION EDU</title>
+<meta name="theme-color" content="#04060e" />
+<title>MISSION EDU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
 <style>
-:root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--red:#ef4444;--amber:#f59e0b;--violet:#8b5cf6;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.45)}
+:root{--bg:#04060e;--blue:#2f7dff;--txt:#e8eefc;--muted:#7f93b8;--red:#ef4444}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(47,125,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(139,92,246,.14),transparent 60%),radial-gradient(800px 500px at 50% 115%,rgba(6,182,212,.09),transparent 60%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;line-height:1.7;display:flex;align-items:center;justify-content:center;padding:20px}
-::-webkit-scrollbar{width:10px;height:10px}
-::-webkit-scrollbar-thumb{background:rgba(90,140,230,.25);border-radius:20px}
-button,input,select,textarea{font-family:inherit;color:inherit}
-button{cursor:pointer;border:none;background:none}
-a{color:inherit;text-decoration:none}
-.glass{background:linear-gradient(180deg,rgba(21,31,56,.72),rgba(11,17,34,.62));border:1px solid var(--border);border-radius:var(--r);backdrop-filter:blur(16px);box-shadow:var(--sh)}
-.h1{font-size:clamp(24px,4vw,32px);font-weight:900;letter-spacing:-.7px}
-.h2{font-size:20px;font-weight:800}
-.sm{font-size:12.5px}
-.xs{font-size:11.5px}
-.muted{color:var(--muted)}
-.txt2{color:var(--txt2)}
-.grad{background:linear-gradient(100deg,#5aa9ff,#a78bfa 55%,#22d3ee);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.flex{display:flex}.between{justify-content:space-between}.center{align-items:center}.col{flex-direction:column}.wrap{flex-wrap:wrap}
-.g6{gap:6px}.g8{gap:8px}.g12{gap:12px}.g16{gap:16px}
-.mt6{margin-top:6px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
-.mb6{margin-bottom:6px}.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:13px 22px;border-radius:14px;font-weight:700;font-size:14.5px;transition:.24s;white-space:nowrap;color:var(--txt)}
-.btn:active{transform:scale(.97)}
-.btn-p{background:linear-gradient(135deg,#2f7dff,#1f5fd6);color:#fff;box-shadow:0 10px 28px rgba(47,125,255,.36)}
-.btn-p:hover:not(:disabled){box-shadow:0 14px 38px rgba(47,125,255,.55);transform:translateY(-2px)}
-.btn-s{background:rgba(255,255,255,.05);color:var(--txt2);border:1px solid var(--border)}
-.btn-s:hover{background:rgba(255,255,255,.09);color:var(--txt)}
-.btn-block{width:100%}
-.btn:disabled{opacity:.42;cursor:not-allowed}
-.btn-lg{padding:15px 32px;font-size:16px;border-radius:16px}
-.input{width:100%;padding:13px 16px;border-radius:13px;background:rgba(10,16,32,.72);border:1.5px solid var(--border);outline:none;font-size:14.5px;transition:.22s;color:var(--txt)}
-.input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.12)}
-.lbl{display:block;font-size:12.5px;font-weight:700;color:var(--txt2);margin-bottom:7px}
-.field{margin-bottom:14px}
-.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:40px;font-size:12px;font-weight:700;border:1px solid transparent}
-.pill-r{background:rgba(239,68,68,.14);color:#fca5a5;border-color:rgba(239,68,68,.32)}
-.brand-logo{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;font-size:30px;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 12px 34px rgba(47,125,255,.45);font-weight:900}
-.login-wrap{width:100%;max-width:460px;animation:fu .5s cubic-bezier(.2,.8,.3,1)}
-@keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-@keyframes slideIn{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:none}}
-@keyframes fadeOut{to{opacity:0;transform:translateX(-30px)}}
-.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(47,125,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(139,92,246,.14),transparent 60%),radial-gradient(800px 500px at 50% 115%,rgba(6,182,212,.09),transparent 60%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;display:grid;place-items:center;padding:20px;user-select:none;-webkit-user-select:none}
+.logo{width:88px;height:88px;border-radius:24px;display:grid;place-items:center;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 16px 50px rgba(47,125,255,.55);animation:pulse 2.2s ease-in-out infinite;margin:0 auto}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 @keyframes spin{to{transform:rotate(360deg)}}
-.divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-size:11.5px;font-weight:600}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
-.phone-prefix{background:rgba(10,16,32,.72);border:1.5px solid var(--border);border-radius:13px;padding:13px 14px;font-weight:700;font-size:14px;color:var(--txt2);white-space:nowrap;display:flex;align-items:center;gap:6px}
-.toast-host{position:fixed;bottom:26px;inset-inline-start:26px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:min(420px,92vw)}
-.toast{pointer-events:auto;min-width:280px;padding:14px 16px 16px;border-radius:16px;background:linear-gradient(135deg,rgba(21,31,56,.98),rgba(11,17,34,.98));border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.65);animation:slideIn .4s cubic-bezier(.2,.8,.3,1);position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:12px}
-.toast.out{animation:fadeOut .3s forwards}
-.toast-ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex-shrink:0}
-.toast-body{flex:1;min-width:0}
-.toast-title{font-weight:800;font-size:13.5px;margin-bottom:3px}
-.toast-msg{font-size:12.5px;color:var(--txt2);line-height:1.55}
-.toast-bar{position:absolute;bottom:0;inset-inline:0;height:3px;background:rgba(255,255,255,.06)}
-.toast-bar-f{height:100%;transition:width linear}
-.toast.ok .toast-ico{background:rgba(34,197,94,.18);color:#6ee7a0}
-.toast.ok .toast-bar-f{background:linear-gradient(90deg,#16a34a,#4ade80)}
-.toast.err .toast-ico{background:rgba(239,68,68,.18);color:#fca5a5}
-.toast.err .toast-bar-f{background:linear-gradient(90deg,#dc2626,#f87171)}
-.toast.warn .toast-ico{background:rgba(245,158,11,.18);color:#fcd34d}
-.toast.warn .toast-bar-f{background:linear-gradient(90deg,#d97706,#fbbf24)}
-.toast.info .toast-ico{background:rgba(47,125,255,.18);color:#7db6ff}
-.toast.info .toast-bar-f{background:linear-gradient(90deg,#2f7dff,#5aa9ff)}
-@media(max-width:520px){.brand-logo{width:56px;height:56px;font-size:26px}}
+@keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.spinner{width:48px;height:48px;border:3px solid rgba(90,140,230,.2);border-top-color:var(--blue);border-radius:50%;animation:spin .9s linear infinite;margin:26px auto 0}
+.txt{margin-top:22px;font-size:22px;font-weight:900;letter-spacing:-.5px}
+.sub{margin-top:8px;color:var(--muted);font-size:13px;font-weight:600}
+.err{margin-top:22px;padding:14px 22px;border-radius:14px;background:rgba(239,68,68,.14);border:1px solid rgba(239,68,68,.32);color:#fca5a5;font-size:13px;font-weight:700;max-width:400px;margin-inline:auto}
+.footer-dev{position:fixed;bottom:14px;left:0;right:0;display:flex;justify-content:center;gap:10px;padding:0 14px;z-index:10}
+.dev-btn,.tg-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:50px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:all .3s cubic-bezier(.2,.8,.3,1);border:1px solid;background:none}
+.dev-btn{background:linear-gradient(135deg,rgba(47,125,255,.15),rgba(139,92,246,.15));border-color:rgba(90,140,230,.3);color:var(--txt);position:relative;overflow:hidden}
+.dev-btn::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);transform:translateX(-100%);transition:transform .7s}
+.dev-btn:hover::before{transform:translateX(100%)}
+.dev-btn:hover{background:linear-gradient(135deg,rgba(47,125,255,.28),rgba(139,92,246,.28));border-color:#2f7dff;transform:translateY(-2px);box-shadow:0 12px 32px rgba(47,125,255,.35)}
+.dev-name b{background:linear-gradient(90deg,#5aa9ff,#a78bfa,#22d3ee,#5aa9ff);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 3s linear infinite;font-weight:900;letter-spacing:.3px}
+@keyframes shine{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+.tg-btn{background:rgba(34,158,217,.12);border-color:rgba(34,158,217,.3);color:#7dd3fc}
+.tg-btn:hover{background:rgba(34,158,217,.22);border-color:#229ed9;color:#fff;transform:translateY(-2px);box-shadow:0 10px 26px rgba(34,158,217,.3)}
+.modal-bg{position:fixed;inset:0;background:rgba(3,5,12,.82);backdrop-filter:blur(10px);z-index:9000;display:none;place-items:center;padding:20px}
+.modal-bg.on{display:grid;animation:fu .25s}
+.modal{width:100%;max-width:440px;background:linear-gradient(180deg,rgba(21,31,56,.98),rgba(11,17,34,.98));border:1px solid rgba(90,140,230,.3);border-radius:22px;padding:24px;box-shadow:0 24px 70px rgba(0,0,0,.7);animation:pu .3s}
+@keyframes pu{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+.modal h3{font-size:18px;font-weight:800;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.close-x{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid rgba(90,140,230,.2);color:var(--txt);cursor:pointer;font-size:14px}
+.close-x:hover{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);color:#fca5a5}
+.modal p{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6}
+.modal textarea{width:100%;min-height:110px;padding:12px 14px;border-radius:12px;background:rgba(10,16,32,.72);border:1.5px solid rgba(90,140,230,.2);color:var(--txt);font-family:inherit;font-size:14px;outline:none;resize:vertical;transition:.22s}
+.modal textarea:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.13)}
+.modal .actions{display:flex;gap:8px;margin-top:16px}
+.modal .btn{flex:1;padding:11px 18px;border-radius:12px;font-weight:700;font-size:13.5px;cursor:pointer;border:none;font-family:inherit;transition:.22s}
+.modal .btn-p{background:linear-gradient(135deg,#2f7dff,#1f5fd6);color:#fff}
+.modal .btn-p:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(47,125,255,.4)}
+.modal .btn-s{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid rgba(90,140,230,.2)}
+.modal .btn-s:hover{color:var(--txt);background:rgba(255,255,255,.09)}
+.modal .btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+.success-msg{padding:14px;border-radius:12px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.35);color:#6ee7a0;font-size:13px;font-weight:700;text-align:center}
+@media(max-width:520px){.footer-dev{flex-direction:column;align-items:center;gap:6px}}
 </style>
 </head>
 <body>
-<div id="root"></div>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script src="../db.js"></script>
-<script type="text/babel" data-presets="react">
-const {useState,useEffect,useCallback,useRef} = React;
 
-function ToastHost(){
-  const [items,setItems]=useState([]);
-  const push=useCallback((msg,type='info',title,duration=3800)=>{
-    const id=window.MissionDB.uid('t_');
-    const titles={ok:'تم بنجاح',err:'خطأ',warn:'تنبيه',info:'معلومة'};
-    setItems(x=>[...x,{id,msg,type,title:title||titles[type]||'',duration}]);
-  },[]);
-  window.__toast=push;
-  const remove=useCallback(id=>setItems(x=>x.filter(t=>t.id!==id)),[]);
-  return <div className="toast-host">{items.map(t=><Toast key={t.id} data={t} onClose={()=>remove(t.id)}/>)}</div>;
-}
-function Toast({data,onClose}){
-  const [out,setOut]=useState(false);
-  const [p,setP]=useState(100);
-  useEffect(()=>{
-    const s=Date.now();
-    const t=setInterval(()=>{
-      const v=Math.max(0,100-((Date.now()-s)/data.duration)*100);
-      setP(v);
-      if(v<=0){clearInterval(t);setOut(true);setTimeout(onClose,280);}
-    },40);
-    return()=>clearInterval(t);
-  },[]);
-  const icons={ok:'✓',err:'✕',warn:'!',info:'i'};
-  return <div className={`toast ${data.type} ${out?'out':''}`}>
-    <div className="toast-ico">{icons[data.type]}</div>
-    <div className="toast-body">
-      {data.title&&<div className="toast-title">{data.title}</div>}
-      <div className="toast-msg">{data.msg}</div>
-    </div>
-    <div className="toast-bar"><div className="toast-bar-f" style={{width:`${p}%`,transitionDuration:'40ms'}}/></div>
-  </div>;
-}
+<div style="text-align:center;animation:fu .5s">
+  <div class="logo">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+      <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+      <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+      <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+    </svg>
+  </div>
+  <div class="txt">MISSION EDU</div>
+  <div class="sub" id="status">جارٍ التحقق من الجلسة...</div>
+  <div class="spinner" id="loader"></div>
+</div>
 
-function LoginPage(){
-  const DB=window.MissionDB;
-  const [phone,setPhone]=useState('');
-  const [password,setPassword]=useState('');
-  const [busy,setBusy]=useState(false);
-  const [err,setErr]=useState('');
-  const [showPass,setShowPass]=useState(false);
-  const [checking,setChecking]=useState(true);
-  const phoneRef=useRef(null);
+<div class="footer-dev">
+  <button class="dev-btn" onclick="openWhatsApp()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+    <span class="dev-name">Developed by <b>EL-sayed Hasan</b></span>
+  </button>
+  <button class="tg-btn" onclick="openReport()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+    </svg>
+    <span>بلاغ</span>
+  </button>
+</div>
 
-  useEffect(()=>{
-    (async ()=>{
-      const sid=DB.getSessionId();
-      if(sid){
-        const u=await DB.getUser(sid);
-        if(u&&u.active!==false) return DB.redirectByRole(u);
-        DB.clearSession();
-      }
-      setChecking(false);
-      setTimeout(()=>phoneRef.current?.focus(),200);
-    })();
-  },[]);
-
-  const submit=async e=>{
-    e.preventDefault();
-    setErr('');
-    const cleanPhone=phone.replace(/\D/g,'');
-    if(!cleanPhone||!password){setErr('يرجى تعبئة جميع الحقول');return;}
-    if(cleanPhone.length<8){setErr('رقم الهاتف غير صالح');return;}
-    setBusy(true);
-    try{
-      const u=await DB.login(cleanPhone,password,'+20');
-      window.__toast?.('مرحبًا بك ' + u.name.split(' ')[0],'ok','تم تسجيل الدخول');
-      setTimeout(()=>DB.redirectByRole(u),500);
-    }catch(ex){
-      setErr(ex.message);
-      window.__toast?.(ex.message,'err');
-      setBusy(false);
-    }
-  };
-
-  if(checking) return <div style={{color:'var(--muted)'}}>جارٍ التحقق...</div>;
-
-  return <div className="login-wrap">
-    <div className="flex col center mb20" style={{gap:14,textAlign:'center'}}>
-      <div className="brand-logo">🚀</div>
-      <div>
-        <div className="h1 grad">MISSION EDU</div>
-        <div className="sm muted mt6">منصة تعليمية تحوّل المنهج إلى مهام</div>
+<div class="modal-bg" id="reportModal">
+  <div class="modal">
+    <h3>
+      <span>🚨 بلاغ عن مشكلة</span>
+      <button class="close-x" onclick="closeReport()">✕</button>
+    </h3>
+    <p id="reportDesc">اكتب مشكلتك بالتفصيل وسيتم إرسالها للإدارة فورًا.</p>
+    <div id="reportBody">
+      <textarea id="reportMsg" placeholder="اكتب رسالتك هنا..."></textarea>
+      <div class="actions">
+        <button class="btn btn-p" id="reportSend" onclick="sendReport()">📤 إرسال</button>
+        <button class="btn btn-s" onclick="closeReport()">إلغاء</button>
       </div>
     </div>
-
-    <div className="glass" style={{padding:26}}>
-      <div className="h2 mb6">تسجيل الدخول</div>
-      <div className="sm muted mb20">أدخل رقم هاتفك وكلمة المرور</div>
-
-      <form onSubmit={submit}>
-        <div className="field">
-          <label className="lbl">رقم الهاتف</label>
-          <div style={{display:'flex',gap:8}}>
-            <div className="phone-prefix"><span>🇪🇬</span><span>+20</span></div>
-            <input
-              ref={phoneRef}
-              className="input"
-              type="tel"
-              inputMode="numeric"
-              value={phone}
-              onChange={e=>setPhone(e.target.value.replace(/\D/g,'').slice(0,11))}
-              placeholder="1xxxxxxxxx"
-              autoComplete="tel"
-              dir="ltr"
-              style={{flex:1,textAlign:'left'}}
-            />
-          </div>
-          <div className="xs muted mt6">مثال: 1012345678</div>
-        </div>
-
-        <div className="field">
-          <label className="lbl">كلمة المرور</label>
-          <div style={{position:'relative'}}>
-            <input
-              className="input"
-              type={showPass?'text':'password'}
-              value={password}
-              onChange={e=>setPassword(e.target.value)}
-              placeholder="••••••"
-              autoComplete="current-password"
-              style={{paddingInlineStart:44}}
-            />
-            <button
-              type="button"
-              onClick={()=>setShowPass(v=>!v)}
-              style={{position:'absolute',insetInlineStart:12,top:'50%',transform:'translateY(-50%)',fontSize:16,opacity:.6,color:'var(--txt)'}}
-            >{showPass?'🙈':'👁'}</button>
-          </div>
-        </div>
-
-        {err&&<div className="pill pill-r mb16" style={{width:'100%',justifyContent:'center',padding:'10px 14px'}}>⚠️ {err}</div>}
-
-        <button type="submit" className="btn btn-p btn-block btn-lg" disabled={busy}>
-          {busy?<><span className="spinner"></span> جارٍ الدخول...</>:'دخول →'}
-        </button>
-      </form>
-
-      <div className="divider">ليس لديك حساب؟</div>
-
-      <a href="register.html" className="btn btn-s btn-block">
-        <span>✚</span> إنشاء حساب جديد
-      </a>
+    <div id="reportSuccess" style="display:none">
+      <div class="success-msg">✅ تم إرسال بلاغك بنجاح، شكرًا لك!</div>
     </div>
+  </div>
+</div>
 
-    <div className="mt16" style={{textAlign:'center'}}>
-      <div className="xs muted">بالمتابعة أنت توافق على شروط الاستخدام وسياسة الخصوصية</div>
-    </div>
-  </div>;
+<script>
+(function(){
+  const blocked = (e) => {
+    if (e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && ["I","J","C","K"].includes(e.key.toUpperCase())) ||
+        (e.ctrlKey && e.key.toUpperCase() === "U")) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  };
+  document.addEventListener("keydown", blocked, true);
+  document.addEventListener("contextmenu", (e) => e.preventDefault());
+})();
+
+function openWhatsApp(){
+  const text = encodeURIComponent("مرحبًا، أريد الاستفسار عن منصة MISSION EDU");
+  window.open("https://wa.me/201550802408?text=" + text, "_blank");
 }
 
-function App(){
-  return <><ToastHost/><LoginPage/></>;
+function openReport(){
+  document.getElementById("reportModal").classList.add("on");
+  document.getElementById("reportBody").style.display = "block";
+  document.getElementById("reportSuccess").style.display = "none";
+  document.getElementById("reportMsg").value = "";
 }
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+function closeReport(){
+  document.getElementById("reportModal").classList.remove("on");
+}
+
+async function sendReport(){
+  const msg = document.getElementById("reportMsg").value.trim();
+  if (!msg || msg.length < 5) {
+    alert("يرجى كتابة رسالة واضحة (5 أحرف على الأقل)");
+    return;
+  }
+  const btn = document.getElementById("reportSend");
+  btn.disabled = true;
+  btn.textContent = "جارٍ الإرسال...";
+
+  try {
+    const DB = window.MissionDB;
+    let userName = "زائر", userPhone = "—";
+    const sid = DB.getSessionId();
+    if (sid) {
+      const u = await DB.getUser(sid);
+      if (u) {
+        userName = u.name || userName;
+        userPhone = (u.country_code || "+20") + (u.phone || "");
+      }
+    }
+    await DB.reportIssue({ userName, userPhone, message: msg });
+    document.getElementById("reportBody").style.display = "none";
+    document.getElementById("reportSuccess").style.display = "block";
+    setTimeout(closeReport, 2200);
+  } catch (e) {
+    alert("حدث خطأ، يرجى المحاولة مرة أخرى");
+  }
+  btn.disabled = false;
+  btn.textContent = "📤 إرسال";
+}
+
+(async () => {
+  const DB = window.MissionDB;
+  const statusEl = document.getElementById("status");
+  const loaderEl = document.getElementById("loader");
+
+  const goLogin = () => window.location.replace("auth/login.html");
+
+  try {
+    const sid = DB.getSessionId();
+    if (!sid) return goLogin();
+
+    const user = await DB.getUser(sid);
+    if (!user || user.active === false) {
+      DB.clearSession();
+      return goLogin();
+    }
+
+    statusEl.textContent = user.role === "admin"
+      ? "جارٍ فتح لوحة الإدارة..."
+      : "جارٍ فتح لوحة الطالب...";
+
+    setTimeout(() => DB.redirectByRole(user), 350);
+  } catch (e) {
+    loaderEl.style.display = "none";
+    statusEl.innerHTML = '<div class="err">تعذّر الاتصال، جارٍ إعادة التوجيه...</div>';
+    setTimeout(goLogin, 1800);
+  }
+})();
 </script>
+<script src="db.js"></script>
 </body>
 </html>
