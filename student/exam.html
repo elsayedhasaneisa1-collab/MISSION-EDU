@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#04060e" />
+<title>الاختبار | MISSION EDU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<link rel="icon" type="image/png" href="/logo.png">
+<link rel="manifest" href="/manifest.json">
+<style>
+:root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#8b5cf6;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.45)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(47,125,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(139,92,246,.14),transparent 60%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;line-height:1.7}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:rgba(90,140,230,.25);border-radius:20px}
+button,input,select,textarea{font-family:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+a{color:inherit;text-decoration:none}
+.glass{background:linear-gradient(180deg,rgba(21,31,56,.72),rgba(11,17,34,.62));border:1px solid var(--border);border-radius:var(--r);backdrop-filter:blur(16px);box-shadow:var(--sh)}
+.glass-s{background:rgba(21,31,56,.62);border:1px solid var(--border);border-radius:var(--rs)}
+.wrap{max-width:760px;margin:0 auto;padding:20px 20px 100px}
+.h1{font-size:clamp(20px,3vw,28px);font-weight:900;letter-spacing:-.5px}
+.h3{font-size:17px;font-weight:800}
+.h4{font-size:14.5px;font-weight:700}
+.sm{font-size:12.5px}.xs{font-size:11.5px}
+.muted{color:var(--muted)}.txt2{color:var(--txt2)}
+.flex{display:flex}.between{justify-content:space-between}.center{align-items:center}.col{flex-direction:column}.wrap-fl{flex-wrap:wrap}
+.g6{gap:6px}.g8{gap:8px}.g12{gap:12px}.g16{gap:16px}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
+.mb6{margin-bottom:6px}.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:12px 22px;border-radius:13px;font-weight:700;font-size:14.5px;transition:.24s;white-space:nowrap;color:var(--txt)}
+.btn-p{background:linear-gradient(135deg,#2f7dff,#1f5fd6);color:#fff;box-shadow:0 10px 28px rgba(47,125,255,.36)}
+.btn-p:hover{box-shadow:0 14px 38px rgba(47,125,255,.55);transform:translateY(-2px)}
+.btn-ok{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;box-shadow:0 10px 26px rgba(34,197,94,.28)}
+.btn-s{background:rgba(255,255,255,.05);color:var(--txt2);border:1px solid var(--border)}
+.btn-s:hover{background:rgba(255,255,255,.09);color:var(--txt)}
+.btn-block{width:100%}
+.btn-lg{padding:15px 32px;font-size:16px;border-radius:16px}
+.btn:disabled{opacity:.42;cursor:not-allowed}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:40px;font-size:11.5px;font-weight:700;border:1px solid transparent}
+.pill-b{background:rgba(47,125,255,.15);color:#7db6ff;border-color:rgba(47,125,255,.28)}
+.pill-g{background:rgba(34,197,94,.14);color:#6ee7a0;border-color:rgba(34,197,94,.28)}
+.pill-a{background:rgba(245,158,11,.14);color:#fcd34d;border-color:rgba(245,158,11,.28)}
+.pill-r{background:rgba(239,68,68,.14);color:#fca5a5;border-color:rgba(239,68,68,.28)}
+.pill-y{background:rgba(255,255,255,.06);color:var(--muted);border-color:var(--border)}
+.bar{height:9px;border-radius:20px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar-f{height:100%;border-radius:20px;transition:width .8s;background:linear-gradient(90deg,#2f7dff,#5aa9ff)}
+.opt{display:flex;align-items:center;gap:13px;padding:14px 17px;border-radius:14px;background:rgba(255,255,255,.035);border:1.5px solid var(--border);transition:.2s;cursor:pointer;text-align:right;width:100%;font-size:14.5px;color:var(--txt)}
+.opt:hover{background:rgba(47,125,255,.09);border-color:var(--border2);transform:translateX(-3px)}
+.opt.sel{background:rgba(47,125,255,.16);border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.10)}
+.opt.ok{background:rgba(34,197,94,.15);border-color:var(--green)}
+.opt.bad{background:rgba(239,68,68,.14);border-color:var(--red)}
+.opt-l{width:32px;height:32px;flex-shrink:0;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.07);font-weight:800;font-size:13px}
+.opt.sel .opt-l{background:var(--blue);color:#fff}
+.opt.ok .opt-l{background:var(--green);color:#fff}
+.opt.bad .opt-l{background:var(--red);color:#fff}
+.loading{display:grid;place-items:center;min-height:60vh;color:var(--muted);font-size:16px}
+.spinner{width:40px;height:40px;border:3px solid rgba(90,140,230,.2);border-top-color:var(--blue);border-radius:50%;animation:sp 1s linear infinite;margin-bottom:14px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.fade-in{animation:fu .5s}
+.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(6,9,20,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.back-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--txt2);font-size:13.5px;font-weight:700;transition:.2s}
+.back-btn:hover{background:rgba(47,125,255,.15);color:var(--txt)}
+.avatar{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:14px;background:linear-gradient(140deg,#2f7dff,#8b5cf6);color:#fff;flex-shrink:0}
+.footer-dev{display:flex;justify-content:center;gap:10px;padding:24px 20px 16px;margin-top:40px;border-top:1px solid rgba(90,140,230,.12);flex-wrap:wrap}
+.dev-btn{display:inline-flex;align-items:center;gap:9px;padding:10px 20px;border-radius:50px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .3s;border:1px solid rgba(90,140,230,.3);background:linear-gradient(135deg,rgba(47,125,255,.15),rgba(139,92,246,.15));color:var(--txt)}
+.dev-btn:hover{background:linear-gradient(135deg,rgba(47,125,255,.28),rgba(139,92,246,.28));border-color:#2f7dff;transform:translateY(-2px)}
+.dev-name b{background:linear-gradient(90deg,#5aa9ff,#a78bfa,#22d3ee,#5aa9ff);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 3s linear infinite;font-weight:900}
+@keyframes shine{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+.swal-custom-popup{border:1px solid rgba(90,140,230,.3) !important;border-radius:22px !important;background:linear-gradient(180deg, #151f38, #0b1122) !important;color:#e8eefc !important;font-family:'Tajawal','Cairo',sans-serif !important}
+.swal-custom-title{color:#e8eefc !important;font-weight:800 !important;font-family:'Tajawal','Cairo',sans-serif !important}
+.swal-custom-input{background:rgba(10,16,32,.75) !important;border:1.5px solid rgba(90,140,230,.3) !important;color:#e8eefc !important;border-radius:12px !important}
+.ring{position:relative;display:grid;place-items:center}
+.ring-t{position:absolute;text-align:center}
+.stat{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:13px;background:rgba(255,255,255,.03);border:1px solid var(--border);margin-bottom:8px}
+.stat-l{font-size:12.5px;color:var(--muted);font-weight:600}
+.stat-v{font-size:16px;font-weight:900;letter-spacing:-.5px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="back-btn" onclick="history.back()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+    رجوع
+  </button>
+  <div class="flex center g8" style="margin-inline-start:auto">
+    <div id="userAvatar" class="avatar">👤</div>
+  </div>
+</div>
+
+<div class="wrap" id="app">
+  <div class="loading"><div class="spinner"></div>جارٍ تحميل الاختبار...</div>
+</div>
+
+<div class="footer-dev">
+  <button class="dev-btn" onclick="openWhatsApp()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    <span class="dev-name">Developed by <b>EL-sayed Hasan</b></span>
+  </button>
+  <button class="dev-btn" onclick="sendReport()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+    <span>بلاغ</span>
+  </button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/db.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  const DB = window.MissionDB;
+  const params = new URLSearchParams(window.location.search);
+  const examId = params.get("id");
+
+  const app = document.getElementById("app");
+  const userAvatar = document.getElementById("userAvatar");
+
+  let state = {
+    user: null,
+    exam: null,
+    questions: [],
+    attempts: [],
+    started: false,
+    submitted: false,
+    current: 0,
+    answers: {},
+    timeLeft: 0,
+    timer: null,
+    result: null
+  };
+
+  function esc(str){
+    return String(str||"").replace(/[&<>"']/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[s]);
+  }
+
+  function fmtTime(s){
+    const m = Math.floor(s/60);
+    const sec = s%60;
+    return `${m}:${String(sec).padStart(2,"0")}`;
+  }
+
+  function Ring({value, size=140, stroke=10, color="#2f7dff"}){
+    const r = (size-stroke)/2;
+    const c = 2*Math.PI*r;
+    const off = c - (value/100)*c;
+    return `
+      <div class="ring" style="width:${size}px;height:${size}px">
+        <svg width="${size}" height="${size}" style="transform:rotate(-90deg)">
+          <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="rgba(255,255,255,.07)" stroke-width="${stroke}" fill="none"/>
+          <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="${color}" stroke-width="${stroke}" fill="none" stroke-dasharray="${c}" stroke-dashoffset="${off}" stroke-linecap="round"/>
+        </svg>
+        <div class="ring-t"><div class="h1" style="font-size:32px">${value}%</div></div>
+      </div>
+    `;
+  }
+
+  function renderStart(){
+    const e = state.exam;
+    const attempts = state.attempts;
+    const canTry = attempts.length < (e.max_attempts || 99);
+    const qCount = (e.question_ids || []).length;
+
+    app.innerHTML = `
+      <div class="fade-in">
+        <div class="glass" style="padding:28px">
+          <div class="h1 mb8">${esc(e.title)}</div>
+          <div class="sm muted mb20">اقرأ التفاصيل جيدًا قبل بدء الاختبار</div>
+
+          <div class="grid mb16" style="grid-template-columns:repeat(2,1fr);gap:12px">
+            <div class="stat"><span class="stat-l">عدد الأسئلة</span><span class="stat-v">${qCount}</span></div>
+            <div class="stat"><span class="stat-l">المدة</span><span class="stat-v">${e.duration}د</span></div>
+            <div class="stat"><span class="stat-l">درجة النجاح</span><span class="stat-v">${e.pass_score}%</span></div>
+            <div class="stat"><span class="stat-l">المكافأة</span><span class="stat-v">+${e.xp} XP</span></div>
+          </div>
+
+          ${attempts.length > 0 ? `
+            <div class="glass-s mb16" style="padding:12px">
+              <div class="h4 mb8">محاولاتك السابقة:</div>
+              ${attempts.map((a,i) => `
+                <div class="flex between center" style="padding:4px 0;font-size:13px">
+                  <span class="muted">محاولة ${i+1}</span>
+                  <span class="pill ${a.passed ? 'pill-g' : 'pill-r'}">${a.pct}%</span>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+
+          <button class="btn btn-p btn-block btn-lg mt16" id="btnStart" ${canTry ? '' : 'disabled'}>
+            ${canTry ? '▶️ بدء الاختبار' : `🚫 استنفدت المحاولات (${e.max_attempts})`}
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.getElementById("btnStart").addEventListener("click", startExam);
+  }
+
+  function startExam(){
+    state.started = true;
+    state.submitted = false;
+    state.current = 0;
+    state.answers = {};
+    state.timeLeft = state.exam.duration * 60;
+    state.result = null;
+
+    DB.trackActivity({
+      userId: state.user.id, userName: state.user.name,
+      type: "exam_start", target: state.exam.title,
+      details: { exam: state.exam.title }
+    });
+
+    clearInterval(state.timer);
+    state.timer = setInterval(()=>{
+      state.timeLeft--;
+      if(state.timeLeft <= 0){
+        clearInterval(state.timer);
+        submitExam();
+        return;
+      }
+      renderExam();
+    }, 1000);
+
+    renderExam();
+  }
+
+  function renderExam(){
+    const q = state.questions[state.current];
+    const total = state.questions.length;
+    const answered = Object.keys(state.answers).length;
+    const progress = Math.round((answered/total)*100);
+
+    app.innerHTML = `
+      <div class="fade-in">
+        <div class="glass mb12" style="padding:14px">
+          <div class="flex between center wrap-fl g8 mb8">
+            <div class="h4">${esc(state.exam.title)}</div>
+            <div class="flex g8 center">
+              <span class="pill pill-b">⏱ ${fmtTime(state.timeLeft)}</span>
+              <span class="pill pill-y">${answered}/${total}</span>
+            </div>
+          </div>
+          <div class="bar"><div class="bar-f" style="width:${progress}%"></div></div>
+        </div>
+
+        <div class="glass" style="padding:22px">
+          <div class="xs muted mb8">سؤال ${state.current+1} من ${total}</div>
+          <div class="h3 mb16">${esc(q.text)}</div>
+          <div class="flex col g8 mb20">
+            ${(q.options||[]).map((op,oi) => `
+              <button class="opt ${state.answers[state.current]===oi ? 'sel' : ''}" data-opt="${oi}">
+                <div class="opt-l">${['أ','ب','ج','د','هـ'][oi]}</div>
+                <div>${esc(op)}</div>
+              </button>
+            `).join('')}
+          </div>
+          <div class="flex between g8">
+            <button class="btn btn-s" id="btnPrev" ${state.current===0 ? 'disabled' : ''}>← السابق</button>
+            ${state.current < total-1 ?
+              `<button class="btn btn-p" id="btnNext">التالي →</button>` :
+              `<button class="btn btn-ok" id="btnSubmit">✓ إرسال الإجابات</button>`
+            }
+          </div>
+        </div>
+      </div>
+    `;
+
+    app.querySelectorAll(".opt").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const oi = parseInt(btn.dataset.opt);
+        state.answers[state.current] = oi;
+        renderExam();
+      });
+    });
+
+    const prev = document.getElementById("btnPrev");
+    if(prev) prev.addEventListener("click", ()=>{ state.current--; renderExam(); });
+
+    const next = document.getElementById("btnNext");
+    if(next) next.addEventListener("click", ()=>{ state.current++; renderExam(); });
+
+    const sub = document.getElementById("btnSubmit");
+    if(sub) sub.addEventListener("click", ()=>{
+      Swal.fire({
+        title: 'إرسال الإجابات؟',
+        text: 'لن يمكنك تعديل الإجابات بعد الإرسال',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'نعم، إرسال',
+        cancelButtonText: 'إلغاء',
+        confirmButtonColor: '#2f7dff',
+        cancelButtonColor: '#64748b',
+        customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
+      }).then(r => { if(r.isConfirmed) submitExam(); });
+    });
+  }
+
+  async function submitExam(){
+    clearInterval(state.timer);
+
+    let score = 0;
+    for(let i=0; i<state.questions.length; i++){
+      const q = state.questions[i];
+      const given = state.answers[i];
+      if(given === q.correct[0]){
+        score++;
+      } else {
+        try{
+          await DB.saveError({
+            userId: state.user.id,
+            questionId: q.id,
+            given: given ?? -1,
+            correct: q.correct[0],
+            lessonId: q.lesson_id
+          });
+        }catch(e){}
+      }
+    }
+
+    const total = state.questions.length;
+    const pct = Math.round((score/total)*100);
+    const passed = pct >= state.exam.pass_score;
+    const gained = passed ? (state.exam.xp || 0) : Math.round((state.exam.xp || 0) * 0.3);
+
+    try{
+      await DB.saveAttempt({
+        userId: state.user.id,
+        examId: state.exam.id,
+        score, total, pct, passed,
+        answers: state.answers
+      });
+    }catch(e){}
+
+    try{
+      await DB.updateUser(state.user.id, { xp: (state.user.xp || 0) + gained });
+    }catch(e){}
+
+    DB.trackActivity({
+      userId: state.user.id, userName: state.user.name,
+      type: "exam_submit", target: state.exam.title,
+      details: { score, total, pct, passed }
+    });
+
+    state.result = { score, total, pct, passed };
+    state.submitted = true;
+    renderResult();
+  }
+
+  function renderResult(){
+    const r = state.result;
+    const color = r.passed ? "#22c55e" : "#f59e0b";
+
+    app.innerHTML = `
+      <div class="fade-in">
+        <div class="glass mb16" style="padding:32px 24px;text-align:center">
+          <div style="font-size:72px;margin-bottom:12px">${r.passed ? '🎉' : '💪'}</div>
+          <div class="h1 mb8">${r.passed ? 'أحسنت!' : 'حاول مرة أخرى'}</div>
+          <div class="sm muted mb20">حصلت على ${r.score} من ${r.total}</div>
+          ${Ring({value: r.pct, color})}
+        </div>
+
+        <div class="h3 mb12">📋 مراجعة الإجابات</div>
+
+        ${state.questions.map((q,i) => {
+          const given = state.answers[i];
+          const correct = given === q.correct[0];
+          return `
+            <div class="glass mb12" style="padding:16px">
+              <div class="flex between center mb8">
+                <span class="pill ${correct ? 'pill-g' : 'pill-r'}">${correct ? '✓ صحيح' : '✗ خطأ'}</span>
+                <span class="xs muted">سؤال ${i+1}</span>
+              </div>
+              <div class="h4 mb12">${esc(q.text)}</div>
+              <div class="flex col g6 mb12">
+                ${(q.options||[]).map((op,oi) => {
+                  const isGiven = given === oi;
+                  const isCorrect = q.correct[0] === oi;
+                  let cls = '';
+                  if(isCorrect) cls = 'ok';
+                  else if(isGiven) cls = 'bad';
+                  return `
+                    <div class="opt ${cls}" style="cursor:default">
+                      <div class="opt-l">${['أ','ب','ج','د','هـ'][oi]}</div>
+                      <div>${esc(op)}</div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+              <div class="glass-s" style="padding:10px">
+                <div class="xs muted mb6"><b style="color:var(--blue2)">💡 الشرح:</b> ${esc(q.explanation || '')}</div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+
+        <div class="flex g8 mt16">
+          <a href="/student/index.html" class="btn btn-p btn-block" style="text-decoration:none">🏠 العودة للرئيسية</a>
+        </div>
+      </div>
+    `;
+
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  async function load(){
+    if(!examId){
+      app.innerHTML = `<div class="glass" style="padding:40px;text-align:center"><div class="h3 mb12">⚠️ لم يتم تحديد الاختبار</div><a href="/student/index.html" class="btn btn-p mt16" style="text-decoration:none">العودة للرئيسية</a></div>`;
+      return;
+    }
+
+    const sid = DB.getSessionId();
+    if(!sid){ window.location.replace("/auth/login.html"); return; }
+
+    const user = await DB.getUser(sid);
+    if(!user || user.active === false){ DB.clearSession(); window.location.replace("/auth/login.html"); return; }
+
+    state.user = user;
+    userAvatar.textContent = user.avatar || "🧑‍🎓";
+
+    const sb = await DB.getClient();
+
+    const { data: exam, error } = await sb.from("exams").select("*").eq("id", examId).maybeSingle();
+    if(error || !exam){
+      app.innerHTML = `<div class="glass" style="padding:40px;text-align:center"><div class="h3 mb12">⚠️ الاختبار غير موجود</div><a href="/student/index.html" class="btn btn-p mt16" style="text-decoration:none">العودة للرئيسية</a></div>`;
+      return;
+    }
+
+    state.exam = exam;
+
+    const qIds = exam.question_ids || [];
+    if(qIds.length === 0){
+      app.innerHTML = `<div class="glass" style="padding:40px;text-align:center"><div class="h3 mb12">⚠️ لا توجد أسئلة في الاختبار</div><a href="/student/index.html" class="btn btn-p mt16" style="text-decoration:none">العودة للرئيسية</a></div>`;
+      return;
+    }
+
+    const { data: questions } = await sb.from("questions").select("*").in("id", qIds);
+    const orderedQs = qIds.map(id => (questions||[]).find(q => q.id === id)).filter(Boolean);
+    state.questions = orderedQs;
+
+    const { data: attempts } = await sb.from("exam_attempts").select("*").eq("user_id", user.id).eq("exam_id", examId).order("at", {ascending:false});
+    state.attempts = attempts || [];
+
+    renderStart();
+
+    document.addEventListener("contextmenu", e=>e.preventDefault());
+    document.addEventListener("keydown", e=>{
+      if(e.key === "F12" || (e.ctrlKey && e.shiftKey && ["I","J","C"].includes(e.key.toUpperCase()))) e.preventDefault();
+    });
+  }
+
+  window.openWhatsApp = ()=>{
+    window.open("https://wa.me/201550802408?text=" + encodeURIComponent("مرحبًا، أريد الاستفسار عن منصة MISSION EDU"), "_blank");
+  };
+
+  window.sendReport = async ()=>{
+    const { value: msg } = await Swal.fire({
+      title: '🚨 بلاغ عن مشكلة',
+      input: 'textarea',
+      inputPlaceholder: 'اكتب رسالتك هنا...',
+      showCancelButton: true,
+      confirmButtonText: '📤 إرسال',
+      cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#2f7dff',
+      cancelButtonColor: '#64748b',
+      inputValidator: v => { if(!v || v.trim().length < 5) return 'يرجى كتابة رسالة واضحة'; },
+      customClass: {popup:'swal-custom-popup',title:'swal-custom-title',input:'swal-custom-input'}
+    });
+    if(msg){
+      const u = state.user;
+      const sent = await DB.reportIssue({
+        userName: u?.name || 'زائر',
+        userPhone: (u?.country_code||'+20')+(u?.phone||'—'),
+        message: msg
+      });
+      Swal.fire({icon: sent?'success':'error', title: sent?'✅ تم الإرسال':'❌ فشل', text: sent?'شكرًا لك':'حاول مرة أخرى', confirmButtonColor:'#2f7dff', customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+    }
+  };
+
+  load();
+})();
+</script>
+</body>
+</html>

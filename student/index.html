@@ -25,6 +25,7 @@ body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 
 button,input,select,textarea{font-family:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none}
 ul{list-style:none}
+a{color:inherit;text-decoration:none}
 .glass{background:linear-gradient(180deg,rgba(21,31,56,.72),rgba(11,17,34,.62));border:1px solid var(--border);border-radius:var(--r);backdrop-filter:blur(16px);box-shadow:var(--sh)}
 .glass-s{background:rgba(21,31,56,.62);border:1px solid var(--border);border-radius:var(--rs)}
 .hv{transition:.28s cubic-bezier(.2,.8,.3,1)}
@@ -101,18 +102,6 @@ ul{list-style:none}
 .bar-v{background:linear-gradient(90deg,#7c3aed,#a78bfa)}
 .input,select.input,textarea.input{width:100%;padding:11px 14px;border-radius:12px;background:rgba(10,16,32,.72);border:1.5px solid var(--border);outline:none;font-size:14px;transition:.22s;color:var(--txt)}
 .input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.12)}
-select.input{cursor:pointer;appearance:none;padding-left:38px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237f93b8' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:left 14px center}
-textarea.input{resize:vertical;min-height:80px;font-family:inherit}
-.lbl{display:block;font-size:12.5px;font-weight:700;color:var(--txt2);margin-bottom:6px}
-.opt{display:flex;align-items:center;gap:13px;padding:14px 17px;border-radius:14px;background:rgba(255,255,255,.035);border:1.5px solid var(--border);transition:.2s;cursor:pointer;text-align:right;width:100%;font-size:14.5px;color:var(--txt)}
-.opt:hover{background:rgba(47,125,255,.09);border-color:var(--border2);transform:translateX(-3px)}
-.opt.sel{background:rgba(47,125,255,.16);border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.10)}
-.opt.ok{background:rgba(34,197,94,.15);border-color:var(--green)}
-.opt.bad{background:rgba(239,68,68,.14);border-color:var(--red)}
-.opt-l{width:32px;height:32px;flex-shrink:0;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.07);font-weight:800;font-size:13px}
-.opt.sel .opt-l{background:var(--blue);color:#fff}
-.opt.ok .opt-l{background:var(--green);color:#fff}
-.opt.bad .opt-l{background:var(--red);color:#fff}
 .stat-n{font-size:clamp(21px,3vw,28px);font-weight:900;letter-spacing:-1px;line-height:1.1}
 .stat-l{font-size:11.5px;color:var(--muted);font-weight:600}
 .div{height:1px;background:var(--border);margin:14px 0}
@@ -156,8 +145,6 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 .toast.warn .toast-bar-f{background:linear-gradient(90deg,#d97706,#fbbf24)}
 .toast.info .toast-ico{background:rgba(47,125,255,.18);color:#7db6ff}
 .toast.info .toast-bar-f{background:linear-gradient(90deg,#2f7dff,#5aa9ff)}
-.modal-bg{position:fixed;inset:0;background:rgba(3,5,12,.82);backdrop-filter:blur(8px);z-index:900;display:grid;place-items:center;padding:18px;overflow-y:auto}
-.modal{width:100%;max-width:600px;max-height:90vh;overflow-y:auto;padding:22px;animation:pu .3s}
 .mbar{display:none}
 .btmnav{display:none}
 .footer-dev{display:flex;justify-content:center;gap:10px;padding:24px 20px 16px;margin-top:40px;border-top:1px solid rgba(90,140,230,.12);position:relative;flex-wrap:wrap}
@@ -174,11 +161,8 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 .swal-custom-popup{border:1px solid rgba(90,140,230,.3) !important;border-radius:22px !important;box-shadow:0 24px 70px rgba(0,0,0,.75) !important;font-family:'Tajawal','Cairo',sans-serif !important;backdrop-filter:blur(20px)}
 .swal-custom-title{color:#e8eefc !important;font-size:20px !important;font-weight:800 !important;font-family:'Tajawal','Cairo',sans-serif !important}
 .swal-custom-input{background:rgba(10,16,32,.75) !important;border:1.5px solid rgba(90,140,230,.3) !important;color:#e8eefc !important;border-radius:12px !important;font-family:'Tajawal','Cairo',sans-serif !important}
-.swal-custom-input:focus{border-color:#2f7dff !important;box-shadow:0 0 0 4px rgba(47,125,255,.15) !important}
 .swal-custom-confirm{border-radius:12px !important;font-weight:700 !important;font-family:'Tajawal','Cairo',sans-serif !important;padding:10px 24px !important}
 .swal-custom-cancel{border-radius:12px !important;font-weight:700 !important;font-family:'Tajawal','Cairo',sans-serif !important;padding:10px 24px !important}
-.swal2-html-container{color:#b7c6e4 !important;font-family:'Tajawal','Cairo',sans-serif !important}
-.swal2-validation-message{background:rgba(239,68,68,.15) !important;color:#fca5a5 !important;border-radius:10px !important;border:1px solid rgba(239,68,68,.3) !important;font-family:'Tajawal','Cairo',sans-serif !important}
 @media(max-width:1080px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:860px){
   .sidebar{position:fixed;inset-inline-end:0;top:0;transform:translateX(-105%);transition:transform .34s;width:280px;box-shadow:-20px 0 60px rgba(0,0,0,.7)}
@@ -202,9 +186,8 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="/db.js"></script>
-<script src="/video-player.js"></script>
 <script type="text/babel" data-presets="react">
-const {useState,useEffect,useMemo,useCallback,useRef,createContext,useContext}=React;
+const {useState,useEffect,useMemo,useCallback,createContext,useContext}=React;
 const DB=window.MissionDB;
 
 const ToastCtx=createContext(null);
@@ -261,8 +244,7 @@ function AppProvider({children}){
     if(!currentUser) return;
     try{
       const [a,e]=await Promise.all([DB.getAttempts(currentUser.id),DB.getErrors(currentUser.id)]);
-      setAttempts(a);
-      setErrors(e);
+      setAttempts(a);setErrors(e);
       const u=await DB.getUser(currentUser.id);
       if(u) setCurrentUser(u);
     }catch(e){}
@@ -278,10 +260,9 @@ function AppProvider({children}){
         if(u.role==='admin'){window.location.replace('/admin/index.html');return;}
         setCurrentUser(u);
         const [a,e]=await Promise.all([DB.getAttempts(u.id),DB.getErrors(u.id)]);
-        setAttempts(a);
-        setErrors(e);
+        setAttempts(a);setErrors(e);
         await reload();
-      }catch(e){console.warn(e);}
+      }catch(e){}
       setLoading(false);
     })();
   },[]);
@@ -299,11 +280,8 @@ function AppProvider({children}){
       background: 'linear-gradient(180deg, #151f38, #0b1122)',
       color: '#e8eefc',
       customClass: {popup: 'swal-custom-popup', title: 'swal-custom-title'}
-    }).then((result) => {
-      if (result.isConfirmed) {
-        DB.clearSession();
-        window.location.replace('/auth/login.html');
-      }
+    }).then(r=>{
+      if(r.isConfirmed){DB.clearSession();window.location.replace('/auth/login.html');}
     });
   },[]);
 
@@ -348,10 +326,8 @@ const Icon=({name,size=18,color='currentColor'})=>{
     check:<><polyline points="20 6 9 17 4 12"/></>,
     logout:<><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></>,
     play:<><polygon points="5 3 19 12 5 21 5 3"/></>,
-    video:<><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></>,
     flame:<><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></>,
     zap:<><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></>,
-    award:<><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></>,
     clipboard:<><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></>
   };
   return <svg {...p}>{paths[name]}</svg>;
@@ -379,65 +355,19 @@ function Ring({value,size=120,stroke=10,color='#2f7dff',children}){
   return <div className="ring" style={{width:size,height:size}}>
     <svg width={size} height={size} style={{transform:'rotate(-90deg)'}}>
       <circle cx={size/2} cy={size/2} r={r} stroke="rgba(255,255,255,.07)" strokeWidth={stroke} fill="none"/>
-      <circle cx={size/2} cy={size/2} r={r} stroke={color} strokeWidth={stroke} fill="none" strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round" style={{transition:'stroke-dashoffset 1s cubic-bezier(.2,.8,.3,1)'}}/>
+      <circle cx={size/2} cy={size/2} r={r} stroke={color} strokeWidth={stroke} fill="none" strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round" style={{transition:'stroke-dashoffset 1s'}}/>
     </svg>
     <div className="ring-t">{children}</div>
   </div>;
 }
 
-function SecureVideoPlayer({video,lessonTitle,user}){
-  const ref = useRef(null);
-  const playerRef = useRef(null);
-
-  useEffect(()=>{
-    if (!ref.current || !window.SecureVideoPlayer) return;
-    
-    const watermark = user?.phone 
-      ? `ID: ${user.phone}` 
-      : (user?.name ? `ID: ${user.name}` : "USER");
-
-    const player = new window.SecureVideoPlayer({
-      container: ref.current,
-      video: video,
-      lessonTitle: lessonTitle,
-      watermark: watermark,
-      onPlay: () => {
-        DB.trackActivity({
-          userId: user.id, userName: user.name,
-          type: "video_play", target: lessonTitle,
-          details: { lesson: lessonTitle }
-        });
-      },
-      onTimeUpdate: (percent, current, duration, milestone) => {
-        if (milestone === "p25") DB.trackActivity({userId:user.id,userName:user.name,type:"video_25",target:lessonTitle,details:{lesson:lessonTitle}});
-        if (milestone === "p50") DB.trackActivity({userId:user.id,userName:user.name,type:"video_50",target:lessonTitle,details:{lesson:lessonTitle}});
-        if (milestone === "p75") DB.trackActivity({userId:user.id,userName:user.name,type:"video_75",target:lessonTitle,details:{lesson:lessonTitle}});
-      },
-      onComplete: () => {
-        DB.trackActivity({
-          userId: user.id, userName: user.name,
-          type: "video_complete", target: lessonTitle,
-          details: { lesson: lessonTitle }
-        });
-      }
-    });
-
-    playerRef.current = player;
-
-    return () => {
-      if (playerRef.current) playerRef.current.destroy();
-    };
-  }, [video?.url, lessonTitle, user?.id]);
-
-  return <div ref={ref} style={{width:'100%'}} />;
-}
 function Sidebar({items,active,onNav,open,onClose}){
   return <>
     {open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.5)',zIndex:55}}/>}
     <aside className={`sidebar ${open?'open':''}`}>
       <div className="brand">
         <div className="brand-logo">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" strokeLinecap="round" strokeLinejoin="round">
             <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
             <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
             <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
@@ -459,14 +389,8 @@ function Sidebar({items,active,onNav,open,onClose}){
 }
 
 function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick}){
-  const [q,setQ]=useState('');
-  const [open,setOpen]=useState(false);
-  useEffect(()=>{
-    if(!q.trim()){setOpen(false);return;}
-    setOpen(true);
-    const t=setTimeout(()=>onSearch?.(q),150);
-    return()=>clearTimeout(t);
-  },[q]);
+  const [q,setQ]=useState('');const [open,setOpen]=useState(false);
+  useEffect(()=>{if(!q.trim()){setOpen(false);return;}setOpen(true);const t=setTimeout(()=>onSearch?.(q),150);return()=>clearTimeout(t);},[q]);
   return <div className="topbar">
     <button className="icon-btn mbar" onClick={onMenu}><Icon name="menu" size={16}/></button>
     <div style={{position:'relative',flex:1,maxWidth:520}}>
@@ -476,13 +400,13 @@ function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick}){
         {q&&<button onClick={()=>{setQ('');setOpen(false);}} style={{opacity:.6,color:'var(--txt)'}}><Icon name="close" size={14}/></button>}
       </div>
       {open&&searchResults?.length>0&&<div className="glass" style={{position:'absolute',top:'calc(100% + 8px)',insetInline:0,padding:8,zIndex:80,maxHeight:340,overflowY:'auto'}}>
-        {searchResults.slice(0,10).map((r,i)=><button key={i} className="nav-i" onClick={()=>{onResultClick(r);setQ('');setOpen(false);}}>
+        {searchResults.slice(0,10).map((r,i)=><a key={i} href={r.href} className="nav-i">
           <span className="nav-ico">{r.icon}</span>
           <div style={{flex:1,textAlign:'right'}}>
             <div style={{fontSize:13.5}}>{r.title}</div>
             <div className="xs muted">{r.type}</div>
           </div>
-        </button>)}
+        </a>)}
       </div>}
     </div>
     <div className="flex center g8" style={{marginInlineStart:'auto'}}>
@@ -515,15 +439,10 @@ function Home({onNav,setSelected}){
       <div className="flex between wrap center g16">
         <div>
           <div className="h2 mb6">أهلًا بك {u.name.split(' ')[0]} 👋</div>
-          <div className="sm txt2 mb12">مهمتك الحالية في انتظارك. خطوة واحدة كل يوم.</div>
-          {currentMission?
-            <button className="btn btn-p btn-lg" onClick={()=>{setSelected({type:'mission',id:currentMission.id});onNav('missions');}}>
-              <Icon name="play" size={14} color="#fff"/> ابدأ مهمتك
-            </button>:
-            <button className="btn btn-g btn-lg" onClick={()=>onNav('subjects')}>
-              <Icon name="book" size={14}/> استعرض المواد
-            </button>
-          }
+          <div className="sm txt2 mb12">مهمتك الحالية في انتظارك.</div>
+          <button className="btn btn-p btn-lg" onClick={()=>onNav('subjects')}>
+            <Icon name="book" size={14} color="#fff"/> استعرض المواد
+          </button>
         </div>
         <div className="flex center g16">
           <Ring value={progressPct} size={110} stroke={9} color="#2f7dff">
@@ -545,21 +464,8 @@ function Home({onNav,setSelected}){
       <Stat label="الإنجازات" value={DB.fmt((u.achievements||[]).length)} icon="trophy" color="#8b5cf6"/>
     </div>
 
-    {currentMission&&<div className="glass mb16" style={{padding:20}}>
-      <div className="flex between center mb12">
-        <div className="h3" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="target" size={18}/> مهمتك الحالية</div>
-        <span className="pill pill-b">+{currentMission.xp} XP</span>
-      </div>
-      <div className="h4 mb6">{currentMission.title}</div>
-      <div className="sm muted mb16">{currentMission.desc}</div>
-      <button className="btn btn-p" onClick={()=>{setSelected({type:'mission',id:currentMission.id});onNav('missions');}}>عرض المهمة ←</button>
-    </div>}
-
     <div className="glass mb16" style={{padding:18}}>
-      <div className="flex between center mb12">
-        <div className="h3" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="medal" size={18}/> المتصدرون العشرة</div>
-        <button className="btn btn-s btn-sm" onClick={()=>onNav('leaderboard')}>الكل</button>
-      </div>
+      <div className="h3 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="medal" size={18}/> المتصدرون العشرة</div>
       {top10.length===0?<div className="sm muted" style={{textAlign:'center',padding:12}}>لا يوجد طلاب بعد</div>:
         top10.map((s,i)=>{
           const {current:c}=app.getLevel(s.xp||0);
@@ -578,22 +484,19 @@ function Home({onNav,setSelected}){
     </div>
 
     <div className="glass" style={{padding:18}}>
-      <div className="flex between center mb12">
-        <div className="h3" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="clipboard" size={18}/> آخر الاختبارات</div>
-        <button className="btn btn-s btn-sm" onClick={()=>onNav('subjects')}>الكل</button>
-      </div>
+      <div className="h3 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="clipboard" size={18}/> آخر الاختبارات</div>
       {recentAttempts.length===0?<div className="sm muted" style={{textAlign:'center',padding:12}}>لم تجرِ اختبارًا بعد</div>:
         recentAttempts.map((a,i)=>{
           const e=app.exam(a.exam_id);
           if(!e) return null;
-          return <div key={i} className="flex center g12" style={{padding:'9px 0',borderBottom:'1px solid rgba(90,140,230,.08)'}}>
+          return <a key={i} href={`/student/exam.html?id=${e.id}`} className="flex center g12" style={{padding:'9px 0',borderBottom:'1px solid rgba(90,140,230,.08)'}}>
             <div style={{color:a.passed?'var(--green)':'var(--red)'}}><Icon name={a.passed?'check':'close'} size={18}/></div>
             <div style={{flex:1}}>
               <div className="sm">{e.title}</div>
               <div className="xs muted">{a.score}/{a.total} — {a.pct}%</div>
             </div>
             <span className={`pill ${a.passed?'pill-g':'pill-r'}`}>{a.pct}%</span>
-          </div>;
+          </a>;
         })
       }
     </div>
@@ -607,7 +510,7 @@ function Subjects({setSelected,setTab}){
   const subjects=app.db.subjects.filter(s=>access.includes(s.id)).sort((a,b)=>a.sort_order-b.sort_order);
   return <>
     <div className="h2 mb16">المواد المتاحة</div>
-    {subjects.length===0?<div className="glass" style={{padding:30}}><Empty icon="📚" title="لا توجد مواد متاحة لك" desc="تواصل مع الإدارة لتفعيل المواد"/></div>:
+    {subjects.length===0?<div className="glass" style={{padding:30}}><Empty icon="📚" title="لا توجد مواد متاحة لك"/></div>:
       <div className="grid g-auto">
         {subjects.map(s=>{
           const units=app.db.units.filter(x=>x.subject_id===s.id);
@@ -639,7 +542,6 @@ function SubjectDetail({subjectId,setSelected,setTab}){
   const s=app.subject(subjectId);
   if(!s) return <Empty icon="❓" title="المادة غير موجودة"/>;
   const units=app.db.units.filter(x=>x.subject_id===s.id).sort((a,b)=>a.sort_order-b.sort_order);
-  const missions=app.db.missions.filter(m=>m.subject_id===s.id).sort((a,b)=>a.sort_order-b.sort_order);
   return <>
     <button className="btn btn-s btn-sm mb16" onClick={()=>setTab('subjects')}>← المواد</button>
     <div className="hero mb16">
@@ -651,26 +553,6 @@ function SubjectDetail({subjectId,setSelected,setTab}){
         </div>
       </div>
     </div>
-
-    {missions.length>0&&<>
-      <div className="h3 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="target" size={18}/> المهام</div>
-      <div className="grid g-auto mb20">
-        {missions.map((m,i)=>{
-          const done=(u.completed_missions||[]).includes(m.id);
-          const prev=missions[i-1];
-          const prevDone=!prev||(u.completed_missions||[]).includes(prev.id);
-          const locked=!prevDone&&!done;
-          return <div key={m.id} className={`glass hv ${locked?'lock':''}`} style={{padding:18,cursor:locked?'not-allowed':'pointer'}} onClick={()=>{if(!locked){setSelected({type:'mission',id:m.id});setTab('missions');}}}>
-            <div className="flex between center mb8">
-              <span className={`pill ${done?'pill-g':locked?'pill-y':'pill-b'}`}>{done?'مكتملة':locked?'مقفولة':'متاحة'}</span>
-              <span className="pill pill-v">+{m.xp} XP</span>
-            </div>
-            <div className="h4 mb6">{m.title}</div>
-            <div className="sm muted">{m.desc}</div>
-          </div>;
-        })}
-      </div>
-    </>}
 
     <div className="h3 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="book" size={18}/> الوحدات والدروس</div>
     {units.map(un=>{
@@ -689,14 +571,14 @@ function SubjectDetail({subjectId,setSelected,setTab}){
             {lessons.map(l=>{
               const done=(u.completed_lessons||[]).includes(l.id);
               const hasVideo=l.video&&l.video.url;
-              return <div key={l.id} className="glass-s hv" style={{padding:14,cursor:'pointer'}} onClick={()=>{setSelected({type:'lesson',id:l.id});setTab('lesson');}}>
+              return <a key={l.id} href={`/student/lesson.html?id=${l.id}`} className="glass-s hv" style={{padding:14,textDecoration:'none',color:'inherit'}}>
                 <div className="flex between center mb6">
                   <span className={`pill ${done?'pill-g':'pill-b'}`}>{done?<Icon name="check" size={12}/>:<Icon name="play" size={12}/>}</span>
                   {hasVideo&&<span className="pill pill-v" style={{fontSize:10}}>🎬</span>}
                 </div>
                 <div className="h4" style={{fontSize:14}}>{l.title}</div>
                 <div className="xs muted mt6">⏱ {l.duration}د • +{l.xp} XP</div>
-              </div>;
+              </a>;
             })}
           </div>
         }
@@ -707,14 +589,14 @@ function SubjectDetail({subjectId,setSelected,setTab}){
             {exams.map(e=>{
               const attempts=(app.attempts||[]).filter(a=>a.exam_id===e.id);
               const best=attempts.length?Math.max(...attempts.map(a=>a.pct)):0;
-              return <div key={e.id} className="glass-s hv" style={{padding:14,cursor:'pointer'}} onClick={()=>{setSelected({type:'exam',id:e.id});setTab('exam');}}>
+              return <a key={e.id} href={`/student/exam.html?id=${e.id}`} className="glass-s hv" style={{padding:14,textDecoration:'none',color:'inherit'}}>
                 <div className="flex between center mb6">
                   <span className={`pill ${best>=e.pass_score?'pill-g':'pill-a'}`}>{attempts.length?`أفضل: ${best}%`:'جديد'}</span>
                   <span className="xs muted">⏱ {e.duration}د</span>
                 </div>
                 <div className="h4" style={{fontSize:14}}>{e.title}</div>
                 <div className="xs muted mt6">+{e.xp} XP • {(e.question_ids||[]).length} أسئلة</div>
-              </div>;
+              </a>;
             })}
           </div>
         </>}
@@ -723,274 +605,11 @@ function SubjectDetail({subjectId,setSelected,setTab}){
   </>;
 }
 
-function LessonView({lessonId,onBack,setSelected,setTab}){
-  const app=useApp();
-  const u=app.currentUser;
-  const l=app.lesson(lessonId);
-  const tracked=useRef(false);
-
-  useEffect(()=>{
-    if(l&&!tracked.current){
-      tracked.current=true;
-      DB.trackActivity({userId:u.id,userName:u.name,type:'lesson_view',target:l.title,details:{lesson:l.title}});
-    }
-  },[l]);
-
-  if(!l) return <Empty icon="❓" title="الدرس غير موجود"/>;
-  const done=(u.completed_lessons||[]).includes(l.id);
-  const quiz=app.db.exams.filter(e=>(e.lesson_ids||[]).includes(l.id)&&e.published!==false);
-
-  const complete=async ()=>{
-    if(done){app.toast.info('الدرس مكتمل مسبقًا');return;}
-    try{
-      await app.updateUser(u.id,{
-        completed_lessons:[...(u.completed_lessons||[]),l.id],
-        xp:(u.xp||0)+(l.xp||0)
-      });
-      DB.trackActivity({userId:u.id,userName:u.name,type:'lesson_complete',target:l.title,details:{xp:l.xp}});
-      app.toast.ok(`أحسنت! +${l.xp} XP`,'أكملت الدرس');
-      await app.reload();
-    }catch(e){app.toast.err(e.message);}
-  };
-
-  return <>
-    <button className="btn btn-s btn-sm mb16" onClick={onBack}>← رجوع</button>
-    <div className="grid" style={{gridTemplateColumns:'minmax(0,2fr) minmax(0,1fr)',gap:16}}>
-      <div>
-        <div className="glass" style={{padding:20}}>
-          <div className="flex between center wrap g8 mb12">
-            <div>
-              <div className="h2 mb6">{l.title}</div>
-              <div className="xs muted">⏱ {l.duration} دقيقة • +{l.xp} XP</div>
-            </div>
-            {done?<span className="pill pill-g">مكتمل</span>:<span className="pill pill-b">لم يُكمل</span>}
-          </div>
-          <div className="sm txt2 mb16">{l.desc}</div>
-
-          <div className="mb16">
-            <SecureVideoPlayer video={l.video} lessonTitle={l.title} user={u}/>
-          </div>
-
-          {l.summary&&<>
-            <div className="h4 mb8">📝 ملخص الدرس</div>
-            <div className="sm txt2 mb16">{l.summary}</div>
-          </>}
-
-          {(l.key_points||[]).length>0&&<>
-            <div className="h4 mb8">💡 النقاط المهمة</div>
-            <ul className="mb16">
-              {(l.key_points||[]).map((k,i)=><li key={i} className="flex g8 mb6" style={{alignItems:'flex-start'}}>
-                <span style={{color:'var(--blue2)',fontWeight:800}}>◆</span>
-                <span className="sm txt2">{k}</span>
-              </li>)}
-            </ul>
-          </>}
-
-          {(l.examples||[]).length>0&&<>
-            <div className="h4 mb8">🧮 أمثلة محلولة</div>
-            {(l.examples||[]).map((ex,i)=><div key={i} className="glass-s mb8" style={{padding:12}}>
-              <div className="sm mb6"><b>س:</b> {ex.q}</div>
-              <div className="sm muted"><b>ج:</b> {ex.a}</div>
-            </div>)}
-          </>}
-
-          {l.notes&&<>
-            <div className="h4 mb8">📌 ملاحظات</div>
-            <div className="sm txt2 mb16">{l.notes}</div>
-          </>}
-
-          <div className="flex wrap g8 mt16">
-            <button className="btn btn-ok" disabled={done} onClick={complete}>
-              {done?'✅ تم إكمال الدرس':'✓ فهمت الدرس'}
-            </button>
-            <button className="btn btn-wr" onClick={()=>app.toast.info('تمت إضافة الدرس للمراجعة')}>🔄 أحتاج مراجعة</button>
-          </div>
-        </div>
-      </div>
-      <div>
-        <div className="glass mb16" style={{padding:16}}>
-          <div className="h4 mb12">📊 تقدمك في الوحدة</div>
-          {(()=>{
-            const un=app.unit(l.unit_id);
-            const all=app.db.lessons.filter(x=>x.unit_id===l.unit_id&&x.published!==false);
-            const doneN=all.filter(x=>(u.completed_lessons||[]).includes(x.id)).length;
-            return <>
-              <div className="flex between center mb8">
-                <span className="sm muted">{un?.name}</span>
-                <span className="sm" style={{fontWeight:700,color:'var(--blue2)'}}>{DB.pct(doneN,all.length)}%</span>
-              </div>
-              <div className="bar"><div className="bar-f bar-b" style={{width:`${DB.pct(doneN,all.length)}%`}}/></div>
-              <div className="xs muted mt8">{doneN} من {all.length} دروس</div>
-            </>;
-          })()}
-        </div>
-        {quiz.length>0&&<div className="glass" style={{padding:16}}>
-          <div className="h4 mb12">📝 اختبار مرتبط</div>
-          {quiz.map(e=><button key={e.id} className="btn btn-p btn-block mb8" onClick={()=>{setSelected({type:'exam',id:e.id});setTab('exam');}}>بدء: {e.title}</button>)}
-        </div>}
-      </div>
-    </div>
-  </>;
-}
-
-function ExamRunner({examId,onBack}){
-  const app=useApp();
-  const u=app.currentUser;
-  const exam=app.exam(examId);
-  const [started,setStarted]=useState(false);
-  const [answers,setAnswers]=useState({});
-  const [current,setCurrent]=useState(0);
-  const [submitted,setSubmitted]=useState(false);
-  const [timeLeft,setTimeLeft]=useState(exam?exam.duration*60:0);
-  const [result,setResult]=useState(null);
-
-  useEffect(()=>{
-    if(!started||submitted) return;
-    const t=setInterval(()=>setTimeLeft(x=>{
-      if(x<=1){clearInterval(t);submit();return 0;}
-      return x-1;
-    }),1000);
-    return()=>clearInterval(t);
-  },[started,submitted]);
-
-  if(!exam) return <Empty icon="❓" title="الاختبار غير موجود"/>;
-  const qs=(exam.question_ids||[]).map(id=>app.question(id)).filter(Boolean);
-  const attempts=(app.attempts||[]).filter(a=>a.exam_id===exam.id);
-  const canTry=attempts.length<(exam.max_attempts||99);
-
-  const start=()=>{
-    setStarted(true);
-    DB.trackActivity({userId:u.id,userName:u.name,type:'exam_start',target:exam.title,details:{exam:exam.title}});
-  };
-
-  const submit=async ()=>{
-    let score=0;
-    for(let i=0;i<qs.length;i++){
-      const q=qs[i];
-      const given=answers[i];
-      if(given===q.correct[0]) score++;
-      else await DB.saveError({userId:u.id,questionId:q.id,given:given??-1,correct:q.correct[0],lessonId:q.lesson_id});
-    }
-    const total=qs.length;
-    const p=DB.pct(score,total);
-    const passed=p>=exam.pass_score;
-    const gained=passed?(exam.xp||0):Math.round((exam.xp||0)*0.3);
-    try{await DB.saveAttempt({userId:u.id,examId:exam.id,score,total,pct:p,passed,answers});}catch(e){}
-    await app.updateUser(u.id,{xp:(u.xp||0)+gained});
-    DB.trackActivity({userId:u.id,userName:u.name,type:'exam_submit',target:exam.title,details:{score,total,pct:p,passed}});
-    setResult({score,total,pct:p,passed,answers:{...answers}});
-    setSubmitted(true);
-    if(passed) app.toast.ok(`🎉 نجحت بـ ${p}% — +${gained} XP`);
-    else app.toast.warn(`حصلت على ${p}%`);
-    await app.reloadUserData();
-  };
-
-  if(!started) return <>
-    <button className="btn btn-s btn-sm mb16" onClick={onBack}>← رجوع</button>
-    <div className="glass" style={{padding:24,maxWidth:640,margin:'0 auto'}}>
-      <div className="h1 mb8">{exam.title}</div>
-      <div className="grid g2 mb16">
-        <Stat label="عدد الأسئلة" value={qs.length} icon="clipboard"/>
-        <Stat label="المدة" value={`${exam.duration}د`} icon="clipboard"/>
-        <Stat label="درجة النجاح" value={`${exam.pass_score}%`} icon="target"/>
-        <Stat label="المكافأة" value={`+${exam.xp} XP`} icon="zap"/>
-      </div>
-      {attempts.length>0&&<div className="glass-s mb16" style={{padding:12}}>
-        <div className="sm mb6"><b>محاولاتك السابقة:</b></div>
-        {attempts.map((a,i)=><div key={i} className="flex between center xs" style={{padding:'4px 0'}}>
-          <span className="muted">محاولة {i+1}</span>
-          <span className={a.passed?'pill pill-g':'pill pill-r'}>{a.pct}%</span>
-        </div>)}
-      </div>}
-      <button className="btn btn-p btn-block btn-lg" disabled={!canTry} onClick={start}>
-        {canTry?'▶️ بدء الاختبار':`🚫 استنفدت المحاولات (${exam.max_attempts})`}
-      </button>
-    </div>
-  </>;
-
-  if(submitted&&result) return <>
-    <button className="btn btn-s btn-sm mb16" onClick={onBack}>← رجوع</button>
-    <div className="glass mb16" style={{padding:24,textAlign:'center'}}>
-      <div style={{fontSize:64,marginBottom:8}}>{result.passed?'🎉':'💪'}</div>
-      <div className="h1 mb6">{result.passed?'أحسنت!':'حاول مرة أخرى'}</div>
-      <div className="sm muted mb16">حصلت على {result.score} من {result.total}</div>
-      <Ring value={result.pct} size={140} stroke={10} color={result.passed?'#22c55e':'#f59e0b'}>
-        <div className="h1">{result.pct}%</div>
-      </Ring>
-    </div>
-    <div className="h3 mb12">📋 مراجعة الإجابات</div>
-    {qs.map((q,i)=>{
-      const given=result.answers[i];
-      const correct=given===q.correct[0];
-      return <div key={q.id} className="glass mb12" style={{padding:16}}>
-        <div className="flex between center mb8">
-          <span className={`pill ${correct?'pill-g':'pill-r'}`}>{correct?'✓ صحيح':'✗ خطأ'}</span>
-          <span className="xs muted">سؤال {i+1}</span>
-        </div>
-        <div className="h4 mb12">{q.text}</div>
-        <div className="flex col g6 mb12">
-          {(q.options||[]).map((op,oi)=>{
-            const isGiven=given===oi,isCorrect=q.correct[0]===oi;
-            let cls='';
-            if(isCorrect)cls='ok';
-            else if(isGiven)cls='bad';
-            return <div key={oi} className={`opt ${cls}`} style={{cursor:'default'}}>
-              <div className="opt-l">{['أ','ب','ج','د','هـ'][oi]}</div>
-              <div>{op}</div>
-            </div>;
-          })}
-        </div>
-        <div className="glass-s" style={{padding:10}}>
-          <div className="xs muted mb6"><b style={{color:'var(--blue2)'}}>💡 الشرح:</b> {q.explanation}</div>
-          {q.lesson_id&&app.lesson(q.lesson_id)&&<div className="xs">📖 الدرس: <b>{app.lesson(q.lesson_id).title}</b></div>}
-        </div>
-      </div>;
-    })}
-    <button className="btn btn-p btn-block" onClick={onBack}>🏠 العودة</button>
-  </>;
-
-  const q=qs[current];
-  const answered=Object.keys(answers).length;
-  const mins=Math.floor(timeLeft/60);
-  const secs=timeLeft%60;
-
-  return <>
-    <div className="glass mb12" style={{padding:14}}>
-      <div className="flex between center wrap g8 mb8">
-        <div className="h4">{exam.title}</div>
-        <div className="flex g8 center">
-          <span className="pill pill-b">⏱ {mins}:{String(secs).padStart(2,'0')}</span>
-          <span className="pill pill-y">{answered}/{qs.length}</span>
-        </div>
-      </div>
-      <div className="bar"><div className="bar-f bar-b" style={{width:`${DB.pct(answered,qs.length)}%`}}/></div>
-    </div>
-    <div className="glass" style={{padding:22}}>
-      <div className="xs muted mb8">سؤال {current+1} من {qs.length}</div>
-      <div className="h3 mb16">{q.text}</div>
-      <div className="flex col g8 mb20">
-        {(q.options||[]).map((op,oi)=><button key={oi} className={`opt ${answers[current]===oi?'sel':''}`} onClick={()=>setAnswers({...answers,[current]:oi})}>
-          <div className="opt-l">{['أ','ب','ج','د','هـ'][oi]}</div>
-          <div>{op}</div>
-        </button>)}
-      </div>
-      <div className="flex between g8">
-        <button className="btn btn-s" disabled={current===0} onClick={()=>setCurrent(c=>c-1)}>← السابق</button>
-        {current<qs.length-1?
-          <button className="btn btn-p" onClick={()=>setCurrent(c=>c+1)}>التالي →</button>:
-          <button className="btn btn-ok" onClick={submit}>✓ إرسال الإجابات</button>
-        }
-      </div>
-    </div>
-  </>;
-}
-
 function Missions({setSelected,setTab}){
   const app=useApp();
   const u=app.currentUser;
   const access=u.all_subjects?app.db.subjects.map(s=>s.id):(u.access_subjects||[]);
   const missions=app.db.missions.filter(m=>access.includes(m.subject_id)).sort((a,b)=>a.sort_order-b.sort_order);
-
   const complete=async m=>{
     try{
       await app.updateUser(u.id,{
@@ -1002,7 +621,6 @@ function Missions({setSelected,setTab}){
       await app.reload();
     }catch(e){app.toast.err(e.message);}
   };
-
   return <>
     <div className="h2 mb16">المهام</div>
     {missions.length===0?<div className="glass" style={{padding:30}}><Empty icon="🎯" title="لا توجد مهام متاحة"/></div>:
@@ -1123,12 +741,10 @@ function Leaderboard(){
                 const isMe=s.id===u.id;
                 return <tr key={s.id} style={{background:isMe?'rgba(47,125,255,.06)':'transparent'}}>
                   <td><div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div></td>
-                  <td>
-                    <div className="flex center g8">
-                      <div className="avatar" style={{width:32,height:32,fontSize:14}}>{s.avatar||'👤'}</div>
-                      <span>{s.name} {isMe&&<span className="pill pill-b" style={{marginInlineStart:6}}>أنت</span>}</span>
-                    </div>
-                  </td>
+                  <td><div className="flex center g8">
+                    <div className="avatar" style={{width:32,height:32,fontSize:14}}>{s.avatar||'👤'}</div>
+                    <span>{s.name} {isMe&&<span className="pill pill-b" style={{marginInlineStart:6}}>أنت</span>}</span>
+                  </div></td>
                   <td><b>{DB.fmt(s.xp||0)}</b></td>
                   <td><span className="pill pill-v">Lv {current.level} — {current.name}</span></td>
                 </tr>;
@@ -1214,73 +830,37 @@ function Profile(){
 function Footer(){
   const app=useApp();
   const u=app.currentUser;
-  
   const sendReport=async ()=>{
     const { value: msg } = await Swal.fire({
       title: '🚨 بلاغ عن مشكلة',
       input: 'textarea',
       inputLabel: 'اكتب مشكلتك بالتفصيل',
       inputPlaceholder: 'اكتب رسالتك هنا...',
-      inputAttributes: { 'aria-label': 'اكتب رسالتك', 'dir': 'rtl' },
       showCancelButton: true,
       confirmButtonText: '📤 إرسال',
       cancelButtonText: 'إلغاء',
       confirmButtonColor: '#2f7dff',
       cancelButtonColor: '#64748b',
-      background: 'linear-gradient(180deg, #151f38, #0b1122)',
-      color: '#e8eefc',
-      inputValidator: (value) => {
-        if (!value || value.trim().length < 5) return 'يرجى كتابة رسالة واضحة (5 أحرف على الأقل)';
-      },
-      customClass: {
-        popup: 'swal-custom-popup',
-        title: 'swal-custom-title',
-        input: 'swal-custom-input',
-        confirmButton: 'swal-custom-confirm',
-        cancelButton: 'swal-custom-cancel'
-      }
+      inputValidator: v => { if(!v || v.trim().length < 5) return 'يرجى كتابة رسالة واضحة'; },
+      customClass: {popup:'swal-custom-popup',title:'swal-custom-title',input:'swal-custom-input',confirmButton:'swal-custom-confirm',cancelButton:'swal-custom-cancel'}
     });
-    
-    if (msg){
-      Swal.fire({
-        title: 'جارٍ الإرسال...',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
-        background: 'linear-gradient(180deg, #151f38, #0b1122)',
-        color: '#e8eefc',
-        customClass: {popup: 'swal-custom-popup'}
-      });
-      
+    if(msg){
+      Swal.fire({title:'جارٍ الإرسال...',allowOutsideClick:false,didOpen:()=>Swal.showLoading(),customClass:{popup:'swal-custom-popup'}});
       const sent = await DB.reportIssue({
         userName: u?.name || 'زائر',
         userPhone: (u?.country_code || '+20') + (u?.phone || '—'),
         message: msg
       });
-      
-      Swal.fire({
-        icon: sent ? 'success' : 'error',
-        title: sent ? '✅ تم الإرسال' : '❌ فشل الإرسال',
-        text: sent ? 'تم استلام بلاغك، شكرًا لك' : 'حدث خطأ، حاول مرة أخرى',
-        confirmButtonText: 'حسنًا',
-        confirmButtonColor: '#2f7dff',
-        background: 'linear-gradient(180deg, #151f38, #0b1122)',
-        color: '#e8eefc',
-        customClass: {popup: 'swal-custom-popup', title: 'swal-custom-title', confirmButton: 'swal-custom-confirm'}
-      });
+      Swal.fire({icon: sent?'success':'error', title: sent?'✅ تم الإرسال':'❌ فشل', text: sent?'شكرًا لك':'حاول مرة أخرى', confirmButtonColor:'#2f7dff', customClass:{popup:'swal-custom-popup',title:'swal-custom-title',confirmButton:'swal-custom-confirm'}});
     }
   };
-  
   return <div className="footer-dev">
     <button className="dev-btn" onClick={()=>window.open("https://wa.me/201550802408?text="+encodeURIComponent("مرحبًا، أريد الاستفسار عن منصة MISSION EDU"),"_blank")}>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-      </svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
       <span className="dev-name">Developed by <b>EL-sayed Hasan</b></span>
     </button>
     <button className="tg-btn" onClick={sendReport}>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-      </svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
       <span>بلاغ</span>
     </button>
   </div>;
@@ -1313,29 +893,20 @@ function StudentApp(){
     app.db.lessons.filter(l=>{
       const un=app.unit(l.unit_id);
       return un&&access.includes(un.subject_id)&&l.published!==false&&(l.title.toLowerCase().includes(lc)||(l.desc||'').toLowerCase().includes(lc));
-    }).slice(0,5).forEach(l=>res.push({type:'درس',icon:<Icon name="book" size={16}/>,title:l.title,nav:'lesson',lessonId:l.id}));
-    app.db.exams.filter(e=>access.includes(e.subject_id)&&e.title.toLowerCase().includes(lc)).forEach(e=>res.push({type:'اختبار',icon:<Icon name="clipboard" size={16}/>,title:e.title,nav:'exam',examId:e.id}));
-    app.db.subjects.filter(s=>access.includes(s.id)&&s.name.toLowerCase().includes(lc)).forEach(s=>res.push({type:'مادة',icon:s.icon||'📚',title:s.name,nav:'subject',subjectId:s.id}));
+    }).slice(0,5).forEach(l=>res.push({type:'درس',icon:<Icon name="book" size={16}/>,title:l.title,href:`/student/lesson.html?id=${l.id}`}));
+    app.db.exams.filter(e=>access.includes(e.subject_id)&&e.title.toLowerCase().includes(lc)).forEach(e=>res.push({type:'اختبار',icon:<Icon name="clipboard" size={16}/>,title:e.title,href:`/student/exam.html?id=${e.id}`}));
     setSearchResults(res);
   };
-  const onResultClick=r=>{
-    if(r.nav==='lesson'){setSelected({type:'lesson',id:r.lessonId});setTab('lesson');}
-    else if(r.nav==='exam'){setSelected({type:'exam',id:r.examId});setTab('exam');}
-    else if(r.nav==='subject'){setSelected({type:'subject',id:r.subjectId});setTab('subject');}
-  };
-  const nav=t=>{setTab(t);setSelected(null);};
 
   return <div className="app">
-    <Sidebar items={items} active={tab} onNav={nav} open={sidebarOpen} onClose={()=>setSidebarOpen(false)}/>
+    <Sidebar items={items} active={tab} onNav={setTab} open={sidebarOpen} onClose={()=>setSidebarOpen(false)}/>
     <div className="main">
-      <Topbar user={user} onMenu={()=>setSidebarOpen(true)} onLogout={app.logout} onSearch={onSearch} searchResults={searchResults} onResultClick={onResultClick}/>
+      <Topbar user={user} onMenu={()=>setSidebarOpen(true)} onLogout={app.logout} onSearch={onSearch} searchResults={searchResults}/>
       <div className="content">
-        {tab==='home'&&<Home onNav={nav} setSelected={setSelected}/>}
+        {tab==='home'&&<Home onNav={setTab} setSelected={setSelected}/>}
         {tab==='subjects'&&<Subjects setSelected={setSelected} setTab={setTab}/>}
         {tab==='subject'&&selected&&<SubjectDetail subjectId={selected.id} setSelected={setSelected} setTab={setTab}/>}
         {tab==='missions'&&<Missions setSelected={setSelected} setTab={setTab}/>}
-        {tab==='lesson'&&selected&&<LessonView lessonId={selected.id} onBack={()=>setTab('home')} setSelected={setSelected} setTab={setTab}/>}
-        {tab==='exam'&&selected&&<ExamRunner examId={selected.id} onBack={()=>setTab('home')}/>}
         {tab==='achievements'&&<Achievements/>}
         {tab==='errors'&&<ErrorBook/>}
         {tab==='leaderboard'&&<Leaderboard/>}
@@ -1351,7 +922,7 @@ function StudentApp(){
         {id:'missions',icon:'target',label:'المهام'},
         {id:'leaderboard',icon:'medal',label:'المتصدرون'},
         {id:'profile',icon:'user',label:'حسابي'}
-      ].map(it=><button key={it.id} className={tab===it.id?'on':''} onClick={()=>nav(it.id)}>
+      ].map(it=><button key={it.id} className={tab===it.id?'on':''} onClick={()=>setTab(it.id)}>
         <span className="i"><Icon name={it.icon} size={19}/></span>{it.label}
       </button>)}
     </div>
