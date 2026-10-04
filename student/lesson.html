@@ -220,7 +220,6 @@ ul{list-style:none}
     const prog = document.getElementById("vidProg");
     const videoEl = document.getElementById("mp4Video");
 
-    // Track play
     const trackPlay = ()=>{
       DB.trackActivity({
         userId: user.id, userName: user.name,
@@ -248,7 +247,6 @@ ul{list-style:none}
       }, { passive: true });
     }
 
-    // MP4 tracking
     if(videoEl && prog){
       const ms = {p25:false, p50:false, p75:false, p90:false};
       videoEl.addEventListener("play", ()=>{ hideCover(); });
@@ -264,7 +262,6 @@ ul{list-style:none}
       videoEl.addEventListener("contextmenu", e=>e.preventDefault());
     }
 
-    // Protection
     wrap.addEventListener("contextmenu", e=>e.preventDefault());
     wrap.addEventListener("dragstart", e=>e.preventDefault());
   }
@@ -466,17 +463,14 @@ ul{list-style:none}
       details: { lesson: lesson.title }
     });
 
-    // Get unit
     const { data: unit } = await sb.from("units").select("*").eq("id", lesson.unit_id).maybeSingle();
     state.unit = unit;
 
-    // Get subject
     if(unit){
       const { data: subject } = await sb.from("subjects").select("*").eq("id", unit.subject_id).maybeSingle();
       state.subject = subject;
     }
 
-    // Get unit lessons for progress
     const { data: unitLessons } = await sb.from("lessons").select("id").eq("unit_id", lesson.unit_id).eq("published", true);
     const { data: userData } = await sb.from("users").select("completed_lessons").eq("id", user.id).maybeSingle();
     const completed = userData?.completed_lessons || [];
@@ -485,7 +479,6 @@ ul{list-style:none}
     state.unitPct = Math.round((state.doneUnit / state.totalUnit) * 100);
     state.isDone = completed.includes(lesson.id);
 
-    // Get exams related to this lesson
     const { data: allExams } = await sb.from("exams").select("*").eq("published", true);
     state.relatedExams = (allExams || []).filter(e => {
       const lessonIds = Array.isArray(e.lesson_ids) ? e.lesson_ids : [];
@@ -494,7 +487,6 @@ ul{list-style:none}
 
     render();
 
-    // Protection
     document.addEventListener("contextmenu", e=>e.preventDefault());
     document.addEventListener("keydown", e=>{
       if(e.key === "F12" || (e.ctrlKey && e.shiftKey && ["I","J","C","K"].includes(e.key.toUpperCase()))) e.preventDefault();

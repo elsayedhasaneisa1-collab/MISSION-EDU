@@ -8,8 +8,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 <link rel="icon" type="image/png" href="/logo.png">
+<link rel="apple-touch-icon" href="/logo.png">
 <link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MISSION EDU">
+<meta name="mobile-web-app-capable" content="yes">
 <style>
 :root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#8b5cf6;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.45)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -63,8 +69,8 @@ a{color:inherit;text-decoration:none}
 @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .fade-in{animation:fu .5s}
 .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(6,9,20,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.back-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--txt2);font-size:13.5px;font-weight:700;transition:.2s}
-.back-btn:hover{background:rgba(47,125,255,.15);color:var(--txt)}
+.back-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--txt2);font-size:13.5px;font-weight:700;transition:.2s;text-decoration:none}
+.back-btn:hover{background:rgba(47,125,255,.15);color:var(--txt);border-color:var(--border2)}
 .avatar{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:14px;background:linear-gradient(140deg,#2f7dff,#8b5cf6);color:#fff;flex-shrink:0}
 .footer-dev{display:flex;justify-content:center;gap:10px;padding:24px 20px 16px;margin-top:40px;border-top:1px solid rgba(90,140,230,.12);flex-wrap:wrap}
 .dev-btn{display:inline-flex;align-items:center;gap:9px;padding:10px 20px;border-radius:50px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .3s;border:1px solid rgba(90,140,230,.3);background:linear-gradient(135deg,rgba(47,125,255,.15),rgba(139,92,246,.15));color:var(--txt)}
@@ -74,7 +80,7 @@ a{color:inherit;text-decoration:none}
 .swal-custom-popup{border:1px solid rgba(90,140,230,.3) !important;border-radius:22px !important;background:linear-gradient(180deg, #151f38, #0b1122) !important;color:#e8eefc !important;font-family:'Tajawal','Cairo',sans-serif !important}
 .swal-custom-title{color:#e8eefc !important;font-weight:800 !important;font-family:'Tajawal','Cairo',sans-serif !important}
 .swal-custom-input{background:rgba(10,16,32,.75) !important;border:1.5px solid rgba(90,140,230,.3) !important;color:#e8eefc !important;border-radius:12px !important}
-.ring{position:relative;display:grid;place-items:center}
+.ring{position:relative;display:grid;place-items:center;margin:0 auto}
 .ring-t{position:absolute;text-align:center}
 .stat{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:13px;background:rgba(255,255,255,.03);border:1px solid var(--border);margin-bottom:8px}
 .stat-l{font-size:12.5px;color:var(--muted);font-weight:600}
@@ -84,10 +90,10 @@ a{color:inherit;text-decoration:none}
 <body>
 
 <div class="topbar">
-  <button class="back-btn" onclick="history.back()">
+  <a href="/student/index.html" class="back-btn">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
     رجوع
-  </button>
+  </a>
   <div class="flex center g8" style="margin-inline-start:auto">
     <div id="userAvatar" class="avatar">👤</div>
   </div>
@@ -145,7 +151,7 @@ a{color:inherit;text-decoration:none}
     return `${m}:${String(sec).padStart(2,"0")}`;
   }
 
-  function Ring({value, size=140, stroke=10, color="#2f7dff"}){
+  function buildRing(value, size, stroke, color){
     const r = (size-stroke)/2;
     const c = 2*Math.PI*r;
     const off = c - (value/100)*c;
@@ -155,7 +161,7 @@ a{color:inherit;text-decoration:none}
           <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="rgba(255,255,255,.07)" stroke-width="${stroke}" fill="none"/>
           <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="${color}" stroke-width="${stroke}" fill="none" stroke-dasharray="${c}" stroke-dashoffset="${off}" stroke-linecap="round"/>
         </svg>
-        <div class="ring-t"><div class="h1" style="font-size:32px">${value}%</div></div>
+        <div class="ring-t"><div style="font-size:32px;font-weight:900;letter-spacing:-1px">${value}%</div></div>
       </div>
     `;
   }
@@ -172,7 +178,7 @@ a{color:inherit;text-decoration:none}
           <div class="h1 mb8">${esc(e.title)}</div>
           <div class="sm muted mb20">اقرأ التفاصيل جيدًا قبل بدء الاختبار</div>
 
-          <div class="grid mb16" style="grid-template-columns:repeat(2,1fr);gap:12px">
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px">
             <div class="stat"><span class="stat-l">عدد الأسئلة</span><span class="stat-v">${qCount}</span></div>
             <div class="stat"><span class="stat-l">المدة</span><span class="stat-v">${e.duration}د</span></div>
             <div class="stat"><span class="stat-l">درجة النجاح</span><span class="stat-v">${e.pass_score}%</span></div>
@@ -346,7 +352,7 @@ a{color:inherit;text-decoration:none}
       details: { score, total, pct, passed }
     });
 
-    state.result = { score, total, pct, passed };
+    state.result = { score, total, pct, passed, gained };
     state.submitted = true;
     renderResult();
   }
@@ -355,13 +361,28 @@ a{color:inherit;text-decoration:none}
     const r = state.result;
     const color = r.passed ? "#22c55e" : "#f59e0b";
 
+    // Confetti للنجاح
+    if (r.passed && window.confetti) {
+      window.confetti({
+        particleCount: 150,
+        spread: 90,
+        origin: { y: 0.6 },
+        colors: ['#2f7dff', '#8b5cf6', '#22c55e', '#fbbf24']
+      });
+      setTimeout(() => {
+        window.confetti({ particleCount: 80, angle: 60, spread: 60, origin: { x: 0 } });
+        window.confetti({ particleCount: 80, angle: 120, spread: 60, origin: { x: 1 } });
+      }, 300);
+    }
+
     app.innerHTML = `
       <div class="fade-in">
         <div class="glass mb16" style="padding:32px 24px;text-align:center">
           <div style="font-size:72px;margin-bottom:12px">${r.passed ? '🎉' : '💪'}</div>
           <div class="h1 mb8">${r.passed ? 'أحسنت!' : 'حاول مرة أخرى'}</div>
           <div class="sm muted mb20">حصلت على ${r.score} من ${r.total}</div>
-          ${Ring({value: r.pct, color})}
+          ${buildRing(r.pct, 140, 10, color)}
+          ${r.passed ? `<div style="margin-top:20px;padding:12px 20px;border-radius:14px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#6ee7a0;font-weight:700">⚡ +${r.gained} XP مكافأة</div>` : ''}
         </div>
 
         <div class="h3 mb12">📋 مراجعة الإجابات</div>
@@ -409,7 +430,10 @@ a{color:inherit;text-decoration:none}
 
   async function load(){
     if(!examId){
-      app.innerHTML = `<div class="glass" style="padding:40px;text-align:center"><div class="h3 mb12">⚠️ لم يتم تحديد الاختبار</div><a href="/student/index.html" class="btn btn-p mt16" style="text-decoration:none">العودة للرئيسية</a></div>`;
+      app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
+        <div class="h3 mb12">⚠️ لم يتم تحديد الاختبار</div>
+        <a href="/student/index.html" class="btn btn-p mt16" style="text-decoration:none">العودة للرئيسية</a>
+      </div>`;
       return;
     }
 
@@ -426,7 +450,10 @@ a{color:inherit;text-decoration:none}
 
     const { data: exam, error } = await sb.from("exams").select("*").eq("id", examId).maybeSingle();
     if(error || !exam){
-      app.innerHTML = `<div class="glass" style="padding:40px;text-align:center"><div class="h3 mb12">⚠️ الاختبار غير موجود</div><a href="/student/index.html" class="btn btn-p mt16" style="text-decoration:none">العودة للرئيسية</a></div>`;
+      app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
+        <div class="h3 mb12">⚠️ الاختبار غير موجود</div>
+        <a href="/student/index.html" class="btn btn-p mt16" style="text-decoration:none">العودة للرئيسية</a>
+      </div>`;
       return;
     }
 
@@ -434,7 +461,10 @@ a{color:inherit;text-decoration:none}
 
     const qIds = exam.question_ids || [];
     if(qIds.length === 0){
-      app.innerHTML = `<div class="glass" style="padding:40px;text-align:center"><div class="h3 mb12">⚠️ لا توجد أسئلة في الاختبار</div><a href="/student/index.html" class="btn btn-p mt16" style="text-decoration:none">العودة للرئيسية</a></div>`;
+      app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
+        <div class="h3 mb12">⚠️ لا توجد أسئلة في الاختبار</div>
+        <a href="/student/index.html" class="btn btn-p mt16" style="text-decoration:none">العودة للرئيسية</a>
+      </div>`;
       return;
     }
 
