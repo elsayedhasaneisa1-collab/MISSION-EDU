@@ -42,15 +42,26 @@ const hashPassword = async (password) => {
 
 const setSession = (userId) => {
   try {
+    localStorage.setItem("me_session", userId);
+    localStorage.setItem("me_session_at", Date.now().toString());
+    localStorage.setItem("me_session_permanent", "true");
     sessionStorage.setItem("me_session", userId);
-    sessionStorage.setItem("me_session_at", Date.now().toString());
   } catch (e) {}
 };
+
 const getSessionId = () => {
-  try { return sessionStorage.getItem("me_session"); } catch (e) { return null; }
+  try {
+    return localStorage.getItem("me_session") || sessionStorage.getItem("me_session");
+  } catch (e) {
+    return null;
+  }
 };
+
 const clearSession = () => {
   try {
+    localStorage.removeItem("me_session");
+    localStorage.removeItem("me_session_at");
+    localStorage.removeItem("me_session_permanent");
     sessionStorage.removeItem("me_session");
     sessionStorage.removeItem("me_session_at");
   } catch (e) {}
