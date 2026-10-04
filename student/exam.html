@@ -67,7 +67,7 @@ a{color:inherit;text-decoration:none}
 .spinner{width:40px;height:40px;border:3px solid rgba(90,140,230,.2);border-top-color:var(--blue);border-radius:50%;animation:sp 1s linear infinite;margin-bottom:14px}
 @keyframes sp{to{transform:rotate(360deg)}}
 @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.fade-in{animation:fu .5s}
+.fade-in{animation:fu .3s ease-out}
 .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(6,9,20,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
 .back-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--txt2);font-size:13.5px;font-weight:700;transition:.2s;text-decoration:none}
 .back-btn:hover{background:rgba(47,125,255,.15);color:var(--txt);border-color:var(--border2)}
@@ -229,7 +229,9 @@ a{color:inherit;text-decoration:none}
         submitExam();
         return;
       }
-      renderExam();
+      // ✅ تحديث الوقت فقط بدون إعادة رسم الصفحة
+      const timerEl = document.getElementById("timerDisplay");
+      if(timerEl) timerEl.textContent = "⏱ " + fmtTime(state.timeLeft);
     }, 1000);
 
     renderExam();
@@ -247,7 +249,7 @@ a{color:inherit;text-decoration:none}
           <div class="flex between center wrap-fl g8 mb8">
             <div class="h4">${esc(state.exam.title)}</div>
             <div class="flex g8 center">
-              <span class="pill pill-b">⏱ ${fmtTime(state.timeLeft)}</span>
+              <span class="pill pill-b" id="timerDisplay">⏱ ${fmtTime(state.timeLeft)}</span>
               <span class="pill pill-y">${answered}/${total}</span>
             </div>
           </div>
@@ -507,7 +509,13 @@ a{color:inherit;text-decoration:none}
         userPhone: (u?.country_code||'+20')+(u?.phone||'—'),
         message: msg
       });
-      Swal.fire({icon: sent?'success':'error', title: sent?'✅ تم الإرسال':'❌ فشل', text: sent?'شكرًا لك':'حاول مرة أخرى', confirmButtonColor:'#2f7dff', customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+      Swal.fire({
+        icon: sent?'success':'error',
+        title: sent?'✅ تم الإرسال':'❌ فشل',
+        text: sent?'شكرًا لك':'حاول مرة أخرى',
+        confirmButtonColor:'#2f7dff',
+        customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+      });
     }
   };
 
