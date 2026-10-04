@@ -428,9 +428,12 @@ function Dashboard(){
   
   const chart1Ref=useRef(null);
   const chart2Ref=useRef(null);
+  const chart3Ref=useRef(null);
   const chart1Instance=useRef(null);
   const chart2Instance=useRef(null);
+  const chart3Instance=useRef(null);
 
+  // Chart 1: XP للـ Top 10
   useEffect(()=>{
     if(!chart1Ref.current || !window.Chart) return;
     const ctx=chart1Ref.current.getContext("2d");
@@ -453,6 +456,7 @@ function Dashboard(){
     return ()=>{if(chart1Instance.current)chart1Instance.current.destroy();};
   },[top10]);
 
+  // Chart 2: توزيع المستويات
   useEffect(()=>{
     if(!chart2Ref.current || !window.Chart) return;
     const ctx=chart2Ref.current.getContext("2d");
@@ -473,17 +477,86 @@ function Dashboard(){
     return ()=>{if(chart2Instance.current)chart2Instance.current.destroy();};
   },[students,app.db.levels]);
 
+  // Chart 3: توزيع المحافظات
+  useEffect(()=>{
+    if(!chart3Ref.current || !window.Chart) return;
+    const ctx=chart3Ref.current.getContext("2d");
+    if(chart3Instance.current) chart3Instance.current.destroy();
+    
+    const govStats={};
+    students.forEach(s=>{
+      const gov = s.governorate || 'بدون محافظة';
+      govStats[gov] = (govStats[gov] || 0) + 1;
+    });
+    const sorted = Object.entries(govStats).sort((a,b)=>b[1]-a[1]).slice(0, 10);
+    
+    if (sorted.length === 0) return;
+    
+    const colors = [
+      "rgba(47, 125, 255, 0.7)",
+      "rgba(139, 92, 246, 0.7)",
+      "rgba(34, 197, 94, 0.7)",
+      "rgba(245, 158, 11, 0.7)",
+      "rgba(236, 72, 153, 0.7)",
+      "rgba(6, 182, 212, 0.7)",
+      "rgba(239, 68, 68, 0.7)",
+      "rgba(168, 85, 247, 0.7)",
+      "rgba(20, 184, 166, 0.7)",
+      "rgba(251, 191, 36, 0.7)"
+    ];
+    
+    chart3Instance.current=new window.Chart(ctx,{
+      type:"doughnut",
+      data:{
+        labels: sorted.map(s => s[0]),
+        datasets: [{
+          data: sorted.map(s => s[1]),
+          backgroundColor: colors.slice(0, sorted.length),
+          borderColor: "rgba(4, 6, 14, 0.6)",
+          borderWidth: 3
+        }]
+      },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{
+          legend:{
+            position:"bottom",
+            labels:{
+              color:"#b7c6e4",
+              font:{family:"Tajawal",size:11},
+              padding:12,
+              boxWidth:14
+            }
+          }
+        }
+      }
+    });
+    return ()=>{if(chart3Instance.current)chart3Instance.current.destroy();};
+  },[students]);
+
   const exportToCSV=()=>{
-    const headers=["الاسم","الهاتف","البريد","XP","المستوى","سلسلة الأيام","الحالة","دروس مكتملة"];
+    const headers=["الاسم","الهاتف","المحافظة","البريد","XP","المستوى","سلسلة الأيام","الحالة","دروس مكتملة"];
     const rows=students.map(s=>{
       const {current}=app.getLevel(s.xp||0);
-      return [s.name,(s.country_code||"+20")+(s.phone||""),s.email||"—",s.xp||0,`Lv ${current.level} - ${current.name}`,s.streak||0,s.active===false?"موقوف":"نشط",(s.completed_lessons||[]).length];
+      return [
+        s.name,
+        (s.country_code||"+20")+(s.phone||""),
+        s.governorate || "—",
+        s.email||"—",
+        s.xp||0,
+        `Lv ${current.level} - ${current.name}`,
+        s.streak||0,
+        s.active===false?"موقوف":"نشط",
+        (s.completed_lessons||[]).length
+      ];
     });
     const csv=[headers,...rows].map(row=>row.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(",")).join("\n");
     const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});
     const url=URL.createObjectURL(blob);
     const a=document.createElement("a");
-    a.href=url;a.download=`students_${new Date().toISOString().slice(0,10)}.csv`;
+    a.href=url;
+    a.download=`students_${new Date().toISOString().slice(0,10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     app.toast.ok("تم تصدير البيانات");
@@ -513,6 +586,7 @@ function Dashboard(){
       <Stat label="متوسط التقدم" value={`${avgProgress}%`} icon="trend" color="#2f7dff"/>
     </div>
 
+    {/* Charts */}
     <div className="grid g2 mb16">
       <div className="glass" style={{padding:18}}>
         <div className="h4 mb12">📊 XP — أفضل 10 طلاب</div>
@@ -528,6 +602,44 @@ function Dashboard(){
       </div>
     </div>
 
+    {/* توزيع المحافظات */}
+    <div className="glass mb16" style={{padding:18}}>
+      <div className="flex between center mb12 wrap g8">
+        <div className="h4">📍 توزيع الطلاب على المحافظات</div>
+        <span className="pill pill-b">{students.filter(s=>s.governorate).length} طالب</span>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'minmax(0,1fr) minmax(0,1.2fr)',gap:16,alignItems:'center'}}>
+        <div style={{height:260,position:'relative'}}>
+          <canvas ref={chart3Ref}></canvas>
+        </div>
+        <div>
+          {(()=>{
+            const govStats={};
+            students.forEach(s=>{
+              const gov = s.governorate || 'بدون محافظة';
+              govStats[gov] = (govStats[gov] || 0) + 1;
+            });
+            const sorted = Object.entries(govStats).sort((a,b)=>b[1]-a[1]);
+            
+            return sorted.map(([gov, count], idx) => (
+              <div key={gov} className="flex between center" style={{padding:'8px 12px',borderBottom:'1px solid rgba(90,140,230,.08)'}}>
+                <div className="flex center g8">
+                  <span className="pill pill-b" style={{fontSize:10, padding:'2px 8px'}}>{idx + 1}</span>
+                  <span className="sm">📍 {gov}</span>
+                </div>
+                <div className="flex center g8">
+                  <div style={{width:'60px',height:'6px',background:'rgba(255,255,255,.07)',borderRadius:20,overflow:'hidden'}}>
+                    <div style={{width:`${(count/students.length)*100}%`,height:'100%',background:'linear-gradient(90deg,#2f7dff,#5aa9ff)'}}/>
+                  </div>
+                  <span className="pill pill-g" style={{fontSize:11}}>{count}</span>
+                </div>
+              </div>
+            ));
+          })()}
+        </div>
+      </div>
+    </div>
+
     <div className="grid g2 mb16">
       <div className="glass" style={{padding:18}}>
         <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="award" size={16}/> المتصدرون العشرة</div>
@@ -537,7 +649,10 @@ function Dashboard(){
             return <div key={s.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid rgba(90,140,230,.08)'}}>
               <div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div>
               <div className="avatar" style={{width:34,height:34,fontSize:14}}>{s.avatar||'👤'}</div>
-              <div style={{flex:1}}><div className="sm">{s.name}</div><div className="xs muted">Lv {current.level} — {current.name}</div></div>
+              <div style={{flex:1}}>
+                <div className="sm">{s.name} {s.governorate && <span className="xs muted">— 📍 {s.governorate}</span>}</div>
+                <div className="xs muted">Lv {current.level} — {current.name}</div>
+              </div>
               <span className="pill pill-b">{DB.fmt(s.xp||0)} XP</span>
             </div>;
           })
@@ -1121,22 +1236,52 @@ function StudentsPage(){
   const [editing,setEditing]=useState(null);
   const [form,setForm]=useState({});
   const [q,setQ]=useState('');
+  const [govFilter,setGovFilter]=useState('all');
   const [busy,setBusy]=useState(false);
-  const list=app.db.users.filter(u=>u.role==='student'&&(u.name.toLowerCase().includes(q.toLowerCase())||(u.phone||'').includes(q)));
-  const open=s=>{setForm(JSON.parse(JSON.stringify(s)));setEditing(s.id);};
-  const save=async ()=>{
+
+  const GOVERNORATES = [
+    "القاهرة", "الجيزة", "الإسكندرية", "الدقهلية", "الشرقية", "المنوفية",
+    "القليوبية", "البحيرة", "الغربية", "بورسعيد", "دمياط", "الإسماعيلية",
+    "السويس", "كفر الشيخ", "الفيوم", "بني سويف", "المنيا", "أسيوط",
+    "سوهاج", "قنا", "الأقصر", "أسوان", "البحر الأحمر", "الوادي الجديد",
+    "مطروح", "شمال سيناء", "جنوب سيناء"
+  ];
+
+  const allStudents = app.db.users.filter(u => u.role === 'student');
+  
+  const list = allStudents.filter(u => {
+    const matchesSearch = u.name.toLowerCase().includes(q.toLowerCase()) || (u.phone||'').includes(q);
+    let matchesGov = true;
+    if (govFilter === 'all') matchesGov = true;
+    else if (govFilter === 'none') matchesGov = !u.governorate;
+    else matchesGov = u.governorate === govFilter;
+    return matchesSearch && matchesGov;
+  });
+
+  const open = s => { setForm(JSON.parse(JSON.stringify(s))); setEditing(s.id); };
+
+  const save = async () => {
     setBusy(true);
-    try{
-      await DB.updateUser(editing,{name:form.name,phone:form.phone,xp:form.xp,grade_id:form.grade_id,all_subjects:form.all_subjects,access_subjects:form.access_subjects||[]});
+    try {
+      await DB.updateUser(editing, {
+        name: form.name,
+        phone: form.phone,
+        xp: form.xp,
+        grade_id: form.grade_id,
+        governorate: form.governorate || null,
+        all_subjects: form.all_subjects,
+        access_subjects: form.access_subjects || []
+      });
       await app.reload();
       app.toast.ok('تم الحفظ');
       setEditing(null);
-    }catch(e){app.toast.err(e.message);}
+    } catch(e) { app.toast.err(e.message); }
     setBusy(false);
   };
-  const toggle=async s=>{
+
+  const toggle = async s => {
     const action = s.active !== false ? 'إيقاف' : 'تفعيل';
-    const r=await Swal.fire({
+    const r = await Swal.fire({
       title: `${action} الحساب؟`,
       text: `هل تريد ${action} حساب ${s.name}؟`,
       icon: 'question',
@@ -1147,45 +1292,184 @@ function StudentsPage(){
       cancelButtonColor: '#64748b',
       background: 'linear-gradient(180deg, #151f38, #0b1122)',
       color: '#e8eefc',
-      customClass: {popup: 'swal-custom-popup', title: 'swal-custom-title'}
+      customClass: { popup: 'swal-custom-popup', title: 'swal-custom-title' }
     });
     if (!r.isConfirmed) return;
-    try{
-      await DB.updateUser(s.id,{active:!s.active});
+    try {
+      await DB.updateUser(s.id, { active: !s.active });
       await app.reload();
-      app.toast.warn(s.active!==false?'تم الإيقاف':'تم التفعيل');
-    }catch(e){app.toast.err(e.message);}
+      app.toast.warn(s.active !== false ? 'تم الإيقاف' : 'تم التفعيل');
+    } catch(e) { app.toast.err(e.message); }
   };
+
+  const govCounts = {};
+  allStudents.forEach(u => {
+    if (u.governorate) {
+      govCounts[u.governorate] = (govCounts[u.governorate] || 0) + 1;
+    }
+  });
+
   return <>
     <div className="flex between center mb16 wrap g8">
       <div className="h2">إدارة الطلاب</div>
-      <input className="input" style={{maxWidth:260}} placeholder="🔍 بحث..." value={q} onChange={e=>setQ(e.target.value)}/>
-    </div>
-    <div className="glass" style={{padding:14}}>
-      <div className="sx"><table className="tbl">
-        <thead><tr><th>الطالب</th><th>الهاتف</th><th>XP</th><th>الحالة</th><th>إجراءات</th></tr></thead>
-        <tbody>{list.map(s=><tr key={s.id}>
-          <td><div className="flex center g8"><div className="avatar" style={{width:30,height:30,fontSize:14}}>{s.avatar||'👤'}</div><span>{s.name}</span></div></td>
-          <td className="sm muted" dir="ltr">{(s.country_code||'+20')}{s.phone||''}</td>
-          <td><b>{DB.fmt(s.xp||0)}</b></td>
-          <td>{s.active!==false?<span className="pill pill-g">نشط</span>:<span className="pill pill-r">موقوف</span>}</td>
-          <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>open(s)}><Icon name="edit" size={13}/></button><button className={`btn btn-sm ${s.active!==false?'btn-dn':'btn-ok'}`} onClick={()=>toggle(s)}>{s.active!==false?'إيقاف':'تفعيل'}</button></div></td>
-        </tr>)}</tbody>
-      </table></div>
-    </div>
-    {editing&&<Modal title={`تعديل: ${form.name}`} onClose={()=>setEditing(null)} wide>
-      <div className="grid g2">
-        <Field label="الاسم"><input className="input" value={form.name||''} onChange={e=>setForm({...form,name:e.target.value})}/></Field>
-        <Field label="الهاتف"><input className="input" value={form.phone||''} onChange={e=>setForm({...form,phone:e.target.value})}/></Field>
-        <Field label="XP"><input type="number" className="input" value={form.xp||0} onChange={e=>setForm({...form,xp:+e.target.value})}/></Field>
-        <Field label="الصف"><select className="input" value={form.grade_id||''} onChange={e=>setForm({...form,grade_id:e.target.value})}><option value="">— اختر —</option>{app.db.grades.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></Field>
+      <div className="flex g8 wrap">
+        <input
+          className="input"
+          style={{maxWidth:200}}
+          placeholder="🔍 بحث..."
+          value={q}
+          onChange={e=>setQ(e.target.value)}
+        />
+        <select
+          className="input"
+          style={{maxWidth:220}}
+          value={govFilter}
+          onChange={e=>setGovFilter(e.target.value)}
+        >
+          <option value="all">كل المحافظات ({allStudents.length})</option>
+          {GOVERNORATES.map(gov => {
+            const count = govCounts[gov] || 0;
+            if (count === 0) return null;
+            return <option key={gov} value={gov}>{gov} ({count})</option>;
+          })}
+          <option value="none">— بدون محافظة ({allStudents.filter(u=>!u.governorate).length}) —</option>
+        </select>
       </div>
-      <Field label="صلاحيات الوصول">
-        <label className="flex center g8 mb12" style={{cursor:'pointer'}}><input type="checkbox" checked={!!form.all_subjects} onChange={e=>setForm({...form,all_subjects:e.target.checked})}/><span className="sm">جميع المواد</span></label>
-        {!form.all_subjects&&<div className="flex wrap g6">{app.db.subjects.map(s=>{const on=(form.access_subjects||[]).includes(s.id);return <button key={s.id} type="button" onClick={()=>{const cur=form.access_subjects||[];setForm({...form,access_subjects:on?cur.filter(x=>x!==s.id):[...cur,s.id]});}} style={{padding:'8px 14px',borderRadius:30,background:on?'rgba(47,125,255,.18)':'rgba(255,255,255,.05)',border:`1px solid ${on?'var(--blue)':'var(--border)'}`,fontSize:12.5,fontWeight:700,color:'var(--txt)'}}>{s.icon} {s.name}</button>;})}</div>}
-      </Field>
-      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
-    </Modal>}
+    </div>
+
+    <div className="glass" style={{padding:14}}>
+      <div className="sx">
+        <table className="tbl">
+          <thead>
+            <tr>
+              <th>الطالب</th>
+              <th>الهاتف</th>
+              <th>📍 المحافظة</th>
+              <th>XP</th>
+              <th>الحالة</th>
+              <th>إجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            {list.map(s => (
+              <tr key={s.id}>
+                <td>
+                  <div className="flex center g8">
+                    <div className="avatar" style={{width:30,height:30,fontSize:14}}>{s.avatar||'👤'}</div>
+                    <span>{s.name}</span>
+                  </div>
+                </td>
+                <td className="sm muted" dir="ltr">{(s.country_code||'+20')}{s.phone||''}</td>
+                <td>
+                  {s.governorate
+                    ? <span className="pill pill-b" style={{fontSize:11}}>📍 {s.governorate}</span>
+                    : <span className="xs muted">—</span>
+                  }
+                </td>
+                <td><b>{DB.fmt(s.xp||0)}</b></td>
+                <td>
+                  {s.active!==false
+                    ? <span className="pill pill-g">نشط</span>
+                    : <span className="pill pill-r">موقوف</span>
+                  }
+                </td>
+                <td>
+                  <div className="flex g6">
+                    <button className="btn btn-s btn-sm" onClick={()=>open(s)}>
+                      <Icon name="edit" size={13}/>
+                    </button>
+                    <button
+                      className={`btn btn-sm ${s.active!==false?'btn-dn':'btn-ok'}`}
+                      onClick={()=>toggle(s)}
+                    >
+                      {s.active!==false?'إيقاف':'تفعيل'}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {list.length === 0 && (
+          <div className="empty" style={{padding:'40px 20px',textAlign:'center'}}>
+            <div className="empty-ico">🔍</div>
+            <div className="h4 txt2 mb8">لا يوجد طلاب مطابقين للبحث</div>
+          </div>
+        )}
+      </div>
+    </div>
+
+    {editing && (
+      <Modal title={`تعديل: ${form.name}`} onClose={()=>setEditing(null)} wide>
+        <div className="grid g2">
+          <Field label="الاسم">
+            <input className="input" value={form.name||''} onChange={e=>setForm({...form,name:e.target.value})}/>
+          </Field>
+          <Field label="الهاتف">
+            <input className="input" value={form.phone||''} onChange={e=>setForm({...form,phone:e.target.value})}/>
+          </Field>
+          <Field label="XP">
+            <input type="number" className="input" value={form.xp||0} onChange={e=>setForm({...form,xp:+e.target.value})}/>
+          </Field>
+          <Field label="الصف">
+            <select className="input" value={form.grade_id||''} onChange={e=>setForm({...form,grade_id:e.target.value})}>
+              <option value="">— اختر —</option>
+              {app.db.grades.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}
+            </select>
+          </Field>
+          <Field label="📍 المحافظة" full>
+            <select className="input" value={form.governorate||''} onChange={e=>setForm({...form,governorate:e.target.value})}>
+              <option value="">— بدون —</option>
+              {GOVERNORATES.map(gov => (
+                <option key={gov} value={gov}>{gov}</option>
+              ))}
+            </select>
+          </Field>
+        </div>
+
+        <Field label="صلاحيات الوصول">
+          <label className="flex center g8 mb12" style={{cursor:'pointer'}}>
+            <input type="checkbox" checked={!!form.all_subjects} onChange={e=>setForm({...form,all_subjects:e.target.checked})}/>
+            <span className="sm">جميع المواد</span>
+          </label>
+          {!form.all_subjects && (
+            <div className="flex wrap g6">
+              {app.db.subjects.map(s => {
+                const on = (form.access_subjects||[]).includes(s.id);
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={()=>{
+                      const cur = form.access_subjects || [];
+                      setForm({...form,access_subjects: on ? cur.filter(x=>x!==s.id) : [...cur,s.id]});
+                    }}
+                    style={{
+                      padding:'8px 14px',
+                      borderRadius:30,
+                      background: on ? 'rgba(47,125,255,.18)' : 'rgba(255,255,255,.05)',
+                      border: `1px solid ${on?'var(--blue)':'var(--border)'}`,
+                      fontSize:12.5,
+                      fontWeight:700,
+                      color:'var(--txt)'
+                    }}
+                  >
+                    {s.icon} {s.name}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </Field>
+
+        <div className="flex g8 mt16">
+          <button className="btn btn-p" onClick={save} disabled={busy}>
+            {busy?'جارٍ...':'💾 حفظ'}
+          </button>
+          <button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button>
+        </div>
+      </Modal>
+    )}
   </>;
 }
 
