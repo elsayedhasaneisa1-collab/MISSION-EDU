@@ -15,15 +15,7 @@
       -webkit-touch-callout: none;
       -webkit-tap-highlight-color: transparent;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-    }
-
-    .vp-wrap::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: 2;
-      pointer-events: none;
-      box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.5);
+      isolation: isolate;
     }
 
     .vp-wrap iframe,
@@ -34,6 +26,8 @@
       display: block;
       object-fit: contain;
       background: #000;
+      position: relative;
+      z-index: 1;
     }
 
     .vp-overlay {
@@ -41,8 +35,8 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 80px;
-      z-index: 10;
+      height: 60px;
+      z-index: 30;
       background: transparent;
       cursor: default;
     }
@@ -51,7 +45,7 @@
       position: absolute;
       top: 14px;
       right: 14px;
-      z-index: 15;
+      z-index: 35;
       font-family: 'Tajawal', 'Cairo', sans-serif;
       font-size: 13px;
       font-weight: 900;
@@ -66,19 +60,13 @@
         1px 1px 2px rgba(0, 0, 0, 0.8);
       pointer-events: none;
       user-select: none;
-      animation: vp-watermark-pulse 3s ease-in-out infinite;
-    }
-
-    @keyframes vp-watermark-pulse {
-      0%, 100% { opacity: 0.85; }
-      50% { opacity: 1; }
     }
 
     .vp-badge {
       position: absolute;
       bottom: 14px;
       left: 14px;
-      z-index: 15;
+      z-index: 35;
       font-family: 'Tajawal', 'Cairo', sans-serif;
       font-size: 10.5px;
       font-weight: 700;
@@ -98,7 +86,7 @@
       position: absolute;
       bottom: 14px;
       right: 14px;
-      z-index: 15;
+      z-index: 35;
       font-family: 'Tajawal', 'Cairo', sans-serif;
       font-size: 11px;
       font-weight: 700;
@@ -117,19 +105,21 @@
     .vp-cover {
       position: absolute;
       inset: 0;
-      z-index: 20;
+      z-index: 50;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-direction: column;
       background: linear-gradient(135deg, rgba(4, 6, 14, 0.85), rgba(11, 18, 38, 0.9));
       cursor: pointer;
       transition: opacity 0.4s ease, visibility 0.4s ease;
+      pointer-events: auto !important;
     }
 
     .vp-cover.hidden {
       opacity: 0;
       visibility: hidden;
-      pointer-events: none;
+      pointer-events: none !important;
     }
 
     .vp-play-btn {
@@ -145,6 +135,7 @@
       padding-right: 6px;
       transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.3, 1);
       animation: vp-pulse 2.5s ease-in-out infinite;
+      pointer-events: none;
     }
 
     .vp-cover:hover .vp-play-btn {
@@ -247,6 +238,7 @@
       this.videoEl = null;
       this.coverEl = null;
       this.progressEl = null;
+      this._playTracked = false;
       this._init();
     }
 
@@ -295,6 +287,18 @@
       this._attachProtection();
     }
 
+    _showCover() {
+      if (this.coverEl) this.coverEl.classList.remove("hidden");
+    }
+
+    _hideCover() {
+      if (this.coverEl) this.coverEl.classList.add("hidden");
+      if (!this._playTracked) {
+        this._playTracked = true;
+        try { this.onPlay(); } catch(e) {}
+      }
+    }
+
     _renderMedia(wrap, cover, overlay, watermark, badge, progressBadge) {
       const v = this.video;
 
@@ -308,6 +312,8 @@
         return;
       }
 
+      const self = this;
+
       if (v.type === "youtube") {
         const id = getYouTubeId(v.url);
         if (!id) {
@@ -315,7 +321,7 @@
           return;
         }
         const iframe = document.createElement("iframe");
-        iframe.src = `https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&fs=1`;
+        iframe.src = `https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&fs=1&enablejsapi=1`;
         iframe.title = this.lessonTitle;
         iframe.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen");
         iframe.setAttribute("allowfullscreen", "true");
@@ -324,10 +330,16 @@
         wrap.appendChild(overlay);
         wrap.appendChild(watermark);
         wrap.appendChild(badge);
-        cover.addEventListener("click", () => {
-          cover.classList.add("hidden");
-          this.onPlay();
+        
+        cover.addEventListener("click", function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          self._hideCover();
         });
+        cover.addEventListener("touchstart", function(e){
+          self._hideCover();
+        }, { passive: true });
+        
         wrap.appendChild(cover);
         return;
       }
@@ -339,7 +351,7 @@
           return;
         }
         const iframe = document.createElement("iframe");
-        iframe.src = `https://player.vimeo.com/video/${id}?byline=0&portrait=0&title=0&dnt=1`;
+        iframe.src = `https://player.vimeo.com/video/${id}?byline=0&portrait=0&title=0&dnt=1&autoplay=1`;
         iframe.title = this.lessonTitle;
         iframe.setAttribute("allow", "autoplay; fullscreen; picture-in-picture");
         iframe.setAttribute("allowfullscreen", "true");
@@ -347,10 +359,16 @@
         wrap.appendChild(overlay);
         wrap.appendChild(watermark);
         wrap.appendChild(badge);
-        cover.addEventListener("click", () => {
-          cover.classList.add("hidden");
-          this.onPlay();
+        
+        cover.addEventListener("click", function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          self._hideCover();
         });
+        cover.addEventListener("touchstart", function(e){
+          self._hideCover();
+        }, { passive: true });
+        
         wrap.appendChild(cover);
         return;
       }
@@ -369,24 +387,23 @@
         source.type = "video/mp4";
         videoEl.appendChild(source);
 
-        videoEl.addEventListener("play", () => {
-          cover.classList.add("hidden");
-          this.onPlay();
+        videoEl.addEventListener("play", function(){
+          self._hideCover();
         });
 
-        videoEl.addEventListener("timeupdate", () => {
+        videoEl.addEventListener("timeupdate", function(){
           if (!videoEl.duration) return;
           const p = (videoEl.currentTime / videoEl.duration) * 100;
-          if (this.progressEl) this.progressEl.textContent = Math.round(p) + "%";
-          this.onTimeUpdate(p, videoEl.currentTime, videoEl.duration);
+          if (self.progressEl) self.progressEl.textContent = Math.round(p) + "%";
+          self.onTimeUpdate(p, videoEl.currentTime, videoEl.duration);
 
-          if (p >= 25 && !this.milestones.p25) { this.milestones.p25 = true; this.onTimeUpdate(25, videoEl.currentTime, videoEl.duration, "p25"); }
-          if (p >= 50 && !this.milestones.p50) { this.milestones.p50 = true; this.onTimeUpdate(50, videoEl.currentTime, videoEl.duration, "p50"); }
-          if (p >= 75 && !this.milestones.p75) { this.milestones.p75 = true; this.onTimeUpdate(75, videoEl.currentTime, videoEl.duration, "p75"); }
-          if (p >= 90 && !this.milestones.p90) { this.milestones.p90 = true; this.onComplete(); }
+          if (p >= 25 && !self.milestones.p25) { self.milestones.p25 = true; self.onTimeUpdate(25, videoEl.currentTime, videoEl.duration, "p25"); }
+          if (p >= 50 && !self.milestones.p50) { self.milestones.p50 = true; self.onTimeUpdate(50, videoEl.currentTime, videoEl.duration, "p50"); }
+          if (p >= 75 && !self.milestones.p75) { self.milestones.p75 = true; self.onTimeUpdate(75, videoEl.currentTime, videoEl.duration, "p75"); }
+          if (p >= 90 && !self.milestones.p90) { self.milestones.p90 = true; self.onComplete(); }
         });
 
-        videoEl.addEventListener("contextmenu", (e) => e.preventDefault());
+        videoEl.addEventListener("contextmenu", function(e){ e.preventDefault(); });
 
         wrap.appendChild(videoEl);
         wrap.appendChild(overlay);
@@ -394,10 +411,18 @@
         wrap.appendChild(badge);
         wrap.appendChild(progressBadge);
 
-        cover.addEventListener("click", () => {
-          cover.classList.add("hidden");
-          videoEl.play().catch(() => {});
+        cover.addEventListener("click", function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          self._hideCover();
+          videoEl.play().catch(function(err){
+            console.warn("Video play error:", err);
+          });
         });
+        cover.addEventListener("touchstart", function(e){
+          self._hideCover();
+          videoEl.play().catch(function(){});
+        }, { passive: true });
 
         wrap.appendChild(cover);
         this.videoEl = videoEl;
@@ -414,6 +439,16 @@
         wrap.appendChild(overlay);
         wrap.appendChild(watermark);
         wrap.appendChild(badge);
+        
+        cover.addEventListener("click", function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          self._hideCover();
+        });
+        cover.addEventListener("touchstart", function(e){
+          self._hideCover();
+        }, { passive: true });
+        
         wrap.appendChild(cover);
         return;
       }
@@ -425,10 +460,10 @@
       const wrap = this.wrapEl;
       if (!wrap) return;
 
-      wrap.addEventListener("contextmenu", (e) => e.preventDefault());
-      wrap.addEventListener("dragstart", (e) => e.preventDefault());
+      wrap.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+      wrap.addEventListener("dragstart", function(e){ e.preventDefault(); });
 
-      const keyBlocker = (e) => {
+      const keyBlocker = function(e){
         if ((e.ctrlKey || e.metaKey) && (e.key === "s" || e.key === "S")) {
           e.preventDefault();
           return false;
@@ -436,30 +471,11 @@
       };
       document.addEventListener("keydown", keyBlocker, true);
       this._keyBlocker = keyBlocker;
-
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach((m) => {
-          if (m.type === "attributes" && m.attributeName === "style") {
-            const el = m.target;
-            if (el === wrap) {
-              const style = el.getAttribute("style") || "";
-              if (style.includes("display: none")) {
-                el.setAttribute("style", style.replace(/display:\s*none;?/g, ""));
-              }
-            }
-          }
-        });
-      });
-      observer.observe(wrap, { attributes: true });
-      this._observer = observer;
     }
 
     destroy() {
       if (this._keyBlocker) {
         document.removeEventListener("keydown", this._keyBlocker, true);
-      }
-      if (this._observer) {
-        this._observer.disconnect();
       }
       if (this.container) {
         this.container.innerHTML = "";
