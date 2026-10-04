@@ -85,6 +85,7 @@ a{color:inherit;text-decoration:none}
 .stat{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:13px;background:rgba(255,255,255,.03);border:1px solid var(--border);margin-bottom:8px}
 .stat-l{font-size:12.5px;color:var(--muted);font-weight:600}
 .stat-v{font-size:16px;font-weight:900;letter-spacing:-.5px}
+.xp-box{margin-top:20px;padding:12px 20px;border-radius:14px;font-weight:700;text-align:center}
 </style>
 </head>
 <body>
@@ -171,6 +172,30 @@ a{color:inherit;text-decoration:none}
     const attempts = state.attempts;
     const canTry = attempts.length < (e.max_attempts || 99);
     const qCount = (e.question_ids || []).length;
+    const hasWon = attempts.some(a => a.passed);
+    const bestPct = attempts.length ? Math.max(...attempts.map(a=>a.pct)) : 0;
+
+    let actionArea = '';
+    if(hasWon){
+      actionArea = `
+        <div style="padding:20px;border-radius:14px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);text-align:center">
+          <div style="font-size:36px;margin-bottom:8px">✅</div>
+          <div class="h4" style="color:#6ee7a0">لقد نجحت في هذا الاختبار</div>
+          <div class="sm muted mt8">أفضل نتيجة: ${bestPct}%</div>
+          <div class="xs muted mt8">لا يمكن الحصول على XP مرة أخرى</div>
+        </div>
+      `;
+    } else if(!canTry){
+      actionArea = `
+        <div style="padding:20px;border-radius:14px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);text-align:center">
+          <div style="font-size:36px;margin-bottom:8px">🚫</div>
+          <div class="h4" style="color:#fca5a5">استنفدت جميع المحاولات</div>
+          <div class="sm muted mt8">عدد المحاولات: ${e.max_attempts}</div>
+        </div>
+      `;
+    } else {
+      actionArea = `<button class="btn btn-p btn-block btn-lg" id="btnStart">▶️ بدء الاختبار</button>`;
+    }
 
     app.innerHTML = `
       <div class="fade-in">
@@ -190,21 +215,20 @@ a{color:inherit;text-decoration:none}
               <div class="h4 mb8">محاولاتك السابقة:</div>
               ${attempts.map((a,i) => `
                 <div class="flex between center" style="padding:4px 0;font-size:13px">
-                  <span class="muted">محاولة ${i+1}</span>
+                  <span class="muted">محاولة ${attempts.length - i}</span>
                   <span class="pill ${a.passed ? 'pill-g' : 'pill-r'}">${a.pct}%</span>
                 </div>
               `).join('')}
             </div>
           ` : ''}
 
-          <button class="btn btn-p btn-block btn-lg mt16" id="btnStart" ${canTry ? '' : 'disabled'}>
-            ${canTry ? '▶️ بدء الاختبار' : `🚫 استنفدت المحاولات (${e.max_attempts})`}
-          </button>
+          <div class="mt16">${actionArea}</div>
         </div>
       </div>
     `;
 
-    document.getElementById("btnStart").addEventListener("click", startExam);
+    const startBtn = document.getElementById("btnStart");
+    if(startBtn) startBtn.addEventListener("click", startExam);
   }
 
   function startExam(){
@@ -229,7 +253,6 @@ a{color:inherit;text-decoration:none}
         submitExam();
         return;
       }
-      // ✅ تحديث الوقت فقط بدون إعادة رسم الصفحة
       const timerEl = document.getElementById("timerDisplay");
       if(timerEl) timerEl.textContent = "⏱ " + fmtTime(state.timeLeft);
     }, 1000);
@@ -333,7 +356,12 @@ a{color:inherit;text-decoration:none}
     const total = state.questions.length;
     const pct = Math.round((score/total)*100);
     const passed = pct >= state.exam.pass_score;
-    const gained = passed ? (state.exam.xp || 0) : Math.round((state.exam.xp || 0) * 0.3);
+
+    // ✅ التحقق من المحاولات السابقة
+    const hasWonBefore = state.attempts.some(a => a.passed);
+
+    // ✅ XP يُمنح فقط عند أول نجاح
+    const gained = (passed && !hasWonBefore) ? (state.exam.xp || 0) : 0;
 
     try{
       await DB.saveAttempt({
@@ -344,17 +372,20 @@ a{color:inherit;text-decoration:none}
       });
     }catch(e){}
 
-    try{
-      await DB.updateUser(state.user.id, { xp: (state.user.xp || 0) + gained });
-    }catch(e){}
+    // ✅ تحديث XP فقط لو كسب XP جديد
+    if(gained > 0){
+      try{
+        await DB.updateUser(state.user.id, { xp: (state.user.xp || 0) + gained });
+      }catch(e){}
+    }
 
     DB.trackActivity({
       userId: state.user.id, userName: state.user.name,
       type: "exam_submit", target: state.exam.title,
-      details: { score, total, pct, passed }
+      details: { score, total, pct, passed, gained, repeat: hasWonBefore }
     });
 
-    state.result = { score, total, pct, passed, gained };
+    state.result = { score, total, pct, passed, gained, hasWonBefore };
     state.submitted = true;
     renderResult();
   }
@@ -363,8 +394,8 @@ a{color:inherit;text-decoration:none}
     const r = state.result;
     const color = r.passed ? "#22c55e" : "#f59e0b";
 
-    // Confetti للنجاح
-    if (r.passed && window.confetti) {
+    // Confetti فقط عند أول نجاح
+    if (r.passed && !r.hasWonBefore && window.confetti) {
       window.confetti({
         particleCount: 150,
         spread: 90,
@@ -377,6 +408,15 @@ a{color:inherit;text-decoration:none}
       }, 300);
     }
 
+    let xpMessage = '';
+    if (r.passed && !r.hasWonBefore && r.gained > 0){
+      xpMessage = `<div class="xp-box" style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#6ee7a0">⚡ +${r.gained} XP مكافأة</div>`;
+    } else if (r.passed && r.hasWonBefore){
+      xpMessage = `<div class="xp-box" style="background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:#c4b5fd">🔁 محاولة إعادة — لا XP إضافي</div>`;
+    } else if (!r.passed){
+      xpMessage = `<div class="xp-box" style="background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:#fcd34d">💪 لم تنجح — حاول مرة أخرى</div>`;
+    }
+
     app.innerHTML = `
       <div class="fade-in">
         <div class="glass mb16" style="padding:32px 24px;text-align:center">
@@ -384,7 +424,7 @@ a{color:inherit;text-decoration:none}
           <div class="h1 mb8">${r.passed ? 'أحسنت!' : 'حاول مرة أخرى'}</div>
           <div class="sm muted mb20">حصلت على ${r.score} من ${r.total}</div>
           ${buildRing(r.pct, 140, 10, color)}
-          ${r.passed ? `<div style="margin-top:20px;padding:12px 20px;border-radius:14px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#6ee7a0;font-weight:700">⚡ +${r.gained} XP مكافأة</div>` : ''}
+          ${xpMessage}
         </div>
 
         <div class="h3 mb12">📋 مراجعة الإجابات</div>
