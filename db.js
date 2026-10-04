@@ -131,7 +131,7 @@ const API = {
     return updated;
   },
 
-  async register({ name, phone, password, gradeId, countryCode = "+20" }) {
+  async register({ name, phone, password, gradeId, countryCode = "+20", governorate = "" }) {
     if (!name || !phone || !password) throw new Error("يرجى تعبئة جميع الحقول");
     if (password.length < 6) throw new Error("كلمة المرور يجب أن تكون 6 أحرف على الأقل");
 
@@ -155,6 +155,7 @@ const API = {
       id: uid("u_"),
       phone: cleanPhone,
       country_code: countryCode,
+      governorate: governorate || null,
       email: null,
       password: hashed,
       password_hash: hashed,
@@ -176,7 +177,7 @@ const API = {
     API.trackActivity({
       userId: u.id, userName: u.name, userRole: "student",
       type: "register", target: u.name,
-      details: { role: "student", phone: cleanPhone }
+      details: { role: "student", phone: cleanPhone, governorate }
     });
 
     return data;
