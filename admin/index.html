@@ -423,7 +423,7 @@ function Dashboard(){
   students.forEach(s=>{totalDone+=(s.completed_lessons||[]).length;});
   const avgProgress=students.length&&totalLessons?Math.round((totalDone/(students.length*totalLessons))*100):0;
   const top10=useMemo(()=>[...students].sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,10),[students]);
-  const recentAct=app.db.activity.slice(0,8);
+  const recentAct=(app.db.activity||[]).slice(0,8);
   const actLabel={login:'تسجيل دخول',register:'تسجيل جديد',lesson_view:'فتح درس',lesson_complete:'أكمل درس',exam_start:'بدأ اختبار',exam_submit:'أنهى اختبار',video_play:'شاهد فيديو',video_25:'25%',video_50:'50%',video_75:'75%',video_complete:'أكمل الفيديو',mission_complete:'أكمل مهمة',achievement_unlock:'فتح إنجاز'};
   
   const chart1Ref=useRef(null);
@@ -433,7 +433,6 @@ function Dashboard(){
   const chart2Instance=useRef(null);
   const chart3Instance=useRef(null);
 
-  // Chart 1: XP للـ Top 10
   useEffect(()=>{
     if(!chart1Ref.current || !window.Chart) return;
     const ctx=chart1Ref.current.getContext("2d");
@@ -456,7 +455,6 @@ function Dashboard(){
     return ()=>{if(chart1Instance.current)chart1Instance.current.destroy();};
   },[top10]);
 
-  // Chart 2: توزيع المستويات
   useEffect(()=>{
     if(!chart2Ref.current || !window.Chart) return;
     const ctx=chart2Ref.current.getContext("2d");
@@ -477,7 +475,6 @@ function Dashboard(){
     return ()=>{if(chart2Instance.current)chart2Instance.current.destroy();};
   },[students,app.db.levels]);
 
-  // Chart 3: توزيع المحافظات
   useEffect(()=>{
     if(!chart3Ref.current || !window.Chart) return;
     const ctx=chart3Ref.current.getContext("2d");
@@ -586,7 +583,6 @@ function Dashboard(){
       <Stat label="متوسط التقدم" value={`${avgProgress}%`} icon="trend" color="#2f7dff"/>
     </div>
 
-    {/* Charts */}
     <div className="grid g2 mb16">
       <div className="glass" style={{padding:18}}>
         <div className="h4 mb12">📊 XP — أفضل 10 طلاب</div>
@@ -602,7 +598,6 @@ function Dashboard(){
       </div>
     </div>
 
-    {/* توزيع المحافظات */}
     <div className="glass mb16" style={{padding:18}}>
       <div className="flex between center mb12 wrap g8">
         <div className="h4">📍 توزيع الطلاب على المحافظات</div>
@@ -659,14 +654,30 @@ function Dashboard(){
         }
       </div>
       <div className="glass" style={{padding:18}}>
-        <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="activity" size={16}/> آخر الأنشطة</div>
-        {recentAct.length===0?<Empty title="لا يوجد نشاط"/>:
-          recentAct.map(a=><div key={a.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid rgba(90,140,230,.08)'}}>
-            <div className="act-ico"><Icon name="activity" size={16}/></div>
-            <div style={{flex:1}}><div className="sm">{a.user_name}</div><div className="xs muted">{actLabel[a.type]||a.type}{a.target?` — ${a.target}`:''}</div></div>
-            <div className="xs muted">{new Date(a.at).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})}</div>
-          </div>)
-        }
+        <div className="flex between center mb12">
+          <div className="h4" style={{display:'flex',alignItems:'center',gap:8}}>
+            <Icon name="activity" size={16}/> آخر الأنشطة
+          </div>
+          <span className="pill pill-b">{app.db.activity?.length || 0}</span>
+        </div>
+        {recentAct.length===0 ? (
+          <div style={{padding:'24px',textAlign:'center'}}>
+            <div style={{fontSize:40,opacity:.3,marginBottom:8}}>📡</div>
+            <div className="sm muted">لا يوجد نشاط بعد</div>
+            <div className="xs muted mt6">سيظهر نشاط الطلاب هنا</div>
+          </div>
+        ) : (
+          recentAct.map(a => (
+            <div key={a.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid rgba(90,140,230,.08)'}}>
+              <div className="act-ico"><Icon name="activity" size={16}/></div>
+              <div style={{flex:1}}>
+                <div className="sm">{a.user_name || 'غير معروف'}</div>
+                <div className="xs muted">{actLabel[a.type] || a.type}{a.target ? ` — ${a.target}` : ''}</div>
+              </div>
+              <div className="xs muted">{DB.formatTime(a.at)}</div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   </>;
@@ -677,36 +688,82 @@ function ActivityLog(){
   const [filter,setFilter]=useState('all');
   const [studentFilter,setStudentFilter]=useState('all');
   const students=app.db.users.filter(u=>u.role==='student');
-  const typeFilters=[{id:'all',label:'الكل'},{id:'lesson_view',label:'دروس'},{id:'video_play',label:'فيديو'},{id:'video_complete',label:'إكمال فيديو'},{id:'exam_start',label:'بدء اختبار'},{id:'exam_submit',label:'إنهاء اختبار'},{id:'mission_complete',label:'مهام'},{id:'login',label:'دخول'}];
-  let list=[...app.db.activity];
+  const typeFilters=[
+    {id:'all',label:'الكل'},
+    {id:'lesson_view',label:'دروس'},
+    {id:'video_play',label:'فيديو'},
+    {id:'video_complete',label:'إكمال فيديو'},
+    {id:'exam_start',label:'بدء اختبار'},
+    {id:'exam_submit',label:'إنهاء اختبار'},
+    {id:'mission_complete',label:'مهام'},
+    {id:'login',label:'دخول'}
+  ];
+  
+  let list=[...(app.db.activity||[])];
   if(filter!=='all') list=list.filter(a=>a.type===filter);
   if(studentFilter!=='all') list=list.filter(a=>a.user_id===studentFilter);
-  const actLabel={login:'تسجيل دخول',register:'تسجيل جديد',lesson_view:'فتح درس',lesson_complete:'أكمل درس',exam_start:'بدأ اختبار',exam_submit:'أنهى اختبار',video_play:'شاهد فيديو',video_25:'25%',video_50:'50%',video_75:'75%',video_complete:'أكمل الفيديو',mission_complete:'أكمل مهمة',achievement_unlock:'فتح إنجاز'};
+  
+  const actLabel={
+    login:'تسجيل دخول',register:'تسجيل جديد',lesson_view:'فتح درس',
+    lesson_complete:'أكمل درس',exam_start:'بدأ اختبار',exam_submit:'أنهى اختبار',
+    video_play:'شاهد فيديو',video_25:'25%',video_50:'50%',video_75:'75%',
+    video_complete:'أكمل الفيديو',mission_complete:'أكمل مهمة',
+    achievement_unlock:'فتح إنجاز'
+  };
+  
   return <>
     <div className="flex between center mb16 wrap g8">
       <div className="h2">سجل النشاط</div>
-      <select className="input" style={{maxWidth:220}} value={studentFilter} onChange={e=>setStudentFilter(e.target.value)}>
-        <option value="all">كل الطلاب</option>
-        {students.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
-      </select>
+      <div className="flex g8 center">
+        <span className="pill pill-b">{list.length} نشاط</span>
+        <select className="input" style={{maxWidth:220}} value={studentFilter} onChange={e=>setStudentFilter(e.target.value)}>
+          <option value="all">كل الطلاب</option>
+          {students.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
+        </select>
+      </div>
     </div>
+    
     <div className="flex wrap g6 mb16">
-      {typeFilters.map(f=><button key={f.id} onClick={()=>setFilter(f.id)} style={{padding:'8px 14px',borderRadius:30,background:filter===f.id?'rgba(47,125,255,.18)':'rgba(255,255,255,.05)',border:`1px solid ${filter===f.id?'var(--blue)':'var(--border)'}`,fontSize:12.5,fontWeight:700,color:'var(--txt)'}}>{f.label}</button>)}
+      {typeFilters.map(f=><button key={f.id} onClick={()=>setFilter(f.id)} style={{
+        padding:'8px 14px',
+        borderRadius:30,
+        background:filter===f.id?'rgba(47,125,255,.18)':'rgba(255,255,255,.05)',
+        border:`1px solid ${filter===f.id?'var(--blue)':'var(--border)'}`,
+        fontSize:12.5,
+        fontWeight:700,
+        color:'var(--txt)',
+        cursor:'pointer'
+      }}>{f.label}</button>)}
     </div>
+    
     <div className="glass" style={{padding:16}}>
-      {list.length===0?<Empty icon="📡" title="لا يوجد نشاط"/>:
+      {list.length===0?(
+        <div style={{padding:'40px 20px',textAlign:'center'}}>
+          <div style={{fontSize:48,opacity:.3,marginBottom:12}}>📡</div>
+          <div className="h4 txt2 mb8">لا يوجد نشاط</div>
+          <div className="sm muted">لم يقم الطلاب بأي نشاط بعد</div>
+        </div>
+      ):(
         <div className="flex col g8">
-          {list.slice(0,200).map(a=><div key={a.id} className="act-row">
-            <div className="act-ico"><Icon name="activity" size={16}/></div>
-            <div style={{flex:1,minWidth:0}}>
-              <div className="flex between center wrap g8">
-                <div><div className="sm" style={{fontWeight:700}}>{a.user_name}</div><div className="xs muted">{actLabel[a.type]||a.type}{a.target?` — ${a.target}`:''}</div></div>
-                <div className="xs muted">{new Date(a.at).toLocaleString('ar-EG',{dateStyle:'short',timeStyle:'short'})}</div>
+          {list.slice(0,200).map(a=>(
+            <div key={a.id} className="act-row">
+              <div className="act-ico"><Icon name="activity" size={16}/></div>
+              <div style={{flex:1,minWidth:0}}>
+                <div className="flex between center wrap g8">
+                  <div>
+                    <div className="sm" style={{fontWeight:700}}>{a.user_name || 'غير معروف'}</div>
+                    <div className="xs muted">
+                      {actLabel[a.type] || a.type}
+                      {a.target ? ` — ${a.target}` : ''}
+                    </div>
+                  </div>
+                  <div className="xs muted">{DB.formatDateTime(a.at)}</div>
+                </div>
               </div>
             </div>
-          </div>)}
+          ))}
         </div>
-      }
+      )}
     </div>
   </>;
 }
@@ -1451,7 +1508,8 @@ function StudentsPage(){
                       border: `1px solid ${on?'var(--blue)':'var(--border)'}`,
                       fontSize:12.5,
                       fontWeight:700,
-                      color:'var(--txt)'
+                      color:'var(--txt)',
+                      cursor:'pointer'
                     }}
                   >
                     {s.icon} {s.name}
@@ -1508,7 +1566,10 @@ function NotificationsPage(){
           <div style={{flex:1}}>
             <div className="h4" style={{fontSize:14}}>{n.title}</div>
             <div className="xs muted">{n.body}</div>
-            <div className="xs mt6" style={{color:'var(--blue2)'}}>← {n.target==='all'?'كل الطلاب':app.db.users.find(u=>u.id===n.target)?.name||'—'}</div>
+            <div className="flex between center mt6">
+              <div className="xs" style={{color:'var(--blue2)'}}>← {n.target==='all'?'كل الطلاب':app.db.users.find(u=>u.id===n.target)?.name||'—'}</div>
+              <div className="xs muted">{DB.formatDate(n.created_at)}</div>
+            </div>
           </div>
           <button className="btn btn-dn btn-sm" onClick={()=>del(n.id)}><Icon name="trash" size={13}/></button>
         </div>)}
@@ -1539,7 +1600,7 @@ function ReportsPage(){
           {reports.map(r=><div key={r.id} className="glass-s" style={{padding:14}}>
             <div className="flex between center mb8">
               <div className="h4">{r.user_name}</div>
-              <span className="xs muted">{new Date(r.created_at).toLocaleString('ar-EG')}</span>
+              <span className="xs muted">{DB.formatDateTime(r.created_at)}</span>
             </div>
             <div className="xs muted mb8" dir="ltr">📱 {r.user_phone}</div>
             <div className="sm txt2" style={{background:'rgba(0,0,0,.2)',padding:10,borderRadius:10}}>{r.message}</div>
