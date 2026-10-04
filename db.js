@@ -27,6 +27,61 @@ const daysBetween = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000)
 const fmt = (n) => new Intl.NumberFormat("ar-EG").format(n || 0);
 const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
 
+// ═══════════════ تنسيق الوقت ═══════════════
+const formatTime = (timestamp) => {
+  if (!timestamp) return "—";
+  try {
+    let ms = Number(timestamp);
+    // لو timestamp بالثواني (10 أرقام) → نحوّله للملي ثانية
+    if (ms < 10000000000) ms = ms * 1000;
+    const d = new Date(ms);
+    if (isNaN(d.getTime())) return "—";
+    return d.toLocaleTimeString("ar-EG", { 
+      hour: "2-digit", 
+      minute: "2-digit",
+      hour12: true 
+    });
+  } catch (e) {
+    return "—";
+  }
+};
+
+const formatDate = (timestamp) => {
+  if (!timestamp) return "—";
+  try {
+    let ms = Number(timestamp);
+    if (ms < 10000000000) ms = ms * 1000;
+    const d = new Date(ms);
+    if (isNaN(d.getTime())) return "—";
+    return d.toLocaleDateString("ar-EG", { 
+      day: "numeric", 
+      month: "short", 
+      year: "numeric" 
+    });
+  } catch (e) {
+    return "—";
+  }
+};
+
+const formatDateTime = (timestamp) => {
+  if (!timestamp) return "—";
+  try {
+    let ms = Number(timestamp);
+    if (ms < 10000000000) ms = ms * 1000;
+    const d = new Date(ms);
+    if (isNaN(d.getTime())) return "—";
+    return d.toLocaleString("ar-EG", { 
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true
+    });
+  } catch (e) {
+    return "—";
+  }
+};
+
 const hashPassword = async (password) => {
   try {
     const enc = new TextEncoder();
@@ -88,6 +143,7 @@ const sendToTelegram = async (message) => {
 
 const API = {
   uid, today, daysBetween, fmt, pct,
+  formatTime, formatDate, formatDateTime,
   getSessionId, clearSession, setSession, getClient,
   hashPassword, sendToTelegram,
 
@@ -200,15 +256,58 @@ const API = {
     } catch (e) { return 0; }
   },
 
+  // ═══════════════ loadAll (بعد الإصلاح) ═══════════════
   async loadAll() {
     const sb = await getClient();
     const tables = ["users","grades","subjects","units","lessons","questions",
                     "exams","missions","achievements","levels","notifications","activity","roles"];
+    
     const results = await Promise.all(
-      tables.map((t) => sb.from(t).select("*").order("created_at", { ascending: false }).limit(3000))
+      tables.map(async (t) => {
+        // محاولة بـ created_at desc
+        let res = await sb.from(t).select("*").order("created_at", { ascending: false }).limit(3000);
+        // لو فشل، جرّب بدون ترتيب
+        if (res.error) {
+          res = await sb.from(t).select("*").limit(3000);
+        }
+        return res;
+      })
     );
+    
     const db = {};
-    tables.forEach((t, i) => { db[t] = results[i].error ? [] : results[i].data || []; });
+    tables.forEach((t, i) => {
+      if (results[i].error) {
+        console.warn(`⚠️ فشل تحميل ${t}:`, results[i].error.message);
+        db[t] = [];
+      } else {
+        db[t] = results[i].data || [];
+      }
+    });
+    
+    // ترتيب يدوي للأنشطة (بـ at)
+    if (db.activity && db.activity.length > 0) {
+      db.activity.sort((a, b) => {
+        const aTime = Number(a.at) || 0;
+        const bTime = Number(b.at) || 0;
+        return bTime - aTime;
+      });
+    }
+    
+    // ترتيب الإشعارات
+    if (db.notifications && db.notifications.length > 0) {
+      db.notifications.sort((a, b) => {
+        const aTime = Number(a.created_at) || 0;
+        const bTime = Number(b.created_at) || 0;
+        return bTime - aTime;
+      });
+    }
+    
+    console.log("✅ Loaded:", {
+      activity: db.activity?.length || 0,
+      users: db.users?.length || 0,
+      notifications: db.notifications?.length || 0
+    });
+    
     return db;
   },
 
@@ -244,26 +343,40 @@ const API = {
     } catch (e) { return []; }
   },
 
+  // ═══════════════ trackActivity (مضمون) ═══════════════
   async trackActivity({ userId, userName, userRole, type, target, details }) {
     try {
       const sb = await getClient();
-      await sb.from("activity").insert([{
+      const now = Date.now();
+      const { error } = await sb.from("activity").insert([{
         id: uid("act_"),
-        user_id: userId, user_name: userName,
+        user_id: userId,
+        user_name: userName,
         user_role: userRole || "student",
-        type, target: target || "",
+        type,
+        target: target || "",
         details: details || {},
-        at: Date.now(), created_at: Date.now()
+        at: now,
+        created_at: now
       }]);
-    } catch (e) {}
+      
+      if (error) {
+        console.warn("⚠️ Track activity failed:", error.message);
+      } else {
+        console.log("✅ Activity tracked:", type);
+      }
+    } catch (e) {
+      console.warn("⚠️ Track activity error:", e.message);
+    }
   },
 
   async saveAttempt({ userId, examId, score, total, pct, passed, answers }) {
     const sb = await getClient();
+    const now = Date.now();
     const row = {
       id: uid("att_"), user_id: userId, exam_id: examId,
       score, total, pct, passed, answers,
-      at: Date.now(), created_at: Date.now()
+      at: now, created_at: now
     };
     const { data, error } = await sb.from("exam_attempts").insert([row]).select().single();
     if (error) throw new Error(error.message);
