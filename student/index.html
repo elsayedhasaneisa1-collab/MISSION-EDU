@@ -270,7 +270,16 @@ function AppProvider({children}){
       confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
       background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',
       customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
-    }).then(r=>{if(r.isConfirmed){DB.clearSession();window.location.replace('/auth/login.html');}});
+    }).then(r=>{
+      if(r.isConfirmed){
+        try{
+          localStorage.removeItem('student_tab');
+          localStorage.removeItem('student_selected');
+        }catch(e){}
+        DB.clearSession();
+        window.location.replace('/auth/login.html');
+      }
+    });
   },[]);
 
   const updateUser=useCallback(async (id,patch)=>{
@@ -552,7 +561,6 @@ function SubjectDetail({subjectId,setSelected,setTab}){
 
     <div className="h3 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="book" size={18}/> الوحدات والدروس</div>
     {units.map(un=>{
-      // ✅ الترتيب الصحيح: sort_order أولاً ثم created_at
       const lessons=app.db.lessons
         .filter(l=>l.unit_id===un.id&&l.published!==false)
         .sort((a,b)=>{
@@ -563,7 +571,6 @@ function SubjectDetail({subjectId,setSelected,setTab}){
           const tb = new Date(b.created_at || b.createdAt || 0).getTime() || 0;
           return ta - tb;
         });
-      // ✅ نفس الترتيب للاختبارات
       const exams=app.db.exams
         .filter(e=>e.unit_id===un.id&&e.published!==false)
         .sort((a,b)=>{
@@ -904,10 +911,50 @@ function Footer(){
 function StudentApp(){
   const app=useApp();
   const user=app.currentUser;
-  const [tab,setTab]=useState('home');
-  const [selected,setSelected]=useState(null);
+
+  // ✅ استرجاع التاب من localStorage
+  const [tab,setTab]=useState(()=>{
+    try{
+      return localStorage.getItem('student_tab') || 'home';
+    }catch(e){ return 'home'; }
+  });
+
+  // ✅ استرجاع المادة المختارة من localStorage
+  const [selected,setSelected]=useState(()=>{
+    try{
+      const saved = localStorage.getItem('student_selected');
+      return saved ? JSON.parse(saved) : null;
+    }catch(e){ return null; }
+  });
+
   const [sidebarOpen,setSidebarOpen]=useState(false);
   const [searchResults,setSearchResults]=useState([]);
+
+  // ✅ حفظ التاب كل ما يتغير
+  useEffect(()=>{
+    try{
+      localStorage.setItem('student_tab', tab);
+    }catch(e){}
+  },[tab]);
+
+  // ✅ حفظ المادة المختارة كل ما تتغير
+  useEffect(()=>{
+    try{
+      if(selected){
+        localStorage.setItem('student_selected', JSON.stringify(selected));
+      } else {
+        localStorage.removeItem('student_selected');
+      }
+    }catch(e){}
+  },[selected]);
+
+  // ✅ التنقل مع مسح المادة لو خرجنا من صفحتها
+  const handleNav = (id)=>{
+    if(id !== 'subject'){
+      setSelected(null);
+    }
+    setTab(id);
+  };
 
   const unread=app.db.notifications.filter(n=>(n.target==='all'||n.target===user.id)&&!(n.read_by||[]).includes(user.id)).length;
 
@@ -934,7 +981,7 @@ function StudentApp(){
   };
 
   return <div className="app">
-    <Sidebar items={items} active={tab} onNav={setTab} open={sidebarOpen} onClose={()=>setSidebarOpen(false)}/>
+    <Sidebar items={items} active={tab} onNav={handleNav} open={sidebarOpen} onClose={()=>setSidebarOpen(false)}/>
     <div className="main">
       <Topbar user={user} onMenu={()=>setSidebarOpen(true)} onLogout={app.logout} onSearch={onSearch} searchResults={searchResults}/>
       <div className="content">
@@ -957,7 +1004,7 @@ function StudentApp(){
         {id:'missions',icon:'target',label:'المهام'},
         {id:'leaderboard',icon:'medal',label:'المتصدرون'},
         {id:'profile',icon:'user',label:'حسابي'}
-      ].map(it=><button key={it.id} className={tab===it.id?'on':''} onClick={()=>setTab(it.id)}>
+      ].map(it=><button key={it.id} className={tab===it.id?'on':''} onClick={()=>handleNav(it.id)}>
         <span className="i"><Icon name={it.icon} size={19}/></span>{it.label}
       </button>)}
     </div>

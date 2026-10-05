@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
 <meta name="theme-color" content="#04060e" />
 <title>الدرس | MISSION EDU</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -65,6 +65,7 @@ ul{list-style:none}
 @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes pulsePlay{0%,100%{box-shadow:0 16px 50px rgba(47,125,255,.55),0 0 0 0 rgba(47,125,255,.5)}50%{box-shadow:0 16px 50px rgba(47,125,255,.55),0 0 0 24px rgba(47,125,255,0)}}
 @keyframes pu{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 .fade-in{animation:fu .5s}
 .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(6,9,20,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
 .back-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--txt2);font-size:13.5px;font-weight:700;transition:.2s;text-decoration:none}
@@ -95,33 +96,37 @@ ul{list-style:none}
    ═══════════════════════════════════════════════════ */
 .player-modal{
   position:fixed;inset:0;z-index:9999;
-  background:rgba(3,5,12,.94);
+  background:rgba(3,5,12,.96);
   backdrop-filter:blur(20px);
   -webkit-backdrop-filter:blur(20px);
   display:none;
   align-items:center;
   justify-content:center;
-  padding:16px;
+  padding:0;
   animation:pu .3s;
 }
 .player-modal.open{display:flex}
 .player-box{
   position:relative;
-  width:100%;max-width:1200px;
+  width:100%;max-width:1400px;
   background:#000;
-  border-radius:20px;
+  border-radius:0;
   overflow:hidden;
-  box-shadow:0 30px 90px rgba(0,0,0,.9),0 0 0 1px rgba(90,140,230,.25);
+  box-shadow:0 30px 90px rgba(0,0,0,.9);
+  display:flex;
+  flex-direction:column;
+  max-height:100vh;
 }
 .player-header{
   display:flex;align-items:center;gap:12px;
-  padding:12px 18px;
+  padding:10px 16px;
   background:linear-gradient(180deg,rgba(21,31,56,.98),rgba(11,17,34,.98));
   border-bottom:1px solid var(--border);
+  flex-shrink:0;
 }
 .player-title{
   flex:1;min-width:0;
-  font-size:14.5px;font-weight:800;
+  font-size:14px;font-weight:800;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .player-badge{
@@ -137,6 +142,17 @@ ul{list-style:none}
   background:#22c55e;box-shadow:0 0 8px #22c55e;
   animation:pulse 2s infinite;
 }
+.player-btn{
+  width:38px;height:38px;border-radius:11px;
+  display:grid;place-items:center;
+  background:rgba(47,125,255,.12);
+  border:1px solid rgba(47,125,255,.3);
+  color:#7db6ff;
+  font-size:16px;
+  transition:.2s;
+  cursor:pointer;flex-shrink:0;
+}
+.player-btn:hover{background:rgba(47,125,255,.25);color:#fff}
 .player-close{
   width:38px;height:38px;border-radius:11px;
   display:grid;place-items:center;
@@ -158,11 +174,13 @@ ul{list-style:none}
   user-select:none;-webkit-user-select:none;
   -webkit-touch-callout:none;
   isolation:isolate;
+  flex:1;
 }
-.player-stage iframe{
+.player-stage iframe,.player-stage video{
   position:absolute;inset:0;
   width:100%;height:100%;
   border:0;display:block;
+  pointer-events:auto;
 }
 
 /* ─── العلامة المائية ─── */
@@ -187,28 +205,83 @@ ul{list-style:none}
   direction:ltr;
 }
 
-/* ─── حماية الفيديو ─── */
-.player-stage::before{
-  content:'';
-  position:absolute;inset:0;z-index:50;
+/* ─── طبقة الحماية (Shield) ─── */
+.shield-overlay{
+  position:absolute;
+  inset:0;
+  z-index:80;
   pointer-events:none;
 }
-.player-shield{
+.shield-overlay::before{
+  content:'';
   position:absolute;
-  top:0;left:0;right:0;height:44px;
-  z-index:60;
+  top:0;left:0;right:0;
+  height:60px;
+  background:transparent;
   pointer-events:auto;
   cursor:default;
 }
+.shield-overlay::after{
+  content:'';
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:80px;
+  background:transparent;
+  pointer-events:auto;
+  cursor:default;
+}
+.shield-side{
+  position:absolute;
+  top:60px;bottom:80px;
+  width:50px;
+  background:transparent;
+  z-index:80;
+  pointer-events:auto;
+  cursor:default;
+}
+.shield-side.right{right:0;left:auto}
+.shield-side.left{left:0;right:auto}
 
-/* ─── تعبئة الشاشة ─── */
-@media(max-width:640px){
-  .player-modal{padding:8px}
-  .player-box{border-radius:14px}
-  .player-header{padding:10px 12px}
-  .player-title{font-size:12.5px}
+/* ─── وضع ملء الشاشة ─── */
+.player-modal.fullscreen .player-box{
+  max-width:100vw;
+  width:100vw;
+  height:100vh;
+  max-height:100vh;
+  border-radius:0;
+}
+.player-modal.fullscreen .player-header{
+  position:absolute;
+  top:0;left:0;right:0;
+  z-index:150;
+  background:linear-gradient(180deg,rgba(0,0,0,.85),transparent);
+  border:none;
+  transition:opacity .3s;
+}
+.player-modal.fullscreen .player-header:hover{opacity:1}
+.player-modal.fullscreen .player-stage{
+  aspect-ratio:auto;
+  height:100vh;
+  flex:1;
+}
+
+/* ─── Landscape على الموبايل ─── */
+@media(max-width:900px) and (orientation:landscape){
+  .player-modal{padding:0}
+  .player-box{border-radius:0;max-width:100vw}
+  .player-header{padding:6px 12px}
+  .player-title{font-size:12px}
   .player-badge{display:none}
-  .player-close{width:34px;height:34px;font-size:16px}
+  .player-btn,.player-close{width:32px;height:32px;font-size:14px}
+  .watermark{font-size:12px}
+}
+@media(max-width:640px){
+  .player-modal{padding:0}
+  .player-box{border-radius:0}
+  .player-header{padding:8px 10px;gap:8px}
+  .player-title{font-size:12px}
+  .player-badge{display:none}
+  .player-btn,.player-close{width:34px;height:34px;font-size:14px}
   .watermark{font-size:12px}
 }
 </style>
@@ -237,11 +310,23 @@ ul{list-style:none}
     <div class="player-header">
       <div class="player-title" id="playerTitle">جارٍ التحميل...</div>
       <span class="player-badge">محمي</span>
+      <button class="player-btn" id="playerFullscreen" title="ملء الشاشة">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+        </svg>
+      </button>
       <button class="player-close" id="playerClose" aria-label="إغلاق">✕</button>
     </div>
     <div class="player-stage" id="playerStage">
-      <div class="player-shield"></div>
+      <!-- طبقات الحماية -->
+      <div class="shield-overlay"></div>
+      <div class="shield-side left"></div>
+      <div class="shield-side right"></div>
+
+      <!-- العلامة المائية -->
       <div class="watermark" id="watermark" style="top:20px;left:20px">MISSION EDU</div>
+
+      <!-- مكان الفيديو -->
       <div id="playerContainer"></div>
     </div>
   </div>
@@ -282,7 +367,7 @@ ul{list-style:none}
     totalUnit: 0,
     isDone: false,
     watermarkTimer: null,
-    currentCorner: 0
+    isFullscreen: false
   };
 
   function esc(str){
@@ -320,10 +405,10 @@ ul{list-style:none}
     const playerTitle = document.getElementById('playerTitle');
     if(playerTitle) playerTitle.textContent = lesson.title || 'الدرس';
 
-    // تحديث العلامة المائية = رقم الطالب
+    // تحديث العلامة المائية = رقم الطالب فقط
     const watermark = document.getElementById('watermark');
     if(watermark){
-      const phone = user.phone || user.name || 'طالب';
+      const phone = (user.country_code || '') + (user.phone || '') || user.name || 'طالب';
       watermark.textContent = phone;
     }
 
@@ -333,8 +418,9 @@ ul{list-style:none}
       if(type === 'youtube'){
         const ytId = getYouTubeId(url);
         if(ytId){
+          // ✅ autoplay + rel=0 + modestbranding
           container.innerHTML = `<iframe
-            src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&fs=1&autoplay=1"
+            src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&fs=1&autoplay=1&showinfo=0&controls=1&disablekb=0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
             allowfullscreen
             referrerpolicy="strict-origin-when-cross-origin"
@@ -355,7 +441,7 @@ ul{list-style:none}
         container.innerHTML = `<video
           id="mp4Video"
           controls
-          controlsList="nodownload noremoteplayback noplaybackrate nofullscreen"
+          controlsList="nodownload noremoteplayback noplaybackrate"
           disablePictureInPicture
           playsinline
           autoplay
@@ -380,6 +466,11 @@ ul{list-style:none}
       document.body.style.overflow = 'hidden';
     }
 
+    // ✅ محاولة الدخول في وضع ملء الشاشة بالعرض
+    setTimeout(()=>{
+      enterFullscreenLandscape();
+    }, 100);
+
     // بدء تحريك العلامة المائية
     startWatermarkMotion();
 
@@ -395,8 +486,17 @@ ul{list-style:none}
 
   function closePlayer(){
     const modal = document.getElementById('playerModal');
-    if(modal) modal.classList.remove('open');
+    if(modal){
+      modal.classList.remove('open');
+      modal.classList.remove('fullscreen');
+    }
     document.body.style.overflow = '';
+
+    // الخروج من ملء الشاشة
+    exitFullscreen();
+
+    // قفل الشاشة في الوضع الرأسي
+    lockOrientation('portrait');
 
     // تفريغ الفيديو لوقف التشغيل
     const container = document.getElementById('playerContainer');
@@ -407,16 +507,88 @@ ul{list-style:none}
   }
 
   // ═══════════════════════════════════════════════════
+  //  🖥 ملء الشاشة + قفل العرض (Landscape)
+  // ═══════════════════════════════════════════════════
+  async function enterFullscreenLandscape(){
+    const modal = document.getElementById('playerModal');
+    const box = modal?.querySelector('.player-box');
+
+    try{
+      // 1) ملء الشاشة
+      if(box){
+        if(box.requestFullscreen){
+          await box.requestFullscreen();
+        } else if(box.webkitRequestFullscreen){
+          box.webkitRequestFullscreen();
+        } else if(box.msRequestFullscreen){
+          box.msRequestFullscreen();
+        }
+      }
+
+      // 2) قفل العرض (Landscape) — يشتغل على الموبايل بس
+      if(screen.orientation && screen.orientation.lock){
+        try{
+          await screen.orientation.lock('landscape');
+        }catch(e){
+          console.warn('Orientation lock failed:', e.message);
+        }
+      }
+
+      // 3) إضافة class للحالة
+      modal.classList.add('fullscreen');
+      state.isFullscreen = true;
+
+    }catch(e){
+      console.warn('Fullscreen failed:', e.message);
+      // نكمل عادي حتى لو ملء الشاشة فشل
+      modal.classList.add('fullscreen');
+      state.isFullscreen = true;
+    }
+  }
+
+  async function exitFullscreen(){
+    try{
+      if(document.fullscreenElement){
+        if(document.exitFullscreen) await document.exitFullscreen();
+        else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+        else if(document.msExitFullscreen) document.msExitFullscreen();
+      }
+    }catch(e){}
+
+    state.isFullscreen = false;
+
+    // إلغاء قفل العرض
+    if(screen.orientation && screen.orientation.unlock){
+      try{ screen.orientation.unlock(); }catch(e){}
+    }
+  }
+
+  async function lockOrientation(mode){
+    if(screen.orientation && screen.orientation.lock){
+      try{
+        await screen.orientation.lock(mode);
+      }catch(e){}
+    }
+  }
+
+  // ✅ زر ملء الشاشة اليدوي
+  function toggleFullscreen(){
+    const modal = document.getElementById('playerModal');
+    if(!modal) return;
+
+    if(state.isFullscreen){
+      exitFullscreen().then(()=>{
+        modal.classList.remove('fullscreen');
+        lockOrientation('portrait');
+      });
+    } else {
+      enterFullscreenLandscape();
+    }
+  }
+
+  // ═══════════════════════════════════════════════════
   //  📍 تحريك العلامة المائية كل 5 ثواني
   // ═══════════════════════════════════════════════════
-  const CORNERS = [
-    {top:'8%', left:'5%'},
-    {top:'8%', right:'5%', left:'auto'},
-    {top:'50%', left:'5%', top:'40%'},
-    {top:'40%', right:'5%', left:'auto'},
-    {top:'80%', left:'40%'}
-  ];
-
   function moveWatermark(){
     const wm = document.getElementById('watermark');
     const stage = document.getElementById('playerStage');
@@ -480,6 +652,14 @@ ul{list-style:none}
       if(t !== 'input' && t !== 'textarea') e.preventDefault();
     });
     document.addEventListener('dblclick', e => e.preventDefault());
+
+    // ✅ إغلاق المشغل عند الخروج من ملء الشاشة (اختياري)
+    document.addEventListener('fullscreenchange', ()=>{
+      const modal = document.getElementById('playerModal');
+      if(!document.fullscreenElement && modal && modal.classList.contains('open')){
+        // لو خرج من ملء الشاشة بشكل يدوي (F11 مثلاً) — نسيب المشغل مفتوح
+      }
+    });
   }
   // ═══════════════════════════════════════════════════
   //  عرض الدرس
@@ -496,7 +676,7 @@ ul{list-style:none}
             <svg width="36" height="36" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           </div>
           <div style="font-size:20px;font-weight:900;color:#e8eefc;margin-bottom:8px;text-align:center;padding:0 16px">${esc(lessonTitle)}</div>
-          <div style="font-size:13px;color:#7f93b8;margin-bottom:20px">اضغط لتشغيل الفيديو</div>
+          <div style="font-size:13px;color:#7f93b8;margin-bottom:20px">اضغط لتشغيل الفيديو في وضع ملء الشاشة</div>
           <div style="font-size:11.5px;color:#7f93b8;opacity:.7">🛡 المشاهدة محمية — لا يمكن التحميل أو النسخ</div>
         </div>
       </div>
@@ -611,8 +791,13 @@ ul{list-style:none}
     // ربط زر فتح المشغل
     const openBtn = document.getElementById('btnOpenPlayer');
     if(openBtn){
-      openBtn.addEventListener('click', ()=>openPlayer(l, u));
-      openBtn.addEventListener('touchstart', (e)=>{ e.preventDefault(); openPlayer(l, u); }, { passive: false });
+      const openHandler = (e)=>{
+        e.preventDefault();
+        e.stopPropagation();
+        openPlayer(l, u);
+      };
+      openBtn.addEventListener('click', openHandler);
+      openBtn.addEventListener('touchend', openHandler, { passive: false });
     }
 
     // زر إتمام الدرس
@@ -730,7 +915,11 @@ ul{list-style:none}
     const closeBtn = document.getElementById('playerClose');
     if(closeBtn) closeBtn.addEventListener('click', closePlayer);
 
-    // إغلاق عند الضغط على الخلفية
+    // ربط زر ملء الشاشة
+    const fsBtn = document.getElementById('playerFullscreen');
+    if(fsBtn) fsBtn.addEventListener('click', toggleFullscreen);
+
+    // إغلاق عند الضغط على الخلفية (بره الـ box)
     const modal = document.getElementById('playerModal');
     if(modal){
       modal.addEventListener('click', (e)=>{
@@ -740,6 +929,11 @@ ul{list-style:none}
 
     // تفعيل الحماية
     attachProtection();
+
+    // ✅ حفظ التاب الحالي في localStorage
+    try{
+      localStorage.setItem('student_last_lesson', lessonId);
+    }catch(e){}
   }
 
   window.openWhatsApp = ()=>{
