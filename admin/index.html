@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="theme-color" content="#04060e" />
+<meta name="theme-color" content="#0a0805" />
 <title>MISSION EDU — لوحة الإدارة</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
@@ -17,20 +17,95 @@
 <meta name="apple-mobile-web-app-title" content="MISSION EDU">
 <meta name="mobile-web-app-capable" content="yes">
 <style>
-:root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#8b5cf6;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.45)}
+:root{
+  --bg:#0a0805;
+  --bg2:#0f0c07;
+  --gold:#D4AF37;
+  --gold-l:#FFD700;
+  --gold-xl:#FFED4E;
+  --gold-d:#8B6914;
+  --gold-dd:#5c4509;
+  --gold-soft:#F5E6A8;
+  --gold-glow:rgba(212,175,55,.35);
+  --border:rgba(212,175,55,.18);
+  --border2:rgba(212,175,55,.38);
+  --border3:rgba(255,215,0,.55);
+  --blue:#D4AF37;
+  --blue2:#FFD700;
+  --txt:#f7f0dd;
+  --txt2:#d4c79a;
+  --muted:#8a7d55;
+  --green:#22c55e;
+  --amber:#f59e0b;
+  --red:#ef4444;
+  --violet:#b8860b;
+  --r:20px;
+  --rs:13px;
+  --sh:0 18px 50px rgba(0,0,0,.65), 0 0 0 1px rgba(212,175,55,.05) inset;
+  --sh-gold:0 10px 30px rgba(212,175,55,.35);
+  --sh-gold-h:0 14px 40px rgba(212,175,55,.55);
+  --grad-gold:linear-gradient(135deg,#FFD700 0%,#D4AF37 45%,#B8860B 100%);
+  --grad-gold-soft:linear-gradient(135deg,rgba(255,215,0,.18),rgba(212,175,55,.08));
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(47,125,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(139,92,246,.14),transparent 60%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;line-height:1.7}
+body{
+  font-family:'Tajawal','Cairo',sans-serif;
+  background:
+    radial-gradient(1200px 620px at 85% -12%,rgba(212,175,55,.20),transparent 62%),
+    radial-gradient(950px 520px at -8% 18%,rgba(184,134,11,.14),transparent 60%),
+    radial-gradient(700px 400px at 50% 110%,rgba(255,215,0,.08),transparent 70%),
+    var(--bg);
+  background-attachment:fixed;
+  color:var(--txt);
+  min-height:100vh;
+  line-height:1.7;
+}
 ::-webkit-scrollbar{width:10px;height:10px}
-::-webkit-scrollbar-thumb{background:rgba(90,140,230,.25);border-radius:20px}
+::-webkit-scrollbar-track{background:rgba(212,175,55,.05)}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#D4AF37,#8B6914);border-radius:20px}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#FFD700,#D4AF37)}
 button,input,select,textarea{font-family:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none}
 ul{list-style:none}
-.glass{background:linear-gradient(180deg,rgba(21,31,56,.72),rgba(11,17,34,.62));border:1px solid var(--border);border-radius:var(--r);backdrop-filter:blur(16px);box-shadow:var(--sh)}
-.glass-s{background:rgba(21,31,56,.62);border:1px solid var(--border);border-radius:var(--rs)}
+.glass{
+  background:linear-gradient(180deg,rgba(28,22,12,.78),rgba(15,12,7,.68));
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  backdrop-filter:blur(16px);
+  box-shadow:var(--sh);
+  position:relative;
+}
+.glass::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:var(--r);
+  padding:1px;
+  background:linear-gradient(135deg,rgba(255,215,0,.25),rgba(212,175,55,.05) 40%,rgba(255,215,0,.20));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  pointer-events:none;
+}
+.glass-s{background:rgba(28,22,12,.65);border:1px solid var(--border);border-radius:var(--rs)}
 .hv{transition:.28s cubic-bezier(.2,.8,.3,1)}
-.hv:hover{transform:translateY(-4px);border-color:var(--border2)}
+.hv:hover{transform:translateY(-4px);border-color:var(--border2);box-shadow:var(--sh-gold)}
 .app{display:flex;min-height:100vh}
-.sidebar{width:264px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;padding:18px 12px;display:flex;flex-direction:column;gap:6px;background:linear-gradient(180deg,rgba(9,14,29,.94),rgba(6,9,20,.9));border-inline-start:1px solid var(--border);z-index:60}
+.sidebar{
+  width:264px;
+  flex-shrink:0;
+  position:sticky;
+  top:0;
+  height:100vh;
+  overflow-y:auto;
+  padding:18px 12px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  background:linear-gradient(180deg,rgba(15,12,7,.96),rgba(10,8,5,.92));
+  border-inline-start:1px solid var(--border);
+  z-index:60;
+}
 .main{flex:1;min-width:0;display:flex;flex-direction:column}
 .content{padding:22px 26px 100px;max-width:1440px;width:100%;margin:0 auto;animation:fu .5s}
 @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -38,25 +113,67 @@ ul{list-style:none}
 @keyframes slideIn{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:none}}
 @keyframes fadeOut{to{opacity:0;transform:translateX(-30px)}}
 @keyframes sp{to{transform:rotate(360deg)}}
+@keyframes goldShine{0%{background-position:0% 50%}100%{background-position:300% 50%}}
 .brand{display:flex;align-items:center;gap:11px;padding:8px 10px 16px}
-.brand-logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 8px 26px rgba(47,125,255,.45)}
-.brand-name{font-weight:900;font-size:17px}
+.brand-logo{
+  width:44px;height:44px;border-radius:14px;display:grid;place-items:center;
+  background:var(--grad-gold);
+  box-shadow:0 8px 26px rgba(212,175,55,.55), 0 0 0 1px rgba(255,237,78,.3) inset;
+  position:relative;
+}
+.brand-logo::after{
+  content:'';position:absolute;inset:0;border-radius:14px;
+  background:linear-gradient(135deg,rgba(255,255,255,.35),transparent 45%);
+  pointer-events:none;
+}
+.brand-name{
+  font-weight:900;font-size:17px;
+  background:linear-gradient(100deg,#FFD700,#FFF3B0 45%,#D4AF37 90%);
+  background-size:200% 100%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:goldShine 4s linear infinite;
+}
 .brand-sub{font-size:10.5px;color:var(--muted);font-weight:600}
-.nav-i{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:13px;color:var(--txt2);font-size:14px;font-weight:600;transition:.22s;width:100%;text-align:right;position:relative}
-.nav-i:hover{background:rgba(47,125,255,.09);color:var(--txt)}
-.nav-i.on{background:linear-gradient(90deg,rgba(47,125,255,.22),rgba(47,125,255,.03));color:#fff}
-.nav-i.on::before{content:'';position:absolute;inset-inline-end:0;top:22%;height:56%;width:3px;border-radius:4px;background:linear-gradient(180deg,#2f7dff,#8b5cf6)}
+.nav-i{
+  display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:13px;
+  color:var(--txt2);font-size:14px;font-weight:600;transition:.22s;width:100%;text-align:right;position:relative;
+}
+.nav-i:hover{background:rgba(212,175,55,.10);color:var(--txt)}
+.nav-i.on{
+  background:linear-gradient(90deg,rgba(212,175,55,.24),rgba(212,175,55,.03));
+  color:#FFF3B0;
+}
+.nav-i.on::before{
+  content:'';position:absolute;inset-inline-end:0;top:22%;height:56%;width:3px;border-radius:4px;
+  background:linear-gradient(180deg,#FFD700,#D4AF37);
+  box-shadow:0 0 12px rgba(255,215,0,.7);
+}
 .nav-ico{font-size:16px;width:22px;text-align:center;display:flex;justify-content:center}
-.nav-gt{font-size:10.5px;font-weight:800;color:var(--muted);letter-spacing:1px;padding:14px 14px 4px}
-.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:12px 26px;background:rgba(6,9,20,.72);backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
-.search{flex:1;max-width:520px;display:flex;align-items:center;gap:10px;background:rgba(18,26,48,.7);border:1px solid var(--border);border-radius:14px;padding:8px 14px}
+.nav-gt{font-size:10.5px;font-weight:800;color:var(--gold);letter-spacing:1px;padding:14px 14px 4px;opacity:.75}
+.topbar{
+  position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;
+  padding:12px 26px;background:rgba(10,8,5,.78);backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+}
+.search{flex:1;max-width:520px;display:flex;align-items:center;gap:10px;background:rgba(28,22,12,.7);border:1px solid var(--border);border-radius:14px;padding:8px 14px;transition:.22s}
+.search:focus-within{border-color:var(--gold);box-shadow:0 0 0 4px rgba(212,175,55,.12)}
 .search input{flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--txt)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:11px 20px;border-radius:13px;font-weight:700;font-size:14px;transition:.24s;white-space:nowrap;color:var(--txt)}
 .btn:active{transform:scale(.97)}
-.btn-p{background:linear-gradient(135deg,#2f7dff,#1f5fd6);color:#fff;box-shadow:0 10px 28px rgba(47,125,255,.36)}
-.btn-p:hover{box-shadow:0 14px 38px rgba(47,125,255,.55);transform:translateY(-2px)}
-.btn-s{background:rgba(255,255,255,.05);color:var(--txt2);border:1px solid var(--border)}
-.btn-s:hover{background:rgba(255,255,255,.09);color:var(--txt)}
+.btn-p{
+  background:var(--grad-gold);color:#1a1206;
+  box-shadow:0 10px 28px rgba(212,175,55,.42), 0 0 0 1px rgba(255,237,78,.4) inset;
+  position:relative;overflow:hidden;
+}
+.btn-p::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);
+  transform:translateX(-100%);transition:transform .7s;
+}
+.btn-p:hover::before{transform:translateX(100%)}
+.btn-p:hover{box-shadow:var(--sh-gold-h);transform:translateY(-2px);color:#000}
+.btn-s{background:rgba(212,175,55,.08);color:var(--gold-soft);border:1px solid var(--border)}
+.btn-s:hover{background:rgba(212,175,55,.16);color:#FFF3B0;border-color:var(--border2)}
 .btn-ok{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff}
 .btn-dn{background:rgba(239,68,68,.14);color:#fca5a5;border:1px solid rgba(239,68,68,.32)}
 .btn-dn:hover{background:rgba(239,68,68,.24)}
@@ -71,7 +188,12 @@ ul{list-style:none}
 .txt2{color:var(--txt2)}
 .sm{font-size:12.5px}
 .xs{font-size:11.5px}
-.grad{background:linear-gradient(100deg,#5aa9ff,#a78bfa 55%,#22d3ee);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.grad{
+  background:linear-gradient(100deg,#FFD700,#FFF3B0 50%,#D4AF37 100%);
+  background-size:200% 100%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:goldShine 5s linear infinite;
+}
 .grid{display:grid;gap:16px}
 .g2{grid-template-columns:repeat(2,1fr)}
 .g3{grid-template-columns:repeat(3,1fr)}
@@ -82,86 +204,126 @@ ul{list-style:none}
 .mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
 .mb6{margin-bottom:6px}.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
 .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:40px;font-size:11.5px;font-weight:700;border:1px solid transparent}
-.pill-b{background:rgba(47,125,255,.15);color:#7db6ff;border-color:rgba(47,125,255,.28)}
+.pill-b{background:rgba(212,175,55,.16);color:#FFD700;border-color:rgba(212,175,55,.35)}
 .pill-g{background:rgba(34,197,94,.14);color:#6ee7a0;border-color:rgba(34,197,94,.28)}
 .pill-a{background:rgba(245,158,11,.14);color:#fcd34d;border-color:rgba(245,158,11,.28)}
 .pill-r{background:rgba(239,68,68,.14);color:#fca5a5;border-color:rgba(239,68,68,.28)}
-.pill-v{background:rgba(139,92,246,.15);color:#c4b5fd;border-color:rgba(139,92,246,.28)}
+.pill-v{background:rgba(184,134,11,.18);color:#e0b84c;border-color:rgba(184,134,11,.35)}
 .pill-y{background:rgba(255,255,255,.06);color:var(--muted);border-color:var(--border)}
-.bar{height:9px;border-radius:20px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar{height:9px;border-radius:20px;background:rgba(212,175,55,.10);overflow:hidden}
 .bar-f{height:100%;border-radius:20px;transition:width .8s}
-.bar-b{background:linear-gradient(90deg,#2f7dff,#5aa9ff)}
-.input,select.input,textarea.input{width:100%;padding:11px 14px;border-radius:12px;background:rgba(10,16,32,.72);border:1.5px solid var(--border);outline:none;font-size:14px;transition:.22s;color:var(--txt)}
-.input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.12)}
-select.input{cursor:pointer;appearance:none;padding-left:38px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237f93b8' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:left 14px center}
+.bar-b{background:var(--grad-gold);box-shadow:0 0 14px rgba(212,175,55,.5)}
+.input,select.input,textarea.input{
+  width:100%;padding:11px 14px;border-radius:12px;
+  background:rgba(15,12,7,.78);border:1.5px solid var(--border);
+  outline:none;font-size:14px;transition:.22s;color:var(--txt);
+}
+.input:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(212,175,55,.14)}
+.input::placeholder{color:var(--muted)}
+select.input{cursor:pointer;appearance:none;padding-left:38px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23D4AF37' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:left 14px center}
 textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 .lbl{display:block;font-size:12.5px;font-weight:700;color:var(--txt2);margin-bottom:6px}
 .stat-n{font-size:clamp(21px,3vw,28px);font-weight:900;letter-spacing:-1px;line-height:1.1}
 .stat-l{font-size:11.5px;color:var(--muted);font-weight:600}
-.div{height:1px;background:var(--border);margin:14px 0}
+.div{height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:14px 0}
 .tbl{width:100%;border-collapse:collapse;font-size:13.5px}
-.tbl th{text-align:right;padding:10px 12px;color:var(--muted);font-weight:700;font-size:11.5px;border-bottom:1px solid var(--border);white-space:nowrap}
-.tbl td{padding:11px 12px;border-bottom:1px solid rgba(90,140,230,.08);vertical-align:middle}
-.tbl tr:hover td{background:rgba(47,125,255,.045)}
+.tbl th{text-align:right;padding:10px 12px;color:var(--gold);font-weight:700;font-size:11.5px;border-bottom:1px solid var(--border);white-space:nowrap;opacity:.85}
+.tbl td{padding:11px 12px;border-bottom:1px solid rgba(212,175,55,.08);vertical-align:middle}
+.tbl tr:hover td{background:rgba(212,175,55,.05)}
 .sx{overflow-x:auto}
-.avatar{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:14px;background:linear-gradient(140deg,#2f7dff,#8b5cf6);color:#fff;flex-shrink:0}
-.icon-btn{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid var(--border);transition:.2s;font-size:16px;color:var(--txt)}
-.icon-btn:hover{background:rgba(47,125,255,.15);border-color:var(--border2)}
-.modal-bg{position:fixed;inset:0;background:rgba(3,5,12,.82);backdrop-filter:blur(8px);z-index:900;display:grid;place-items:center;padding:18px;overflow-y:auto}
+.avatar{
+  width:38px;height:38px;border-radius:12px;display:grid;place-items:center;
+  font-weight:800;font-size:14px;background:var(--grad-gold);color:#1a1206;flex-shrink:0;
+  box-shadow:0 4px 14px rgba(212,175,55,.4);
+}
+.icon-btn{
+  width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+  background:rgba(212,175,55,.08);border:1px solid var(--border);transition:.2s;
+  font-size:16px;color:var(--gold);
+}
+.icon-btn:hover{background:rgba(212,175,55,.18);border-color:var(--border2);box-shadow:0 0 16px rgba(212,175,55,.3)}
+.modal-bg{position:fixed;inset:0;background:rgba(5,3,1,.85);backdrop-filter:blur(8px);z-index:900;display:grid;place-items:center;padding:18px;overflow-y:auto}
 .modal{width:100%;max-width:600px;max-height:90vh;overflow-y:auto;padding:22px;animation:pu .3s}
 .modal.wide{max-width:820px}
 .mbar{display:none}
-.hero{padding:24px;border-radius:22px;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(47,125,255,.18),rgba(139,92,246,.12) 50%,rgba(6,182,212,.08));border:1px solid var(--border)}
-.vid-preview{aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;border:1px solid var(--border);position:relative;margin-top:10px}
+.hero{
+  padding:24px;border-radius:22px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,rgba(212,175,55,.18),rgba(184,134,11,.12) 50%,rgba(255,215,0,.06));
+  border:1px solid var(--border2);
+  box-shadow:0 20px 50px rgba(0,0,0,.5), 0 0 40px rgba(212,175,55,.10) inset;
+}
+.hero::after{
+  content:'';position:absolute;top:-50%;inset-inline-end:-20%;width:340px;height:340px;
+  background:radial-gradient(circle,rgba(255,215,0,.18),transparent 65%);
+  pointer-events:none;
+}
+.vid-preview{aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;border:1px solid var(--border2);position:relative;margin-top:10px}
 .vid-preview iframe,.vid-preview video{width:100%;height:100%;border:0;display:block;object-fit:contain}
-.act-row{display:flex;gap:12px;padding:12px;border-radius:13px;background:rgba(255,255,255,.03);border:1px solid var(--border);align-items:flex-start}
-.act-ico{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:18px;flex-shrink:0;background:rgba(47,125,255,.14);color:#7db6ff}
+.act-row{display:flex;gap:12px;padding:12px;border-radius:13px;background:rgba(212,175,55,.04);border:1px solid var(--border);align-items:flex-start}
+.act-ico{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:18px;flex-shrink:0;background:rgba(212,175,55,.15);color:var(--gold)}
 .empty{text-align:center;padding:52px 20px;color:var(--muted)}
 .empty-ico{font-size:52px;opacity:.35;margin-bottom:14px}
 .loading{display:grid;place-items:center;min-height:100vh;font-size:18px;color:var(--muted)}
-.spinner{width:48px;height:48px;border:3px solid rgba(90,140,230,.2);border-top-color:var(--blue);border-radius:50%;animation:sp 1s linear infinite;margin-bottom:14px}
+.spinner{width:48px;height:48px;border:3px solid rgba(212,175,55,.18);border-top-color:var(--gold);border-radius:50%;animation:sp 1s linear infinite;margin-bottom:14px;box-shadow:0 0 20px rgba(212,175,55,.3)}
 .rank{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-weight:900;font-size:15px;flex-shrink:0}
-.rank-1{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000}
-.rank-2{background:linear-gradient(135deg,#cbd5e1,#94a3b8);color:#000}
-.rank-3{background:linear-gradient(135deg,#d97706,#b45309);color:#fff}
-.rank-x{background:rgba(255,255,255,.06);color:var(--muted)}
+.rank-1{background:linear-gradient(135deg,#FFD700,#D4AF37);color:#1a1206;box-shadow:0 0 20px rgba(255,215,0,.6)}
+.rank-2{background:linear-gradient(135deg,#e8e8e8,#a8a8a8);color:#000}
+.rank-3{background:linear-gradient(135deg,#cd7f32,#8B6914);color:#fff}
+.rank-x{background:rgba(212,175,55,.10);color:var(--muted)}
 .toast-host{position:fixed;bottom:26px;inset-inline-start:26px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:min(440px,92vw)}
-.toast{pointer-events:auto;min-width:280px;padding:14px 16px 16px;border-radius:16px;background:linear-gradient(135deg,rgba(21,31,56,.98),rgba(11,17,34,.98));border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.65);animation:slideIn .4s;position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:12px}
+.toast{
+  pointer-events:auto;min-width:280px;padding:14px 16px 16px;border-radius:16px;
+  background:linear-gradient(135deg,rgba(28,22,12,.98),rgba(15,12,7,.98));
+  border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.7), 0 0 30px rgba(212,175,55,.15);
+  animation:slideIn .4s;position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:12px;
+}
 .toast.out{animation:fadeOut .3s forwards}
 .toast-ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex-shrink:0}
 .toast-body{flex:1;min-width:0}
-.toast-title{font-weight:800;font-size:13.5px;margin-bottom:3px}
+.toast-title{font-weight:800;font-size:13.5px;margin-bottom:3px;color:var(--gold-soft)}
 .toast-msg{font-size:12.5px;color:var(--txt2);line-height:1.55}
 .toast-bar{position:absolute;bottom:0;inset-inline:0;height:3px;background:rgba(255,255,255,.06)}
 .toast-bar-f{height:100%;transition:width linear}
-.toast-close{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font-size:12px;color:var(--muted);background:rgba(255,255,255,.05);flex-shrink:0}
+.toast-close{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font-size:12px;color:var(--muted);background:rgba(212,175,55,.08);flex-shrink:0}
 .toast.ok .toast-ico{background:rgba(34,197,94,.18);color:#6ee7a0}
 .toast.ok .toast-bar-f{background:linear-gradient(90deg,#16a34a,#4ade80)}
 .toast.err .toast-ico{background:rgba(239,68,68,.18);color:#fca5a5}
 .toast.err .toast-bar-f{background:linear-gradient(90deg,#dc2626,#f87171)}
 .toast.warn .toast-ico{background:rgba(245,158,11,.18);color:#fcd34d}
 .toast.warn .toast-bar-f{background:linear-gradient(90deg,#d97706,#fbbf24)}
-.toast.info .toast-ico{background:rgba(47,125,255,.18);color:#7db6ff}
-.toast.info .toast-bar-f{background:linear-gradient(90deg,#2f7dff,#5aa9ff)}
-.footer-dev{display:flex;justify-content:center;gap:10px;padding:24px 20px 16px;margin-top:40px;border-top:1px solid rgba(90,140,230,.12);position:relative;flex-wrap:wrap}
-.footer-dev::before{content:"";position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:120px;height:1px;background:linear-gradient(90deg,transparent,#2f7dff,transparent)}
-.dev-btn,.tg-btn{display:inline-flex;align-items:center;gap:9px;padding:10px 20px;border-radius:50px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .32s;border:1px solid}
-.dev-btn{background:linear-gradient(135deg,rgba(47,125,255,.15),rgba(139,92,246,.15));border-color:rgba(90,140,230,.3);color:var(--txt);position:relative;overflow:hidden}
-.dev-btn::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);transform:translateX(-100%);transition:transform .7s}
+.toast.info .toast-ico{background:rgba(212,175,55,.20);color:#FFD700}
+.toast.info .toast-bar-f{background:var(--grad-gold)}
+.footer-dev{
+  display:flex;justify-content:center;gap:10px;padding:24px 20px 16px;margin-top:40px;
+  border-top:1px solid rgba(212,175,55,.14);position:relative;flex-wrap:wrap;
+}
+.footer-dev::before{content:"";position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:180px;height:1px;background:linear-gradient(90deg,transparent,#FFD700,transparent)}
+.dev-btn,.tg-btn{
+  display:inline-flex;align-items:center;gap:9px;padding:10px 20px;border-radius:50px;
+  font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .32s;border:1px solid;
+}
+.dev-btn{
+  background:linear-gradient(135deg,rgba(212,175,55,.18),rgba(184,134,11,.18));
+  border-color:rgba(212,175,55,.4);color:var(--txt);position:relative;overflow:hidden;
+}
+.dev-btn::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,237,78,.28),transparent);transform:translateX(-100%);transition:transform .7s}
 .dev-btn:hover::before{transform:translateX(100%)}
-.dev-btn:hover{background:linear-gradient(135deg,rgba(47,125,255,.28),rgba(139,92,246,.28));border-color:#2f7dff;transform:translateY(-2px);box-shadow:0 12px 32px rgba(47,125,255,.35)}
-.dev-name b{background:linear-gradient(90deg,#5aa9ff,#a78bfa,#22d3ee,#5aa9ff);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 3s linear infinite;font-weight:900;letter-spacing:.3px}
-@keyframes shine{0%{background-position:0% 50%}100%{background-position:300% 50%}}
-.tg-btn{background:rgba(34,158,217,.12);border-color:rgba(34,158,217,.3);color:#7dd3fc}
-.tg-btn:hover{background:rgba(34,158,217,.22);border-color:#229ed9;color:#fff;transform:translateY(-2px);box-shadow:0 10px 26px rgba(34,158,217,.3)}
-.swal-custom-popup{border:1px solid rgba(90,140,230,.3) !important;border-radius:22px !important;box-shadow:0 24px 70px rgba(0,0,0,.75) !important;font-family:'Tajawal','Cairo',sans-serif !important;backdrop-filter:blur(20px)}
-.swal-custom-title{color:#e8eefc !important;font-size:20px !important;font-weight:800 !important;font-family:'Tajawal','Cairo',sans-serif !important}
-.swal-custom-input{background:rgba(10,16,32,.75) !important;border:1.5px solid rgba(90,140,230,.3) !important;color:#e8eefc !important;border-radius:12px !important;font-family:'Tajawal','Cairo',sans-serif !important}
-.swal-custom-confirm{border-radius:12px !important;font-weight:700 !important;font-family:'Tajawal','Cairo',sans-serif !important;padding:10px 24px !important}
+.dev-btn:hover{background:linear-gradient(135deg,rgba(212,175,55,.32),rgba(184,134,11,.32));border-color:#FFD700;transform:translateY(-2px);box-shadow:var(--sh-gold)}
+.dev-name b{background:linear-gradient(90deg,#FFD700,#FFF3B0,#D4AF37,#FFD700);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 3s linear infinite;font-weight:900;letter-spacing:.3px}
+.tg-btn{background:rgba(212,175,55,.12);border-color:rgba(212,175,55,.35);color:#FFD700}
+.tg-btn:hover{background:rgba(212,175,55,.24);border-color:#FFD700;color:#FFF3B0;transform:translateY(-2px);box-shadow:var(--sh-gold)}
+.swal-custom-popup{
+  border:1px solid rgba(212,175,55,.4) !important;border-radius:22px !important;
+  box-shadow:0 24px 70px rgba(0,0,0,.85), 0 0 40px rgba(212,175,55,.2) !important;
+  font-family:'Tajawal','Cairo',sans-serif !important;backdrop-filter:blur(20px);
+}
+.swal-custom-title{color:#f7f0dd !important;font-size:20px !important;font-weight:800 !important;font-family:'Tajawal','Cairo',sans-serif !important}
+.swal-custom-input{background:rgba(15,12,7,.78) !important;border:1.5px solid rgba(212,175,55,.35) !important;color:#f7f0dd !important;border-radius:12px !important;font-family:'Tajawal','Cairo',sans-serif !important}
+.swal-custom-confirm{border-radius:12px !important;font-weight:700 !important;font-family:'Tajawal','Cairo',sans-serif !important;padding:10px 24px !important;background:var(--grad-gold) !important;color:#1a1206 !important}
 .swal-custom-cancel{border-radius:12px !important;font-weight:700 !important;font-family:'Tajawal','Cairo',sans-serif !important;padding:10px 24px !important}
 @media(max-width:1080px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:860px){
-  .sidebar{position:fixed;inset-inline-end:0;top:0;transform:translateX(-105%);transition:transform .34s;width:280px;box-shadow:-20px 0 60px rgba(0,0,0,.7)}
+  .sidebar{position:fixed;inset-inline-end:0;top:0;transform:translateX(-105%);transition:transform .34s;width:280px;box-shadow:-20px 0 60px rgba(0,0,0,.75)}
   .sidebar.open{transform:translateX(0)!important}
   .mbar{display:flex}
   .content{padding:14px 14px 90px}
@@ -169,7 +331,7 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
   .g2,.g3,.g4{grid-template-columns:1fr}
 }
 </style>
-</head>
+</head> 
 <body>
 <div id="root"></div>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -240,8 +402,8 @@ function AppProvider({children}){
     Swal.fire({
       title:'تسجيل الخروج',text:'هل أنت متأكد؟',icon:'question',
       showCancelButton:true,confirmButtonText:'نعم، خروج',cancelButtonText:'إلغاء',
-      confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
-      background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',
+      confirmButtonColor:'#D4AF37',cancelButtonColor:'#64748b',
+      background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',
       customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
     }).then(r=>{if(r.isConfirmed){DB.clearSession();window.location.replace('/auth/login.html');}});
   },[]);
@@ -318,7 +480,7 @@ function Modal({title,children,onClose,wide}){
     </div>
   </div>;
 }
-function Stat({label,value,icon,color='var(--blue)',sub}){
+function Stat({label,value,icon,color='var(--gold)',sub}){
   return <div className="glass-s hv" style={{padding:16}}>
     <div className="flex between center mb8">
       <div className="stat-l">{label}</div>
@@ -334,7 +496,6 @@ function Field({label,children,hint}){
 function Empty({icon='📭',title,desc}){
   return <div className="empty"><div className="empty-ico">{icon}</div><div className="h4 txt2 mb8">{title}</div>{desc&&<div className="sm">{desc}</div>}</div>;
 }
-
 function VideoEditor({value,onChange}){
   const v=value||{type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true};
   const set=(k,val)=>onChange({...v,[k]:val});
@@ -346,10 +507,10 @@ function VideoEditor({value,onChange}){
   ];
   const placeholder={youtube:'https://www.youtube.com/watch?v=xxxxx',vimeo:'https://vimeo.com/123456789',mp4:'https://example.com/video.mp4',external:'https://example.com/embed/xxxx'}[v.type];
   return <div className="glass-s" style={{padding:14,borderColor:'var(--border2)'}}>
-    <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="video" size={16}/> إعدادات الفيديو</div>
+    <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8,color:'var(--gold)'}}><Icon name="video" size={16}/> إعدادات الفيديو</div>
     <Field label="نوع الفيديو">
       <div className="flex wrap g6">
-        {types.map(t=><button key={t.id} type="button" onClick={()=>set('type',t.id)} style={{padding:'8px 14px',borderRadius:30,background:v.type===t.id?'rgba(47,125,255,.18)':'rgba(255,255,255,.05)',border:`1px solid ${v.type===t.id?'var(--blue)':'var(--border)'}`,fontSize:12.5,fontWeight:700,color:'var(--txt)'}}>{t.icon} {t.label}</button>)}
+        {types.map(t=><button key={t.id} type="button" onClick={()=>set('type',t.id)} style={{padding:'8px 14px',borderRadius:30,background:v.type===t.id?'rgba(212,175,55,.20)':'rgba(212,175,55,.05)',border:`1px solid ${v.type===t.id?'var(--gold)':'var(--border)'}`,fontSize:12.5,fontWeight:700,color:v.type===t.id?'#FFD700':'var(--txt)'}}>{t.icon} {t.label}</button>)}
       </div>
     </Field>
     <Field label="الرابط" hint={types.find(t=>t.id===v.type)?.hint}>
@@ -371,10 +532,10 @@ function VideoEditor({value,onChange}){
 
 function Sidebar({items,active,onNav,open,onClose}){
   return <>
-    {open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.5)',zIndex:55}}/>}
+    {open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',zIndex:55}}/>}
     <aside className={`sidebar ${open?'open':''}`}>
       <div className="brand">
-        <div className="brand-logo"><Icon name="trophy" size={22} color="#fff"/></div>
+        <div className="brand-logo"><Icon name="trophy" size={22} color="#1a1206"/></div>
         <div><div className="brand-name">MISSION EDU</div><div className="brand-sub">لوحة الإدارة</div></div>
       </div>
       {items.map((g,gi)=><div key={gi}>
@@ -401,7 +562,7 @@ function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick}){
   return <div className="topbar">
     <button className="icon-btn mbar" onClick={onMenu}><Icon name="menu" size={16}/></button>
     <div style={{position:'relative',flex:1,maxWidth:520}}>
-      <div className="search"><span style={{fontSize:15,opacity:.7}}>🔍</span><input value={q} onChange={e=>setQ(e.target.value)} placeholder="ابحث..."/>{q&&<button onClick={()=>{setQ('');setOpen(false);}} style={{opacity:.6,color:'var(--txt)'}}>✕</button>}</div>
+      <div className="search"><span style={{fontSize:15,opacity:.7,color:'var(--gold)'}}>🔍</span><input value={q} onChange={e=>setQ(e.target.value)} placeholder="ابحث..."/>{q&&<button onClick={()=>{setQ('');setOpen(false);}} style={{opacity:.6,color:'var(--txt)'}}>✕</button>}</div>
       {open&&searchResults?.length>0&&<div className="glass" style={{position:'absolute',top:'calc(100% + 8px)',insetInline:0,padding:8,zIndex:80,maxHeight:340,overflowY:'auto'}}>
         {searchResults.slice(0,10).map((r,i)=><button key={i} className="nav-i" onClick={()=>{onResultClick(r);setQ('');setOpen(false);}}>
           <span className="nav-ico">{r.icon}</span><div style={{flex:1,textAlign:'right'}}><div style={{fontSize:13.5}}>{r.title}</div><div className="xs muted">{r.type}</div></div>
@@ -409,11 +570,12 @@ function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick}){
       </div>}
     </div>
     <div className="flex center g8" style={{marginInlineStart:'auto'}}>
-      <div className="glass-s" style={{padding:'5px 12px',display:'flex',alignItems:'center',gap:8}}><div className="avatar" style={{width:32,height:32,fontSize:15}}>{user.avatar||'👑'}</div></div>
+      <div className="glass-s" style={{padding:'5px 12px',display:'flex',alignItems:'center',gap:8,borderColor:'var(--border2)'}}><div className="avatar" style={{width:32,height:32,fontSize:15}}>{user.avatar||'👑'}</div></div>
       <button className="icon-btn" onClick={onLogout}><Icon name="logout" size={16}/></button>
     </div>
   </div>;
 }
+
 function Dashboard(){
   const app=useApp();
   const students=app.db.users.filter(u=>u.role==='student');
@@ -437,18 +599,21 @@ function Dashboard(){
     if(!chart1Ref.current || !window.Chart) return;
     const ctx=chart1Ref.current.getContext("2d");
     if(chart1Instance.current) chart1Instance.current.destroy();
+    const g1=ctx.createLinearGradient(0,0,0,240);
+    g1.addColorStop(0,"rgba(255,215,0,0.85)");
+    g1.addColorStop(1,"rgba(139,105,20,0.5)");
     chart1Instance.current=new window.Chart(ctx,{
       type:"bar",
       data:{
         labels:top10.map(s=>s.name.split(" ")[0]),
-        datasets:[{label:"XP",data:top10.map(s=>s.xp||0),backgroundColor:"rgba(47, 125, 255, 0.6)",borderColor:"#2f7dff",borderWidth:2,borderRadius:10}]
+        datasets:[{label:"XP",data:top10.map(s=>s.xp||0),backgroundColor:g1,borderColor:"#FFD700",borderWidth:2,borderRadius:10}]
       },
       options:{
         responsive:true,maintainAspectRatio:false,
         plugins:{legend:{display:false}},
         scales:{
-          x:{ticks:{color:"#7f93b8",font:{family:"Tajawal",size:12}},grid:{display:false}},
-          y:{ticks:{color:"#7f93b8",font:{family:"Tajawal",size:12}},grid:{color:"rgba(90, 140, 230, 0.08)"}}
+          x:{ticks:{color:"#d4c79a",font:{family:"Tajawal",size:12}},grid:{display:false}},
+          y:{ticks:{color:"#d4c79a",font:{family:"Tajawal",size:12}},grid:{color:"rgba(212,175,55,0.08)"}}
         }
       }
     });
@@ -468,9 +633,9 @@ function Dashboard(){
       type:"doughnut",
       data:{
         labels:distribution.map(d=>d.name),
-        datasets:[{data:distribution.map(d=>d.count),backgroundColor:["rgba(47, 125, 255, 0.7)","rgba(139, 92, 246, 0.7)","rgba(34, 197, 94, 0.7)","rgba(245, 158, 11, 0.7)","rgba(236, 72, 153, 0.7)"],borderColor:"rgba(4, 6, 14, 0.6)",borderWidth:3}]
+        datasets:[{data:distribution.map(d=>d.count),backgroundColor:["rgba(255,215,0,0.8)","rgba(212,175,55,0.8)","rgba(184,134,11,0.8)","rgba(139,105,20,0.8)","rgba(92,69,9,0.8)"],borderColor:"rgba(10,8,5,0.7)",borderWidth:3}]
       },
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{color:"#b7c6e4",font:{family:"Tajawal",size:11},padding:12,boxWidth:14}}}}
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{color:"#d4c79a",font:{family:"Tajawal",size:11},padding:12,boxWidth:14}}}}
     });
     return ()=>{if(chart2Instance.current)chart2Instance.current.destroy();};
   },[students,app.db.levels]);
@@ -490,16 +655,16 @@ function Dashboard(){
     if (sorted.length === 0) return;
     
     const colors = [
-      "rgba(47, 125, 255, 0.7)",
-      "rgba(139, 92, 246, 0.7)",
-      "rgba(34, 197, 94, 0.7)",
-      "rgba(245, 158, 11, 0.7)",
-      "rgba(236, 72, 153, 0.7)",
-      "rgba(6, 182, 212, 0.7)",
-      "rgba(239, 68, 68, 0.7)",
-      "rgba(168, 85, 247, 0.7)",
-      "rgba(20, 184, 166, 0.7)",
-      "rgba(251, 191, 36, 0.7)"
+      "rgba(255,215,0,0.85)",
+      "rgba(212,175,55,0.85)",
+      "rgba(184,134,11,0.85)",
+      "rgba(245,222,110,0.85)",
+      "rgba(139,105,20,0.85)",
+      "rgba(255,237,78,0.85)",
+      "rgba(168,132,20,0.85)",
+      "rgba(220,190,80,0.85)",
+      "rgba(92,69,9,0.85)",
+      "rgba(255,240,150,0.85)"
     ];
     
     chart3Instance.current=new window.Chart(ctx,{
@@ -509,7 +674,7 @@ function Dashboard(){
         datasets: [{
           data: sorted.map(s => s[1]),
           backgroundColor: colors.slice(0, sorted.length),
-          borderColor: "rgba(4, 6, 14, 0.6)",
+          borderColor: "rgba(10,8,5,0.7)",
           borderWidth: 3
         }]
       },
@@ -520,7 +685,7 @@ function Dashboard(){
           legend:{
             position:"bottom",
             labels:{
-              color:"#b7c6e4",
+              color:"#d4c79a",
               font:{family:"Tajawal",size:11},
               padding:12,
               boxWidth:14
@@ -563,7 +728,7 @@ function Dashboard(){
     <div className="hero mb16">
       <div className="flex between center wrap g12">
         <div>
-          <div className="h2 mb6">لوحة تحكم الأدمن</div>
+          <div className="h2 mb6 grad">لوحة تحكم الأدمن</div>
           <div className="sm txt2">إدارة كاملة لكل محتوى المنصة</div>
         </div>
         <button className="btn btn-p" onClick={exportToCSV}>
@@ -573,25 +738,25 @@ function Dashboard(){
     </div>
     
     <div className="grid g4 mb16">
-      <Stat label="إجمالي الطلاب" value={DB.fmt(students.length)} icon="users" color="#5aa9ff"/>
+      <Stat label="إجمالي الطلاب" value={DB.fmt(students.length)} icon="users" color="#FFD700"/>
       <Stat label="الطلاب النشطون" value={DB.fmt(active)} icon="check" color="#22c55e"/>
-      <Stat label="عدد المواد" value={DB.fmt(app.db.subjects.length)} icon="book" color="#f59e0b"/>
-      <Stat label="عدد الدروس" value={DB.fmt(app.db.lessons.length)} icon="file" color="#8b5cf6"/>
-      <Stat label="الوحدات" value={DB.fmt(app.db.units.length)} icon="folder" color="#06b6d4"/>
-      <Stat label="الاختبارات" value={DB.fmt(app.db.exams.length)} icon="clipboard" color="#ec4899"/>
-      <Stat label="الأسئلة" value={DB.fmt(app.db.questions.length)} icon="help" color="#22c55e"/>
-      <Stat label="متوسط التقدم" value={`${avgProgress}%`} icon="trend" color="#2f7dff"/>
+      <Stat label="عدد المواد" value={DB.fmt(app.db.subjects.length)} icon="book" color="#D4AF37"/>
+      <Stat label="عدد الدروس" value={DB.fmt(app.db.lessons.length)} icon="file" color="#B8860B"/>
+      <Stat label="الوحدات" value={DB.fmt(app.db.units.length)} icon="folder" color="#FFED4E"/>
+      <Stat label="الاختبارات" value={DB.fmt(app.db.exams.length)} icon="clipboard" color="#D4AF37"/>
+      <Stat label="الأسئلة" value={DB.fmt(app.db.questions.length)} icon="help" color="#FFD700"/>
+      <Stat label="متوسط التقدم" value={`${avgProgress}%`} icon="trend" color="#FFD700"/>
     </div>
 
     <div className="grid g2 mb16">
       <div className="glass" style={{padding:18}}>
-        <div className="h4 mb12">📊 XP — أفضل 10 طلاب</div>
+        <div className="h4 mb12" style={{color:'var(--gold)'}}>📊 XP — أفضل 10 طلاب</div>
         <div style={{height:240,position:'relative'}}>
           <canvas ref={chart1Ref}></canvas>
         </div>
       </div>
       <div className="glass" style={{padding:18}}>
-        <div className="h4 mb12">🎯 توزيع المستويات</div>
+        <div className="h4 mb12" style={{color:'var(--gold)'}}>🎯 توزيع المستويات</div>
         <div style={{height:240,position:'relative'}}>
           <canvas ref={chart2Ref}></canvas>
         </div>
@@ -600,7 +765,7 @@ function Dashboard(){
 
     <div className="glass mb16" style={{padding:18}}>
       <div className="flex between center mb12 wrap g8">
-        <div className="h4">📍 توزيع الطلاب على المحافظات</div>
+        <div className="h4" style={{color:'var(--gold)'}}>📍 توزيع الطلاب على المحافظات</div>
         <span className="pill pill-b">{students.filter(s=>s.governorate).length} طالب</span>
       </div>
       <div style={{display:'grid',gridTemplateColumns:'minmax(0,1fr) minmax(0,1.2fr)',gap:16,alignItems:'center'}}>
@@ -617,14 +782,14 @@ function Dashboard(){
             const sorted = Object.entries(govStats).sort((a,b)=>b[1]-a[1]);
             
             return sorted.map(([gov, count], idx) => (
-              <div key={gov} className="flex between center" style={{padding:'8px 12px',borderBottom:'1px solid rgba(90,140,230,.08)'}}>
+              <div key={gov} className="flex between center" style={{padding:'8px 12px',borderBottom:'1px solid rgba(212,175,55,.08)'}}>
                 <div className="flex center g8">
                   <span className="pill pill-b" style={{fontSize:10, padding:'2px 8px'}}>{idx + 1}</span>
                   <span className="sm">📍 {gov}</span>
                 </div>
                 <div className="flex center g8">
-                  <div style={{width:'60px',height:'6px',background:'rgba(255,255,255,.07)',borderRadius:20,overflow:'hidden'}}>
-                    <div style={{width:`${(count/students.length)*100}%`,height:'100%',background:'linear-gradient(90deg,#2f7dff,#5aa9ff)'}}/>
+                  <div style={{width:'60px',height:'6px',background:'rgba(212,175,55,.12)',borderRadius:20,overflow:'hidden'}}>
+                    <div style={{width:`${(count/students.length)*100}%`,height:'100%',background:'var(--grad-gold)'}}/>
                   </div>
                   <span className="pill pill-g" style={{fontSize:11}}>{count}</span>
                 </div>
@@ -637,11 +802,11 @@ function Dashboard(){
 
     <div className="grid g2 mb16">
       <div className="glass" style={{padding:18}}>
-        <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="award" size={16}/> المتصدرون العشرة</div>
+        <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8,color:'var(--gold)'}}><Icon name="award" size={16}/> المتصدرون العشرة</div>
         {top10.length===0?<Empty icon="🏅" title="لا يوجد طلاب بعد"/>:
           top10.map((s,i)=>{
             const {current}=app.getLevel(s.xp||0);
-            return <div key={s.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid rgba(90,140,230,.08)'}}>
+            return <div key={s.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid rgba(212,175,55,.08)'}}>
               <div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div>
               <div className="avatar" style={{width:34,height:34,fontSize:14}}>{s.avatar||'👤'}</div>
               <div style={{flex:1}}>
@@ -655,7 +820,7 @@ function Dashboard(){
       </div>
       <div className="glass" style={{padding:18}}>
         <div className="flex between center mb12">
-          <div className="h4" style={{display:'flex',alignItems:'center',gap:8}}>
+          <div className="h4" style={{display:'flex',alignItems:'center',gap:8,color:'var(--gold)'}}>
             <Icon name="activity" size={16}/> آخر الأنشطة
           </div>
           <span className="pill pill-b">{app.db.activity?.length || 0}</span>
@@ -668,7 +833,7 @@ function Dashboard(){
           </div>
         ) : (
           recentAct.map(a => (
-            <div key={a.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid rgba(90,140,230,.08)'}}>
+            <div key={a.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid rgba(212,175,55,.08)'}}>
               <div className="act-ico"><Icon name="activity" size={16}/></div>
               <div style={{flex:1}}>
                 <div className="sm">{a.user_name || 'غير معروف'}</div>
@@ -682,7 +847,6 @@ function Dashboard(){
     </div>
   </>;
 }
-
 function ActivityLog(){
   const app=useApp();
   const [filter,setFilter]=useState('all');
@@ -713,7 +877,7 @@ function ActivityLog(){
   
   return <>
     <div className="flex between center mb16 wrap g8">
-      <div className="h2">سجل النشاط</div>
+      <div className="h2 grad">سجل النشاط</div>
       <div className="flex g8 center">
         <span className="pill pill-b">{list.length} نشاط</span>
         <select className="input" style={{maxWidth:220}} value={studentFilter} onChange={e=>setStudentFilter(e.target.value)}>
@@ -727,11 +891,11 @@ function ActivityLog(){
       {typeFilters.map(f=><button key={f.id} onClick={()=>setFilter(f.id)} style={{
         padding:'8px 14px',
         borderRadius:30,
-        background:filter===f.id?'rgba(47,125,255,.18)':'rgba(255,255,255,.05)',
-        border:`1px solid ${filter===f.id?'var(--blue)':'var(--border)'}`,
+        background:filter===f.id?'rgba(212,175,55,.20)':'rgba(212,175,55,.05)',
+        border:`1px solid ${filter===f.id?'var(--gold)':'var(--border)'}`,
         fontSize:12.5,
         fontWeight:700,
-        color:'var(--txt)',
+        color:filter===f.id?'#FFD700':'var(--txt)',
         cursor:'pointer'
       }}>{f.label}</button>)}
     </div>
@@ -789,7 +953,7 @@ function Crud({title,collection,defaultItem,fields,columns}){
       title:'تأكيد الحذف',text:'سيتم حذف هذا العنصر نهائيًا',icon:'warning',
       showCancelButton:true,confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',
       confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
-      background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',
+      background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',
       customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
     });
     if(!r.isConfirmed) return;
@@ -799,7 +963,7 @@ function Crud({title,collection,defaultItem,fields,columns}){
   const items=app.db[collection]||[];
   return <>
     <div className="flex between center mb16">
-      <div className="h2">{title}</div>
+      <div className="h2 grad">{title}</div>
       <button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> إضافة</button>
     </div>
     <div className="glass" style={{padding:14}}>
@@ -844,7 +1008,7 @@ function GradesPage(){return <Crud title="🏫 إدارة الصفوف" collecti
 
 function SubjectsPage(){
   const app=useApp();
-  return <Crud title="📚 إدارة المواد" collection="subjects" defaultItem={()=>({name:'',desc:'',icon:'📚',color:'#2f7dff',sort_order:1,grade_id:''})} fields={[
+  return <Crud title="📚 إدارة المواد" collection="subjects" defaultItem={()=>({name:'',desc:'',icon:'📚',color:'#D4AF37',sort_order:1,grade_id:''})} fields={[
     {key:'name',label:'اسم المادة'},{key:'icon',label:'الأيقونة'},{key:'color',label:'اللون'},{key:'sort_order',label:'الترتيب',type:'number'},
     {key:'grade_id',label:'الصف',type:'select',options:a=>a.db.grades.map(g=>({value:g.id,label:g.name}))},{key:'desc',label:'الوصف',type:'textarea',full:true}
   ]} columns={[
@@ -877,19 +1041,32 @@ function LessonsPage(){
     setBusy(false);
   };
   const del=async id=>{
-    const r=await Swal.fire({title:'حذف الدرس؟',text:'لا يمكن التراجع',icon:'warning',showCancelButton:true,confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+    const r=await Swal.fire({title:'حذف الدرس؟',text:'لا يمكن التراجع',icon:'warning',showCancelButton:true,confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
     if(!r.isConfirmed) return;
     try{await app.remove('lessons',id);app.toast.warn('تم الحذف');}
     catch(e){app.toast.err(e.message);}
   };
   const badge=l=>{if(!l.video||!l.video.url)return <span className="pill pill-y">لا فيديو</span>;const map={youtube:'📺 YouTube',vimeo:'🎬 Vimeo',mp4:'🎥 MP4',external:'🔗 خارجي'};return <span className="pill pill-b">{map[l.video.type]||l.video.type}</span>;};
+
+  // ✅ الترتيب: الأقدم أولاً (sort_order ثم created_at)
+  const sortedLessons = useMemo(()=>{
+    return [...app.db.lessons].sort((a,b)=>{
+      const sa = a.sort_order ?? 999999;
+      const sb = b.sort_order ?? 999999;
+      if(sa !== sb) return sa - sb;
+      const ta = new Date(a.created_at || 0).getTime();
+      const tb = new Date(b.created_at || 0).getTime();
+      return ta - tb;
+    });
+  },[app.db.lessons]);
+
   return <>
-    <div className="flex between center mb16"><div className="h2">📖 إدارة الدروس</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> درس جديد</button></div>
+    <div className="flex between center mb16"><div className="h2 grad">📖 إدارة الدروس</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> درس جديد</button></div>
     <div className="glass" style={{padding:14}}>
       {app.db.lessons.length===0?<Empty title="لا توجد دروس"/>:
         <div className="sx"><table className="tbl">
           <thead><tr><th>الدرس</th><th>الوحدة</th><th>الفيديو</th><th>XP</th><th>الحالة</th><th>إجراءات</th></tr></thead>
-          <tbody>{app.db.lessons.map(l=><tr key={l.id}>
+          <tbody>{sortedLessons.map(l=><tr key={l.id}>
             <td><b>{l.title}</b></td><td className="sm">{app.unit(l.unit_id)?.name||'—'}</td><td>{badge(l)}</td><td>{l.xp}</td>
             <td>{l.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td>
             <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(l)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(l.id)}><Icon name="trash" size={13}/></button></div></td>
@@ -915,6 +1092,7 @@ function LessonsPage(){
     </Modal>}
   </>;
 }
+
 function QuestionsPage(){
   const app=useApp();
   const [editing,setEditing]=useState(null);
@@ -990,7 +1168,7 @@ function QuestionsPage(){
       title:'حذف السؤال؟',icon:'warning',showCancelButton:true,
       confirmButtonText:'نعم',cancelButtonText:'إلغاء',
       confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
-      background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',
+      background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',
       customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
     });
     if(!r.isConfirmed) return;
@@ -1012,9 +1190,18 @@ function QuestionsPage(){
     ? app.db.questions
     : app.db.questions.filter(q=>q.lesson_id === filterLesson);
 
+  // ✅ الترتيب: الأقدم أولاً
+  const sortedQuestions = useMemo(()=>{
+    return [...filteredQuestions].sort((a,b)=>{
+      const ta = new Date(a.created_at || 0).getTime();
+      const tb = new Date(b.created_at || 0).getTime();
+      return ta - tb;
+    });
+  },[filteredQuestions]);
+
   return <>
     <div className="flex between center mb16 wrap g8">
-      <div className="h2">❓ بنك الأسئلة</div>
+      <div className="h2 grad">❓ بنك الأسئلة</div>
       <div className="flex g8">
         <button className="btn btn-s" onClick={()=>setBulkMode(true)}>
           <Icon name="plus" size={14}/> إضافة مجموعة أسئلة
@@ -1036,14 +1223,14 @@ function QuestionsPage(){
           })}
         </select>
       </div>
-      <span className="pill pill-b">{filteredQuestions.length} سؤال</span>
+      <span className="pill pill-b">{sortedQuestions.length} سؤال</span>
     </div>
 
     <div className="glass" style={{padding:14}}>
-      {filteredQuestions.length===0?<Empty title="لا توجد أسئلة"/>:
+      {sortedQuestions.length===0?<Empty title="لا توجد أسئلة"/>:
         <div className="sx"><table className="tbl">
           <thead><tr><th>السؤال</th><th>الدرس</th><th>الصعوبة</th><th>XP</th><th>إجراءات</th></tr></thead>
-          <tbody>{filteredQuestions.map(q=><tr key={q.id}>
+          <tbody>{sortedQuestions.map(q=><tr key={q.id}>
             <td style={{maxWidth:340}}>{q.text.slice(0,80)}{q.text.length>80?'...':''}</td>
             <td className="sm">{app.lesson(q.lesson_id)?.title||'—'}</td>
             <td><span className={`pill ${q.difficulty==='easy'?'pill-g':q.difficulty==='hard'?'pill-r':'pill-a'}`}>{q.difficulty}</span></td>
@@ -1151,7 +1338,6 @@ function QuestionsPage(){
     </Modal>}
   </>;
 }
-
 function ExamsPage(){
   const app=useApp();
   const [editing,setEditing]=useState(null);
@@ -1168,18 +1354,28 @@ function ExamsPage(){
     setBusy(false);
   };
   const del=async id=>{
-    const r=await Swal.fire({title:'حذف الاختبار؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+    const r=await Swal.fire({title:'حذف الاختبار؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
     if(!r.isConfirmed) return;
     try{await app.remove('exams',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}
   };
   const availQ=form.unit_id?app.db.questions.filter(q=>q.unit_id===form.unit_id):app.db.questions;
+
+  // ✅ الترتيب: الأقدم أولاً
+  const sortedExams = useMemo(()=>{
+    return [...app.db.exams].sort((a,b)=>{
+      const ta = new Date(a.created_at || 0).getTime();
+      const tb = new Date(b.created_at || 0).getTime();
+      return ta - tb;
+    });
+  },[app.db.exams]);
+
   return <>
-    <div className="flex between center mb16"><div className="h2">📝 إدارة الاختبارات</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> اختبار جديد</button></div>
+    <div className="flex between center mb16"><div className="h2 grad">📝 إدارة الاختبارات</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> اختبار جديد</button></div>
     <div className="glass" style={{padding:14}}>
-      {app.db.exams.length===0?<Empty title="لا توجد اختبارات"/>:
+      {sortedExams.length===0?<Empty title="لا توجد اختبارات"/>:
         <div className="sx"><table className="tbl">
           <thead><tr><th>العنوان</th><th>المادة</th><th>الأسئلة</th><th>النجاح</th><th>إجراءات</th></tr></thead>
-          <tbody>{app.db.exams.map(e=><tr key={e.id}>
+          <tbody>{sortedExams.map(e=><tr key={e.id}>
             <td>{e.title}</td><td className="sm">{app.subject(e.subject_id)?.name||'—'}</td>
             <td>{(e.question_ids||[]).length}</td><td>{e.pass_score}%</td>
             <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(e)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(e.id)}><Icon name="trash" size={13}/></button></div></td>
@@ -1228,12 +1424,12 @@ function MissionsPage(){
     setBusy(false);
   };
   const del=async id=>{
-    const r=await Swal.fire({title:'حذف المهمة؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+    const r=await Swal.fire({title:'حذف المهمة؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
     if(!r.isConfirmed) return;
     try{await app.remove('missions',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}
   };
   return <>
-    <div className="flex between center mb16"><div className="h2">🎯 إدارة المهام</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> مهمة جديدة</button></div>
+    <div className="flex between center mb16"><div className="h2 grad">🎯 إدارة المهام</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> مهمة جديدة</button></div>
     <div className="glass" style={{padding:14}}>
       {app.db.missions.length===0?<Empty title="لا توجد مهام"/>:
         <div className="sx"><table className="tbl">
@@ -1345,10 +1541,10 @@ function StudentsPage(){
       showCancelButton: true,
       confirmButtonText: `نعم، ${action}`,
       cancelButtonText: 'إلغاء',
-      confirmButtonColor: s.active !== false ? '#ef4444' : '#22c55e',
+      confirmButtonColor: s.active !== false ? '#ef4444' : '#D4AF37',
       cancelButtonColor: '#64748b',
-      background: 'linear-gradient(180deg, #151f38, #0b1122)',
-      color: '#e8eefc',
+      background: 'linear-gradient(180deg, #1c160c, #0f0c07)',
+      color: '#f7f0dd',
       customClass: { popup: 'swal-custom-popup', title: 'swal-custom-title' }
     });
     if (!r.isConfirmed) return;
@@ -1368,7 +1564,7 @@ function StudentsPage(){
 
   return <>
     <div className="flex between center mb16 wrap g8">
-      <div className="h2">إدارة الطلاب</div>
+      <div className="h2 grad">إدارة الطلاب</div>
       <div className="flex g8 wrap">
         <input
           className="input"
@@ -1423,7 +1619,7 @@ function StudentsPage(){
                     : <span className="xs muted">—</span>
                   }
                 </td>
-                <td><b>{DB.fmt(s.xp||0)}</b></td>
+                <td><b style={{color:'var(--gold)'}}>{DB.fmt(s.xp||0)}</b></td>
                 <td>
                   {s.active!==false
                     ? <span className="pill pill-g">نشط</span>
@@ -1504,11 +1700,11 @@ function StudentsPage(){
                     style={{
                       padding:'8px 14px',
                       borderRadius:30,
-                      background: on ? 'rgba(47,125,255,.18)' : 'rgba(255,255,255,.05)',
-                      border: `1px solid ${on?'var(--blue)':'var(--border)'}`,
+                      background: on ? 'rgba(212,175,55,.20)' : 'rgba(212,175,55,.05)',
+                      border: `1px solid ${on?'var(--gold)':'var(--border)'}`,
                       fontSize:12.5,
                       fontWeight:700,
-                      color:'var(--txt)',
+                      color: on ? '#FFD700' : 'var(--txt)',
                       cursor:'pointer'
                     }}
                   >
@@ -1543,15 +1739,15 @@ function NotificationsPage(){
     setBusy(false);
   };
   const del=async id=>{
-    const r=await Swal.fire({title:'حذف الإشعار؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+    const r=await Swal.fire({title:'حذف الإشعار؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
     if(!r.isConfirmed) return;
     try{await app.remove('notifications',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}
   };
   return <>
-    <div className="h2 mb16">الإشعارات</div>
+    <div className="h2 mb16 grad">الإشعارات</div>
     <div className="grid g2">
       <div className="glass" style={{padding:20}}>
-        <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="bell" size={16}/> إرسال إشعار</div>
+        <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8,color:'var(--gold)'}}><Icon name="bell" size={16}/> إرسال إشعار</div>
         <Field label="العنوان"><input className="input" value={form.title} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
         <Field label="النص"><textarea className="input" value={form.body} onChange={e=>setForm({...form,body:e.target.value})}/></Field>
         <Field label="المستهدفون"><select className="input" value={form.target} onChange={e=>setForm({...form,target:e.target.value})}>
@@ -1561,13 +1757,13 @@ function NotificationsPage(){
         <button className="btn btn-p btn-block" onClick={send} disabled={busy}>{busy?'جارٍ...':'📤 إرسال'}</button>
       </div>
       <div className="glass" style={{padding:20}}>
-        <div className="h4 mb12">آخر الإشعارات</div>
+        <div className="h4 mb12" style={{color:'var(--gold)'}}>آخر الإشعارات</div>
         {app.db.notifications.slice(0,10).map(n=><div key={n.id} className="glass-s mb8" style={{padding:12,display:'flex',gap:10,alignItems:'flex-start'}}>
           <div style={{flex:1}}>
             <div className="h4" style={{fontSize:14}}>{n.title}</div>
             <div className="xs muted">{n.body}</div>
             <div className="flex between center mt6">
-              <div className="xs" style={{color:'var(--blue2)'}}>← {n.target==='all'?'كل الطلاب':app.db.users.find(u=>u.id===n.target)?.name||'—'}</div>
+              <div className="xs" style={{color:'var(--gold)'}}>← {n.target==='all'?'كل الطلاب':app.db.users.find(u=>u.id===n.target)?.name||'—'}</div>
               <div className="xs muted">{DB.formatDate(n.created_at)}</div>
             </div>
           </div>
@@ -1592,7 +1788,7 @@ function ReportsPage(){
     })();
   },[]);
   return <>
-    <div className="h2 mb16">📨 البلاغات المستلمة</div>
+    <div className="h2 mb16 grad">📨 البلاغات المستلمة</div>
     <div className="glass" style={{padding:20}}>
       {loading?<div style={{textAlign:'center',padding:20}}><div className="spinner" style={{margin:'0 auto 14px'}}></div>جارٍ التحميل...</div>:
         reports.length===0?<Empty icon="📨" title="لا توجد بلاغات"/>:
@@ -1603,7 +1799,7 @@ function ReportsPage(){
               <span className="xs muted">{DB.formatDateTime(r.created_at)}</span>
             </div>
             <div className="xs muted mb8" dir="ltr">📱 {r.user_phone}</div>
-            <div className="sm txt2" style={{background:'rgba(0,0,0,.2)',padding:10,borderRadius:10}}>{r.message}</div>
+            <div className="sm txt2" style={{background:'rgba(0,0,0,.25)',padding:10,borderRadius:10,borderInlineStart:'2px solid var(--gold)'}}>{r.message}</div>
           </div>)}
         </div>
       }
@@ -1614,9 +1810,9 @@ function ReportsPage(){
 function SettingsPage(){
   const app=useApp();
   return <>
-    <div className="h2 mb16">الإعدادات</div>
+    <div className="h2 mb16 grad">الإعدادات</div>
     <div className="glass" style={{padding:20,maxWidth:640}}>
-      <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="settings" size={16}/> معلومات النظام</div>
+      <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8,color:'var(--gold)'}}><Icon name="settings" size={16}/> معلومات النظام</div>
       <div className="glass-s mb12" style={{padding:12}}>
         <div className="xs muted">Supabase URL</div>
         <div className="xs" style={{wordBreak:'break-all'}}>https://szuvpbdwixezecxnykjn.supabase.co</div>
@@ -1644,7 +1840,7 @@ function Footer(){
       showCancelButton: true,
       confirmButtonText: '📤 إرسال',
       cancelButtonText: 'إلغاء',
-      confirmButtonColor: '#2f7dff',
+      confirmButtonColor: '#D4AF37',
       cancelButtonColor: '#64748b',
       inputValidator: (value) => {
         if (!value || value.trim().length < 5) return 'يرجى كتابة رسالة واضحة (5 أحرف على الأقل)';
@@ -1663,8 +1859,8 @@ function Footer(){
         title: 'جارٍ الإرسال...',
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
-        background: 'linear-gradient(180deg, #151f38, #0b1122)',
-        color: '#e8eefc',
+        background: 'linear-gradient(180deg, #1c160c, #0f0c07)',
+        color: '#f7f0dd',
         customClass: {popup: 'swal-custom-popup'}
       });
       
@@ -1679,9 +1875,9 @@ function Footer(){
         title: sent ? '✅ تم الإرسال' : '❌ فشل الإرسال',
         text: sent ? 'تم استلام بلاغك، شكرًا لك' : 'حدث خطأ، حاول مرة أخرى',
         confirmButtonText: 'حسنًا',
-        confirmButtonColor: '#2f7dff',
-        background: 'linear-gradient(180deg, #151f38, #0b1122)',
-        color: '#e8eefc',
+        confirmButtonColor: '#D4AF37',
+        background: 'linear-gradient(180deg, #1c160c, #0f0c07)',
+        color: '#f7f0dd',
         customClass: {popup: 'swal-custom-popup', title: 'swal-custom-title', confirmButton: 'swal-custom-confirm'}
       });
     }
