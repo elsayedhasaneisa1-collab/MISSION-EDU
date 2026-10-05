@@ -1380,23 +1380,6 @@ function CertificatesPage(){
     }
     setBusy(false);
   };
-
-    const imgData = canvas.toDataURL('image/jpeg', 0.95);
-    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-    const pdfW = pdf.internal.pageSize.getWidth();
-    const pdfH = pdf.internal.pageSize.getHeight();
-    pdf.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
-
-    pdf.save(`شهادة_${subject?.name || 'مادة'}.pdf`);
-
-    document.body.removeChild(container);
-    app.toast.ok('✅ تم تحميل الشهادة');
-  }catch(e){
-    console.error(e);
-    app.toast.err('❌ فشل توليد الشهادة');
-  }
-  setBusy(false);
-};  return <>
     <div className="flex between center mb16 wrap g8">
       <div>
         <div className="h2 grad">🏆 شهاداتي</div>
