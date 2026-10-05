@@ -1533,17 +1533,16 @@ function StudentApp(){
   const unread=app.db.notifications.filter(n=>(n.target==='all'||n.target===user.id)&&!(n.read_by||[]).includes(user.id)).length;
 
   const items=[{title:'',items:[
-    {id:'home',icon:'home',label:'الرئيسية'},
-    {id:'subjects',icon:'book',label:'المواد'},
-    {id:'missions',icon:'target',label:'المهام'},
-    {id:'achievements',icon:'trophy',label:'الإنجازات'},
-    {id:'notes',icon:'note',label:'ملاحظاتي',badge:app.notes?.length||null},
-    {id:'certificates',icon:'award',label:'شهاداتي',badge:app.certificates?.length||null},
-    {id:'errors',icon:'alert',label:'دفتر أخطائي'},
-    {id:'leaderboard',icon:'medal',label:'المتصدرون'},
-    {id:'notifications',icon:'bell',label:'الإشعارات',badge:unread||null},
-    {id:'profile',icon:'user',label:'الملف الشخصي'}
-  ]}];
+  {id:'home',icon:'home',label:'الرئيسية'},
+  {id:'subjects',icon:'book',label:'المواد'},
+  {id:'missions',icon:'target',label:'المهام'},
+  {id:'achievements',icon:'trophy',label:'الإنجازات'},
+  {id:'notes',icon:'note',label:'ملاحظاتي',badge:app.notes?.length||null},
+  {id:'errors',icon:'alert',label:'دفتر أخطائي'},
+  {id:'leaderboard',icon:'medal',label:'المتصدرون'},
+  {id:'notifications',icon:'bell',label:'الإشعارات',badge:unread||null},
+  {id:'profile',icon:'user',label:'الملف الشخصي'}
+]}];
 
   const onSearch=q=>{
     const lc=q.toLowerCase(),res=[];
@@ -1575,7 +1574,6 @@ function StudentApp(){
         {tab==='missions'&&<Missions setSelected={setSelected} setTab={setTab}/>}
         {tab==='achievements'&&<Achievements/>}
         {tab==='notes'&&<NotesPage setTab={setTab}/>}
-        {tab==='certificates'&&<CertificatesPage/>}
         {tab==='errors'&&<ErrorBook/>}
         {tab==='leaderboard'&&<Leaderboard/>}
         {tab==='notifications'&&<Notifications/>}
@@ -1584,13 +1582,12 @@ function StudentApp(){
       </div>
     </div>
     <div className="btmnav">
-      {[
-        {id:'home',icon:'home',label:'الرئيسية'},
-        {id:'subjects',icon:'book',label:'المواد'},
-        {id:'missions',icon:'target',label:'المهام'},
-        {id:'notes',icon:'note',label:'ملاحظاتي'},
-        {id:'certificates',icon:'award',label:'شهاداتي'}
-      ].map(it=><button key={it.id} className={tab===it.id?'on':''} onClick={()=>handleNav(it.id)}>
+  {[
+    {id:'home',icon:'home',label:'الرئيسية'},
+    {id:'subjects',icon:'book',label:'المواد'},
+    {id:'missions',icon:'target',label:'المهام'},
+    {id:'notes',icon:'note',label:'ملاحظاتي'}
+  ].map(it=><button key={it.id} className={tab===it.id?'on':''} onClick={()=>handleNav(it.id)}>
         <span className="i"><Icon name={it.icon} size={19}/></span>
         <span className="lbl-txt">{it.label}</span>
       </button>)}
