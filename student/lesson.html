@@ -64,6 +64,7 @@ ul{list-style:none}
 @keyframes sp{to{transform:rotate(360deg)}}
 @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes pulsePlay{0%,100%{box-shadow:0 16px 50px rgba(47,125,255,.55),0 0 0 0 rgba(47,125,255,.5)}50%{box-shadow:0 16px 50px rgba(47,125,255,.55),0 0 0 24px rgba(47,125,255,0)}}
+@keyframes pu{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
 .fade-in{animation:fu .5s}
 .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(6,9,20,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
 .back-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--txt2);font-size:13.5px;font-weight:700;transition:.2s;text-decoration:none}
@@ -71,7 +72,7 @@ ul{list-style:none}
 .avatar{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:14px;background:linear-gradient(140deg,#2f7dff,#8b5cf6);color:#fff;flex-shrink:0}
 .grid-main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px}
 @media(max-width:900px){.grid-main{grid-template-columns:1fr}}
-.vid-shell{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#000;border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.6);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;isolation:isolate}
+.vid-shell{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#000;border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.6);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;isolation:isolate;cursor:pointer}
 .vp-error{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:'Tajawal','Cairo',sans-serif;text-align:center;padding:20px}
 .example{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px}
 .example-q{font-size:13px;font-weight:700;margin-bottom:6px;color:var(--txt2)}
@@ -88,6 +89,128 @@ ul{list-style:none}
 .swal-custom-popup{border:1px solid rgba(90,140,230,.3) !important;border-radius:22px !important;background:linear-gradient(180deg, #151f38, #0b1122) !important;color:#e8eefc !important;font-family:'Tajawal','Cairo',sans-serif !important}
 .swal-custom-title{color:#e8eefc !important;font-weight:800 !important;font-family:'Tajawal','Cairo',sans-serif !important}
 .swal-custom-input{background:rgba(10,16,32,.75) !important;border:1.5px solid rgba(90,140,230,.3) !important;color:#e8eefc !important;border-radius:12px !important}
+
+/* ═══════════════════════════════════════════════════
+   🎬 مشغل الفيديو (Modal)
+   ═══════════════════════════════════════════════════ */
+.player-modal{
+  position:fixed;inset:0;z-index:9999;
+  background:rgba(3,5,12,.94);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  animation:pu .3s;
+}
+.player-modal.open{display:flex}
+.player-box{
+  position:relative;
+  width:100%;max-width:1200px;
+  background:#000;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 30px 90px rgba(0,0,0,.9),0 0 0 1px rgba(90,140,230,.25);
+}
+.player-header{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 18px;
+  background:linear-gradient(180deg,rgba(21,31,56,.98),rgba(11,17,34,.98));
+  border-bottom:1px solid var(--border);
+}
+.player-title{
+  flex:1;min-width:0;
+  font-size:14.5px;font-weight:800;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.player-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 11px;border-radius:20px;
+  font-size:10.5px;font-weight:700;
+  background:rgba(34,197,94,.12);
+  color:#6ee7a0;
+  border:1px solid rgba(34,197,94,.28);
+}
+.player-badge::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:#22c55e;box-shadow:0 0 8px #22c55e;
+  animation:pulse 2s infinite;
+}
+.player-close{
+  width:38px;height:38px;border-radius:11px;
+  display:grid;place-items:center;
+  background:rgba(239,68,68,.12);
+  border:1px solid rgba(239,68,68,.3);
+  color:#fca5a5;
+  font-size:18px;font-weight:900;
+  transition:.2s;
+  cursor:pointer;flex-shrink:0;
+}
+.player-close:hover{background:rgba(239,68,68,.25);color:#fff}
+
+.player-stage{
+  position:relative;
+  width:100%;
+  aspect-ratio:16/9;
+  background:#000;
+  overflow:hidden;
+  user-select:none;-webkit-user-select:none;
+  -webkit-touch-callout:none;
+  isolation:isolate;
+}
+.player-stage iframe{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  border:0;display:block;
+}
+
+/* ─── العلامة المائية ─── */
+.watermark{
+  position:absolute;
+  z-index:100;
+  font-size:15px;
+  font-weight:900;
+  font-family:'Cairo','Tajawal',sans-serif;
+  color:rgba(255,60,60,.32);
+  text-shadow:0 0 4px rgba(255,60,60,.15),1px 1px 1px rgba(0,0,0,.3);
+  padding:0;
+  background:transparent;
+  border:none;
+  outline:none;
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-select:none;
+  white-space:nowrap;
+  transition:top 1.8s cubic-bezier(.4,0,.2,1),left 1.8s cubic-bezier(.4,0,.2,1);
+  letter-spacing:1px;
+  direction:ltr;
+}
+
+/* ─── حماية الفيديو ─── */
+.player-stage::before{
+  content:'';
+  position:absolute;inset:0;z-index:50;
+  pointer-events:none;
+}
+.player-shield{
+  position:absolute;
+  top:0;left:0;right:0;height:44px;
+  z-index:60;
+  pointer-events:auto;
+  cursor:default;
+}
+
+/* ─── تعبئة الشاشة ─── */
+@media(max-width:640px){
+  .player-modal{padding:8px}
+  .player-box{border-radius:14px}
+  .player-header{padding:10px 12px}
+  .player-title{font-size:12.5px}
+  .player-badge{display:none}
+  .player-close{width:34px;height:34px;font-size:16px}
+  .watermark{font-size:12px}
+}
 </style>
 </head>
 <body>
@@ -104,6 +227,24 @@ ul{list-style:none}
 
 <div class="wrap" id="app">
   <div class="loading"><div class="spinner"></div>جارٍ تحميل الدرس...</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     🎬 مشغل الفيديو (Modal)
+     ═══════════════════════════════════════════════════ -->
+<div class="player-modal" id="playerModal">
+  <div class="player-box">
+    <div class="player-header">
+      <div class="player-title" id="playerTitle">جارٍ التحميل...</div>
+      <span class="player-badge">محمي</span>
+      <button class="player-close" id="playerClose" aria-label="إغلاق">✕</button>
+    </div>
+    <div class="player-stage" id="playerStage">
+      <div class="player-shield"></div>
+      <div class="watermark" id="watermark" style="top:20px;left:20px">MISSION EDU</div>
+      <div id="playerContainer"></div>
+    </div>
+  </div>
 </div>
 
 <div class="footer-dev">
@@ -139,84 +280,232 @@ ul{list-style:none}
     unitPct: 0,
     doneUnit: 0,
     totalUnit: 0,
-    isDone: false
+    isDone: false,
+    watermarkTimer: null,
+    currentCorner: 0
   };
 
   function esc(str){
     return String(str||"").replace(/[&<>"']/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[s]);
   }
 
+  function getYouTubeId(url){
+    if(!url) return "";
+    const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
+    return m ? m[1] : "";
+  }
+
   // ═══════════════════════════════════════════════════
-  //  مشغل الفيديو: غطاء يفتح player.html
+  //  🎬 تشغيل الفيديو في Modal
   // ═══════════════════════════════════════════════════
-  function buildPlayerHTML(video, lessonTitle, watermark){
+  function openPlayer(lesson, user){
+    const video = lesson.video || {};
+    const url = video.url || "";
+    const type = video.type || "youtube";
+
+    if(!url){
+      Swal.fire({
+        icon: 'warning',
+        title: 'لا يوجد فيديو',
+        text: 'هذا الدرس لا يحتوي على فيديو',
+        background: 'linear-gradient(180deg, #151f38, #0b1122)',
+        color: '#e8eefc',
+        confirmButtonColor: '#2f7dff',
+        customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
+      });
+      return;
+    }
+
+    // تحديث عنوان المشغل
+    const playerTitle = document.getElementById('playerTitle');
+    if(playerTitle) playerTitle.textContent = lesson.title || 'الدرس';
+
+    // تحديث العلامة المائية = رقم الطالب
+    const watermark = document.getElementById('watermark');
+    if(watermark){
+      const phone = user.phone || user.name || 'طالب';
+      watermark.textContent = phone;
+    }
+
+    // بناء الفيديو
+    const container = document.getElementById('playerContainer');
+    if(container){
+      if(type === 'youtube'){
+        const ytId = getYouTubeId(url);
+        if(ytId){
+          container.innerHTML = `<iframe
+            src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&fs=1&autoplay=1"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+            allowfullscreen
+            referrerpolicy="strict-origin-when-cross-origin"
+            title="فيديو الدرس"
+          ></iframe>`;
+        } else {
+          container.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:Tajawal,sans-serif">رابط YouTube غير صالح</div>`;
+        }
+      } else if(type === 'vimeo'){
+        const vId = (url.match(/vimeo\.com\/(?:video\/)?(\d+)/) || [])[1];
+        container.innerHTML = `<iframe
+          src="https://player.vimeo.com/video/${vId}?byline=0&portrait=0&title=0&dnt=1&autoplay=1"
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowfullscreen
+          title="فيديو الدرس"
+        ></iframe>`;
+      } else if(type === 'mp4'){
+        container.innerHTML = `<video
+          id="mp4Video"
+          controls
+          controlsList="nodownload noremoteplayback noplaybackrate nofullscreen"
+          disablePictureInPicture
+          playsinline
+          autoplay
+          style="position:absolute;inset:0;width:100%;height:100%;background:#000;object-fit:contain"
+        >
+          <source src="${esc(url)}" type="video/mp4"/>
+        </video>`;
+      } else {
+        container.innerHTML = `<iframe
+          src="${esc(url)}"
+          allowfullscreen
+          sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"
+          title="فيديو الدرس"
+        ></iframe>`;
+      }
+    }
+
+    // إظهار المشغل
+    const modal = document.getElementById('playerModal');
+    if(modal){
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // بدء تحريك العلامة المائية
+    startWatermarkMotion();
+
+    // تسجيل النشاط
+    try{
+      DB.trackActivity({
+        userId: user.id, userName: user.name,
+        type: "video_play", target: lesson.title,
+        details: { lesson: lesson.title }
+      });
+    }catch(e){}
+  }
+
+  function closePlayer(){
+    const modal = document.getElementById('playerModal');
+    if(modal) modal.classList.remove('open');
+    document.body.style.overflow = '';
+
+    // تفريغ الفيديو لوقف التشغيل
+    const container = document.getElementById('playerContainer');
+    if(container) container.innerHTML = '';
+
+    // إيقاف العلامة المائية
+    stopWatermarkMotion();
+  }
+
+  // ═══════════════════════════════════════════════════
+  //  📍 تحريك العلامة المائية كل 5 ثواني
+  // ═══════════════════════════════════════════════════
+  const CORNERS = [
+    {top:'8%', left:'5%'},
+    {top:'8%', right:'5%', left:'auto'},
+    {top:'50%', left:'5%', top:'40%'},
+    {top:'40%', right:'5%', left:'auto'},
+    {top:'80%', left:'40%'}
+  ];
+
+  function moveWatermark(){
+    const wm = document.getElementById('watermark');
+    const stage = document.getElementById('playerStage');
+    if(!wm || !stage) return;
+
+    const w = stage.offsetWidth;
+    const h = stage.offsetHeight;
+
+    // إحداثيات عشوائية داخل الفيديو
+    const maxX = Math.max(20, w - 180);
+    const maxY = Math.max(20, h - 50);
+
+    const x = Math.floor(Math.random() * maxX) + 10;
+    const y = Math.floor(Math.random() * maxY) + 10;
+
+    wm.style.left = x + 'px';
+    wm.style.top = y + 'px';
+    wm.style.right = 'auto';
+    wm.style.bottom = 'auto';
+  }
+
+  function startWatermarkMotion(){
+    moveWatermark();
+    state.watermarkTimer = setInterval(moveWatermark, 5000);
+  }
+
+  function stopWatermarkMotion(){
+    if(state.watermarkTimer){
+      clearInterval(state.watermarkTimer);
+      state.watermarkTimer = null;
+    }
+  }
+
+  // ═══════════════════════════════════════════════════
+  //  🛡 حماية الفيديو
+  // ═══════════════════════════════════════════════════
+  function attachProtection(){
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    document.addEventListener('keydown', e => {
+      if(e.key === 'F12'){ e.preventDefault(); return false; }
+      if(e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())){ e.preventDefault(); return false; }
+      if(e.ctrlKey && e.key.toUpperCase() === 'U'){ e.preventDefault(); return false; }
+      if(e.ctrlKey && e.key.toUpperCase() === 'S'){ e.preventDefault(); return false; }
+      if(e.ctrlKey && e.key.toUpperCase() === 'P'){ e.preventDefault(); return false; }
+      if(e.key === 'PrintScreen'){
+        try{ navigator.clipboard.writeText(''); }catch(err){}
+      }
+      // ESC لإغلاق المشغل
+      if(e.key === 'Escape'){
+        const modal = document.getElementById('playerModal');
+        if(modal && modal.classList.contains('open')) closePlayer();
+      }
+    });
+
+    document.addEventListener('copy', e => e.preventDefault());
+    document.addEventListener('cut', e => e.preventDefault());
+    document.addEventListener('dragstart', e => e.preventDefault());
+    document.addEventListener('selectstart', e => {
+      const t = e.target?.tagName?.toLowerCase();
+      if(t !== 'input' && t !== 'textarea') e.preventDefault();
+    });
+    document.addEventListener('dblclick', e => e.preventDefault());
+  }
+  // ═══════════════════════════════════════════════════
+  //  عرض الدرس
+  // ═══════════════════════════════════════════════════
+  function buildPlayerHTML(video, lessonTitle){
     if(!video || !video.url){
       return `<div class="vid-shell"><div class="vp-error"><div style="font-size:48px;opacity:.35;margin-bottom:12px">🎬</div><div>لا يوجد فيديو لهذا الدرس</div></div></div>`;
     }
 
     return `
-      <div class="vid-shell" id="vidShell" style="position:relative">
+      <div class="vid-shell" id="vidShell">
         <div class="vp-error" style="background:linear-gradient(135deg,rgba(4,6,14,.92),rgba(11,18,38,.94));display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%">
           <div id="btnOpenPlayer" style="width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 16px 50px rgba(47,125,255,.55);padding-right:6px;margin-bottom:20px;cursor:pointer;animation:pulsePlay 2.5s ease-in-out infinite">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           </div>
           <div style="font-size:20px;font-weight:900;color:#e8eefc;margin-bottom:8px;text-align:center;padding:0 16px">${esc(lessonTitle)}</div>
-          <div style="font-size:13px;color:#7f93b8;margin-bottom:20px">اضغط لتشغيل الفيديو في مشغل محمي</div>
+          <div style="font-size:13px;color:#7f93b8;margin-bottom:20px">اضغط لتشغيل الفيديو</div>
           <div style="font-size:11.5px;color:#7f93b8;opacity:.7">🛡 المشاهدة محمية — لا يمكن التحميل أو النسخ</div>
         </div>
       </div>
     `;
   }
 
-  function attachPlayerHandlers(user, lesson, lessonTitle){
-    const btn = document.getElementById("btnOpenPlayer");
-    if(!btn) return;
-
-    const openPlayer = ()=>{
-      const video = lesson.video || {};
-      const params = new URLSearchParams({
-        id: lesson.id,
-        url: video.url || '',
-        type: video.type || 'youtube',
-        title: lessonTitle || lesson.title || ''
-      });
-      const playerUrl = `/student/player.html?${params.toString()}`;
-
-      const w = Math.min(window.innerWidth - 40, 1200);
-      const h = Math.min(window.innerHeight - 40, 750);
-      const left = (window.innerWidth - w) / 2;
-      const top = (window.innerHeight - h) / 2;
-
-      const popup = window.open(
-        playerUrl,
-        'mission_player_' + lesson.id,
-        `width=${w},height=${h},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,scrollbars=no,resizable=yes`
-      );
-
-      if(!popup || popup.closed || typeof popup.closed === 'undefined'){
-        window.location.href = playerUrl;
-        return;
-      }
-
-      try{
-        DB.trackActivity({
-          userId: user.id, userName: user.name,
-          type: "video_play", target: lessonTitle,
-          details: { lesson: lessonTitle }
-        });
-      }catch(e){}
-    };
-
-    btn.addEventListener('click', openPlayer);
-  }
-
-  // ═══════════════════════════════════════════════════
-  //  عرض الدرس
-  // ═══════════════════════════════════════════════════
   function render(){
     const l = state.lesson;
     const u = state.user;
-    const watermark = u.phone ? `ID: ${u.phone}` : `ID: ${u.name}`;
 
     app.innerHTML = `
       <div class="fade-in">
@@ -239,8 +528,8 @@ ul{list-style:none}
             <div class="glass" style="padding:20px">
               ${l.desc ? `<div class="sm txt2 mb16">${esc(l.desc)}</div>` : ''}
 
-              <div class="mb20">
-                ${buildPlayerHTML(l.video, l.title, watermark)}
+              <div class="mb20" id="playerHost">
+                ${buildPlayerHTML(l.video, l.title)}
               </div>
 
               ${l.summary ? `
@@ -319,8 +608,14 @@ ul{list-style:none}
       </div>
     `;
 
-    attachPlayerHandlers(u, l, l.title);
+    // ربط زر فتح المشغل
+    const openBtn = document.getElementById('btnOpenPlayer');
+    if(openBtn){
+      openBtn.addEventListener('click', ()=>openPlayer(l, u));
+      openBtn.addEventListener('touchstart', (e)=>{ e.preventDefault(); openPlayer(l, u); }, { passive: false });
+    }
 
+    // زر إتمام الدرس
     document.getElementById("btnDone").addEventListener("click", async ()=>{
       if(state.isDone) return;
       try{
@@ -352,6 +647,7 @@ ul{list-style:none}
       }
     });
 
+    // زر المراجعة
     document.getElementById("btnReview").addEventListener("click", ()=>{
       Swal.fire({
         icon: 'info',
@@ -365,6 +661,9 @@ ul{list-style:none}
     });
   }
 
+  // ═══════════════════════════════════════════════════
+  //  تحميل البيانات
+  // ═══════════════════════════════════════════════════
   async function load(){
     if(!lessonId){
       app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
@@ -427,10 +726,20 @@ ul{list-style:none}
 
     render();
 
-    document.addEventListener("contextmenu", e=>e.preventDefault());
-    document.addEventListener("keydown", e=>{
-      if(e.key === "F12" || (e.ctrlKey && e.shiftKey && ["I","J","C","K"].includes(e.key.toUpperCase()))) e.preventDefault();
-    });
+    // ربط زر الإغلاق
+    const closeBtn = document.getElementById('playerClose');
+    if(closeBtn) closeBtn.addEventListener('click', closePlayer);
+
+    // إغلاق عند الضغط على الخلفية
+    const modal = document.getElementById('playerModal');
+    if(modal){
+      modal.addEventListener('click', (e)=>{
+        if(e.target === modal) closePlayer();
+      });
+    }
+
+    // تفعيل الحماية
+    attachProtection();
   }
 
   window.openWhatsApp = ()=>{
