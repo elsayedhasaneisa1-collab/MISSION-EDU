@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#04060e" />
+<title>مشغل الفيديو | MISSION EDU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="/logo.png">
+<link rel="apple-touch-icon" href="/logo.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+:root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--red:#ef4444;--violet:#8b5cf6;--r:20px;--sh:0 18px 50px rgba(0,0,0,.45)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:'Tajawal','Cairo',sans-serif;
+  background:radial-gradient(1200px 620px at 85% -12%,rgba(47,125,255,.20),transparent 62%),
+             radial-gradient(950px 520px at -8% 18%,rgba(139,92,246,.14),transparent 60%),
+             var(--bg);
+  background-attachment:fixed;
+  color:var(--txt);
+  line-height:1.7;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+
+/* ─── الشريط العلوي ─── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;gap:12px;
+  padding:12px 20px;
+  background:rgba(6,9,20,.75);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.back-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:9px 16px;border-radius:12px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);
+  color:var(--txt2);font-size:13.5px;font-weight:700;
+  transition:.2s;text-decoration:none;
+}
+.back-btn:hover{background:rgba(47,125,255,.15);color:var(--txt);border-color:var(--border2)}
+.title-bar{
+  flex:1;min-width:0;
+  font-size:14.5px;font-weight:800;color:var(--txt);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 12px;border-radius:20px;
+  font-size:11px;font-weight:700;
+  background:rgba(34,197,94,.12);
+  color:#6ee7a0;
+  border:1px solid rgba(34,197,94,.28);
+}
+.badge::before{
+  content:'';
+  width:6px;height:6px;border-radius:50%;
+  background:#22c55e;
+  box-shadow:0 0 8px #22c55e;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:.5;transform:scale(.85)}
+}
+
+/* ─── حاوية الفيديو ─── */
+.video-stage{
+  position:fixed;
+  top:60px;left:0;right:0;bottom:0;
+  display:flex;align-items:center;justify-content:center;
+  background:#000;
+  padding:0;
+}
+.video-frame{
+  position:relative;
+  width:100%;height:100%;
+  max-width:100%;
+  max-height:100%;
+  background:#000;
+  overflow:hidden;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+  isolation:isolate;
+}
+.video-frame iframe{
+  position:absolute;
+  inset:0;
+  width:100%;height:100%;
+  border:0;display:block;
+  pointer-events:auto;
+}
+
+/* ─── طبقة منع التفاعل ─── */
+.shield{
+  position:absolute;inset:0;z-index:5;
+  background:transparent;
+  pointer-events:none;
+}
+
+/* ─── العلامة المائية المتحركة ─── */
+.watermark{
+  position:absolute;
+  z-index:10;
+  font-size:14px;
+  font-weight:800;
+  font-family:'Cairo','Tajawal',sans-serif;
+  color:rgba(255,60,60,.35);
+  text-shadow:0 0 6px rgba(255,60,60,.25),1px 1px 2px rgba(0,0,0,.4);
+  padding:6px 12px;
+  border-radius:8px;
+  background:rgba(0,0,0,.08);
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-select:none;
+  white-space:nowrap;
+  transition:top 1s cubic-bezier(.4,0,.2,1), left 1s cubic-bezier(.4,0,.2,1), right 1s cubic-bezier(.4,0,.2,1);
+  letter-spacing:.5px;
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
+}
+.watermark.moving{
+  transition:top 2s cubic-bezier(.4,0,.2,1), left 2s cubic-bezier(.4,0,.2,1), right 2s cubic-bezier(.4,0,.2,1);
+}
+
+/* ─── غطاء التشغيل ─── */
+.cover{
+  position:absolute;inset:0;z-index:20;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:linear-gradient(135deg,rgba(4,6,14,.92),rgba(11,18,38,.94));
+  cursor:pointer;
+  transition:opacity .4s,visibility .4s;
+  padding:20px;
+  text-align:center;
+}
+.cover.hidden{
+  opacity:0;visibility:hidden;pointer-events:none;
+}
+.cover-icon{
+  width:90px;height:90px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(140deg,#2f7dff,#8b5cf6);
+  box-shadow:0 16px 50px rgba(47,125,255,.55);
+  padding-right:6px;
+  margin-bottom:20px;
+  animation:pulsePlay 2.5s ease-in-out infinite;
+}
+@keyframes pulsePlay{
+  0%,100%{box-shadow:0 16px 50px rgba(47,125,255,.55),0 0 0 0 rgba(47,125,255,.5)}
+  50%{box-shadow:0 16px 50px rgba(47,125,255,.55),0 0 0 24px rgba(47,125,255,0)}
+}
+.cover-title{
+  font-size:clamp(18px,3vw,24px);
+  font-weight:900;
+  color:var(--txt);
+  margin-bottom:8px;
+  letter-spacing:-.5px;
+}
+.cover-sub{
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:20px;
+}
+.cover-hint{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:16px;
+  opacity:.7;
+}
+
+/* ─── شاشة الحماية ─── */
+.secure-hint{
+  position:fixed;bottom:16px;right:16px;z-index:50;
+  font-size:11px;
+  color:rgba(255,255,255,.4);
+  padding:6px 12px;
+  border-radius:20px;
+  background:rgba(0,0,0,.4);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.08);
+  pointer-events:none;
+  user-select:none;
+}
+
+/* ─── Loading ─── */
+.loading{
+  position:fixed;inset:0;z-index:200;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:rgba(4,6,14,.95);
+  color:var(--muted);font-size:16px;
+}
+.spinner{
+  width:48px;height:48px;
+  border:3px solid rgba(90,140,230,.2);
+  border-top-color:var(--blue);
+  border-radius:50%;
+  animation:sp 1s linear infinite;
+  margin-bottom:14px;
+}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ─── Error state ─── */
+.error-state{
+  position:fixed;inset:0;z-index:150;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:rgba(4,6,14,.95);
+  padding:20px;text-align:center;
+}
+.error-icon{font-size:64px;opacity:.5;margin-bottom:16px}
+.error-title{font-size:20px;font-weight:800;margin-bottom:8px}
+.error-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
+.error-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 24px;border-radius:13px;
+  background:linear-gradient(135deg,#2f7dff,#1f5fd6);
+  color:#fff;font-weight:700;font-size:14px;
+  text-decoration:none;
+  box-shadow:0 10px 28px rgba(47,125,255,.36);
+  transition:.2s;
+}
+.error-btn:hover{transform:translateY(-2px);box-shadow:0 14px 38px rgba(47,125,255,.55)}
+
+/* ─── شاشة الجوال ─── */
+@media(max-width:640px){
+  .topbar{padding:10px 14px;gap:8px}
+  .back-btn{padding:8px 12px;font-size:12.5px}
+  .title-bar{font-size:13px}
+  .badge{padding:4px 10px;font-size:10px}
+  .watermark{font-size:12px;padding:5px 10px}
+  .cover-icon{width:74px;height:74px}
+  .cover-title{font-size:18px}
+}
+
+/* ─── منع تحديد النص ─── */
+*{
+  -webkit-user-drag:none;
+  -khtml-user-drag:none;
+  -moz-user-drag:none;
+  -o-user-drag:none;
+}
+img,video,iframe{
+  pointer-events:auto;
+  -webkit-user-drag:none;
+}
+</style>
+</head>
+<body>
+
+<!-- شريط علوي -->
+<div class="topbar">
+  <a href="/student/index.html" class="back-btn">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <path d="m15 18-6-6 6-6"/>
+    </svg>
+    رجوع
+  </a>
+  <div class="title-bar" id="lessonTitle">جارٍ التحميل...</div>
+  <span class="badge">محمي</span>
+</div>
+
+<!-- حاوية الفيديو -->
+<div class="video-stage">
+  <div class="video-frame" id="videoFrame">
+    <div id="playerContainer"></div>
+
+    <!-- العلامة المائية -->
+    <div class="watermark" id="watermark" style="top:20px;right:20px">MISSION EDU</div>
+
+    <!-- غطاء التشغيل -->
+    <div class="cover" id="cover">
+      <div class="cover-icon">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="#fff">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+      </div>
+      <div class="cover-title" id="coverTitle">جارٍ التحميل...</div>
+      <div class="cover-sub">اضغط لتشغيل الفيديو</div>
+      <div class="cover-hint">🛡 المشاهدة محمية — لا يمكن التحميل أو النسخ</div>
+    </div>
+  </div>
+</div>
+
+<!-- تنبيه الحماية -->
+<div class="secure-hint">🛡 محتوى محمي</div>
+
+<!-- شاشة التحميل -->
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  جارٍ تحميل الفيديو...
+</div>
+
+<script src="/db.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  const DB = window.MissionDB;
+  const params = new URLSearchParams(window.location.search);
+  const lessonId = params.get("id");
+  const videoUrl = params.get("url");
+  const videoType = params.get("type") || "youtube";
+  const videoTitle = params.get("title") || "";
+
+  const state = {
+    user: null,
+    lesson: null,
+    watermarkInterval: null,
+    currentCorner: 0
+  };
+
+  /* ─────────────────────────────────────
+     أدوات مساعدة
+  ───────────────────────────────────── */
+  function esc(str){
+    return String(str||"").replace(/[&<>"']/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[s]);
+  }
+
+  function getYouTubeId(url){
+    if(!url) return "";
+    const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
+    return m ? m[1] : "";
+  }
+
+  function getVimeoId(url){
+    if(!url) return "";
+    const m = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+    return m ? m[1] : "";
+  }
+
+  /* ─────────────────────────────────────
+     بناء الفيديو (YouTube / Vimeo / MP4 / External)
+  ───────────────────────────────────── */
+  function buildPlayer(type, url){
+    if(!url) return '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:Tajawal,sans-serif">لا يوجد فيديو</div>';
+
+    if(type === "youtube"){
+      const id = getYouTubeId(url);
+      if(!id) return '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:Tajawal,sans-serif">رابط YouTube غير صالح</div>';
+      // ✅ youtube-nocookie + خيارات منع التحميل والاقتراحات
+      return `<iframe
+        src="https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&fs=1&disablekb=0&controls=1&showinfo=0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+        allowfullscreen
+        referrerpolicy="strict-origin-when-cross-origin"
+        loading="eager"
+        title="فيديو الدرس"
+      ></iframe>`;
+    }
+
+    if(type === "vimeo"){
+      const id = getVimeoId(url);
+      if(!id) return '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:Tajawal,sans-serif">رابط Vimeo غير صالح</div>';
+      return `<iframe
+        src="https://player.vimeo.com/video/${id}?byline=0&portrait=0&title=0&dnt=1&pip=0&download=0"
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowfullscreen
+        loading="eager"
+        title="فيديو الدرس"
+      ></iframe>`;
+    }
+
+    if(type === "mp4"){
+      return `<video
+        id="mp4Video"
+        controls
+        controlsList="nodownload noremoteplayback noplaybackrate nofullscreen"
+        disablePictureInPicture
+        playsinline
+        preload="metadata"
+        style="position:absolute;inset:0;width:100%;height:100%;background:#000;object-fit:contain"
+      >
+        <source src="${esc(url)}" type="video/mp4"/>
+      </video>`;
+    }
+
+    if(type === "external"){
+      return `<iframe
+        src="${esc(url)}"
+        allowfullscreen
+        sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"
+        loading="eager"
+        title="فيديو الدرس"
+      ></iframe>`;
+    }
+
+    return '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:Tajawal,sans-serif">نوع الفيديو غير مدعوم</div>';
+  }
+
+  /* ─────────────────────────────────────
+     تحريك العلامة المائية كل 5 ثواني
+  ───────────────────────────────────── */
+  const CORNERS = [
+    {top:'20px', right:'20px', left:'auto'},   // يمين فوق
+    {top:'20px', left:'20px', right:'auto'},   // يسار فوق
+    {bottom:'20px', left:'20px', right:'auto', top:'auto'},  // يسار تحت
+    {bottom:'20px', right:'20px', left:'auto', top:'auto'},  // يمين تحت
+    {top:'50%', left:'50%', right:'auto', bottom:'auto', transform:'translate(-50%,-50%)'} // وسط
+  ];
+
+  function moveWatermark(){
+    const wm = document.getElementById('watermark');
+    if(!wm) return;
+
+    state.currentCorner = (state.currentCorner + 1) % CORNERS.length;
+    const pos = CORNERS[state.currentCorner];
+
+    // reset
+    wm.style.top = '';
+    wm.style.bottom = '';
+    wm.style.left = '';
+    wm.style.right = '';
+    wm.style.transform = '';
+
+    if(pos.top) wm.style.top = pos.top;
+    if(pos.bottom) wm.style.bottom = pos.bottom;
+    if(pos.left) wm.style.left = pos.left;
+    if(pos.right) wm.style.right = pos.right;
+    if(pos.transform) wm.style.transform = pos.transform;
+
+    // توليد إحداثيات عشوائية بسيطة للتغيير
+    const frame = document.getElementById('videoFrame');
+    if(!frame) return;
+    const w = frame.offsetWidth;
+    const h = frame.offsetHeight;
+
+    const randomTop = Math.floor(Math.random() * Math.max(20, h - 60));
+    const randomRight = Math.floor(Math.random() * Math.max(20, w - 180));
+
+    wm.style.top = randomTop + 'px';
+    wm.style.right = randomRight + 'px';
+    wm.style.left = 'auto';
+    wm.style.bottom = 'auto';
+    wm.style.transform = 'none';
+  }
+
+  function startWatermarkMotion(){
+    moveWatermark();
+    state.watermarkInterval = setInterval(moveWatermark, 5000);
+  }
+
+  function stopWatermarkMotion(){
+    if(state.watermarkInterval){
+      clearInterval(state.watermarkInterval);
+      state.watermarkInterval = null;
+    }
+  }
+
+  /* ─────────────────────────────────────
+     تحميل البيانات من URL أو من DB
+  ───────────────────────────────────── */
+  async function resolveVideoData(){
+    // الحالة 1: البيانات جاية من URL (زي ما lesson.html بيبعت)
+    if(videoUrl){
+      return {
+        type: videoType,
+        url: videoUrl,
+        title: videoTitle || "الدرس",
+        watermark: "MISSION EDU"
+      };
+    }
+
+    // الحالة 2: البيانات جاية من lesson ID (نحمّل من DB)
+    if(lessonId){
+      const sb = await DB.getClient();
+      const { data: lesson } = await sb.from("lessons").select("*").eq("id", lessonId).maybeSingle();
+      if(!lesson) return null;
+
+      const user = state.user;
+      const wm = user?.phone ? `ID: ${user.phone}` : `ID: ${user?.name || "طالب"}`;
+
+      return {
+        type: lesson.video?.type || "youtube",
+        url: lesson.video?.url || "",
+        title: lesson.title || "الدرس",
+        watermark: wm
+      };
+    }
+
+    return null;
+  }
+
+  /* ─────────────────────────────────────
+     عرض الفيديو
+  ───────────────────────────────────── */
+  async function render(){
+    const data = await resolveVideoData();
+    const loadingEl = document.getElementById('loading');
+
+    if(!data || !data.url){
+      if(loadingEl) loadingEl.style.display = 'none';
+      document.body.innerHTML = `
+        <div class="error-state">
+          <div class="error-icon">🎬</div>
+          <div class="error-title">الفيديو غير متوفر</div>
+          <div class="error-sub">لم نتمكن من العثور على الفيديو المطلوب</div>
+          <a href="/student/index.html" class="error-btn">العودة للرئيسية</a>
+        </div>
+      `;
+      return;
+    }
+
+    // إخفاء التحميل
+    if(loadingEl) loadingEl.style.display = 'none';
+
+    // تحديث العنوان
+    const titleEl = document.getElementById('lessonTitle');
+    if(titleEl) titleEl.textContent = data.title;
+    const coverTitle = document.getElementById('coverTitle');
+    if(coverTitle) coverTitle.textContent = data.title;
+
+    // تحديث العلامة المائية
+    const wm = document.getElementById('watermark');
+    if(wm) wm.textContent = data.watermark;
+
+    // تحميل الفيديو
+    const container = document.getElementById('playerContainer');
+    if(container){
+      container.innerHTML = buildPlayer(data.type, data.url);
+      container.style.cssText = 'position:absolute;inset:0;width:100%;height:100%';
+    }
+
+    // ربط زر التشغيل
+    const cover = document.getElementById('cover');
+    const iframe = container?.querySelector('iframe');
+    const videoEl = container?.querySelector('video');
+
+    if(cover){
+      const startPlay = ()=>{
+        cover.classList.add('hidden');
+
+        // تشغيل mp4 مباشرة
+        if(videoEl){
+          videoEl.play().catch(()=>{});
+        }
+
+        // تشغيل youtube/vimeo عبر postMessage
+        if(iframe){
+          try{
+            iframe.contentWindow?.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+          }catch(e){}
+        }
+
+        // بدء تحريك العلامة المائية
+        startWatermarkMotion();
+
+        // إخفاء شاشة البداية نهائياً
+        setTimeout(()=>{ if(cover) cover.style.display = 'none'; }, 500);
+      };
+
+      cover.addEventListener('click', startPlay, { once: true });
+    }
+
+    // حماية الفيديو
+    attachProtection();
+  }
+    /* ─────────────────────────────────────
+     حماية الفيديو (منع الكليك يمين + الاختصارات + السحب)
+  ───────────────────────────────────── */
+  function attachProtection(){
+    const frame = document.getElementById('videoFrame');
+
+    // منع الكليك يمين
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // منع اختصارات لوحة المفاتيح
+    document.addEventListener('keydown', e => {
+      // F12
+      if(e.key === 'F12') { e.preventDefault(); return false; }
+      // Ctrl+Shift+I/J/C (DevTools)
+      if(e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())) { e.preventDefault(); return false; }
+      // Ctrl+U (عرض المصدر)
+      if(e.ctrlKey && e.key.toUpperCase() === 'U') { e.preventDefault(); return false; }
+      // Ctrl+S (حفظ)
+      if(e.ctrlKey && e.key.toUpperCase() === 'S') { e.preventDefault(); return false; }
+      // Ctrl+P (طباعة)
+      if(e.ctrlKey && e.key.toUpperCase() === 'P') { e.preventDefault(); return false; }
+      // PrintScreen
+      if(e.key === 'PrintScreen') {
+        try{ navigator.clipboard.writeText(''); }catch(err){}
+      }
+    });
+
+    // منع السحب
+    if(frame){
+      frame.addEventListener('dragstart', e => e.preventDefault());
+      frame.addEventListener('drop', e => e.preventDefault());
+    }
+
+    // منع التحديد
+    document.addEventListener('selectstart', e => {
+      const tag = e.target?.tagName?.toLowerCase();
+      if(tag !== 'input' && tag !== 'textarea') e.preventDefault();
+    });
+
+    // منع النسخ
+    document.addEventListener('copy', e => e.preventDefault());
+    document.addEventListener('cut', e => e.preventDefault());
+
+    // منع السحب على الصور
+    document.querySelectorAll('img').forEach(img => {
+      img.setAttribute('draggable', 'false');
+      img.addEventListener('dragstart', e => e.preventDefault());
+    });
+
+    // حماية إضافية: كشف فتح DevTools (اختياري — مش دقيق 100%)
+    let devtoolsOpen = false;
+    const threshold = 160;
+    setInterval(() => {
+      const widthDiff = window.outerWidth - window.innerWidth;
+      const heightDiff = window.outerHeight - window.innerHeight;
+      if(widthDiff > threshold || heightDiff > threshold){
+        if(!devtoolsOpen){
+          devtoolsOpen = true;
+          // ممكن تسجّل الحدث
+          try{
+            if(state.user && window.MissionDB?.trackActivity){
+              DB.trackActivity({
+                userId: state.user.id,
+                userName: state.user.name,
+                type: 'video_protect',
+                target: 'محاولة فتح DevTools',
+                details: {lesson: videoTitle}
+              });
+            }
+          }catch(e){}
+        }
+      } else {
+        devtoolsOpen = false;
+      }
+    }, 1500);
+
+    // منع النقر المزدوج
+    document.addEventListener('dblclick', e => e.preventDefault());
+
+    // منع السحب الطويل على الموبايل
+    document.addEventListener('touchstart', e => {
+      if(e.target?.tagName?.toLowerCase() === 'img') e.preventDefault();
+    }, { passive: false });
+
+    // منع سحب الصفحة ككل
+    document.addEventListener('gesturestart', e => e.preventDefault());
+  }
+
+  /* ─────────────────────────────────────
+     تحميل بيانات المستخدم
+  ───────────────────────────────────── */
+  async function loadUser(){
+    try{
+      const sid = DB.getSessionId();
+      if(!sid) return null;
+      const user = await DB.getUser(sid);
+      if(!user || user.active === false) return null;
+      state.user = user;
+      return user;
+    }catch(e){
+      return null;
+    }
+  }
+
+  /* ─────────────────────────────────────
+     معالج resize (لتحديث حجم الفيديو)
+  ───────────────────────────────────── */
+  function handleResize(){
+    const frame = document.getElementById('videoFrame');
+    if(!frame) return;
+    // إعادة تحريك العلامة المائية لتتناسب مع الحجم الجديد
+    if(state.watermarkInterval){
+      moveWatermark();
+    }
+  }
+
+  /* ─────────────────────────────────────
+     نقطة البداية
+  ───────────────────────────────────── */
+  async function init(){
+    // 1) تحميل المستخدم (لو مش مسجّل، نسمح بالمشاهدة لكن بدون تتبع)
+    await loadUser();
+
+    // 2) عرض الفيديو
+    await render();
+
+    // 3) ربط resize
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+
+    // 4) تفعيل الحماية فوراً
+    attachProtection();
+
+    // 5) تتبع النشاط
+    try{
+      if(state.user && window.MissionDB?.trackActivity){
+        DB.trackActivity({
+          userId: state.user.id,
+          userName: state.user.name,
+          type: 'video_open',
+          target: videoTitle || lessonId || 'فيديو',
+          details: {lesson: videoTitle}
+        });
+      }
+    }catch(e){}
+  }
+
+  // تشغيل عند جاهزية الصفحة
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  // تنظيف عند إغلاق الصفحة
+  window.addEventListener('beforeunload', () => {
+    stopWatermarkMotion();
+  });
+
+})();
+</script>
+</body>
+</html>

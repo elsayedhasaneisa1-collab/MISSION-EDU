@@ -63,6 +63,7 @@ ul{list-style:none}
 .spinner{width:40px;height:40px;border:3px solid rgba(90,140,230,.2);border-top-color:var(--blue);border-radius:50%;animation:sp 1s linear infinite;margin-bottom:14px}
 @keyframes sp{to{transform:rotate(360deg)}}
 @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pulsePlay{0%,100%{box-shadow:0 16px 50px rgba(47,125,255,.55),0 0 0 0 rgba(47,125,255,.5)}50%{box-shadow:0 16px 50px rgba(47,125,255,.55),0 0 0 24px rgba(47,125,255,0)}}
 .fade-in{animation:fu .5s}
 .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(6,9,20,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
 .back-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--txt2);font-size:13.5px;font-weight:700;transition:.2s;text-decoration:none}
@@ -71,18 +72,6 @@ ul{list-style:none}
 .grid-main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px}
 @media(max-width:900px){.grid-main{grid-template-columns:1fr}}
 .vid-shell{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#000;border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.6);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;isolation:isolate}
-.vid-shell iframe,.vid-shell video{width:100%;height:100%;border:0;display:block;object-fit:contain;background:#000;position:relative;z-index:1}
-.vid-cover{position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(4,6,14,.85),rgba(11,18,38,.9));cursor:pointer;transition:opacity .4s,visibility .4s;pointer-events:auto!important}
-.vid-cover.hidden{opacity:0;visibility:hidden;pointer-events:none!important}
-.vid-cover-title{position:absolute;top:20px;left:20px;right:20px;text-align:center;color:#e8eefc;font-size:14px;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.7);pointer-events:none}
-.play-btn{width:88px;height:88px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 16px 50px rgba(47,125,255,.7);padding-right:6px;animation:pulse 2.5s ease-in-out infinite;pointer-events:none}
-@keyframes pulse{0%,100%{box-shadow:0 16px 50px rgba(47,125,255,.7),0 0 0 0 rgba(47,125,255,.6)}50%{box-shadow:0 16px 50px rgba(47,125,255,.7),0 0 0 20px rgba(47,125,255,0)}}
-.cover-hint{position:absolute;bottom:20px;left:0;right:0;text-align:center;color:rgba(255,255,255,.55);font-size:12px;font-weight:600;pointer-events:none}
-.vid-wm{position:absolute;top:14px;right:14px;z-index:25;font-size:13px;font-weight:900;color:#ff2d2d;text-shadow:0 0 8px rgba(255,45,45,.9),0 0 16px rgba(255,45,45,.6),1px 1px 2px rgba(0,0,0,.8);pointer-events:none;user-select:none;animation:wmPulse 3s ease-in-out infinite}
-@keyframes wmPulse{0%,100%{opacity:.85}50%{opacity:1}}
-.vid-badge{position:absolute;bottom:14px;left:14px;z-index:25;font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:20px;color:rgba(255,255,255,.85);background:rgba(0,0,0,.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);pointer-events:none}
-.vid-prog{position:absolute;bottom:14px;right:14px;z-index:25;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;color:rgba(255,255,255,.9);background:rgba(0,0,0,.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);pointer-events:none}
-.vid-overlay{position:absolute;top:0;left:0;right:0;height:60px;z-index:30;background:transparent}
 .vp-error{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:'Tajawal','Cairo',sans-serif;text-align:center;padding:20px}
 .example{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px}
 .example-q{font-size:13px;font-weight:700;margin-bottom:6px;color:var(--txt2)}
@@ -157,115 +146,73 @@ ul{list-style:none}
     return String(str||"").replace(/[&<>"']/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[s]);
   }
 
-  function getYouTubeId(url){
-    if(!url) return "";
-    const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([\w-]{11})/);
-    return m ? m[1] : "";
-  }
-  function getVimeoId(url){
-    if(!url) return "";
-    const m = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
-    return m ? m[1] : "";
-  }
-
+  // ═══════════════════════════════════════════════════
+  //  مشغل الفيديو: غطاء يفتح player.html
+  // ═══════════════════════════════════════════════════
   function buildPlayerHTML(video, lessonTitle, watermark){
     if(!video || !video.url){
       return `<div class="vid-shell"><div class="vp-error"><div style="font-size:48px;opacity:.35;margin-bottom:12px">🎬</div><div>لا يوجد فيديو لهذا الدرس</div></div></div>`;
     }
 
-    let inner = "";
-    if(video.type === "youtube"){
-      const id = getYouTubeId(video.url);
-      if(!id){
-        return `<div class="vid-shell"><div class="vp-error"><div style="font-size:48px;opacity:.35;margin-bottom:12px">⚠️</div><div>رابط YouTube غير صالح</div></div></div>`;
-      }
-      inner = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&fs=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
-    } else if(video.type === "vimeo"){
-      const id = getVimeoId(video.url);
-      if(!id){
-        return `<div class="vid-shell"><div class="vp-error"><div style="font-size:48px;opacity:.35;margin-bottom:12px">⚠️</div><div>رابط Vimeo غير صالح</div></div></div>`;
-      }
-      inner = `<iframe src="https://player.vimeo.com/video/${id}?byline=0&portrait=0&title=0&dnt=1" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
-    } else if(video.type === "mp4"){
-      inner = `<video controls controlsList="nodownload noremoteplayback noplaybackrate" disablePictureInPicture playsInline preload="metadata" ${video.poster?`poster="${esc(video.poster)}"`:''} id="mp4Video"><source src="${esc(video.url)}" type="video/mp4"/></video>`;
-    } else if(video.type === "external"){
-      inner = `<iframe src="${esc(video.url)}" allowfullscreen sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"></iframe>`;
-    } else {
-      return `<div class="vid-shell"><div class="vp-error"><div style="font-size:48px;opacity:.35;margin-bottom:12px">⚠️</div><div>نوع الفيديو غير مدعوم</div></div></div>`;
-    }
-
     return `
-      <div class="vid-shell" id="vidShell">
-        ${inner}
-        <div class="vid-overlay"></div>
-        <div class="vid-wm">${esc(watermark)}</div>
-        <div class="vid-badge">🛡 مشاهدة محمية</div>
-        <div class="vid-prog" id="vidProg">0%</div>
-        <div class="vid-cover" id="vidCover">
-          <div class="vid-cover-title">${esc(lessonTitle)}</div>
-          <div class="play-btn">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      <div class="vid-shell" id="vidShell" style="position:relative">
+        <div class="vp-error" style="background:linear-gradient(135deg,rgba(4,6,14,.92),rgba(11,18,38,.94));display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%">
+          <div id="btnOpenPlayer" style="width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 16px 50px rgba(47,125,255,.55);padding-right:6px;margin-bottom:20px;cursor:pointer;animation:pulsePlay 2.5s ease-in-out infinite">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           </div>
-          <div class="cover-hint">اضغط لتشغيل الفيديو</div>
+          <div style="font-size:20px;font-weight:900;color:#e8eefc;margin-bottom:8px;text-align:center;padding:0 16px">${esc(lessonTitle)}</div>
+          <div style="font-size:13px;color:#7f93b8;margin-bottom:20px">اضغط لتشغيل الفيديو في مشغل محمي</div>
+          <div style="font-size:11.5px;color:#7f93b8;opacity:.7">🛡 المشاهدة محمية — لا يمكن التحميل أو النسخ</div>
         </div>
       </div>
     `;
   }
 
   function attachPlayerHandlers(user, lesson, lessonTitle){
-    const wrap = document.getElementById("vidShell");
-    if(!wrap) return;
+    const btn = document.getElementById("btnOpenPlayer");
+    if(!btn) return;
 
-    const cover = document.getElementById("vidCover");
-    const prog = document.getElementById("vidProg");
-    const videoEl = document.getElementById("mp4Video");
-
-    const trackPlay = ()=>{
-      DB.trackActivity({
-        userId: user.id, userName: user.name,
-        type: "video_play", target: lessonTitle,
-        details: { lesson: lessonTitle }
+    const openPlayer = ()=>{
+      const video = lesson.video || {};
+      const params = new URLSearchParams({
+        id: lesson.id,
+        url: video.url || '',
+        type: video.type || 'youtube',
+        title: lessonTitle || lesson.title || ''
       });
+      const playerUrl = `/student/player.html?${params.toString()}`;
+
+      const w = Math.min(window.innerWidth - 40, 1200);
+      const h = Math.min(window.innerHeight - 40, 750);
+      const left = (window.innerWidth - w) / 2;
+      const top = (window.innerHeight - h) / 2;
+
+      const popup = window.open(
+        playerUrl,
+        'mission_player_' + lesson.id,
+        `width=${w},height=${h},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,scrollbars=no,resizable=yes`
+      );
+
+      if(!popup || popup.closed || typeof popup.closed === 'undefined'){
+        window.location.href = playerUrl;
+        return;
+      }
+
+      try{
+        DB.trackActivity({
+          userId: user.id, userName: user.name,
+          type: "video_play", target: lessonTitle,
+          details: { lesson: lessonTitle }
+        });
+      }catch(e){}
     };
 
-    const hideCover = ()=>{
-      if(cover) cover.classList.add("hidden");
-    };
-
-    if(cover){
-      cover.addEventListener("click", (e)=>{
-        e.preventDefault();
-        e.stopPropagation();
-        hideCover();
-        trackPlay();
-        if(videoEl) videoEl.play().catch(()=>{});
-      });
-      cover.addEventListener("touchstart", ()=>{
-        hideCover();
-        trackPlay();
-        if(videoEl) videoEl.play().catch(()=>{});
-      }, { passive: true });
-    }
-
-    if(videoEl && prog){
-      const ms = {p25:false, p50:false, p75:false, p90:false};
-      videoEl.addEventListener("play", ()=>{ hideCover(); });
-      videoEl.addEventListener("timeupdate", ()=>{
-        if(!videoEl.duration) return;
-        const p = (videoEl.currentTime / videoEl.duration) * 100;
-        prog.textContent = Math.round(p) + "%";
-        if(p >= 25 && !ms.p25){ ms.p25 = true; DB.trackActivity({userId:user.id,userName:user.name,type:"video_25",target:lessonTitle,details:{lesson:lessonTitle}}); }
-        if(p >= 50 && !ms.p50){ ms.p50 = true; DB.trackActivity({userId:user.id,userName:user.name,type:"video_50",target:lessonTitle,details:{lesson:lessonTitle}}); }
-        if(p >= 75 && !ms.p75){ ms.p75 = true; DB.trackActivity({userId:user.id,userName:user.name,type:"video_75",target:lessonTitle,details:{lesson:lessonTitle}}); }
-        if(p >= 90 && !ms.p90){ ms.p90 = true; DB.trackActivity({userId:user.id,userName:user.name,type:"video_complete",target:lessonTitle,details:{lesson:lessonTitle}}); }
-      });
-      videoEl.addEventListener("contextmenu", e=>e.preventDefault());
-    }
-
-    wrap.addEventListener("contextmenu", e=>e.preventDefault());
-    wrap.addEventListener("dragstart", e=>e.preventDefault());
+    btn.addEventListener('click', openPlayer);
   }
 
+  // ═══════════════════════════════════════════════════
+  //  عرض الدرس
+  // ═══════════════════════════════════════════════════
   function render(){
     const l = state.lesson;
     const u = state.user;
@@ -429,17 +376,10 @@ ul{list-style:none}
     }
 
     const sid = DB.getSessionId();
-    if(!sid){
-      window.location.replace("/auth/login.html");
-      return;
-    }
+    if(!sid){ window.location.replace("/auth/login.html"); return; }
 
     const user = await DB.getUser(sid);
-    if(!user || user.active === false){
-      DB.clearSession();
-      window.location.replace("/auth/login.html");
-      return;
-    }
+    if(!user || user.active === false){ DB.clearSession(); window.location.replace("/auth/login.html"); return; }
 
     state.user = user;
     userAvatar.textContent = user.avatar || "🧑‍🎓";
