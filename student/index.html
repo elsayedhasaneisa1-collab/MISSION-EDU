@@ -1378,9 +1378,11 @@ function CertificatesPage(){
       console.error('❌ Certificate error:', e);
       app.toast.err('❌ فشل: ' + e.message);
     }
-    setBusy(false);
-  };
-    <div className="flex between center mb16 wrap g8">
+      setBusy(false);
+};
+
+  return <>
+  <div className="flex between center mb16 wrap g8">
       <div>
         <div className="h2 grad">🏆 شهاداتي</div>
         <div className="sm muted mt6">كل شهاداتك في مكان واحد</div>
