@@ -133,14 +133,20 @@ select.input{cursor:pointer;appearance:none;padding-inline-start:38px;background
 
       <div class="field">
         <label class="lbl">📍 المحافظة</label>
-        <div class="gov-grid" id="govGrid">
-          <!-- JavaScript سيضيف المحافظات -->
-        </div>
+        <div class="gov-grid" id="govGrid"></div>
         <div class="gov-selected" id="govSelected" style="display:none">
           <span style="font-size:16px">📍</span>
           <span>المحافظة: <span id="govName"></span></span>
         </div>
         <input type="hidden" id="governorate" value="">
+      </div>
+
+      <!-- ✅ حقل كود الإحالة الجديد -->
+      <div class="field">
+        <label class="lbl">🎁 كود الإحالة (اختياري)</label>
+        <input id="referralCode" class="input" placeholder="مثال: ME-A1B2C3" style="text-transform:uppercase;letter-spacing:2px;font-weight:900;text-align:center" maxlength="12">
+        <div class="xs muted mt6">لو حد دعاك، اكتب كوده هنا وانت الاتنين هتكسبوا XP 🎉</div>
+        <div id="referralStatus" class="xs mt8" style="display:none"></div>
       </div>
 
       <div class="field">
@@ -174,26 +180,11 @@ select.input{cursor:pointer;appearance:none;padding-inline-start:38px;background
       </div>
 
       <div class="mb16">
-        <div class="check-row">
-          <div class="check-box" id="cbName"></div>
-          <span class="sm">الاسم 3 أحرف على الأقل</span>
-        </div>
-        <div class="check-row">
-          <div class="check-box" id="cbPhone"></div>
-          <span class="sm">رقم هاتف صالح (8 أرقام على الأقل)</span>
-        </div>
-        <div class="check-row">
-          <div class="check-box" id="cbGov"></div>
-          <span class="sm">اختر محافظتك</span>
-        </div>
-        <div class="check-row">
-          <div class="check-box" id="cbPass"></div>
-          <span class="sm">كلمة المرور 6 أحرف على الأقل</span>
-        </div>
-        <div class="check-row">
-          <div class="check-box" id="cbMatch"></div>
-          <span class="sm">كلمتا المرور متطابقتان</span>
-        </div>
+        <div class="check-row"><div class="check-box" id="cbName"></div><span class="sm">الاسم 3 أحرف على الأقل</span></div>
+        <div class="check-row"><div class="check-box" id="cbPhone"></div><span class="sm">رقم هاتف صالح (8 أرقام على الأقل)</span></div>
+        <div class="check-row"><div class="check-box" id="cbGov"></div><span class="sm">اختر محافظتك</span></div>
+        <div class="check-row"><div class="check-box" id="cbPass"></div><span class="sm">كلمة المرور 6 أحرف على الأقل</span></div>
+        <div class="check-row"><div class="check-box" id="cbMatch"></div><span class="sm">كلمتا المرور متطابقتان</span></div>
       </div>
 
       <div id="errBox" class="pill pill-r mb16" style="width:100%;justify-content:center;padding:10px 14px;display:none">⚠️</div>
@@ -229,7 +220,6 @@ select.input{cursor:pointer;appearance:none;padding-inline-start:38px;background
     </button>
   </div>
 </div>
-
 <script src="/db.js"></script>
 <script>
 (function(){
@@ -245,10 +235,6 @@ select.input{cursor:pointer;appearance:none;padding-inline-start:38px;background
     "سوهاج", "قنا", "الأقصر", "أسوان", "البحر الأحمر", "الوادي الجديد",
     "مطروح", "شمال سيناء", "جنوب سيناء"
   ];
-
-  const Icons = {
-    eye: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`
-  };
 
   // ═══════════════ حماية ═══════════════
   (function(){
@@ -276,8 +262,65 @@ select.input{cursor:pointer;appearance:none;padding-inline-start:38px;background
     errBox: document.getElementById("errBox"),
     submitBtn: document.getElementById("submitBtn"),
     submitText: document.getElementById("submitText"),
+    referralCode: document.getElementById("referralCode"),
+    referralStatus: document.getElementById("referralStatus")
   };
 
+  // ═══════════════ كود الإحالة — متغير عام ═══════════════
+  let referrerId = null;
+
+  // ═══════════════ التحقق من كود الإحالة ═══════════════
+  async function checkReferralCode(code){
+    if(!code || code.trim().length < 4){
+      els.referralStatus.style.display = "none";
+      referrerId = null;
+      return;
+    }
+
+    try{
+      const sb = await DB.getClient();
+      const { data: users, error } = await sb
+        .from("users")
+        .select("id, name")
+        .eq("role", "student")
+        .limit(2000);
+
+      if(error) throw error;
+
+      const codeClean = code.trim().toUpperCase().replace(/^ME-?/, "");
+      const found = (users || []).find(u => {
+        const uCode = "ME" + u.id.replace(/[^a-zA-Z0-9]/g,'').slice(-6).toUpperCase();
+        return uCode === "ME" + codeClean || uCode === code.trim().toUpperCase();
+      });
+
+      if(found){
+        referrerId = found.id;
+        els.referralStatus.style.display = "block";
+        els.referralStatus.style.color = "#6ee7a0";
+        els.referralStatus.textContent = "✅ كود صحيح — مرحبًا بك من " + found.name;
+      } else {
+        referrerId = null;
+        els.referralStatus.style.display = "block";
+        els.referralStatus.style.color = "#fca5a5";
+        els.referralStatus.textContent = "❌ كود غير صحيح — تأكد من الكود";
+      }
+    }catch(e){
+      console.warn("Referral check error:", e);
+      referrerId = null;
+      els.referralStatus.style.display = "none";
+    }
+  }
+
+  // ربط حدث كود الإحالة
+  if(els.referralCode){
+    els.referralCode.addEventListener("input", (e)=>{
+      e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "");
+      clearTimeout(window._refTimer);
+      window._refTimer = setTimeout(() => checkReferralCode(e.target.value), 500);
+    });
+  }
+
+  // ═══════════════ Toggle Password ═══════════════
   function togglePass(id, btn){
     const el = document.getElementById(id);
     el.type = el.type === "password" ? "text" : "password";
@@ -290,6 +333,7 @@ select.input{cursor:pointer;appearance:none;padding-inline-start:38px;background
   }
   window.openWhatsApp = openWhatsApp;
 
+  // ═══════════════ Password Strength ═══════════════
   function calcStrength(pw){
     let s = 0;
     if (pw.length >= 6) s++;
@@ -326,15 +370,12 @@ select.input{cursor:pointer;appearance:none;padding-inline-start:38px;background
         const gov = btn.dataset.gov;
         els.governorate.value = gov;
 
-        // إزالة التنشيط من الكل
         els.govGrid.querySelectorAll(".gov-item").forEach(b => b.classList.remove("on"));
         btn.classList.add("on");
 
-        // عرض الاختيار
         els.govName.textContent = gov;
         els.govSelected.style.display = "flex";
 
-        // تحديث check
         setCheck("cbGov", true);
         updateUI();
       });
@@ -430,7 +471,6 @@ select.input{cursor:pointer;appearance:none;padding-inline-start:38px;background
     els.submitText.innerHTML = '<span class="spinner" style="display:inline-block;vertical-align:middle"></span>';
 
     try{
-      // استخدام DB.register
       const u = await DB.register({
         name, phone, password: pass, gradeId, countryCode: "+20", governorate
       });
@@ -440,6 +480,24 @@ select.input{cursor:pointer;appearance:none;padding-inline-start:38px;background
         const sb = await DB.getClient();
         await sb.from("users").update({ governorate }).eq("id", u.id);
       }catch(e){}
+
+      // ═══════════════ حفظ الإحالة ═══════════════
+      if(referrerId && referrerId !== u.id){
+        try{
+          const sb = await DB.getClient();
+          await sb.from("referrals").insert([{
+            id: "ref_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36),
+            referrer_id: referrerId,
+            referred_id: u.id,
+            rewarded: false,
+            reward_xp: 50,
+            created_at: Date.now()
+          }]);
+          console.log("✅ Referral saved");
+        }catch(e){
+          console.warn("⚠️ Referral save failed:", e.message);
+        }
+      }
 
       els.submitText.textContent = "تم الإنشاء ✓";
       setTimeout(() => DB.redirectByRole(u), 600);
