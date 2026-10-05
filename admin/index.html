@@ -937,6 +937,7 @@ function Crud({title,collection,defaultItem,fields,columns}){
   const [editing,setEditing]=useState(null);
   const [form,setForm]=useState({});
   const [busy,setBusy]=useState(false);
+  const items=[...(app.db[collection]||[])].sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
   const openNew=()=>{setForm(defaultItem());setEditing('new');};
   const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
   const save=async ()=>{
@@ -960,7 +961,6 @@ function Crud({title,collection,defaultItem,fields,columns}){
     try{await app.remove(collection,id);app.toast.warn('تم الحذف');}
     catch(e){app.toast.err(e.message);}
   };
-  const items=app.db[collection]||[];
   return <>
     <div className="flex between center mb16">
       <div className="h2 grad">{title}</div>
