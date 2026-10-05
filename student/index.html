@@ -670,34 +670,76 @@ function Home({onNav,setSelected}){
   const lastLesson = lastLessonId ? app.lesson(lastLessonId) : null;
 
   return <>
-    <div className="hero mb16">
-      <div className="flex between wrap center g16">
-        <div style={{minWidth:0,flex:1}}>
-          <div className="h2 mb6">أهلًا بك {u.name.split(' ')[0]} 👋</div>
-          <div className="sm txt2 mb12">مهمتك الحالية في انتظارك.</div>
-          <div className="flex wrap g8">
-            {lastLesson && (
-              <a href={`/student/lesson.html?id=${lastLesson.id}`} className="btn btn-p btn-lg" style={{textDecoration:'none'}}>
-                ▶️ متابعة: {lastLesson.title.slice(0,20)}
-              </a>
-            )}
-            <button className="btn btn-g btn-lg" onClick={()=>onNav('subjects')}>
-              <Icon name="book" size={14}/> استعرض المواد
-            </button>
-          </div>
-        </div>
-        <div className="flex center g16">
-          <Ring value={progressPct} size={110} stroke={9} color="#2f7dff">
-            <div className="stat-n">{progressPct}%</div>
-            <div className="xs muted">التقدم</div>
-          </Ring>
-          <Ring value={next?DB.pct((u.xp-current.xp),next.xp-current.xp):100} size={90} stroke={8} color="#8b5cf6">
-            <div style={{fontWeight:900}}>Lv {current.level}</div>
-            <div className="xs muted">{current.name}</div>
-          </Ring>
-        </div>
+    <div className="hero mb16" style={{padding:'clamp(16px,4vw,24px)'}}>
+  <div style={{
+    display:'flex',
+    flexDirection:'column',
+    alignItems:'center',
+    textAlign:'center',
+    gap:'16px'
+  }}>
+    {/* النص + الأزرار */}
+    <div style={{width:'100%'}}>
+      <div className="h2 mb6" style={{whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
+        أهلًا بك {u.name.split(' ')[0]} 👋
       </div>
+      <div className="sm txt2 mb12">مهمتك الحالية في انتظارك.</div>
     </div>
+
+    {/* الدواير - عرضية على الشاشات كلها */}
+    <div style={{
+      display:'flex',
+      alignItems:'center',
+      justifyContent:'center',
+      gap:'20px',
+      flexWrap:'wrap'
+    }}>
+      <Ring value={progressPct} size={100} stroke={8} color="#2f7dff">
+        <div className="stat-n">{progressPct}%</div>
+        <div className="xs muted">التقدم</div>
+      </Ring>
+      <Ring value={next?DB.pct((u.xp-current.xp),next.xp-current.xp):100} size={80} stroke={7} color="#8b5cf6">
+        <div style={{fontWeight:900}}>Lv {current.level}</div>
+        <div className="xs muted">{current.name}</div>
+      </Ring>
+    </div>
+
+    {/* الأزرار - في صف واحد بالعرض الكامل */}
+    <div style={{
+      display:'flex',
+      gap:'8px',
+      width:'100%',
+      flexWrap:'wrap'
+    }}>
+      {lastLesson && (
+        <a href={`/student/lesson.html?id=${lastLesson.id}`}
+           className="btn btn-p"
+           style={{
+             textDecoration:'none',
+             flex:'1 1 auto',
+             minWidth:'140px',
+             fontSize:'13px',
+             padding:'10px 16px',
+             whiteSpace:'nowrap',
+             overflow:'hidden',
+             textOverflow:'ellipsis'
+           }}>
+          ▶️ متابعة الدرس
+        </a>
+      )}
+      <button className="btn btn-g"
+              onClick={()=>onNav('subjects')}
+              style={{
+                flex:'1 1 auto',
+                minWidth:'140px',
+                fontSize:'13px',
+                padding:'10px 16px'
+              }}>
+        <Icon name="book" size={14}/> استعرض المواد
+      </button>
+    </div>
+  </div>
+</div>
 
     <div className="grid g4 mb16">
       <Stat label="نقاط XP" value={DB.fmt(u.xp||0)} icon="zap" color="#5aa9ff"/>
