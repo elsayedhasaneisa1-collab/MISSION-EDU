@@ -2697,7 +2697,7 @@ function CertificatesPage(){
   // تحميل اللوجو
   let logoDataUrl = '';
   try{
-    const response = await fetch('/logo.png');
+    const response = await fetch('logo.png');
     const blob = await response.blob();
     logoDataUrl = await new Promise((resolve)=>{
       const reader = new FileReader();
