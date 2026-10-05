@@ -1358,7 +1358,32 @@ function CertificatesPage(){
     app.toast.err('❌ فشل توليد الشهادة');
   }
   setBusy(false);
-};
+};  return <>
+    <div className="flex between center mb16 wrap g8">
+      <div>
+        <div className="h2 grad">🏆 شهاداتي</div>
+        <div className="sm muted mt6">كل شهاداتك في مكان واحد</div>
+      </div>
+      <span className="pill pill-b">{certs.length} شهادة</span>
+    </div>
+    {certs.length===0?<div className="glass" style={{padding:30}}><Empty icon="🏆" title="لا توجد شهادات" desc="أكمل مادة كاملة للحصول على شهادة"/></div>:
+      <div className="grid g-auto">
+        {certs.map(c=>{
+          const s = app.subject(c.subject_id);
+          return <div key={c.id} className="glass hv" style={{padding:24,textAlign:'center'}}>
+            <div style={{fontSize:56,marginBottom:12}}>🏆</div>
+            <div className="h4 mb6">{s?.icon} {s?.name||'مادة'}</div>
+            <div className="xs muted mb16">صدرت في {new Date(c.issued_at).toLocaleDateString('ar-EG')}</div>
+            <div className="xs muted mb16" dir="ltr" style={{fontFamily:'monospace'}}>#{c.id.slice(-12).toUpperCase()}</div>
+            <button className="btn btn-p btn-block" onClick={()=>downloadPDF(c)} disabled={busy}>
+              {busy?'جارٍ...':<><Icon name="download" size={14}/> تحميل PDF</>}
+            </button>
+          </div>;
+        })}
+      </div>
+    }
+  </>;
+}
 
 /* ═══════════ Notifications ═══════════ */
 function Notifications(){
