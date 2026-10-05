@@ -356,11 +356,7 @@ a{color:inherit;text-decoration:none}
     const total = state.questions.length;
     const pct = Math.round((score/total)*100);
     const passed = pct >= state.exam.pass_score;
-
-    // ✅ التحقق من المحاولات السابقة
     const hasWonBefore = state.attempts.some(a => a.passed);
-
-    // ✅ XP يُمنح فقط عند أول نجاح
     const gained = (passed && !hasWonBefore) ? (state.exam.xp || 0) : 0;
 
     try{
@@ -372,7 +368,6 @@ a{color:inherit;text-decoration:none}
       });
     }catch(e){}
 
-    // ✅ تحديث XP فقط لو كسب XP جديد
     if(gained > 0){
       try{
         await DB.updateUser(state.user.id, { xp: (state.user.xp || 0) + gained });
@@ -394,12 +389,9 @@ a{color:inherit;text-decoration:none}
     const r = state.result;
     const color = r.passed ? "#22c55e" : "#f59e0b";
 
-    // Confetti فقط عند أول نجاح
     if (r.passed && !r.hasWonBefore && window.confetti) {
       window.confetti({
-        particleCount: 150,
-        spread: 90,
-        origin: { y: 0.6 },
+        particleCount: 150, spread: 90, origin: { y: 0.6 },
         colors: ['#2f7dff', '#8b5cf6', '#22c55e', '#fbbf24']
       });
       setTimeout(() => {

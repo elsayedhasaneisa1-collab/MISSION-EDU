@@ -91,181 +91,39 @@ ul{list-style:none}
 .swal-custom-title{color:#e8eefc !important;font-weight:800 !important;font-family:'Tajawal','Cairo',sans-serif !important}
 .swal-custom-input{background:rgba(10,16,32,.75) !important;border:1.5px solid rgba(90,140,230,.3) !important;color:#e8eefc !important;border-radius:12px !important}
 
-/* ═══════════════════════════════════════════════════
-   🎬 مشغل الفيديو (Modal)
-   ═══════════════════════════════════════════════════ */
-.player-modal{
-  position:fixed;inset:0;z-index:9999;
-  background:rgba(3,5,12,.96);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:0;
-  animation:pu .3s;
-}
+/* ═══════════════ مشغل الفيديو (Modal) ═══════════════ */
+.player-modal{position:fixed;inset:0;z-index:9999;background:rgba(3,5,12,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;padding:0;animation:pu .3s}
 .player-modal.open{display:flex}
-.player-box{
-  position:relative;
-  width:100%;max-width:1400px;
-  background:#000;
-  border-radius:0;
-  overflow:hidden;
-  box-shadow:0 30px 90px rgba(0,0,0,.9);
-  display:flex;
-  flex-direction:column;
-  max-height:100vh;
-}
-.player-header{
-  display:flex;align-items:center;gap:12px;
-  padding:10px 16px;
-  background:linear-gradient(180deg,rgba(21,31,56,.98),rgba(11,17,34,.98));
-  border-bottom:1px solid var(--border);
-  flex-shrink:0;
-}
-.player-title{
-  flex:1;min-width:0;
-  font-size:14px;font-weight:800;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.player-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:4px 11px;border-radius:20px;
-  font-size:10.5px;font-weight:700;
-  background:rgba(34,197,94,.12);
-  color:#6ee7a0;
-  border:1px solid rgba(34,197,94,.28);
-}
-.player-badge::before{
-  content:'';width:6px;height:6px;border-radius:50%;
-  background:#22c55e;box-shadow:0 0 8px #22c55e;
-  animation:pulse 2s infinite;
-}
-.player-btn{
-  width:38px;height:38px;border-radius:11px;
-  display:grid;place-items:center;
-  background:rgba(47,125,255,.12);
-  border:1px solid rgba(47,125,255,.3);
-  color:#7db6ff;
-  font-size:16px;
-  transition:.2s;
-  cursor:pointer;flex-shrink:0;
-}
+.player-box{position:relative;width:100%;max-width:1400px;background:#000;border-radius:0;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.9);display:flex;flex-direction:column;max-height:100vh}
+.player-header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:linear-gradient(180deg,rgba(21,31,56,.98),rgba(11,17,34,.98));border-bottom:1px solid var(--border);flex-shrink:0}
+.player-title{flex:1;min-width:0;font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:20px;font-size:10.5px;font-weight:700;background:rgba(34,197,94,.12);color:#6ee7a0;border:1px solid rgba(34,197,94,.28)}
+.player-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:pulse 2s infinite}
+.player-btn{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(47,125,255,.12);border:1px solid rgba(47,125,255,.3);color:#7db6ff;font-size:16px;transition:.2s;cursor:pointer;flex-shrink:0}
 .player-btn:hover{background:rgba(47,125,255,.25);color:#fff}
-.player-close{
-  width:38px;height:38px;border-radius:11px;
-  display:grid;place-items:center;
-  background:rgba(239,68,68,.12);
-  border:1px solid rgba(239,68,68,.3);
-  color:#fca5a5;
-  font-size:18px;font-weight:900;
-  transition:.2s;
-  cursor:pointer;flex-shrink:0;
-}
+.player-close{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;font-size:18px;font-weight:900;transition:.2s;cursor:pointer;flex-shrink:0}
 .player-close:hover{background:rgba(239,68,68,.25);color:#fff}
-
-.player-stage{
-  position:relative;
-  width:100%;
-  aspect-ratio:16/9;
-  background:#000;
-  overflow:hidden;
-  user-select:none;-webkit-user-select:none;
-  -webkit-touch-callout:none;
-  isolation:isolate;
-  flex:1;
-}
-.player-stage iframe,.player-stage video{
-  position:absolute;inset:0;
-  width:100%;height:100%;
-  border:0;display:block;
-  pointer-events:auto;
-}
-
-/* ─── العلامة المائية ─── */
-.watermark{
-  position:absolute;
-  z-index:100;
-  font-size:15px;
-  font-weight:900;
-  font-family:'Cairo','Tajawal',sans-serif;
-  color:rgba(255,60,60,.32);
-  text-shadow:0 0 4px rgba(255,60,60,.15),1px 1px 1px rgba(0,0,0,.3);
-  padding:0;
-  background:transparent;
-  border:none;
-  outline:none;
-  pointer-events:none;
-  user-select:none;
-  -webkit-user-select:none;
-  white-space:nowrap;
-  transition:top 1.8s cubic-bezier(.4,0,.2,1),left 1.8s cubic-bezier(.4,0,.2,1);
-  letter-spacing:1px;
-  direction:ltr;
-}
-
-/* ─── طبقة الحماية (Shield) ─── */
-.shield-overlay{
-  position:absolute;
-  inset:0;
-  z-index:80;
-  pointer-events:none;
-}
-.shield-overlay::before{
-  content:'';
-  position:absolute;
-  top:0;left:0;right:0;
-  height:60px;
-  background:transparent;
-  pointer-events:auto;
-  cursor:default;
-}
-.shield-overlay::after{
-  content:'';
-  position:absolute;
-  bottom:0;left:0;right:0;
-  height:80px;
-  background:transparent;
-  pointer-events:auto;
-  cursor:default;
-}
-.shield-side{
-  position:absolute;
-  top:60px;bottom:80px;
-  width:50px;
-  background:transparent;
-  z-index:80;
-  pointer-events:auto;
-  cursor:default;
-}
+.player-stage{position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;isolation:isolate;flex:1}
+.player-stage iframe,.player-stage video{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;pointer-events:auto}
+.watermark{position:absolute;z-index:100;font-size:15px;font-weight:900;font-family:'Cairo','Tajawal',sans-serif;color:rgba(255,60,60,.32);text-shadow:0 0 4px rgba(255,60,60,.15),1px 1px 1px rgba(0,0,0,.3);padding:0;background:transparent;border:none;outline:none;pointer-events:none;user-select:none;-webkit-user-select:none;white-space:nowrap;transition:top 1.8s cubic-bezier(.4,0,.2,1),left 1.8s cubic-bezier(.4,0,.2,1);letter-spacing:1px;direction:ltr}
+.shield-overlay{position:absolute;inset:0;z-index:80;pointer-events:none}
+.shield-overlay::before{content:'';position:absolute;top:0;left:0;right:0;height:60px;background:transparent;pointer-events:auto;cursor:default}
+.shield-overlay::after{content:'';position:absolute;bottom:0;left:0;right:0;height:80px;background:transparent;pointer-events:auto;cursor:default}
+.shield-side{position:absolute;top:60px;bottom:80px;width:50px;background:transparent;z-index:80;pointer-events:auto;cursor:default}
 .shield-side.right{right:0;left:auto}
 .shield-side.left{left:0;right:auto}
-
-/* ─── وضع ملء الشاشة ─── */
-.player-modal.fullscreen .player-box{
-  max-width:100vw;
-  width:100vw;
-  height:100vh;
-  max-height:100vh;
-  border-radius:0;
-}
-.player-modal.fullscreen .player-header{
-  position:absolute;
-  top:0;left:0;right:0;
-  z-index:150;
-  background:linear-gradient(180deg,rgba(0,0,0,.85),transparent);
-  border:none;
-  transition:opacity .3s;
-}
+.player-modal.fullscreen .player-box{max-width:100vw;width:100vw;height:100vh;max-height:100vh;border-radius:0}
+.player-modal.fullscreen .player-header{position:absolute;top:0;left:0;right:0;z-index:150;background:linear-gradient(180deg,rgba(0,0,0,.85),transparent);border:none;transition:opacity .3s}
 .player-modal.fullscreen .player-header:hover{opacity:1}
-.player-modal.fullscreen .player-stage{
-  aspect-ratio:auto;
-  height:100vh;
-  flex:1;
-}
+.player-modal.fullscreen .player-stage{aspect-ratio:auto;height:100vh;flex:1}
 
-/* ─── Landscape على الموبايل ─── */
+/* ═══════════════ Notes Panel ═══════════════ */
+.notes-panel{background:linear-gradient(180deg,rgba(21,31,56,.72),rgba(11,17,34,.62));border:1px solid var(--border);border-radius:16px;padding:16px;transition:.3s}
+.notes-panel:focus-within{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.10)}
+.notes-textarea{width:100%;background:rgba(10,16,32,.72);border:1.5px solid var(--border);border-radius:12px;padding:12px;color:var(--txt);font-family:inherit;font-size:13.5px;line-height:1.7;resize:vertical;min-height:120px;outline:none;transition:.22s}
+.notes-textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(47,125,255,.12)}
+.notes-saved-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:10.5px;font-weight:700;background:rgba(34,197,94,.15);color:#6ee7a0;border:1px solid rgba(34,197,94,.28);animation:pu .3s}
+
 @media(max-width:900px) and (orientation:landscape){
   .player-modal{padding:0}
   .player-box{border-radius:0;max-width:100vw}
@@ -302,9 +160,7 @@ ul{list-style:none}
   <div class="loading"><div class="spinner"></div>جارٍ تحميل الدرس...</div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════
-     🎬 مشغل الفيديو (Modal)
-     ═══════════════════════════════════════════════════ -->
+<!-- ═══════════════ مشغل الفيديو Modal ═══════════════ -->
 <div class="player-modal" id="playerModal">
   <div class="player-box">
     <div class="player-header">
@@ -318,15 +174,10 @@ ul{list-style:none}
       <button class="player-close" id="playerClose" aria-label="إغلاق">✕</button>
     </div>
     <div class="player-stage" id="playerStage">
-      <!-- طبقات الحماية -->
       <div class="shield-overlay"></div>
       <div class="shield-side left"></div>
       <div class="shield-side right"></div>
-
-      <!-- العلامة المائية -->
       <div class="watermark" id="watermark" style="top:20px;left:20px">MISSION EDU</div>
-
-      <!-- مكان الفيديو -->
       <div id="playerContainer"></div>
     </div>
   </div>
@@ -366,6 +217,9 @@ ul{list-style:none}
     doneUnit: 0,
     totalUnit: 0,
     isDone: false,
+    noteText: "",
+    noteSaved: false,
+    noteSaving: false,
     watermarkTimer: null,
     isFullscreen: false
   };
@@ -380,9 +234,7 @@ ul{list-style:none}
     return m ? m[1] : "";
   }
 
-  // ═══════════════════════════════════════════════════
-  //  🎬 تشغيل الفيديو في Modal
-  // ═══════════════════════════════════════════════════
+  /* ═══════════════ مشغل الفيديو ═══════════════ */
   function openPlayer(lesson, user){
     const video = lesson.video || {};
     const url = video.url || "";
@@ -390,42 +242,32 @@ ul{list-style:none}
 
     if(!url){
       Swal.fire({
-        icon: 'warning',
-        title: 'لا يوجد فيديو',
-        text: 'هذا الدرس لا يحتوي على فيديو',
-        background: 'linear-gradient(180deg, #151f38, #0b1122)',
-        color: '#e8eefc',
+        icon: 'warning', title: 'لا يوجد فيديو', text: 'هذا الدرس لا يحتوي على فيديو',
+        background: 'linear-gradient(180deg, #151f38, #0b1122)', color: '#e8eefc',
         confirmButtonColor: '#2f7dff',
         customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
       });
       return;
     }
 
-    // تحديث عنوان المشغل
     const playerTitle = document.getElementById('playerTitle');
     if(playerTitle) playerTitle.textContent = lesson.title || 'الدرس';
 
-    // تحديث العلامة المائية = رقم الطالب فقط
     const watermark = document.getElementById('watermark');
     if(watermark){
       const phone = (user.country_code || '') + (user.phone || '') || user.name || 'طالب';
       watermark.textContent = phone;
     }
 
-    // بناء الفيديو
     const container = document.getElementById('playerContainer');
     if(container){
       if(type === 'youtube'){
         const ytId = getYouTubeId(url);
         if(ytId){
-          // ✅ autoplay + rel=0 + modestbranding
           container.innerHTML = `<iframe
             src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&fs=1&autoplay=1&showinfo=0&controls=1&disablekb=0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-            allowfullscreen
-            referrerpolicy="strict-origin-when-cross-origin"
-            title="فيديو الدرس"
-          ></iframe>`;
+            allowfullscreen referrerpolicy="strict-origin-when-cross-origin" title="فيديو الدرس"></iframe>`;
         } else {
           container.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:Tajawal,sans-serif">رابط YouTube غير صالح</div>`;
         }
@@ -433,48 +275,24 @@ ul{list-style:none}
         const vId = (url.match(/vimeo\.com\/(?:video\/)?(\d+)/) || [])[1];
         container.innerHTML = `<iframe
           src="https://player.vimeo.com/video/${vId}?byline=0&portrait=0&title=0&dnt=1&autoplay=1"
-          allow="autoplay; fullscreen; picture-in-picture"
-          allowfullscreen
-          title="فيديو الدرس"
-        ></iframe>`;
+          allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="فيديو الدرس"></iframe>`;
       } else if(type === 'mp4'){
-        container.innerHTML = `<video
-          id="mp4Video"
-          controls
-          controlsList="nodownload noremoteplayback noplaybackrate"
-          disablePictureInPicture
-          playsinline
-          autoplay
-          style="position:absolute;inset:0;width:100%;height:100%;background:#000;object-fit:contain"
-        >
-          <source src="${esc(url)}" type="video/mp4"/>
-        </video>`;
+        container.innerHTML = `<video id="mp4Video" controls
+          controlsList="nodownload noremoteplayback noplaybackrate" disablePictureInPicture playsinline autoplay
+          style="position:absolute;inset:0;width:100%;height:100%;background:#000;object-fit:contain">
+          <source src="${esc(url)}" type="video/mp4"/></video>`;
       } else {
-        container.innerHTML = `<iframe
-          src="${esc(url)}"
-          allowfullscreen
-          sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"
-          title="فيديو الدرس"
-        ></iframe>`;
+        container.innerHTML = `<iframe src="${esc(url)}" allowfullscreen
+          sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms" title="فيديو الدرس"></iframe>`;
       }
     }
 
-    // إظهار المشغل
     const modal = document.getElementById('playerModal');
-    if(modal){
-      modal.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
+    if(modal){ modal.classList.add('open'); document.body.style.overflow = 'hidden'; }
 
-    // ✅ محاولة الدخول في وضع ملء الشاشة بالعرض
-    setTimeout(()=>{
-      enterFullscreenLandscape();
-    }, 100);
-
-    // بدء تحريك العلامة المائية
+    setTimeout(()=>{ enterFullscreenLandscape(); }, 100);
     startWatermarkMotion();
 
-    // تسجيل النشاط
     try{
       DB.trackActivity({
         userId: user.id, userName: user.name,
@@ -486,61 +304,30 @@ ul{list-style:none}
 
   function closePlayer(){
     const modal = document.getElementById('playerModal');
-    if(modal){
-      modal.classList.remove('open');
-      modal.classList.remove('fullscreen');
-    }
+    if(modal){ modal.classList.remove('open'); modal.classList.remove('fullscreen'); }
     document.body.style.overflow = '';
-
-    // الخروج من ملء الشاشة
     exitFullscreen();
-
-    // قفل الشاشة في الوضع الرأسي
     lockOrientation('portrait');
-
-    // تفريغ الفيديو لوقف التشغيل
     const container = document.getElementById('playerContainer');
     if(container) container.innerHTML = '';
-
-    // إيقاف العلامة المائية
     stopWatermarkMotion();
   }
 
-  // ═══════════════════════════════════════════════════
-  //  🖥 ملء الشاشة + قفل العرض (Landscape)
-  // ═══════════════════════════════════════════════════
   async function enterFullscreenLandscape(){
     const modal = document.getElementById('playerModal');
     const box = modal?.querySelector('.player-box');
-
     try{
-      // 1) ملء الشاشة
       if(box){
-        if(box.requestFullscreen){
-          await box.requestFullscreen();
-        } else if(box.webkitRequestFullscreen){
-          box.webkitRequestFullscreen();
-        } else if(box.msRequestFullscreen){
-          box.msRequestFullscreen();
-        }
+        if(box.requestFullscreen) await box.requestFullscreen();
+        else if(box.webkitRequestFullscreen) box.webkitRequestFullscreen();
+        else if(box.msRequestFullscreen) box.msRequestFullscreen();
       }
-
-      // 2) قفل العرض (Landscape) — يشتغل على الموبايل بس
       if(screen.orientation && screen.orientation.lock){
-        try{
-          await screen.orientation.lock('landscape');
-        }catch(e){
-          console.warn('Orientation lock failed:', e.message);
-        }
+        try{ await screen.orientation.lock('landscape'); }catch(e){}
       }
-
-      // 3) إضافة class للحالة
       modal.classList.add('fullscreen');
       state.isFullscreen = true;
-
     }catch(e){
-      console.warn('Fullscreen failed:', e.message);
-      // نكمل عادي حتى لو ملء الشاشة فشل
       modal.classList.add('fullscreen');
       state.isFullscreen = true;
     }
@@ -554,60 +341,34 @@ ul{list-style:none}
         else if(document.msExitFullscreen) document.msExitFullscreen();
       }
     }catch(e){}
-
     state.isFullscreen = false;
-
-    // إلغاء قفل العرض
-    if(screen.orientation && screen.orientation.unlock){
-      try{ screen.orientation.unlock(); }catch(e){}
-    }
+    if(screen.orientation && screen.orientation.unlock){ try{ screen.orientation.unlock(); }catch(e){} }
   }
 
   async function lockOrientation(mode){
-    if(screen.orientation && screen.orientation.lock){
-      try{
-        await screen.orientation.lock(mode);
-      }catch(e){}
-    }
+    if(screen.orientation && screen.orientation.lock){ try{ await screen.orientation.lock(mode); }catch(e){} }
   }
 
-  // ✅ زر ملء الشاشة اليدوي
   function toggleFullscreen(){
     const modal = document.getElementById('playerModal');
     if(!modal) return;
-
     if(state.isFullscreen){
-      exitFullscreen().then(()=>{
-        modal.classList.remove('fullscreen');
-        lockOrientation('portrait');
-      });
+      exitFullscreen().then(()=>{ modal.classList.remove('fullscreen'); lockOrientation('portrait'); });
     } else {
       enterFullscreenLandscape();
     }
   }
 
-  // ═══════════════════════════════════════════════════
-  //  📍 تحريك العلامة المائية كل 5 ثواني
-  // ═══════════════════════════════════════════════════
   function moveWatermark(){
     const wm = document.getElementById('watermark');
     const stage = document.getElementById('playerStage');
     if(!wm || !stage) return;
-
-    const w = stage.offsetWidth;
-    const h = stage.offsetHeight;
-
-    // إحداثيات عشوائية داخل الفيديو
-    const maxX = Math.max(20, w - 180);
-    const maxY = Math.max(20, h - 50);
-
+    const w = stage.offsetWidth, h = stage.offsetHeight;
+    const maxX = Math.max(20, w - 180), maxY = Math.max(20, h - 50);
     const x = Math.floor(Math.random() * maxX) + 10;
     const y = Math.floor(Math.random() * maxY) + 10;
-
-    wm.style.left = x + 'px';
-    wm.style.top = y + 'px';
-    wm.style.right = 'auto';
-    wm.style.bottom = 'auto';
+    wm.style.left = x + 'px'; wm.style.top = y + 'px';
+    wm.style.right = 'auto'; wm.style.bottom = 'auto';
   }
 
   function startWatermarkMotion(){
@@ -616,34 +377,23 @@ ul{list-style:none}
   }
 
   function stopWatermarkMotion(){
-    if(state.watermarkTimer){
-      clearInterval(state.watermarkTimer);
-      state.watermarkTimer = null;
-    }
+    if(state.watermarkTimer){ clearInterval(state.watermarkTimer); state.watermarkTimer = null; }
   }
 
-  // ═══════════════════════════════════════════════════
-  //  🛡 حماية الفيديو
-  // ═══════════════════════════════════════════════════
   function attachProtection(){
     document.addEventListener('contextmenu', e => e.preventDefault());
-
     document.addEventListener('keydown', e => {
       if(e.key === 'F12'){ e.preventDefault(); return false; }
       if(e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())){ e.preventDefault(); return false; }
       if(e.ctrlKey && e.key.toUpperCase() === 'U'){ e.preventDefault(); return false; }
       if(e.ctrlKey && e.key.toUpperCase() === 'S'){ e.preventDefault(); return false; }
       if(e.ctrlKey && e.key.toUpperCase() === 'P'){ e.preventDefault(); return false; }
-      if(e.key === 'PrintScreen'){
-        try{ navigator.clipboard.writeText(''); }catch(err){}
-      }
-      // ESC لإغلاق المشغل
+      if(e.key === 'PrintScreen'){ try{ navigator.clipboard.writeText(''); }catch(err){} }
       if(e.key === 'Escape'){
         const modal = document.getElementById('playerModal');
         if(modal && modal.classList.contains('open')) closePlayer();
       }
     });
-
     document.addEventListener('copy', e => e.preventDefault());
     document.addEventListener('cut', e => e.preventDefault());
     document.addEventListener('dragstart', e => e.preventDefault());
@@ -652,23 +402,63 @@ ul{list-style:none}
       if(t !== 'input' && t !== 'textarea') e.preventDefault();
     });
     document.addEventListener('dblclick', e => e.preventDefault());
-
-    // ✅ إغلاق المشغل عند الخروج من ملء الشاشة (اختياري)
-    document.addEventListener('fullscreenchange', ()=>{
-      const modal = document.getElementById('playerModal');
-      if(!document.fullscreenElement && modal && modal.classList.contains('open')){
-        // لو خرج من ملء الشاشة بشكل يدوي (F11 مثلاً) — نسيب المشغل مفتوح
-      }
-    });
   }
-  // ═══════════════════════════════════════════════════
-  //  عرض الدرس
-  // ═══════════════════════════════════════════════════
+
+  /* ═══════════════ Notes Panel ═══════════════ */
+  async function loadNote(){
+    try{
+      const sb = await DB.getClient();
+      const { data } = await sb.from('notes').select('*').eq('user_id', state.user.id).eq('lesson_id', lessonId).maybeSingle();
+      state.noteText = data?.text || '';
+      state.noteId = data?.id || null;
+    }catch(e){
+      state.noteText = '';
+      state.noteId = null;
+    }
+  }
+
+  async function saveNote(){
+    if(state.noteSaving) return;
+    state.noteSaving = true;
+    const btn = document.getElementById('btnSaveNote');
+    const badge = document.getElementById('noteSavedBadge');
+    if(btn){ btn.disabled = true; btn.textContent = '⏳ جارٍ الحفظ...'; }
+
+    try{
+      const sb = await DB.getClient();
+      const now = Date.now();
+      if(state.noteId){
+        await sb.from('notes').update({text: state.noteText, updated_at: now}).eq('id', state.noteId);
+      } else {
+        const id = DB.uid('note_');
+        await sb.from('notes').insert([{
+          id, user_id: state.user.id, lesson_id: lessonId,
+          text: state.noteText, created_at: now, updated_at: now
+        }]);
+        state.noteId = id;
+      }
+      state.noteSaved = true;
+      if(badge){
+        badge.style.display = 'inline-flex';
+        setTimeout(()=>{ badge.style.display = 'none'; state.noteSaved = false; }, 2500);
+      }
+    }catch(e){
+      Swal.fire({
+        icon:'error', title:'خطأ', text:e.message,
+        background:'linear-gradient(180deg, #151f38, #0b1122)', color:'#e8eefc',
+        confirmButtonColor:'#2f7dff',
+        customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+      });
+    }
+    state.noteSaving = false;
+    if(btn){ btn.disabled = false; btn.textContent = '💾 حفظ الملاحظات'; }
+  }
+
+  /* ═══════════════ عرض الدرس ═══════════════ */
   function buildPlayerHTML(video, lessonTitle){
     if(!video || !video.url){
       return `<div class="vid-shell"><div class="vp-error"><div style="font-size:48px;opacity:.35;margin-bottom:12px">🎬</div><div>لا يوجد فيديو لهذا الدرس</div></div></div>`;
     }
-
     return `
       <div class="vid-shell" id="vidShell">
         <div class="vp-error" style="background:linear-gradient(135deg,rgba(4,6,14,.92),rgba(11,18,38,.94));display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%">
@@ -763,6 +553,28 @@ ul{list-style:none}
               <div class="xs muted mt8">${state.doneUnit} من ${state.totalUnit} دروس</div>
             </div>
 
+            <!-- ═══════════ 📝 ملاحظاتي ═══════════ -->
+            <div class="notes-panel mb16">
+              <div class="flex between center mb12">
+                <div class="h4" style="display:flex;align-items:center;gap:8px">
+                  <span style="color:var(--blue2)">📝</span> ملاحظاتي
+                </div>
+                <span class="notes-saved-badge" id="noteSavedBadge" style="display:none">✓ محفوظ</span>
+              </div>
+              <textarea
+                class="notes-textarea"
+                id="noteTextarea"
+                placeholder="اكتب ملاحظاتك على الدرس هنا..."
+                rows="6"
+              >${esc(state.noteText)}</textarea>
+              <button class="btn btn-p btn-block mt12" id="btnSaveNote">
+                💾 حفظ الملاحظات
+              </button>
+              <div class="xs muted mt8" style="text-align:center">
+                💡 ملاحظاتك محفوظة على حسابك — تقدر ترجع لها في أي وقت
+              </div>
+            </div>
+
             ${state.relatedExams.length > 0 ? `
               <div class="glass" style="padding:16px">
                 <div class="h4 mb12">📝 اختبارات مرتبطة (${state.relatedExams.length})</div>
@@ -815,15 +627,11 @@ ul{list-style:none}
         DB.trackActivity({userId:u.id,userName:u.name,type:"lesson_complete",target:l.title,details:{xp:l.xp}});
 
         await Swal.fire({
-          icon: 'success',
-          title: 'أحسنت!',
-          text: `+${l.xp} XP`,
-          background: 'linear-gradient(180deg, #151f38, #0b1122)',
-          color: '#e8eefc',
+          icon: 'success', title: 'أحسنت!', text: `+${l.xp} XP`,
+          background: 'linear-gradient(180deg, #151f38, #0b1122)', color: '#e8eefc',
           confirmButtonColor: '#2f7dff',
           customClass: {popup:'swal-custom-popup', title:'swal-custom-title'},
-          timer: 1800,
-          showConfirmButton: false
+          timer: 1800, showConfirmButton: false
         });
 
         location.reload();
@@ -835,20 +643,28 @@ ul{list-style:none}
     // زر المراجعة
     document.getElementById("btnReview").addEventListener("click", ()=>{
       Swal.fire({
-        icon: 'info',
-        title: 'تمت الإضافة',
-        text: 'سجلنا هذا الدرس في قائمة المراجعة',
-        background: 'linear-gradient(180deg, #151f38, #0b1122)',
-        color: '#e8eefc',
+        icon: 'info', title: 'تمت الإضافة', text: 'سجلنا هذا الدرس في قائمة المراجعة',
+        background: 'linear-gradient(180deg, #151f38, #0b1122)', color: '#e8eefc',
         confirmButtonColor: '#2f7dff',
         customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
       });
     });
+
+    // 📝 ربط Notes
+    const ta = document.getElementById('noteTextarea');
+    if(ta){
+      ta.addEventListener('input', (e)=>{
+        state.noteText = e.target.value;
+        state.noteSaved = false;
+        const badge = document.getElementById('noteSavedBadge');
+        if(badge) badge.style.display = 'none';
+      });
+    }
+    const btnSave = document.getElementById('btnSaveNote');
+    if(btnSave) btnSave.addEventListener('click', saveNote);
   }
 
-  // ═══════════════════════════════════════════════════
-  //  تحميل البيانات
-  // ═══════════════════════════════════════════════════
+  /* ═══════════════ تحميل البيانات ═══════════════ */
   async function load(){
     if(!lessonId){
       app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
@@ -909,17 +725,18 @@ ul{list-style:none}
       return lessonIds.includes(lesson.id);
     });
 
+    // 📝 تحميل الملاحظات
+    await loadNote();
+
     render();
 
-    // ربط زر الإغلاق
+    // ربط الأزرار
     const closeBtn = document.getElementById('playerClose');
     if(closeBtn) closeBtn.addEventListener('click', closePlayer);
 
-    // ربط زر ملء الشاشة
     const fsBtn = document.getElementById('playerFullscreen');
     if(fsBtn) fsBtn.addEventListener('click', toggleFullscreen);
 
-    // إغلاق عند الضغط على الخلفية (بره الـ box)
     const modal = document.getElementById('playerModal');
     if(modal){
       modal.addEventListener('click', (e)=>{
@@ -927,13 +744,9 @@ ul{list-style:none}
       });
     }
 
-    // تفعيل الحماية
     attachProtection();
 
-    // ✅ حفظ التاب الحالي في localStorage
-    try{
-      localStorage.setItem('student_last_lesson', lessonId);
-    }catch(e){}
+    try{ localStorage.setItem('student_last_lesson', lessonId); }catch(e){}
   }
 
   window.openWhatsApp = ()=>{
@@ -943,14 +756,10 @@ ul{list-style:none}
   window.sendReport = async ()=>{
     const user = state.user || await DB.getUser(DB.getSessionId());
     const { value: msg } = await Swal.fire({
-      title: '🚨 بلاغ عن مشكلة',
-      input: 'textarea',
+      title: '🚨 بلاغ عن مشكلة', input: 'textarea',
       inputPlaceholder: 'اكتب رسالتك هنا...',
-      showCancelButton: true,
-      confirmButtonText: '📤 إرسال',
-      cancelButtonText: 'إلغاء',
-      confirmButtonColor: '#2f7dff',
-      cancelButtonColor: '#64748b',
+      showCancelButton: true, confirmButtonText: '📤 إرسال', cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#2f7dff', cancelButtonColor: '#64748b',
       inputValidator: v => { if(!v || v.trim().length < 5) return 'يرجى كتابة رسالة واضحة'; },
       customClass: {popup:'swal-custom-popup',title:'swal-custom-title',input:'swal-custom-input'}
     });

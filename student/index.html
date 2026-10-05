@@ -9,6 +9,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <link rel="icon" type="image/png" href="/logo.png">
 <link rel="apple-touch-icon" href="/logo.png">
 <link rel="manifest" href="/manifest.json">
@@ -40,6 +43,7 @@ a{color:inherit;text-decoration:none}
 @keyframes fadeOut{to{opacity:0;transform:translateX(-30px)}}
 @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
 @keyframes sp{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 .brand{display:flex;align-items:center;gap:11px;padding:8px 10px 16px}
 .brand-logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 8px 26px rgba(47,125,255,.45)}
 .brand-name{font-weight:900;font-size:17px}
@@ -113,7 +117,7 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 .sx{overflow-x:auto}
 .avatar{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:14px;background:linear-gradient(140deg,#2f7dff,#8b5cf6);color:#fff;flex-shrink:0}
 .avatar-lg{width:64px;height:64px;border-radius:18px;font-size:24px}
-.icon-btn{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid var(--border);transition:.2s;font-size:16px;color:var(--txt)}
+.icon-btn{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid var(--border);transition:.2s;font-size:16px;color:var(--txt);position:relative}
 .icon-btn:hover{background:rgba(47,125,255,.15);border-color:var(--border2)}
 .hero{padding:24px;border-radius:22px;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(47,125,255,.18),rgba(139,92,246,.12) 50%,rgba(6,182,212,.08));border:1px solid var(--border)}
 .ring{position:relative;display:grid;place-items:center}
@@ -181,6 +185,13 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
   .btmnav button.on{color:var(--blue2);background:rgba(47,125,255,.12)}
   .btmnav .i{font-size:19px;display:flex;justify-content:center}
 }
+/* ═══════════════════════════════════
+   🍅 Pomodoro Styles
+   ═══════════════════════════════════ */
+.pomodoro-ring{position:relative;display:grid;place-items:center}
+.pomodoro-time{font-size:48px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-2px}
+.pomodoro-label{font-size:12px;color:var(--muted);margin-top:6px}
+@media(max-width:640px){.pomodoro-time{font-size:36px}}
 </style>
 </head>
 <body>
@@ -194,6 +205,16 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 const {useState,useEffect,useMemo,useCallback,useRef,createContext,useContext}=React;
 const DB=window.MissionDB;
 
+/* ═══════════════ أصوات ═══════════════ */
+const SOUNDS={
+  notify:"data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT",
+  success:"data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQBvT18AAACAgICAf39/f39/f3+AgICAf39/f39/f3+AgICAf39/f39/f3+AgICAf39/f39/f3+AgICAf39/f39/f38="
+};
+function playSound(type='notify'){
+  try{const a=new Audio(SOUNDS[type]||SOUNDS.notify);a.volume=0.35;a.play().catch(()=>{});}catch(e){}
+}
+
+/* ═══════════════ Toast ═══════════════ */
 const ToastCtx=createContext(null);
 function ToastProvider({children}){
   const [items,setItems]=useState([]);
@@ -201,6 +222,8 @@ function ToastProvider({children}){
     const id=DB.uid('t_');
     const titles={ok:'تم بنجاح',err:'خطأ',warn:'تنبيه',info:'معلومة'};
     setItems(x=>[...x,{id,msg,type,title:title||titles[type]||'',duration}]);
+    if(type==='ok') playSound('success');
+    else if(type==='err') playSound('notify');
   },[]);
   const remove=useCallback(id=>setItems(x=>x.filter(t=>t.id!==id)),[]);
   return <ToastCtx.Provider value={{ok:(m,t)=>push(m,'ok',t),err:(m,t)=>push(m,'err',t),warn:(m,t)=>push(m,'warn',t),info:(m,t)=>push(m,'info',t)}}>
@@ -221,6 +244,7 @@ function Toast({data,onClose}){
 }
 const useToast=()=>useContext(ToastCtx);
 
+/* ═══════════════ App Context ═══════════════ */
 const AppCtx=createContext(null);
 const useApp=()=>useContext(AppCtx);
 
@@ -229,6 +253,8 @@ function AppProvider({children}){
   const [currentUser,setCurrentUser]=useState(null);
   const [attempts,setAttempts]=useState([]);
   const [errors,setErrors]=useState([]);
+  const [notes,setNotes]=useState([]);
+  const [certificates,setCertificates]=useState([]);
   const [loading,setLoading]=useState(true);
   const toast=useToast();
 
@@ -239,11 +265,17 @@ function AppProvider({children}){
   const reloadUserData=useCallback(async ()=>{
     if(!currentUser) return;
     try{
-      const [a,e]=await Promise.all([DB.getAttempts(currentUser.id),DB.getErrors(currentUser.id)]);
-      setAttempts(a);setErrors(e);
+      const sb=await DB.getClient();
+      const [a,e,n,c]=await Promise.all([
+        DB.getAttempts(currentUser.id),
+        DB.getErrors(currentUser.id),
+        sb.from('notes').select('*').eq('user_id',currentUser.id).then(r=>r.data||[]),
+        sb.from('certificates').select('*').eq('user_id',currentUser.id).then(r=>r.data||[])
+      ]);
+      setAttempts(a);setErrors(e);setNotes(n);setCertificates(c);
       const u=await DB.getUser(currentUser.id);
       if(u) setCurrentUser(u);
-    }catch(e){}
+    }catch(e){console.warn(e);}
   },[currentUser]);
 
   useEffect(()=>{
@@ -255,10 +287,16 @@ function AppProvider({children}){
         if(!u||u.active===false){DB.clearSession();window.location.replace('/auth/login.html');return;}
         if(u.role==='admin'){window.location.replace('/admin/index.html');return;}
         setCurrentUser(u);
-        const [a,e]=await Promise.all([DB.getAttempts(u.id),DB.getErrors(u.id)]);
-        setAttempts(a);setErrors(e);
+        const sb=await DB.getClient();
+        const [a,e,n,c]=await Promise.all([
+          DB.getAttempts(u.id),
+          DB.getErrors(u.id),
+          sb.from('notes').select('*').eq('user_id',u.id).then(r=>r.data||[]),
+          sb.from('certificates').select('*').eq('user_id',u.id).then(r=>r.data||[])
+        ]);
+        setAttempts(a);setErrors(e);setNotes(n);setCertificates(c);
         await reload();
-      }catch(e){}
+      }catch(e){console.warn(e);}
       setLoading(false);
     })();
   },[]);
@@ -287,6 +325,7 @@ function AppProvider({children}){
     setCurrentUser(u);
     return u;
   },[]);
+
   const getLevel=useCallback((xp)=>{
     const ls=[...db.levels].sort((a,b)=>a.xp-b.xp);
     if(ls.length===0) return {current:{level:1,name:'مبتدئ',xp:0},next:null};
@@ -295,8 +334,30 @@ function AppProvider({children}){
     return {current:cur,next};
   },[db.levels]);
 
+  /* ═══ الملاحظات ═══ */
+  const saveNote=useCallback(async (lessonId,text)=>{
+    if(!currentUser) return;
+    const sb=await DB.getClient();
+    const existing=notes.find(n=>n.lesson_id===lessonId);
+    const now=Date.now();
+    if(existing){
+      await sb.from('notes').update({text,updated_at:now}).eq('id',existing.id);
+      setNotes(x=>x.map(n=>n.id===existing.id?{...n,text,updated_at:now}:n));
+    } else {
+      const row={id:DB.uid('note_'),user_id:currentUser.id,lesson_id:lessonId,text,created_at:now,updated_at:now};
+      await sb.from('notes').insert([row]);
+      setNotes(x=>[...x,row]);
+    }
+  },[currentUser,notes]);
+
+  const getNote=useCallback((lessonId)=>{
+    return notes.find(n=>n.lesson_id===lessonId)?.text||'';
+  },[notes]);
+
   return <AppCtx.Provider value={{
-    db,currentUser,attempts,errors,loading,logout,updateUser,reload,reloadUserData,getLevel,toast,
+    db,currentUser,attempts,errors,notes,certificates,loading,
+    logout,updateUser,reload,reloadUserData,getLevel,toast,playSound,
+    saveNote,getNote,
     subject:id=>db.subjects.find(s=>s.id===id),
     unit:id=>db.units.find(u=>u.id===id),
     lesson:id=>db.lessons.find(l=>l.id===id),
@@ -306,6 +367,7 @@ function AppProvider({children}){
   }}>{children}</AppCtx.Provider>;
 }
 
+/* ═══════════════ Icon ═══════════════ */
 const Icon=({name,size=18,color='currentColor'})=>{
   const p={width:size,height:size,viewBox:'0 0 24 24',fill:'none',stroke:color,strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round'};
   const paths={
@@ -325,11 +387,20 @@ const Icon=({name,size=18,color='currentColor'})=>{
     play:<><polygon points="5 3 19 12 5 21 5 3"/></>,
     flame:<><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></>,
     zap:<><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></>,
-    clipboard:<><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></>
+    clipboard:<><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></>,
+    note:<><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></>,
+    clock:<><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></>,
+    award:<><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></>,
+    download:<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></>,
+    share:<><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></>,
+    coupon:<><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6"/><path d="M2 8h20v4H2z"/><line x1="12" y1="12" x2="12" y2="22"/><path d="M12 2v6"/></>,
+    pause:<><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></>,
+    refresh:<><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></>
   };
-  return <svg {...p}>{paths[name]}</svg>;
+  return <svg {...p}>{paths[name]||paths.help}</svg>;
 };
 
+/* ═══════════════ مكونات أساسية ═══════════════ */
 function Stat({label,value,icon,color='var(--blue)',sub}){
   return <div className="glass-s hv" style={{padding:16}}>
     <div className="flex between center mb8">
@@ -357,6 +428,197 @@ function Ring({value,size=120,stroke=10,color='#2f7dff',children}){
     <div className="ring-t">{children}</div>
   </div>;
 }
+
+/* ═══════════════ 🍅 Pomodoro Timer ═══════════════ */
+function PomodoroTimer({compact=false}){
+  const app=useApp();
+  const u=app.currentUser;
+  const [mode,setMode]=useState('work'); // work | break
+  const [running,setRunning]=useState(false);
+  const [secondsLeft,setSecondsLeft]=useState(25*60);
+  const [sessions,setSessions]=useState(0);
+  const intervalRef=useRef(null);
+
+  const WORK_TIME=25*60;
+  const BREAK_TIME=5*60;
+
+  useEffect(()=>{
+    if(running){
+      intervalRef.current=setInterval(()=>{
+        setSecondsLeft(s=>{
+          if(s<=1){
+            // خلص الوقت
+            clearInterval(intervalRef.current);
+            setRunning(false);
+            if(mode==='work'){
+              // سجل جلسة
+              saveSession();
+              app.playSound('success');
+              Swal.fire({
+                icon:'success',
+                title:'🎉 خلصت 25 دقيقة!',
+                text:'خد راحة 5 دقايق',
+                background:'linear-gradient(180deg, #151f38, #0b1122)',
+                color:'#e8eefc',
+                confirmButtonColor:'#2f7dff',
+                confirmButtonText:'خد راحة',
+                customClass:{popup:'swal-custom-popup',title:'swal-custom-title'},
+                timer:5000,
+                showConfirmButton:true
+              }).then(()=>{
+                setMode('break');
+                setSecondsLeft(BREAK_TIME);
+              });
+            } else {
+              app.playSound('notify');
+              Swal.fire({
+                icon:'info',
+                title:'☕ خلصت الراحة',
+                text:'جاهز لـ 25 دقيقة جديدة؟',
+                background:'linear-gradient(180deg, #151f38, #0b1122)',
+                color:'#e8eefc',
+                confirmButtonColor:'#2f7dff',
+                confirmButtonText:'يلا نبدأ',
+                customClass:{popup:'swal-custom-popup',title:'swal-custom-title'},
+                timer:5000
+              }).then(()=>{
+                setMode('work');
+                setSecondsLeft(WORK_TIME);
+              });
+            }
+            return 0;
+          }
+          return s-1;
+        });
+      },1000);
+    } else {
+      clearInterval(intervalRef.current);
+    }
+    return ()=>clearInterval(intervalRef.current);
+  },[running,mode]);
+
+  const saveSession=async ()=>{
+    try{
+      const sb=await DB.getClient();
+      await sb.from('pomodoro_sessions').insert([{
+        id:DB.uid('pomo_'),
+        user_id:u.id,
+        duration:25,
+        completed_at:Date.now(),
+        created_at:Date.now()
+      }]);
+      setSessions(s=>s+1);
+      // نضيف XP بسيط
+      await DB.updateUser(u.id,{xp:(u.xp||0)+5});
+      app.reloadUserData();
+    }catch(e){console.warn(e);}
+  };
+
+  const reset=()=>{
+    setRunning(false);
+    setMode('work');
+    setSecondsLeft(WORK_TIME);
+  };
+
+  const total=mode==='work'?WORK_TIME:BREAK_TIME;
+  const progress=((total-secondsLeft)/total)*100;
+  const mins=Math.floor(secondsLeft/60);
+  const secs=secondsLeft%60;
+  const color=mode==='work'?'#f59e0b':'#22c55e';
+
+  if(compact){
+    return <div className="glass-s" style={{padding:12}}>
+      <div className="flex between center mb8">
+        <div className="flex center g8">
+          <span style={{color}}><Icon name="clock" size={16}/></span>
+          <span className="sm" style={{fontWeight:700}}>{mode==='work'?'🍅 مذاكرة':'☕ راحة'}</span>
+        </div>
+        <span className="h4" style={{fontVariantNumeric:'tabular-nums',color}}>
+          {String(mins).padStart(2,'0')}:{String(secs).padStart(2,'0')}
+        </span>
+      </div>
+      <div className="bar"><div className="bar-f" style={{width:`${progress}%`,background:color}}/></div>
+      <div className="flex g6 mt8">
+        <button className="btn btn-s btn-sm" style={{flex:1}} onClick={()=>setRunning(r=>!r)}>
+          {running?<><Icon name="pause" size={12}/> إيقاف</>:'▶️ تشغيل'}
+        </button>
+        <button className="btn btn-s btn-sm" onClick={reset}>
+          <Icon name="refresh" size={12}/>
+        </button>
+      </div>
+    </div>;
+  }
+
+  return <div className="glass" style={{padding:24,textAlign:'center'}}>
+    <div className="h3 mb16" style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
+      <span style={{color}}>{mode==='work'?'🍅':'☕'}</span>
+      {mode==='work'?'وقت المذاكرة':'وقت الراحة'}
+    </div>
+
+    <Ring value={progress} size={220} stroke={14} color={color}>
+      <div className="pomodoro-time">{String(mins).padStart(2,'0')}:{String(secs).padStart(2,'0')}</div>
+      <div className="pomodoro-label">{mode==='work'?'من 25 دقيقة':'من 5 دقايق'}</div>
+    </Ring>
+
+    <div className="flex center g8 mt20" style={{justifyContent:'center'}}>
+      <button className="btn btn-p" onClick={()=>setRunning(r=>!r)} style={{minWidth:140}}>
+        {running?<><Icon name="pause" size={14}/> إيقاف مؤقت</>:'▶️ ابدأ'}
+      </button>
+      <button className="btn btn-s" onClick={reset}>
+        <Icon name="refresh" size={14}/> إعادة
+      </button>
+    </div>
+
+    {sessions > 0 && <div className="pill pill-g mt16" style={{display:'inline-flex'}}>
+      ✅ أكملت {sessions} جلسة النهاردة
+    </div>}
+  </div>;
+}
+
+/* ═══════════════ 📝 Notes Panel ═══════════════ */
+function NotesPanel({lessonId}){
+  const app=useApp();
+  const [text,setText]=useState(()=>app.getNote(lessonId));
+  const [saving,setSaving]=useState(false);
+  const [saved,setSaved]=useState(false);
+
+  useEffect(()=>{
+    setText(app.getNote(lessonId));
+    setSaved(false);
+  },[lessonId]);
+
+  const save=async ()=>{
+    setSaving(true);
+    try{
+      await app.saveNote(lessonId,text);
+      setSaved(true);
+      app.toast.ok('تم حفظ الملاحظات');
+      setTimeout(()=>setSaved(false),2000);
+    }catch(e){app.toast.err(e.message);}
+    setSaving(false);
+  };
+
+  return <div className="glass" style={{padding:16}}>
+    <div className="flex between center mb12">
+      <div className="h4" style={{display:'flex',alignItems:'center',gap:8}}>
+        <Icon name="note" size={16}/> ملاحظاتي
+      </div>
+      {saved && <span className="pill pill-g" style={{fontSize:10}}>✓ محفوظ</span>}
+    </div>
+    <textarea
+      className="input"
+      value={text}
+      onChange={e=>{setText(e.target.value);setSaved(false);}}
+      placeholder="اكتب ملاحظاتك على الدرس هنا..."
+      rows="5"
+    />
+    <button className="btn btn-p btn-block mt12" onClick={save} disabled={saving}>
+      {saving?'جارٍ الحفظ...':'💾 حفظ الملاحظات'}
+    </button>
+  </div>;
+}
+
+/* ═══════════════ Sidebar ═══════════════ */
 function Sidebar({items,active,onNav,open,onClose}){
   return <>
     {open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.5)',zIndex:55}}/>}
@@ -384,7 +646,8 @@ function Sidebar({items,active,onNav,open,onClose}){
   </>;
 }
 
-function Topbar({user,onMenu,onLogout,onSearch,searchResults}){
+/* ═══════════════ Topbar ═══════════════ */
+function Topbar({user,onMenu,onLogout,onSearch,searchResults,unreadNotifs=0,onOpenNotifications}){
   const [q,setQ]=useState('');
   const [open,setOpen]=useState(false);
   useEffect(()=>{
@@ -412,6 +675,20 @@ function Topbar({user,onMenu,onLogout,onSearch,searchResults}){
       </div>}
     </div>
     <div className="flex center g8" style={{marginInlineStart:'auto'}}>
+      <button className="icon-btn" onClick={onOpenNotifications} title="الإشعارات">
+        <Icon name="bell" size={16}/>
+        {unreadNotifs > 0 && (
+          <span style={{
+            position:'absolute',top:-4,insetInlineEnd:-4,
+            minWidth:18,height:18,borderRadius:9,
+            background:'linear-gradient(135deg,#2f7dff,#8b5cf6)',
+            color:'#fff',fontSize:10,fontWeight:900,
+            display:'grid',placeItems:'center',padding:'0 5px',
+            boxShadow:'0 0 10px rgba(47,125,255,.7)',
+            animation:'pulse 2s infinite'
+          }}>{unreadNotifs > 9 ? '9+' : unreadNotifs}</span>
+        )}
+      </button>
       <div className="glass-s" style={{padding:'5px 12px',display:'flex',alignItems:'center',gap:8}}>
         <div className="avatar" style={{width:32,height:32,fontSize:15}}>{user.avatar||'👤'}</div>
       </div>
@@ -419,7 +696,7 @@ function Topbar({user,onMenu,onLogout,onSearch,searchResults}){
     </div>
   </div>;
 }
-
+/* ═══════════════ Home ═══════════════ */
 function Home({onNav,setSelected}){
   const app=useApp();
   const u=app.currentUser;
@@ -431,10 +708,15 @@ function Home({onNav,setSelected}){
   });
   const doneLessons=accessibleLessons.filter(l=>(u.completed_lessons||[]).includes(l.id));
   const progressPct=DB.pct(doneLessons.length,accessibleLessons.length);
-  const userMissions=app.db.missions.filter(m=>access.includes(m.subject_id));
-  const currentMission=userMissions.sort((a,b)=>a.sort_order-b.sort_order).find(m=>!(u.completed_missions||[]).includes(m.id));
   const top10=useMemo(()=>[...app.db.users.filter(x=>x.role==='student'&&x.active!==false)].sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,10),[app.db.users]);
   const recentAttempts=useMemo(()=>[...(app.attempts||[])].slice(0,3),[app.attempts]);
+
+  // آخر درس
+  const lastLessonId = (()=>{
+    try{ return localStorage.getItem('student_last_lesson'); }
+    catch(e){ return null; }
+  })();
+  const lastLesson = lastLessonId ? app.lesson(lastLessonId) : null;
 
   return <>
     <div className="hero mb16">
@@ -442,9 +724,16 @@ function Home({onNav,setSelected}){
         <div>
           <div className="h2 mb6">أهلًا بك {u.name.split(' ')[0]} 👋</div>
           <div className="sm txt2 mb12">مهمتك الحالية في انتظارك.</div>
-          <button className="btn btn-p btn-lg" onClick={()=>onNav('subjects')}>
-            <Icon name="book" size={14} color="#fff"/> استعرض المواد
-          </button>
+          <div className="flex wrap g8">
+            {lastLesson && (
+              <a href={`/student/lesson.html?id=${lastLesson.id}`} className="btn btn-p btn-lg" style={{textDecoration:'none'}}>
+                ▶️ متابعة: {lastLesson.title.slice(0,20)}
+              </a>
+            )}
+            <button className="btn btn-g btn-lg" onClick={()=>onNav('subjects')}>
+              <Icon name="book" size={14}/> استعرض المواد
+            </button>
+          </div>
         </div>
         <div className="flex center g16">
           <Ring value={progressPct} size={110} stroke={9} color="#2f7dff">
@@ -464,6 +753,21 @@ function Home({onNav,setSelected}){
       <Stat label="سلسلة المذاكرة" value={`${u.streak||0}`} icon="flame" color="#f59e0b"/>
       <Stat label="الدروس المكتملة" value={DB.fmt(doneLessons.length)} icon="book" color="#22c55e" sub={`من ${accessibleLessons.length}`}/>
       <Stat label="الإنجازات" value={DB.fmt((u.achievements||[]).length)} icon="trophy" color="#8b5cf6"/>
+    </div>
+
+    <div className="grid g2 mb16">
+      <PomodoroTimer compact={true}/>
+      <div className="glass-s" style={{padding:12,cursor:'pointer'}} onClick={()=>onNav('notes')}>
+        <div className="flex between center mb8">
+          <div className="flex center g8">
+            <span style={{color:'var(--blue2)'}}><Icon name="note" size={16}/></span>
+            <span className="sm" style={{fontWeight:700}}>📝 ملاحظاتي</span>
+          </div>
+          <span className="pill pill-b">{app.notes?.length||0}</span>
+        </div>
+        <div className="xs muted">عندك {app.notes?.length||0} ملاحظة محفوظة</div>
+        <div className="xs mt8" style={{color:'var(--blue2)',fontWeight:700}}>اضغط لعرضهم ←</div>
+      </div>
     </div>
 
     <div className="glass mb16" style={{padding:18}}>
@@ -508,6 +812,7 @@ function Home({onNav,setSelected}){
   </>;
 }
 
+/* ═══════════════ Subjects ═══════════════ */
 function Subjects({setSelected,setTab}){
   const app=useApp();
   const u=app.currentUser;
@@ -541,6 +846,7 @@ function Subjects({setSelected,setTab}){
   </>;
 }
 
+/* ═══════════════ SubjectDetail ═══════════════ */
 function SubjectDetail({subjectId,setSelected,setTab}){
   const app=useApp();
   const u=app.currentUser;
@@ -594,10 +900,14 @@ function SubjectDetail({subjectId,setSelected,setTab}){
             {lessons.map(l=>{
               const done=(u.completed_lessons||[]).includes(l.id);
               const hasVideo=l.video&&l.video.url;
+              const note=app.getNote(l.id);
               return <a key={l.id} href={`/student/lesson.html?id=${l.id}`} className="glass-s hv" style={{padding:14,textDecoration:'none',color:'inherit'}}>
                 <div className="flex between center mb6">
                   <span className={`pill ${done?'pill-g':'pill-b'}`}>{done?<Icon name="check" size={12}/>:<Icon name="play" size={12}/>}</span>
-                  {hasVideo&&<span className="pill pill-v" style={{fontSize:10}}>🎬</span>}
+                  <div className="flex g6">
+                    {note && <span className="pill pill-y" style={{fontSize:10}}>📝</span>}
+                    {hasVideo&&<span className="pill pill-v" style={{fontSize:10}}>🎬</span>}
+                  </div>
                 </div>
                 <div className="h4" style={{fontSize:14}}>{l.title}</div>
                 <div className="xs muted mt6">⏱ {l.duration}د • +{l.xp} XP</div>
@@ -627,6 +937,8 @@ function SubjectDetail({subjectId,setSelected,setTab}){
     })}
   </>;
 }
+
+/* ═══════════════ Missions ═══════════════ */
 function Missions({setSelected,setTab}){
   const app=useApp();
   const u=app.currentUser;
@@ -689,6 +1001,7 @@ function Missions({setSelected,setTab}){
   </>;
 }
 
+/* ═══════════════ Achievements ═══════════════ */
 function Achievements(){
   const app=useApp();
   const u=app.currentUser;
@@ -710,6 +1023,7 @@ function Achievements(){
   </>;
 }
 
+/* ═══════════════ ErrorBook ═══════════════ */
 function ErrorBook(){
   const app=useApp();
   const errs=app.errors;
@@ -746,6 +1060,7 @@ function ErrorBook(){
   </>;
 }
 
+/* ═══════════════ Leaderboard ═══════════════ */
 function Leaderboard(){
   const app=useApp();
   const u=app.currentUser;
@@ -828,6 +1143,256 @@ function Leaderboard(){
   </>;
 }
 
+/* ═══════════════ 📝 Notes Page (جديد) ═══════════════ */
+function NotesPage({setTab}){
+  const app=useApp();
+  const notes = app.notes || [];
+  const sortedNotes = useMemo(()=>{
+    return [...notes].sort((a,b)=>(b.updated_at||0)-(a.updated_at||0));
+  },[notes]);
+
+  const [editing,setEditing]=useState(null);
+  const [text,setText]=useState('');
+
+  const startEdit=(n)=>{setEditing(n.id);setText(n.text||'');};
+  const cancelEdit=()=>{setEditing(null);setText('');};
+
+  const saveEdit=async (n)=>{
+    try{
+      await app.saveNote(n.lesson_id,text);
+      app.toast.ok('تم الحفظ');
+      setEditing(null);
+    }catch(e){app.toast.err(e.message);}
+  };
+
+  const delNote=async (n)=>{
+    const r=await Swal.fire({
+      title:'حذف الملاحظة؟',icon:'warning',showCancelButton:true,
+      confirmButtonText:'نعم',cancelButtonText:'إلغاء',
+      confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
+      background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',
+      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+    });
+    if(!r.isConfirmed) return;
+    try{
+      const sb=await DB.getClient();
+      await sb.from('notes').delete().eq('id',n.id);
+      app.reloadUserData();
+      app.toast.warn('تم الحذف');
+    }catch(e){app.toast.err(e.message);}
+  };
+
+  return <>
+    <div className="flex between center mb16 wrap g8">
+      <div>
+        <div className="h2 grad">📝 ملاحظاتي</div>
+        <div className="sm muted mt6">كل ملاحظاتك على الدروس في مكان واحد</div>
+      </div>
+      <span className="pill pill-b">{sortedNotes.length} ملاحظة</span>
+    </div>
+
+    {sortedNotes.length===0 ? (
+      <div className="glass" style={{padding:30}}>
+        <Empty icon="📝" title="لا توجد ملاحظات" desc="ابدأ بكتابة ملاحظاتك من صفحة الدرس"/>
+      </div>
+    ) : (
+      <div className="grid g2">
+        {sortedNotes.map(n=>{
+          const l = app.lesson(n.lesson_id);
+          const isEditing = editing===n.id;
+          return <div key={n.id} className="glass" style={{padding:16}}>
+            <div className="flex between center mb12">
+              <div className="flex center g8" style={{flex:1,minWidth:0}}>
+                <span className="pill pill-b" style={{fontSize:11}}>
+                  <Icon name="note" size={11}/> درس
+                </span>
+                {l ? (
+                  <a href={`/student/lesson.html?id=${l.id}`} className="sm" style={{fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
+                    {l.title}
+                  </a>
+                ) : <span className="sm muted">درس محذوف</span>}
+              </div>
+              <span className="xs muted">{new Date(n.updated_at||n.created_at).toLocaleDateString('ar-EG')}</span>
+            </div>
+
+            {isEditing ? (
+              <>
+                <textarea className="input" value={text} onChange={e=>setText(e.target.value)} rows="5"/>
+                <div className="flex g8 mt12">
+                  <button className="btn btn-p btn-sm" style={{flex:1}} onClick={()=>saveEdit(n)}>💾 حفظ</button>
+                  <button className="btn btn-s btn-sm" onClick={cancelEdit}>إلغاء</button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="sm txt2" style={{
+                  background:'rgba(0,0,0,.20)',
+                  padding:10,borderRadius:10,
+                  borderInlineStart:'2px solid var(--blue)',
+                  whiteSpace:'pre-wrap',minHeight:60
+                }}>{n.text||'—'}</div>
+                <div className="flex g8 mt12">
+                  <button className="btn btn-s btn-sm" style={{flex:1}} onClick={()=>startEdit(n)}>
+                    <Icon name="edit" size={12}/> تعديل
+                  </button>
+                  <button className="btn btn-dn btn-sm" onClick={()=>delNote(n)}>
+                    <Icon name="trash" size={12}/>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>;
+        })}
+      </div>
+    )}
+  </>;
+}
+
+/* ═══════════════ 🏆 Certificates Page (جديد) ═══════════════ */
+function CertificatesPage(){
+  const app=useApp();
+  const certs = app.certificates || [];
+  const [busy,setBusy]=useState(false);
+
+  const downloadPDF = async (cert) => {
+    setBusy(true);
+    try{
+      const { jsPDF } = window.jspdf;
+      const student = app.currentUser;
+      const subject = app.subject(cert.subject_id);
+
+      const container = document.createElement('div');
+      container.style.cssText = `
+        position:fixed; left:-9999px; top:0;
+        width:1123px; height:794px;
+        font-family:'Tajawal','Cairo',sans-serif;
+        direction:rtl;
+        background:linear-gradient(135deg,#04060e 0%,#0b1122 50%,#04060e 100%);
+        color:#e8eefc;
+        padding:60px;
+        box-sizing:border-box;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        text-align:center;
+        border:8px double #5aa9ff;
+        position:relative;
+      `;
+
+      container.innerHTML = `
+        <div style="position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,#5aa9ff,#a78bfa,#22d3ee,#a78bfa,#5aa9ff)"></div>
+        <div style="position:absolute;bottom:0;left:0;right:0;height:6px;background:linear-gradient(90deg,#5aa9ff,#a78bfa,#22d3ee,#a78bfa,#5aa9ff)"></div>
+
+        <div style="font-size:72px;font-weight:900;color:#5aa9ff;letter-spacing:2px;margin-bottom:10px">MISSION EDU</div>
+        <div style="font-size:22px;color:#b7c6e4;letter-spacing:4px;margin-bottom:40px">منصة تعليمية متكاملة</div>
+
+        <div style="font-size:38px;font-weight:900;color:#5aa9ff;margin-bottom:30px;padding-bottom:20px;border-bottom:2px solid #5aa9ff;display:inline-block">
+          شهادة إتمام
+        </div>
+
+        <div style="font-size:22px;color:#b7c6e4;margin-bottom:20px">تشهد المنصة بأن</div>
+
+        <div style="font-size:44px;font-weight:900;color:#a78bfa;margin-bottom:25px;padding:15px 40px;background:rgba(90,169,255,.12);border:2px solid #5aa9ff;border-radius:15px">
+          ${student?.name || 'الطالب'}
+        </div>
+
+        <div style="font-size:22px;color:#b7c6e4;margin-bottom:20px">قد أتم بنجاح دراسة مادة</div>
+
+        <div style="font-size:34px;font-weight:900;color:#5aa9ff;margin-bottom:35px">
+          ${subject?.icon || '📚'} ${subject?.name || 'المادة'}
+        </div>
+
+        <div style="font-size:16px;color:#7f93b8;margin-bottom:40px">
+          ${new Date(cert.issued_at).toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'})}
+        </div>
+
+        <div style="display:flex;justify-content:space-around;width:100%;margin-top:20px">
+          <div style="text-align:center">
+            <div style="font-size:14px;color:#b7c6e4;margin-bottom:8px">رقم الشهادة</div>
+            <div style="font-size:12px;color:#7f93b8;font-family:monospace" dir="ltr">${cert.id.slice(-12).toUpperCase()}</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:14px;color:#b7c6e4;margin-bottom:8px">التوقيع</div>
+            <div style="font-size:20px;color:#5aa9ff;font-weight:900">MISSION EDU</div>
+          </div>
+        </div>
+
+        <div style="position:absolute;top:40px;right:40px;font-size:60px;opacity:.15">🏆</div>
+        <div style="position:absolute;bottom:40px;left:40px;font-size:60px;opacity:.15">🎓</div>
+      `;
+
+      document.body.appendChild(container);
+
+      const canvas = await window.html2canvas(container, {
+        scale: 2,
+        backgroundColor: '#04060e',
+        useCORS: true
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const pdfW = pdf.internal.pageSize.getWidth();
+      const pdfH = pdf.internal.pageSize.getHeight();
+
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
+      pdf.save(`شهادة_${subject?.name||'مادة'}.pdf`);
+
+      document.body.removeChild(container);
+      app.toast.ok('تم تحميل الشهادة');
+    }catch(e){
+      console.error(e);
+      app.toast.err('فشل توليد الشهادة');
+    }
+    setBusy(false);
+  };
+
+  return <>
+    <div className="flex between center mb16 wrap g8">
+      <div>
+        <div className="h2 grad">🏆 شهاداتي</div>
+        <div className="sm muted mt6">كل شهاداتك في مكان واحد</div>
+      </div>
+      <span className="pill pill-b">{certs.length} شهادة</span>
+    </div>
+
+    {certs.length===0 ? (
+      <div className="glass" style={{padding:30}}>
+        <Empty icon="🏆" title="لا توجد شهادات" desc="أكمل مادة كاملة للحصول على شهادة"/>
+      </div>
+    ) : (
+      <div className="grid g-auto">
+        {certs.map(c=>{
+          const s = app.subject(c.subject_id);
+          return <div key={c.id} className="glass hv" style={{padding:24,textAlign:'center'}}>
+            <div style={{fontSize:56,marginBottom:12}}>🏆</div>
+            <div className="h4 mb6">{s?.icon} {s?.name||'مادة'}</div>
+            <div className="xs muted mb16">
+              صدرت في {new Date(c.issued_at).toLocaleDateString('ar-EG')}
+            </div>
+            <div className="xs muted mb16" dir="ltr" style={{fontFamily:'monospace'}}>
+              #{c.id.slice(-12).toUpperCase()}
+            </div>
+            <button
+              className="btn btn-p btn-block"
+              onClick={()=>downloadPDF(c)}
+              disabled={busy}
+            >
+              {busy?'جارٍ...':<><Icon name="download" size={14}/> تحميل PDF</>}
+            </button>
+          </div>;
+        })}
+      </div>
+    )}
+  </>;
+}
+
+/* ═══════════════ Notifications ═══════════════ */
 function Notifications(){
   const app=useApp();
   const u=app.currentUser;
@@ -859,6 +1424,7 @@ function Notifications(){
   </>;
 }
 
+/* ═══════════════ Profile Redirect ═══════════════ */
 function ProfileRedirect(){
   useEffect(()=>{
     window.location.href = "/student/profile.html";
@@ -866,6 +1432,7 @@ function ProfileRedirect(){
   return <div className="loading"><div className="spinner"></div>جارٍ التحويل...</div>;
 }
 
+/* ═══════════════ Footer ═══════════════ */
 function Footer(){
   const app=useApp();
   const u=app.currentUser;
@@ -873,7 +1440,6 @@ function Footer(){
     const { value: msg } = await Swal.fire({
       title: '🚨 بلاغ عن مشكلة',
       input: 'textarea',
-      inputLabel: 'اكتب مشكلتك بالتفصيل',
       inputPlaceholder: 'اكتب رسالتك هنا...',
       showCancelButton: true,
       confirmButtonText: '📤 إرسال',
@@ -908,18 +1474,17 @@ function Footer(){
     </button>
   </div>;
 }
+
+/* ═══════════════ StudentApp النهائي ═══════════════ */
 function StudentApp(){
   const app=useApp();
   const user=app.currentUser;
 
-  // ✅ استرجاع التاب من localStorage
   const [tab,setTab]=useState(()=>{
-    try{
-      return localStorage.getItem('student_tab') || 'home';
-    }catch(e){ return 'home'; }
+    try{ return localStorage.getItem('student_tab') || 'home'; }
+    catch(e){ return 'home'; }
   });
 
-  // ✅ استرجاع المادة المختارة من localStorage
   const [selected,setSelected]=useState(()=>{
     try{
       const saved = localStorage.getItem('student_selected');
@@ -930,14 +1495,11 @@ function StudentApp(){
   const [sidebarOpen,setSidebarOpen]=useState(false);
   const [searchResults,setSearchResults]=useState([]);
 
-  // ✅ حفظ التاب كل ما يتغير
   useEffect(()=>{
-    try{
-      localStorage.setItem('student_tab', tab);
-    }catch(e){}
+    try{ localStorage.setItem('student_tab', tab); }
+    catch(e){}
   },[tab]);
 
-  // ✅ حفظ المادة المختارة كل ما تتغير
   useEffect(()=>{
     try{
       if(selected){
@@ -948,11 +1510,8 @@ function StudentApp(){
     }catch(e){}
   },[selected]);
 
-  // ✅ التنقل مع مسح المادة لو خرجنا من صفحتها
   const handleNav = (id)=>{
-    if(id !== 'subject'){
-      setSelected(null);
-    }
+    if(id !== 'subject') setSelected(null);
     setTab(id);
   };
 
@@ -963,6 +1522,8 @@ function StudentApp(){
     {id:'subjects',icon:'book',label:'المواد'},
     {id:'missions',icon:'target',label:'المهام'},
     {id:'achievements',icon:'trophy',label:'الإنجازات'},
+    {id:'notes',icon:'note',label:'ملاحظاتي',badge:app.notes?.length||null},
+    {id:'certificates',icon:'award',label:'شهاداتي',badge:app.certificates?.length||null},
     {id:'errors',icon:'alert',label:'دفتر أخطائي'},
     {id:'leaderboard',icon:'medal',label:'المتصدرون'},
     {id:'notifications',icon:'bell',label:'الإشعارات',badge:unread||null},
@@ -983,13 +1544,23 @@ function StudentApp(){
   return <div className="app">
     <Sidebar items={items} active={tab} onNav={handleNav} open={sidebarOpen} onClose={()=>setSidebarOpen(false)}/>
     <div className="main">
-      <Topbar user={user} onMenu={()=>setSidebarOpen(true)} onLogout={app.logout} onSearch={onSearch} searchResults={searchResults}/>
+      <Topbar
+        user={user}
+        onMenu={()=>setSidebarOpen(true)}
+        onLogout={app.logout}
+        onSearch={onSearch}
+        searchResults={searchResults}
+        unreadNotifs={unread}
+        onOpenNotifications={()=>handleNav('notifications')}
+      />
       <div className="content">
         {tab==='home'&&<Home onNav={setTab} setSelected={setSelected}/>}
         {tab==='subjects'&&<Subjects setSelected={setSelected} setTab={setTab}/>}
         {tab==='subject'&&selected&&<SubjectDetail subjectId={selected.id} setSelected={setSelected} setTab={setTab}/>}
         {tab==='missions'&&<Missions setSelected={setSelected} setTab={setTab}/>}
         {tab==='achievements'&&<Achievements/>}
+        {tab==='notes'&&<NotesPage setTab={setTab}/>}
+        {tab==='certificates'&&<CertificatesPage/>}
         {tab==='errors'&&<ErrorBook/>}
         {tab==='leaderboard'&&<Leaderboard/>}
         {tab==='notifications'&&<Notifications/>}
@@ -1002,8 +1573,8 @@ function StudentApp(){
         {id:'home',icon:'home',label:'الرئيسية'},
         {id:'subjects',icon:'book',label:'المواد'},
         {id:'missions',icon:'target',label:'المهام'},
-        {id:'leaderboard',icon:'medal',label:'المتصدرون'},
-        {id:'profile',icon:'user',label:'حسابي'}
+        {id:'notes',icon:'note',label:'ملاحظاتي'},
+        {id:'certificates',icon:'award',label:'شهاداتي'}
       ].map(it=><button key={it.id} className={tab===it.id?'on':''} onClick={()=>handleNav(it.id)}>
         <span className="i"><Icon name={it.icon} size={19}/></span>{it.label}
       </button>)}
@@ -1011,6 +1582,7 @@ function StudentApp(){
   </div>;
 }
 
+/* ═══════════════ Root + App ═══════════════ */
 function Root(){
   const app=useApp();
   if(app.loading) return <div className="loading"><div className="spinner"></div>جارٍ التحميل...</div>;

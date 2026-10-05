@@ -11,6 +11,7 @@
 <link rel="apple-touch-icon" href="/logo.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MISSION EDU">
 <meta name="mobile-web-app-capable" content="yes">
 <style>
 :root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--red:#ef4444;--violet:#8b5cf6;--r:20px;--sh:0 18px 50px rgba(0,0,0,.45)}
@@ -31,7 +32,6 @@ body{
 button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
 a{color:inherit;text-decoration:none}
 
-/* ─── الشريط العلوي ─── */
 .topbar{
   position:fixed;top:0;left:0;right:0;z-index:100;
   display:flex;align-items:center;gap:12px;
@@ -75,7 +75,6 @@ a{color:inherit;text-decoration:none}
   50%{opacity:.5;transform:scale(.85)}
 }
 
-/* ─── حاوية الفيديو ─── */
 .video-stage{
   position:fixed;
   top:60px;left:0;right:0;bottom:0;
@@ -103,14 +102,12 @@ a{color:inherit;text-decoration:none}
   pointer-events:auto;
 }
 
-/* ─── طبقة منع التفاعل ─── */
 .shield{
   position:absolute;inset:0;z-index:5;
   background:transparent;
   pointer-events:none;
 }
 
-/* ─── العلامة المائية المتحركة ─── */
 .watermark{
   position:absolute;
   z-index:10;
@@ -135,7 +132,6 @@ a{color:inherit;text-decoration:none}
   transition:top 2s cubic-bezier(.4,0,.2,1), left 2s cubic-bezier(.4,0,.2,1), right 2s cubic-bezier(.4,0,.2,1);
 }
 
-/* ─── غطاء التشغيل ─── */
 .cover{
   position:absolute;inset:0;z-index:20;
   display:flex;flex-direction:column;
@@ -181,7 +177,6 @@ a{color:inherit;text-decoration:none}
   opacity:.7;
 }
 
-/* ─── شاشة الحماية ─── */
 .secure-hint{
   position:fixed;bottom:16px;right:16px;z-index:50;
   font-size:11px;
@@ -196,7 +191,6 @@ a{color:inherit;text-decoration:none}
   user-select:none;
 }
 
-/* ─── Loading ─── */
 .loading{
   position:fixed;inset:0;z-index:200;
   display:flex;flex-direction:column;
@@ -214,7 +208,6 @@ a{color:inherit;text-decoration:none}
 }
 @keyframes sp{to{transform:rotate(360deg)}}
 
-/* ─── Error state ─── */
 .error-state{
   position:fixed;inset:0;z-index:150;
   display:flex;flex-direction:column;
@@ -236,7 +229,6 @@ a{color:inherit;text-decoration:none}
 }
 .error-btn:hover{transform:translateY(-2px);box-shadow:0 14px 38px rgba(47,125,255,.55)}
 
-/* ─── شاشة الجوال ─── */
 @media(max-width:640px){
   .topbar{padding:10px 14px;gap:8px}
   .back-btn{padding:8px 12px;font-size:12.5px}
@@ -247,7 +239,6 @@ a{color:inherit;text-decoration:none}
   .cover-title{font-size:18px}
 }
 
-/* ─── منع تحديد النص ─── */
 *{
   -webkit-user-drag:none;
   -khtml-user-drag:none;
@@ -262,7 +253,6 @@ img,video,iframe{
 </head>
 <body>
 
-<!-- شريط علوي -->
 <div class="topbar">
   <a href="/student/index.html" class="back-btn">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
@@ -274,15 +264,12 @@ img,video,iframe{
   <span class="badge">محمي</span>
 </div>
 
-<!-- حاوية الفيديو -->
 <div class="video-stage">
   <div class="video-frame" id="videoFrame">
     <div id="playerContainer"></div>
 
-    <!-- العلامة المائية -->
     <div class="watermark" id="watermark" style="top:20px;right:20px">MISSION EDU</div>
 
-    <!-- غطاء التشغيل -->
     <div class="cover" id="cover">
       <div class="cover-icon">
         <svg width="36" height="36" viewBox="0 0 24 24" fill="#fff">
@@ -296,10 +283,8 @@ img,video,iframe{
   </div>
 </div>
 
-<!-- تنبيه الحماية -->
 <div class="secure-hint">🛡 محتوى محمي</div>
 
-<!-- شاشة التحميل -->
 <div class="loading" id="loading">
   <div class="spinner"></div>
   جارٍ تحميل الفيديو...
@@ -324,9 +309,6 @@ img,video,iframe{
     currentCorner: 0
   };
 
-  /* ─────────────────────────────────────
-     أدوات مساعدة
-  ───────────────────────────────────── */
   function esc(str){
     return String(str||"").replace(/[&<>"']/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[s]);
   }
@@ -343,16 +325,12 @@ img,video,iframe{
     return m ? m[1] : "";
   }
 
-  /* ─────────────────────────────────────
-     بناء الفيديو (YouTube / Vimeo / MP4 / External)
-  ───────────────────────────────────── */
   function buildPlayer(type, url){
     if(!url) return '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:Tajawal,sans-serif">لا يوجد فيديو</div>';
 
     if(type === "youtube"){
       const id = getYouTubeId(url);
       if(!id) return '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:Tajawal,sans-serif">رابط YouTube غير صالح</div>';
-      // ✅ youtube-nocookie + خيارات منع التحميل والاقتراحات
       return `<iframe
         src="https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&fs=1&disablekb=0&controls=1&showinfo=0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
@@ -402,15 +380,12 @@ img,video,iframe{
     return '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:Tajawal,sans-serif">نوع الفيديو غير مدعوم</div>';
   }
 
-  /* ─────────────────────────────────────
-     تحريك العلامة المائية كل 5 ثواني
-  ───────────────────────────────────── */
   const CORNERS = [
-    {top:'20px', right:'20px', left:'auto'},   // يمين فوق
-    {top:'20px', left:'20px', right:'auto'},   // يسار فوق
-    {bottom:'20px', left:'20px', right:'auto', top:'auto'},  // يسار تحت
-    {bottom:'20px', right:'20px', left:'auto', top:'auto'},  // يمين تحت
-    {top:'50%', left:'50%', right:'auto', bottom:'auto', transform:'translate(-50%,-50%)'} // وسط
+    {top:'20px', right:'20px', left:'auto'},
+    {top:'20px', left:'20px', right:'auto'},
+    {bottom:'20px', left:'20px', right:'auto', top:'auto'},
+    {bottom:'20px', right:'20px', left:'auto', top:'auto'},
+    {top:'50%', left:'50%', right:'auto', bottom:'auto', transform:'translate(-50%,-50%)'}
   ];
 
   function moveWatermark(){
@@ -420,7 +395,6 @@ img,video,iframe{
     state.currentCorner = (state.currentCorner + 1) % CORNERS.length;
     const pos = CORNERS[state.currentCorner];
 
-    // reset
     wm.style.top = '';
     wm.style.bottom = '';
     wm.style.left = '';
@@ -433,7 +407,6 @@ img,video,iframe{
     if(pos.right) wm.style.right = pos.right;
     if(pos.transform) wm.style.transform = pos.transform;
 
-    // توليد إحداثيات عشوائية بسيطة للتغيير
     const frame = document.getElementById('videoFrame');
     if(!frame) return;
     const w = frame.offsetWidth;
@@ -461,11 +434,7 @@ img,video,iframe{
     }
   }
 
-  /* ─────────────────────────────────────
-     تحميل البيانات من URL أو من DB
-  ───────────────────────────────────── */
   async function resolveVideoData(){
-    // الحالة 1: البيانات جاية من URL (زي ما lesson.html بيبعت)
     if(videoUrl){
       return {
         type: videoType,
@@ -475,7 +444,6 @@ img,video,iframe{
       };
     }
 
-    // الحالة 2: البيانات جاية من lesson ID (نحمّل من DB)
     if(lessonId){
       const sb = await DB.getClient();
       const { data: lesson } = await sb.from("lessons").select("*").eq("id", lessonId).maybeSingle();
@@ -495,9 +463,6 @@ img,video,iframe{
     return null;
   }
 
-  /* ─────────────────────────────────────
-     عرض الفيديو
-  ───────────────────────────────────── */
   async function render(){
     const data = await resolveVideoData();
     const loadingEl = document.getElementById('loading');
@@ -515,27 +480,22 @@ img,video,iframe{
       return;
     }
 
-    // إخفاء التحميل
     if(loadingEl) loadingEl.style.display = 'none';
 
-    // تحديث العنوان
     const titleEl = document.getElementById('lessonTitle');
     if(titleEl) titleEl.textContent = data.title;
     const coverTitle = document.getElementById('coverTitle');
     if(coverTitle) coverTitle.textContent = data.title;
 
-    // تحديث العلامة المائية
     const wm = document.getElementById('watermark');
     if(wm) wm.textContent = data.watermark;
 
-    // تحميل الفيديو
     const container = document.getElementById('playerContainer');
     if(container){
       container.innerHTML = buildPlayer(data.type, data.url);
       container.style.cssText = 'position:absolute;inset:0;width:100%;height:100%';
     }
 
-    // ربط زر التشغيل
     const cover = document.getElementById('cover');
     const iframe = container?.querySelector('iframe');
     const videoEl = container?.querySelector('video');
@@ -544,81 +504,61 @@ img,video,iframe{
       const startPlay = ()=>{
         cover.classList.add('hidden');
 
-        // تشغيل mp4 مباشرة
         if(videoEl){
           videoEl.play().catch(()=>{});
         }
 
-        // تشغيل youtube/vimeo عبر postMessage
         if(iframe){
           try{
             iframe.contentWindow?.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
           }catch(e){}
         }
 
-        // بدء تحريك العلامة المائية
         startWatermarkMotion();
 
-        // إخفاء شاشة البداية نهائياً
         setTimeout(()=>{ if(cover) cover.style.display = 'none'; }, 500);
       };
 
       cover.addEventListener('click', startPlay, { once: true });
     }
 
-    // حماية الفيديو
     attachProtection();
   }
-    /* ─────────────────────────────────────
-     حماية الفيديو (منع الكليك يمين + الاختصارات + السحب)
-  ───────────────────────────────────── */
+
   function attachProtection(){
     const frame = document.getElementById('videoFrame');
 
-    // منع الكليك يمين
     document.addEventListener('contextmenu', e => e.preventDefault());
 
-    // منع اختصارات لوحة المفاتيح
     document.addEventListener('keydown', e => {
-      // F12
       if(e.key === 'F12') { e.preventDefault(); return false; }
-      // Ctrl+Shift+I/J/C (DevTools)
       if(e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())) { e.preventDefault(); return false; }
-      // Ctrl+U (عرض المصدر)
       if(e.ctrlKey && e.key.toUpperCase() === 'U') { e.preventDefault(); return false; }
-      // Ctrl+S (حفظ)
       if(e.ctrlKey && e.key.toUpperCase() === 'S') { e.preventDefault(); return false; }
-      // Ctrl+P (طباعة)
       if(e.ctrlKey && e.key.toUpperCase() === 'P') { e.preventDefault(); return false; }
-      // PrintScreen
       if(e.key === 'PrintScreen') {
         try{ navigator.clipboard.writeText(''); }catch(err){}
       }
     });
 
-    // منع السحب
     if(frame){
       frame.addEventListener('dragstart', e => e.preventDefault());
       frame.addEventListener('drop', e => e.preventDefault());
     }
 
-    // منع التحديد
     document.addEventListener('selectstart', e => {
       const tag = e.target?.tagName?.toLowerCase();
       if(tag !== 'input' && tag !== 'textarea') e.preventDefault();
     });
 
-    // منع النسخ
     document.addEventListener('copy', e => e.preventDefault());
     document.addEventListener('cut', e => e.preventDefault());
 
-    // منع السحب على الصور
     document.querySelectorAll('img').forEach(img => {
       img.setAttribute('draggable', 'false');
       img.addEventListener('dragstart', e => e.preventDefault());
     });
 
-    // حماية إضافية: كشف فتح DevTools (اختياري — مش دقيق 100%)
     let devtoolsOpen = false;
     const threshold = 160;
     setInterval(() => {
@@ -627,7 +567,6 @@ img,video,iframe{
       if(widthDiff > threshold || heightDiff > threshold){
         if(!devtoolsOpen){
           devtoolsOpen = true;
-          // ممكن تسجّل الحدث
           try{
             if(state.user && window.MissionDB?.trackActivity){
               DB.trackActivity({
@@ -645,21 +584,15 @@ img,video,iframe{
       }
     }, 1500);
 
-    // منع النقر المزدوج
     document.addEventListener('dblclick', e => e.preventDefault());
 
-    // منع السحب الطويل على الموبايل
     document.addEventListener('touchstart', e => {
       if(e.target?.tagName?.toLowerCase() === 'img') e.preventDefault();
     }, { passive: false });
 
-    // منع سحب الصفحة ككل
     document.addEventListener('gesturestart', e => e.preventDefault());
   }
 
-  /* ─────────────────────────────────────
-     تحميل بيانات المستخدم
-  ───────────────────────────────────── */
   async function loadUser(){
     try{
       const sid = DB.getSessionId();
@@ -673,36 +606,23 @@ img,video,iframe{
     }
   }
 
-  /* ─────────────────────────────────────
-     معالج resize (لتحديث حجم الفيديو)
-  ───────────────────────────────────── */
   function handleResize(){
     const frame = document.getElementById('videoFrame');
     if(!frame) return;
-    // إعادة تحريك العلامة المائية لتتناسب مع الحجم الجديد
     if(state.watermarkInterval){
       moveWatermark();
     }
   }
 
-  /* ─────────────────────────────────────
-     نقطة البداية
-  ───────────────────────────────────── */
   async function init(){
-    // 1) تحميل المستخدم (لو مش مسجّل، نسمح بالمشاهدة لكن بدون تتبع)
     await loadUser();
-
-    // 2) عرض الفيديو
     await render();
 
-    // 3) ربط resize
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', handleResize);
 
-    // 4) تفعيل الحماية فوراً
     attachProtection();
 
-    // 5) تتبع النشاط
     try{
       if(state.user && window.MissionDB?.trackActivity){
         DB.trackActivity({
@@ -716,14 +636,12 @@ img,video,iframe{
     }catch(e){}
   }
 
-  // تشغيل عند جاهزية الصفحة
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }
 
-  // تنظيف عند إغلاق الصفحة
   window.addEventListener('beforeunload', () => {
     stopWatermarkMotion();
   });
