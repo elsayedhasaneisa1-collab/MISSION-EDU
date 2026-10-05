@@ -32,7 +32,6 @@ const formatTime = (timestamp) => {
   if (!timestamp) return "—";
   try {
     let ms = Number(timestamp);
-    // لو timestamp بالثواني (10 أرقام) → نحوّله للملي ثانية
     if (ms < 10000000000) ms = ms * 1000;
     const d = new Date(ms);
     if (isNaN(d.getTime())) return "—";
@@ -256,7 +255,6 @@ const API = {
     } catch (e) { return 0; }
   },
 
-  // ═══════════════ loadAll (بعد الإصلاح) ═══════════════
   async loadAll() {
     const sb = await getClient();
     const tables = ["users","grades","subjects","units","lessons","questions",
@@ -264,9 +262,7 @@ const API = {
     
     const results = await Promise.all(
       tables.map(async (t) => {
-        // محاولة بـ created_at desc
         let res = await sb.from(t).select("*").order("created_at", { ascending: false }).limit(3000);
-        // لو فشل، جرّب بدون ترتيب
         if (res.error) {
           res = await sb.from(t).select("*").limit(3000);
         }
@@ -284,7 +280,6 @@ const API = {
       }
     });
     
-    // ترتيب يدوي للأنشطة (بـ at)
     if (db.activity && db.activity.length > 0) {
       db.activity.sort((a, b) => {
         const aTime = Number(a.at) || 0;
@@ -293,7 +288,6 @@ const API = {
       });
     }
     
-    // ترتيب الإشعارات
     if (db.notifications && db.notifications.length > 0) {
       db.notifications.sort((a, b) => {
         const aTime = Number(a.created_at) || 0;
@@ -343,7 +337,6 @@ const API = {
     } catch (e) { return []; }
   },
 
-  // ═══════════════ trackActivity (مضمون) ═══════════════
   async trackActivity({ userId, userName, userRole, type, target, details }) {
     try {
       const sb = await getClient();
