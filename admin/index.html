@@ -331,7 +331,7 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
   .g2,.g3,.g4{grid-template-columns:1fr}
 }
 </style>
-</head> 
+</head>
 <body>
 <div id="root"></div>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -1048,22 +1048,22 @@ function LessonsPage(){
   };
   const badge=l=>{if(!l.video||!l.video.url)return <span className="pill pill-y">لا فيديو</span>;const map={youtube:'📺 YouTube',vimeo:'🎬 Vimeo',mp4:'🎥 MP4',external:'🔗 خارجي'};return <span className="pill pill-b">{map[l.video.type]||l.video.type}</span>;};
 
-  // ✅ الترتيب: الأقدم أولاً (sort_order ثم created_at)
+  // ✅ الترتيب: الأقدم أولاً
   const sortedLessons = useMemo(()=>{
     return [...app.db.lessons].sort((a,b)=>{
-      const sa = a.sort_order ?? 999999;
-      const sb = b.sort_order ?? 999999;
-      if(sa !== sb) return sa - sb;
-      const ta = new Date(a.created_at || 0).getTime();
-      const tb = new Date(b.created_at || 0).getTime();
-      return ta - tb;
+      const ta = new Date(a.created_at || a.createdAt || 0).getTime() || 0;
+      const tb = new Date(b.created_at || b.createdAt || 0).getTime() || 0;
+      if(ta !== tb) return ta - tb;
+      const sa = Number(a.sort_order) || 0;
+      const sb = Number(b.sort_order) || 0;
+      return sa - sb;
     });
   },[app.db.lessons]);
 
   return <>
     <div className="flex between center mb16"><div className="h2 grad">📖 إدارة الدروس</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> درس جديد</button></div>
     <div className="glass" style={{padding:14}}>
-      {app.db.lessons.length===0?<Empty title="لا توجد دروس"/>:
+      {sortedLessons.length===0?<Empty title="لا توجد دروس"/>:
         <div className="sx"><table className="tbl">
           <thead><tr><th>الدرس</th><th>الوحدة</th><th>الفيديو</th><th>XP</th><th>الحالة</th><th>إجراءات</th></tr></thead>
           <tbody>{sortedLessons.map(l=><tr key={l.id}>
@@ -1193,8 +1193,8 @@ function QuestionsPage(){
   // ✅ الترتيب: الأقدم أولاً
   const sortedQuestions = useMemo(()=>{
     return [...filteredQuestions].sort((a,b)=>{
-      const ta = new Date(a.created_at || 0).getTime();
-      const tb = new Date(b.created_at || 0).getTime();
+      const ta = new Date(a.created_at || a.createdAt || 0).getTime() || 0;
+      const tb = new Date(b.created_at || b.createdAt || 0).getTime() || 0;
       return ta - tb;
     });
   },[filteredQuestions]);
@@ -1363,8 +1363,8 @@ function ExamsPage(){
   // ✅ الترتيب: الأقدم أولاً
   const sortedExams = useMemo(()=>{
     return [...app.db.exams].sort((a,b)=>{
-      const ta = new Date(a.created_at || 0).getTime();
-      const tb = new Date(b.created_at || 0).getTime();
+      const ta = new Date(a.created_at || a.createdAt || 0).getTime() || 0;
+      const tb = new Date(b.created_at || b.createdAt || 0).getTime() || 0;
       return ta - tb;
     });
   },[app.db.exams]);
