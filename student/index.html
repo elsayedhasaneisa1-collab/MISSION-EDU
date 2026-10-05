@@ -348,7 +348,6 @@ function Ring({value,size=120,stroke=10,color='#2f7dff',children}){
     <div className="ring-t">{children}</div>
   </div>;
 }
-
 function Sidebar({items,active,onNav,open,onClose}){
   return <>
     {open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.5)',zIndex:55}}/>}
@@ -553,8 +552,28 @@ function SubjectDetail({subjectId,setSelected,setTab}){
 
     <div className="h3 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="book" size={18}/> الوحدات والدروس</div>
     {units.map(un=>{
-      const lessons=app.db.lessons.filter(l=>l.unit_id===un.id&&l.published!==false).sort((a,b)=>a.sort_order-b.sort_order);
-      const exams=app.db.exams.filter(e=>e.unit_id===un.id&&e.published!==false);
+      // ✅ الترتيب الصحيح: sort_order أولاً ثم created_at
+      const lessons=app.db.lessons
+        .filter(l=>l.unit_id===un.id&&l.published!==false)
+        .sort((a,b)=>{
+          const sa = Number(a.sort_order) || 999999;
+          const sb = Number(b.sort_order) || 999999;
+          if(sa !== sb) return sa - sb;
+          const ta = new Date(a.created_at || a.createdAt || 0).getTime() || 0;
+          const tb = new Date(b.created_at || b.createdAt || 0).getTime() || 0;
+          return ta - tb;
+        });
+      // ✅ نفس الترتيب للاختبارات
+      const exams=app.db.exams
+        .filter(e=>e.unit_id===un.id&&e.published!==false)
+        .sort((a,b)=>{
+          const sa = Number(a.sort_order) || 999999;
+          const sb = Number(b.sort_order) || 999999;
+          if(sa !== sb) return sa - sb;
+          const ta = new Date(a.created_at || a.createdAt || 0).getTime() || 0;
+          const tb = new Date(b.created_at || b.createdAt || 0).getTime() || 0;
+          return ta - tb;
+        });
       return <div key={un.id} className="glass mb16" style={{padding:18}}>
         <div className="flex between center mb12">
           <div>
@@ -601,7 +620,6 @@ function SubjectDetail({subjectId,setSelected,setTab}){
     })}
   </>;
 }
-
 function Missions({setSelected,setTab}){
   const app=useApp();
   const u=app.currentUser;
@@ -883,7 +901,6 @@ function Footer(){
     </button>
   </div>;
 }
-
 function StudentApp(){
   const app=useApp();
   const user=app.currentUser;
