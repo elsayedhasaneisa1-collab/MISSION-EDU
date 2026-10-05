@@ -9,6 +9,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- ✅ مكتبة الشهادات (عربي) -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <link rel="icon" type="image/png" href="/logo.png">
 <link rel="apple-touch-icon" href="/logo.png">
 <link rel="manifest" href="/manifest.json">
@@ -343,13 +346,47 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 const {useState,useEffect,useMemo,useCallback,useRef,createContext,useContext}=React;
 const DB=window.MissionDB;
 
+/* ═══════════════════════════════════════════
+   🎵 أصوات الإشعارات (Base64 - بدون ملفات خارجية)
+   ═══════════════════════════════════════════ */
+const SOUNDS = {
+  notify: "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT",
+  success: "data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQBvT18AAACAgICAf39/f39/f3+AgICAf39/f39/f3+AgICAf39/f39/f3+AgICAf39/f39/f3+AgICAf39/f39/f3+AgICAf39/f39/f3+AgICAf39/f39/f3+AgICAf39/f39/f3+AgICAf39/f39/f3+AgICAf39/f39/f3+AgICAf39/f39/f3+AgICAf39/f39/f38="
+};
+
+function playSound(type='notify'){
+  try{
+    const audio = new Audio(SOUNDS[type] || SOUNDS.notify);
+    audio.volume = 0.35;
+    audio.play().catch(()=>{});
+  }catch(e){}
+}
+
+/* ═══════════════════════════════════════════
+   🎨 الثيمات (Dark / Light)
+   ═══════════════════════════════════════════ */
+const THEME_KEY = 'me_theme';
+function getTheme(){
+  try{ return localStorage.getItem(THEME_KEY) || 'dark'; }
+  catch(e){ return 'dark'; }
+}
+function applyTheme(theme){
+  try{
+    localStorage.setItem(THEME_KEY, theme);
+    document.documentElement.setAttribute('data-theme', theme);
+  }catch(e){}
+}
+
 const ToastCtx=createContext(null);
 function ToastProvider({children}){
   const [items,setItems]=useState([]);
-  const push=useCallback((msg,type='info',title,duration=3800)=>{
+  const push=useCallback((msg,type='info',title,duration=3800,sound=false)=>{
     const id=DB.uid('t_');
     const titles={ok:'تم بنجاح',err:'خطأ',warn:'تنبيه',info:'معلومة'};
     setItems(x=>[...x,{id,msg,type,title:title||titles[type]||'',duration}]);
+    if(sound || type==='ok' || type==='err'){
+      playSound(type==='ok'?'success':'notify');
+    }
   },[]);
   const remove=useCallback(id=>setItems(x=>x.filter(t=>t.id!==id)),[]);
   return <ToastCtx.Provider value={{ok:(m,t)=>push(m,'ok',t),err:(m,t)=>push(m,'err',t),warn:(m,t)=>push(m,'warn',t),info:(m,t)=>push(m,'info',t)}}>
@@ -376,8 +413,15 @@ const useApp=()=>useContext(AppCtx);
 function AppProvider({children}){
   const [db,setDb]=useState({users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[]});
   const [currentUser,setCurrentUser]=useState(null);
+  const [theme,setTheme]=useState(getTheme());
   const [loading,setLoading]=useState(true);
   const toast=useToast();
+
+  useEffect(()=>{ applyTheme(theme); },[theme]);
+
+  const toggleTheme=useCallback(()=>{
+    setTheme(t=>{ const n = t==='dark'?'light':'dark'; applyTheme(n); return n; });
+  },[]);
 
   const reload=useCallback(async ()=>{
     try{const data=await DB.loadAll();setDb(data);}catch(e){console.warn(e);}
@@ -427,6 +471,7 @@ function AppProvider({children}){
 
   return <AppCtx.Provider value={{
     db,currentUser,loading,logout,reload,save,remove,getLevel,toast,
+    theme,toggleTheme,playSound,
     subject:id=>db.subjects.find(s=>s.id===id),
     unit:id=>db.units.find(u=>u.id===id),
     lesson:id=>db.lessons.find(l=>l.id===id),
@@ -464,11 +509,20 @@ const Icon=({name,size=18,color='currentColor'})=>{
     video:<><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></>,
     link:<><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></>,
     user:<><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></>,
-    award:<><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></>
+    award:<><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></>,
+    /* ✅ أيقونات جديدة للمميزات */
+    alert:<><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></>,
+    sun:<><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></>,
+    moon:<><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></>,
+    clock:<><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></>,
+    note:<><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></>,
+    download:<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></>,
+    coupon:<><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6"/><path d="M2 8h20v4H2z"/><line x1="12" y1="12" x2="12" y2="22"/><path d="M12 2v6"/></>,
+    card:<><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></>,
+    share:<><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></>
   };
-  return <svg {...p}>{paths[name]}</svg>;
+  return <svg {...p}>{paths[name]||paths.help}</svg>;
 };
-
 function Modal({title,children,onClose,wide}){
   return <div className="modal-bg" onClick={e=>e.target===e.currentTarget&&onClose()}>
     <div className={`glass modal ${wide?'wide':''}`}>
@@ -480,6 +534,7 @@ function Modal({title,children,onClose,wide}){
     </div>
   </div>;
 }
+
 function Stat({label,value,icon,color='var(--gold)',sub}){
   return <div className="glass-s hv" style={{padding:16}}>
     <div className="flex between center mb8">
@@ -490,12 +545,15 @@ function Stat({label,value,icon,color='var(--gold)',sub}){
     {sub&&<div className="xs muted mt8">{sub}</div>}
   </div>;
 }
+
 function Field({label,children,hint}){
   return <div className="mb12"><label className="lbl">{label}</label>{children}{hint&&<div className="xs muted mt8">{hint}</div>}</div>;
 }
+
 function Empty({icon='📭',title,desc}){
   return <div className="empty"><div className="empty-ico">{icon}</div><div className="h4 txt2 mb8">{title}</div>{desc&&<div className="sm">{desc}</div>}</div>;
 }
+
 function VideoEditor({value,onChange}){
   const v=value||{type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true};
   const set=(k,val)=>onChange({...v,[k]:val});
@@ -550,7 +608,7 @@ function Sidebar({items,active,onNav,open,onClose}){
   </>;
 }
 
-function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick}){
+function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick,theme,onToggleTheme}){
   const [q,setQ]=useState('');
   const [open,setOpen]=useState(false);
   useEffect(()=>{
@@ -562,20 +620,38 @@ function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick}){
   return <div className="topbar">
     <button className="icon-btn mbar" onClick={onMenu}><Icon name="menu" size={16}/></button>
     <div style={{position:'relative',flex:1,maxWidth:520}}>
-      <div className="search"><span style={{fontSize:15,opacity:.7,color:'var(--gold)'}}>🔍</span><input value={q} onChange={e=>setQ(e.target.value)} placeholder="ابحث..."/>{q&&<button onClick={()=>{setQ('');setOpen(false);}} style={{opacity:.6,color:'var(--txt)'}}>✕</button>}</div>
+      <div className="search">
+        <span style={{fontSize:15,opacity:.7,color:'var(--gold)'}}>🔍</span>
+        <input value={q} onChange={e=>setQ(e.target.value)} placeholder="ابحث..."/>
+        {q&&<button onClick={()=>{setQ('');setOpen(false);}} style={{opacity:.6,color:'var(--txt)'}}>✕</button>}
+      </div>
       {open&&searchResults?.length>0&&<div className="glass" style={{position:'absolute',top:'calc(100% + 8px)',insetInline:0,padding:8,zIndex:80,maxHeight:340,overflowY:'auto'}}>
         {searchResults.slice(0,10).map((r,i)=><button key={i} className="nav-i" onClick={()=>{onResultClick(r);setQ('');setOpen(false);}}>
-          <span className="nav-ico">{r.icon}</span><div style={{flex:1,textAlign:'right'}}><div style={{fontSize:13.5}}>{r.title}</div><div className="xs muted">{r.type}</div></div>
+          <span className="nav-ico">{r.icon}</span>
+          <div style={{flex:1,textAlign:'right'}}>
+            <div style={{fontSize:13.5}}>{r.title}</div>
+            <div className="xs muted">{r.type}</div>
+          </div>
         </button>)}
       </div>}
     </div>
     <div className="flex center g8" style={{marginInlineStart:'auto'}}>
-      <div className="glass-s" style={{padding:'5px 12px',display:'flex',alignItems:'center',gap:8,borderColor:'var(--border2)'}}><div className="avatar" style={{width:32,height:32,fontSize:15}}>{user.avatar||'👑'}</div></div>
+      {/* ✅ زر Dark/Light Mode */}
+      <button
+        className="icon-btn"
+        onClick={onToggleTheme}
+        title={theme==='dark'?'الوضع النهاري':'الوضع الليلي'}
+        style={{position:'relative'}}
+      >
+        <Icon name={theme==='dark'?'sun':'moon'} size={16}/>
+      </button>
+      <div className="glass-s" style={{padding:'5px 12px',display:'flex',alignItems:'center',gap:8,borderColor:'var(--border2)'}}>
+        <div className="avatar" style={{width:32,height:32,fontSize:15}}>{user.avatar||'👑'}</div>
+      </div>
       <button className="icon-btn" onClick={onLogout}><Icon name="logout" size={16}/></button>
     </div>
   </div>;
 }
-
 function Dashboard(){
   const app=useApp();
   const students=app.db.users.filter(u=>u.role==='student');
@@ -655,16 +731,9 @@ function Dashboard(){
     if (sorted.length === 0) return;
     
     const colors = [
-      "rgba(255,215,0,0.85)",
-      "rgba(212,175,55,0.85)",
-      "rgba(184,134,11,0.85)",
-      "rgba(245,222,110,0.85)",
-      "rgba(139,105,20,0.85)",
-      "rgba(255,237,78,0.85)",
-      "rgba(168,132,20,0.85)",
-      "rgba(220,190,80,0.85)",
-      "rgba(92,69,9,0.85)",
-      "rgba(255,240,150,0.85)"
+      "rgba(255,215,0,0.85)","rgba(212,175,55,0.85)","rgba(184,134,11,0.85)",
+      "rgba(245,222,110,0.85)","rgba(139,105,20,0.85)","rgba(255,237,78,0.85)",
+      "rgba(168,132,20,0.85)","rgba(220,190,80,0.85)","rgba(92,69,9,0.85)","rgba(255,240,150,0.85)"
     ];
     
     chart3Instance.current=new window.Chart(ctx,{
@@ -679,19 +748,8 @@ function Dashboard(){
         }]
       },
       options:{
-        responsive:true,
-        maintainAspectRatio:false,
-        plugins:{
-          legend:{
-            position:"bottom",
-            labels:{
-              color:"#d4c79a",
-              font:{family:"Tajawal",size:11},
-              padding:12,
-              boxWidth:14
-            }
-          }
-        }
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{position:"bottom",labels:{color:"#d4c79a",font:{family:"Tajawal",size:11},padding:12,boxWidth:14}}}
       }
     });
     return ()=>{if(chart3Instance.current)chart3Instance.current.destroy();};
@@ -1004,7 +1062,9 @@ function Crud({title,collection,defaultItem,fields,columns}){
   </>;
 }
 
-function GradesPage(){return <Crud title="🏫 إدارة الصفوف" collection="grades" defaultItem={()=>({name:'',desc:''})} fields={[{key:'name',label:'اسم الصف'},{key:'desc',label:'الوصف',type:'textarea',full:true}]} columns={[{key:'name',label:'الاسم'},{key:'desc',label:'الوصف'}]}/>;}
+function GradesPage(){
+  return <Crud title="🏫 إدارة الصفوف" collection="grades" defaultItem={()=>({name:'',desc:''})} fields={[{key:'name',label:'اسم الصف'},{key:'desc',label:'الوصف',type:'textarea',full:true}]} columns={[{key:'name',label:'الاسم'},{key:'desc',label:'الوصف'}]}/>;
+}
 
 function SubjectsPage(){
   const app=useApp();
@@ -1048,7 +1108,6 @@ function LessonsPage(){
   };
   const badge=l=>{if(!l.video||!l.video.url)return <span className="pill pill-y">لا فيديو</span>;const map={youtube:'📺 YouTube',vimeo:'🎬 Vimeo',mp4:'🎥 MP4',external:'🔗 خارجي'};return <span className="pill pill-b">{map[l.video.type]||l.video.type}</span>;};
 
-  // ✅ الترتيب: الأقدم أولاً
   const sortedLessons = useMemo(()=>{
     return [...app.db.lessons].sort((a,b)=>{
       const ta = new Date(a.created_at || a.createdAt || 0).getTime() || 0;
@@ -1092,7 +1151,6 @@ function LessonsPage(){
     </Modal>}
   </>;
 }
-
 function QuestionsPage(){
   const app=useApp();
   const [editing,setEditing]=useState(null);
@@ -1190,7 +1248,6 @@ function QuestionsPage(){
     ? app.db.questions
     : app.db.questions.filter(q=>q.lesson_id === filterLesson);
 
-  // ✅ الترتيب: الأقدم أولاً
   const sortedQuestions = useMemo(()=>{
     return [...filteredQuestions].sort((a,b)=>{
       const ta = new Date(a.created_at || a.createdAt || 0).getTime() || 0;
@@ -1338,6 +1395,7 @@ function QuestionsPage(){
     </Modal>}
   </>;
 }
+
 function ExamsPage(){
   const app=useApp();
   const [editing,setEditing]=useState(null);
@@ -1360,7 +1418,6 @@ function ExamsPage(){
   };
   const availQ=form.unit_id?app.db.questions.filter(q=>q.unit_id===form.unit_id):app.db.questions;
 
-  // ✅ الترتيب: الأقدم أولاً
   const sortedExams = useMemo(()=>{
     return [...app.db.exams].sort((a,b)=>{
       const ta = new Date(a.created_at || a.createdAt || 0).getTime() || 0;
@@ -1465,7 +1522,6 @@ function MissionsPage(){
     </Modal>}
   </>;
 }
-
 function AchievementsPage(){
   return <Crud title="🏆 إدارة الإنجازات" collection="achievements" defaultItem={()=>({title:'',desc:'',icon:'🏆',type:'lessons',threshold:1})} fields={[
     {key:'title',label:'الاسم'},{key:'icon',label:'الأيقونة'},
@@ -1523,7 +1579,10 @@ function StudentsPage(){
         grade_id: form.grade_id,
         governorate: form.governorate || null,
         all_subjects: form.all_subjects,
-        access_subjects: form.access_subjects || []
+        access_subjects: form.access_subjects || [],
+        subscription: form.subscription || 'free',
+        subscription_until: form.subscription_until || null,
+        referral_code: form.referral_code || null
       });
       await app.reload();
       app.toast.ok('تم الحفظ');
@@ -1599,6 +1658,7 @@ function StudentsPage(){
               <th>الهاتف</th>
               <th>📍 المحافظة</th>
               <th>XP</th>
+              <th>💳 الاشتراك</th>
               <th>الحالة</th>
               <th>إجراءات</th>
             </tr>
@@ -1620,6 +1680,14 @@ function StudentsPage(){
                   }
                 </td>
                 <td><b style={{color:'var(--gold)'}}>{DB.fmt(s.xp||0)}</b></td>
+                <td>
+                  {s.subscription === 'vip'
+                    ? <span className="pill pill-v">💎 VIP</span>
+                    : s.subscription === 'paid'
+                    ? <span className="pill pill-g">💳 مدفوع</span>
+                    : <span className="pill pill-y">مجاني</span>
+                  }
+                </td>
                 <td>
                   {s.active!==false
                     ? <span className="pill pill-g">نشط</span>
@@ -1680,6 +1748,24 @@ function StudentsPage(){
           </Field>
         </div>
 
+        <div className="div"/>
+
+        <div className="h4 mb12" style={{color:'var(--gold)'}}>💳 الاشتراك</div>
+        <div className="grid g2">
+          <Field label="نوع الاشتراك">
+            <select className="input" value={form.subscription||'free'} onChange={e=>setForm({...form,subscription:e.target.value})}>
+              <option value="free">مجاني</option>
+              <option value="paid">مدفوع</option>
+              <option value="vip">VIP</option>
+            </select>
+          </Field>
+          <Field label="تاريخ انتهاء الاشتراك">
+            <input type="date" className="input" value={form.subscription_until||''} onChange={e=>setForm({...form,subscription_until:e.target.value})}/>
+          </Field>
+        </div>
+
+        <div className="div"/>
+
         <Field label="صلاحيات الوصول">
           <label className="flex center g8 mb12" style={{cursor:'pointer'}}>
             <input type="checkbox" checked={!!form.all_subjects} onChange={e=>setForm({...form,all_subjects:e.target.checked})}/>
@@ -1734,7 +1820,12 @@ function NotificationsPage(){
   const send=async ()=>{
     if(!form.title||!form.body) return app.toast.warn('أدخل العنوان والنص');
     setBusy(true);
-    try{await app.save('notifications',{...form,read_by:[]});app.toast.ok('تم الإرسال');setForm({title:'',body:'',target:'all'});}
+    try{
+      await app.save('notifications',{...form,read_by:[]});
+      app.toast.ok('تم الإرسال');
+      setForm({title:'',body:'',target:'all'});
+      app.playSound && app.playSound('success');
+    }
     catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
@@ -1825,140 +1916,451 @@ function SettingsPage(){
     </div>
   </>;
 }
-
-function Footer(){
+function ErrorsAnalyticsPage(){
   const app=useApp();
-  const user=app.currentUser;
-  
-  const sendReport=async ()=>{
-    const { value: msg } = await Swal.fire({
-      title: '🚨 بلاغ عن مشكلة',
-      input: 'textarea',
-      inputLabel: 'اكتب مشكلتك بالتفصيل',
-      inputPlaceholder: 'اكتب رسالتك هنا...',
-      inputAttributes: { 'aria-label': 'اكتب رسالتك', 'dir': 'rtl' },
-      showCancelButton: true,
-      confirmButtonText: '📤 إرسال',
-      cancelButtonText: 'إلغاء',
-      confirmButtonColor: '#D4AF37',
-      cancelButtonColor: '#64748b',
-      inputValidator: (value) => {
-        if (!value || value.trim().length < 5) return 'يرجى كتابة رسالة واضحة (5 أحرف على الأقل)';
-      },
-      customClass: {
-        popup: 'swal-custom-popup',
-        title: 'swal-custom-title',
-        input: 'swal-custom-input',
-        confirmButton: 'swal-custom-confirm',
-        cancelButton: 'swal-custom-cancel'
+  const [filterSubject,setFilterSubject]=useState('all');
+  const [filterLesson,setFilterLesson]=useState('all');
+  const [sortBy,setSortBy]=useState('count');
+  const [loading,setLoading]=useState(true);
+  const [allErrors,setAllErrors]=useState([]);
+
+  useEffect(()=>{
+    (async ()=>{
+      try{
+        const sb=await DB.getClient();
+        const {data}=await sb.from('user_errors').select('*').limit(2000);
+        setAllErrors(data||[]);
+      }catch(e){
+        console.warn('فشل تحميل الأخطاء:',e);
+      }
+      setLoading(false);
+    })();
+  },[]);
+
+  const groupedByQuestion = useMemo(()=>{
+    const map={};
+    allErrors.forEach(err=>{
+      const qid = err.question_id;
+      if(!qid) return;
+      if(!map[qid]){
+        map[qid] = {
+          question_id: qid,
+          total_errors: 0,
+          unique_students: new Set(),
+          last_error_at: 0
+        };
+      }
+      map[qid].total_errors += (err.count || 1);
+      map[qid].unique_students.add(err.user_id);
+      if(err.at && err.at > map[qid].last_error_at){
+        map[qid].last_error_at = err.at;
       }
     });
-    
-    if (msg){
-      Swal.fire({
-        title: 'جارٍ الإرسال...',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
-        background: 'linear-gradient(180deg, #1c160c, #0f0c07)',
-        color: '#f7f0dd',
-        customClass: {popup: 'swal-custom-popup'}
-      });
-      
-      const sent = await DB.reportIssue({
-        userName: user?.name || 'أدمن',
-        userPhone: (user?.country_code || '+20') + (user?.phone || '—'),
-        message: msg
-      });
-      
-      Swal.fire({
-        icon: sent ? 'success' : 'error',
-        title: sent ? '✅ تم الإرسال' : '❌ فشل الإرسال',
-        text: sent ? 'تم استلام بلاغك، شكرًا لك' : 'حدث خطأ، حاول مرة أخرى',
-        confirmButtonText: 'حسنًا',
-        confirmButtonColor: '#D4AF37',
-        background: 'linear-gradient(180deg, #1c160c, #0f0c07)',
-        color: '#f7f0dd',
-        customClass: {popup: 'swal-custom-popup', title: 'swal-custom-title', confirmButton: 'swal-custom-confirm'}
-      });
-    }
-  };
-  
-  return <div className="footer-dev">
-    <button className="dev-btn" onClick={()=>window.open("https://wa.me/201128351702?text="+encodeURIComponent("مرحبًا، أريد الاستفسار عن منصة MISSION EDU"),"_blank")}>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-      </svg>
-      <span className="dev-name">Developed by <b>EL-sayed Hasan</b></span>
-    </button>
-    <button className="tg-btn" onClick={sendReport}>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-      </svg>
-      <span>بلاغ</span>
-    </button>
-  </div>;
-}
 
-function AdminApp(){
-  const app=useApp();
-  const [tab,setTab]=useState('dashboard');
-  const [sidebarOpen,setSidebarOpen]=useState(false);
-  const [searchResults,setSearchResults]=useState([]);
-  const user=app.currentUser;
-  const items=[
-    {title:'الرئيسية',items:[{id:'dashboard',icon:'dashboard',label:'لوحة التحكم'},{id:'activity',icon:'activity',label:'سجل النشاط'}]},
-    {title:'المحتوى',items:[
-      {id:'grades',icon:'school',label:'الصفوف'},{id:'subjects',icon:'book',label:'المواد'},{id:'units',icon:'folder',label:'الوحدات'},
-      {id:'lessons',icon:'file',label:'الدروس'},{id:'questions',icon:'help',label:'بنك الأسئلة'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'missions',icon:'target',label:'المهام'}
-    ]},
-    {title:'التحفيز',items:[{id:'achievements',icon:'trophy',label:'الإنجازات'},{id:'levels',icon:'trend',label:'المستويات'}]},
-    {title:'المستخدمون',items:[{id:'students',icon:'users',label:'الطلاب'},{id:'notifications',icon:'bell',label:'الإشعارات'},{id:'reports',icon:'link',label:'البلاغات'},{id:'settings',icon:'settings',label:'الإعدادات'}]}
-  ];
-  const onSearch=q=>{
-    const lc=q.toLowerCase(),res=[];
-    app.db.users.filter(x=>x.name.toLowerCase().includes(lc)||(x.phone||'').includes(lc)).slice(0,5).forEach(s=>res.push({type:'مستخدم',icon:<Icon name="user" size={16}/>,title:s.name,nav:'students'}));
-    app.db.subjects.filter(s=>s.name.toLowerCase().includes(lc)).forEach(s=>res.push({type:'مادة',icon:s.icon||'📚',title:s.name,nav:'subjects'}));
-    app.db.lessons.filter(l=>l.title.toLowerCase().includes(lc)).slice(0,5).forEach(l=>res.push({type:'درس',icon:<Icon name="file" size={16}/>,title:l.title,nav:'lessons'}));
-    app.db.exams.filter(e=>e.title.toLowerCase().includes(lc)).slice(0,5).forEach(e=>res.push({type:'اختبار',icon:<Icon name="clipboard" size={16}/>,title:e.title,nav:'exams'}));
-    app.db.questions.filter(x=>x.text.toLowerCase().includes(lc)).slice(0,5).forEach(x=>res.push({type:'سؤال',icon:<Icon name="help" size={16}/>,title:x.text.slice(0,50),nav:'questions'}));
-    setSearchResults(res);
+    return Object.values(map).map(item=>{
+      const q = app.question(item.question_id);
+      const lesson = q ? app.lesson(q.lesson_id) : null;
+      const unit = lesson ? app.unit(lesson.unit_id) : null;
+      const subject = unit ? app.subject(unit.subject_id) : null;
+      return {
+        ...item,
+        question: q,
+        lesson,
+        unit,
+        subject,
+        studentsCount: item.unique_students.size
+      };
+    }).filter(x=>x.question);
+  },[allErrors, app.db.questions, app.db.lessons, app.db.units, app.db.subjects]);
+
+  const filtered = useMemo(()=>{
+    let list = [...groupedByQuestion];
+
+    if(filterSubject !== 'all'){
+      list = list.filter(x=>x.subject?.id === filterSubject);
+    }
+    if(filterLesson !== 'all'){
+      list = list.filter(x=>x.lesson?.id === filterLesson);
+    }
+
+    if(sortBy === 'count'){
+      list.sort((a,b)=>b.total_errors - a.total_errors);
+    } else if(sortBy === 'students'){
+      list.sort((a,b)=>b.studentsCount - a.studentsCount);
+    } else if(sortBy === 'recent'){
+      list.sort((a,b)=>b.last_error_at - a.last_error_at);
+    }
+
+    return list;
+  },[groupedByQuestion, filterSubject, filterLesson, sortBy]);
+
+  const stats = useMemo(()=>{
+    const totalErrors = groupedByQuestion.reduce((s,x)=>s+x.total_errors,0);
+    const totalQuestions = groupedByQuestion.length;
+    const worstQuestion = groupedByQuestion[0];
+    return {totalErrors, totalQuestions, worstQuestion};
+  },[groupedByQuestion]);
+
+  const availableLessons = useMemo(()=>{
+    if(filterSubject === 'all') return app.db.lessons;
+    return app.db.lessons.filter(l=>{
+      const u = app.unit(l.unit_id);
+      return u?.subject_id === filterSubject;
+    });
+  },[filterSubject, app.db.lessons]);
+
+  const exportErrorsCSV=()=>{
+    const headers=["السؤال","المادة","الدرس","عدد الأخطاء","عدد الطلاب"];
+    const rows=filtered.map(x=>[
+      x.question.text,
+      x.subject?.name||'—',
+      x.lesson?.title||'—',
+      x.total_errors,
+      x.studentsCount
+    ]);
+    const csv=[headers,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+    const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;
+    a.download=`errors_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    app.toast.ok("تم تصدير الأخطاء");
   };
-  return <div className="app">
-    <Sidebar items={items} active={tab} onNav={setTab} open={sidebarOpen} onClose={()=>setSidebarOpen(false)}/>
-    <div className="main">
-      <Topbar user={user} onMenu={()=>setSidebarOpen(true)} onLogout={app.logout} onSearch={onSearch} searchResults={searchResults} onResultClick={r=>setTab(r.nav)}/>
-      <div className="content">
-        {tab==='dashboard'&&<Dashboard/>}
-        {tab==='activity'&&<ActivityLog/>}
-        {tab==='grades'&&<GradesPage/>}
-        {tab==='subjects'&&<SubjectsPage/>}
-        {tab==='units'&&<UnitsPage/>}
-        {tab==='lessons'&&<LessonsPage/>}
-        {tab==='questions'&&<QuestionsPage/>}
-        {tab==='exams'&&<ExamsPage/>}
-        {tab==='missions'&&<MissionsPage/>}
-        {tab==='achievements'&&<AchievementsPage/>}
-        {tab==='levels'&&<LevelsPage/>}
-        {tab==='students'&&<StudentsPage/>}
-        {tab==='notifications'&&<NotificationsPage/>}
-        {tab==='reports'&&<ReportsPage/>}
-        {tab==='settings'&&<SettingsPage/>}
-        <Footer/>
+
+  return <>
+    <div className="flex between center mb16 wrap g8">
+      <div>
+        <div className="h2 grad">📊 تحليل أخطاء الطلاب</div>
+        <div className="sm muted mt6">اكتشف الأسئلة الصعبة وحسّن المحتوى</div>
+      </div>
+      <div className="flex g8">
+        <button className="btn btn-s" onClick={exportErrorsCSV} disabled={filtered.length===0}>
+          <Icon name="file" size={14}/> تصدير CSV
+        </button>
+        <button className="btn btn-s" onClick={()=>window.location.reload()}>
+          🔄 تحديث
+        </button>
       </div>
     </div>
-  </div>;
+
+    <div className="grid g3 mb16">
+      <Stat label="إجمالي الأخطاء" value={DB.fmt(stats.totalErrors)} icon="alert" color="#ef4444"/>
+      <Stat label="أسئلة فيها أخطاء" value={DB.fmt(stats.totalQuestions)} icon="help" color="#f59e0b"/>
+      <Stat
+        label="أصعب سؤال"
+        value={stats.worstQuestion ? `${stats.worstQuestion.total_errors} خطأ` : '—'}
+        icon="trophy"
+        color="#ef4444"
+        sub={stats.worstQuestion?.question?.text?.slice(0,40)+'...'}
+      />
+    </div>
+
+    <div className="glass mb16" style={{padding:14}}>
+      <div className="flex wrap g8 center">
+        <div style={{flex:'1 1 200px'}}>
+          <label className="lbl">المادة</label>
+          <select className="input" value={filterSubject} onChange={e=>{setFilterSubject(e.target.value);setFilterLesson('all');}}>
+            <option value="all">كل المواد</option>
+            {app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.icon} {s.name}</option>)}
+          </select>
+        </div>
+        <div style={{flex:'1 1 200px'}}>
+          <label className="lbl">الدرس</label>
+          <select className="input" value={filterLesson} onChange={e=>setFilterLesson(e.target.value)}>
+            <option value="all">كل الدروس</option>
+            {availableLessons.map(l=><option key={l.id} value={l.id}>{l.title}</option>)}
+          </select>
+        </div>
+        <div style={{flex:'1 1 200px'}}>
+          <label className="lbl">الترتيب حسب</label>
+          <select className="input" value={sortBy} onChange={e=>setSortBy(e.target.value)}>
+            <option value="count">عدد الأخطاء</option>
+            <option value="students">عدد الطلاب</option>
+            <option value="recent">الأحدث</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div className="glass" style={{padding:14}}>
+      {loading ? (
+        <div style={{textAlign:'center',padding:40}}>
+          <div className="spinner" style={{margin:'0 auto 14px'}}></div>
+          جارٍ تحميل بيانات الأخطاء...
+        </div>
+      ) : filtered.length === 0 ? (
+        <Empty icon="✨" title="لا توجد أخطاء" desc="لم يسجل الطلاب أي أخطاء بعد"/>
+      ) : (
+        <div className="sx">
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>السؤال</th>
+                <th>المادة</th>
+                <th>الدرس</th>
+                <th>عدد الأخطاء</th>
+                <th>عدد الطلاب</th>
+                <th>آخر خطأ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((x, idx) => (
+                <tr key={x.question_id}>
+                  <td>
+                    <span className={`rank ${idx===0?'rank-1':idx===1?'rank-2':idx===2?'rank-3':'rank-x'}`} style={{width:28,height:28,fontSize:12}}>
+                      {idx+1}
+                    </span>
+                  </td>
+                  <td style={{maxWidth:380}}>
+                    <div className="sm" style={{fontWeight:700}}>{x.question.text.slice(0,100)}{x.question.text.length>100?'...':''}</div>
+                    <div className="xs muted mt6">
+                      💡 {x.question.explanation?.slice(0,60)}...
+                    </div>
+                  </td>
+                  <td>
+                    {x.subject ? <span className="pill pill-b" style={{fontSize:11}}>{x.subject.icon} {x.subject.name}</span> : <span className="xs muted">—</span>}
+                  </td>
+                  <td className="sm">{x.lesson?.title || '—'}</td>
+                  <td>
+                    <span className="pill pill-r" style={{fontWeight:800}}>{x.total_errors}</span>
+                  </td>
+                  <td>
+                    <span className="pill pill-a">{x.studentsCount} طالب</span>
+                  </td>
+                  <td className="xs muted">
+                    {x.last_error_at ? DB.formatDateTime(x.last_error_at) : '—'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  </>;
+}
+// ✅ الميزة 3: متابعة آخر نشاط
+const lastActivity = useMemo(()=>{
+  const recent = [...(app.db.activity||[])].find(a=>
+    a.user_id && ['lesson_view','lesson_complete','exam_start'].includes(a.type)
+  );
+  return recent || null;
+},[app.db.activity]);
+
+const lastLesson = useMemo(()=>{
+  if(!lastActivity) return null;
+  const lesson = app.db.lessons.find(l => 
+    l.title === lastActivity.target
+  );
+  return lesson || null;
+},[lastActivity, app.db.lessons]);
+
+const lastStudent = useMemo(()=>{
+  if(!lastActivity) return null;
+  return app.db.users.find(u => u.id === lastActivity.user_id) || null;
+},[lastActivity, app.db.users]);
+      <label className="flex center g8 mt12" style={{cursor:'pointer'}}>
+        <input type="checkbox" checked={form.active!==false} onChange={e=>setForm({...form,active:e.target.checked})}/>
+        <span className="sm">مفعّل</span>
+      </label>
+      <Field label="تاريخ الانتهاء (اختياري)">
+        <input type="date" className="input" value={form.expires_at||''} onChange={e=>setForm({...form,expires_at:e.target.value})}/>
+      </Field>
+      <div className="flex g8 mt16">
+        <button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button>
+        <button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button>
+      </div>
+    </Modal>}
+  </>;
 }
 
-function Root(){
+/* ═══════════════════════════════════════════
+   🎁 الميزة 10: نظام الإحالة (Referral)
+   ═══════════════════════════════════════════ */
+function ReferralsPage(){
   const app=useApp();
-  if(app.loading) return <div className="loading"><div className="spinner"></div>جارٍ التحميل...</div>;
-  if(!app.currentUser) return null;
-  if(app.currentUser.role!=='admin') return null;
-  return <AdminApp/>;
-}
+  const [loading,setLoading]=useState(true);
+  const [referrals,setReferrals]=useState([]);
 
-function App(){return <ToastProvider><AppProvider><Root/></AppProvider></ToastProvider>;}
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
-</script>
-</body>
-</html>
+  const loadReferrals = useCallback(async ()=>{
+    try{
+      const sb = await DB.getClient();
+      const { data } = await sb.from('referrals').select('*').order('created_at',{ascending:false}).limit(500);
+      setReferrals(data||[]);
+    }catch(e){console.warn(e);}
+    setLoading(false);
+  },[]);
+
+  useEffect(()=>{ loadReferrals(); },[loadReferrals]);
+
+  const stats = useMemo(()=>{
+    const total = referrals.length;
+    const rewarded = referrals.filter(r=>r.rewarded).length;
+    const totalXp = referrals.reduce((s,r)=>s+(r.reward_xp||50),0);
+    return { total, rewarded, totalXp };
+  },[referrals]);
+
+  // ترتيب أفضل المُحيلين
+  const topReferrers = useMemo(()=>{
+    const map = {};
+    referrals.forEach(r=>{
+      const id = r.referrer_id;
+      if(!id) return;
+      if(!map[id]){
+        map[id] = { user_id:id, count:0, rewarded:0, total_xp:0 };
+      }
+      map[id].count++;
+      if(r.rewarded) map[id].rewarded++;
+      map[id].total_xp += (r.reward_xp||50);
+    });
+    return Object.values(map).sort((a,b)=>b.count - a.count).slice(0,10);
+  },[referrals]);
+
+  const del = async id => {
+    const r = await Swal.fire({
+      title:'حذف الإحالة؟',icon:'warning',showCancelButton:true,
+      confirmButtonText:'نعم',cancelButtonText:'إلغاء',
+      confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
+      background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',
+      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+    });
+    if(!r.isConfirmed) return;
+    try{
+      const sb = await DB.getClient();
+      await sb.from('referrals').delete().eq('id',id);
+      setReferrals(x=>x.filter(x=>x.id!==id));
+      app.toast.warn('تم الحذف');
+    }catch(e){app.toast.err(e.message);}
+  };
+
+  const markRewarded = async (r) => {
+    try{
+      const sb = await DB.getClient();
+      await sb.from('referrals').update({rewarded:true}).eq('id',r.id);
+      setReferrals(x=>x.map(x=>x.id===r.id?{...x,rewarded:true}:x));
+
+      // نضيف XP للطالبين
+      const referrer = app.db.users.find(u=>u.id===r.referrer_id);
+      const referred = app.db.users.find(u=>u.id===r.referred_id);
+      const xp = r.reward_xp || 50;
+
+      if(referrer) await DB.updateUser(referrer.id, { xp: (referrer.xp||0) + xp });
+      if(referred) await DB.updateUser(referred.id, { xp: (referred.xp||0) + xp });
+
+      await app.reload();
+      app.toast.ok(`✅ تم توزيع ${xp} XP على الطالبين`);
+    }catch(e){app.toast.err(e.message);}
+  };
+
+  return <>
+    <div className="flex between center mb16 wrap g8">
+      <div>
+        <div className="h2 grad">🎁 نظام الإحالة</div>
+        <div className="sm muted mt6">إحصائيات دعوة الأصدقاء</div>
+      </div>
+      <button className="btn btn-s" onClick={loadReferrals}>
+        🔄 تحديث
+      </button>
+    </div>
+
+    <div className="grid g3 mb16">
+      <Stat label="إجمالي الإحالات" value={DB.fmt(stats.total)} icon="share" color="#FFD700"/>
+      <Stat label="إحالات مكافأة" value={DB.fmt(stats.rewarded)} icon="check" color="#22c55e"/>
+      <Stat label="إجمالي XP الموزع" value={DB.fmt(stats.totalXp)} icon="zap" color="#B8860B"/>
+    </div>
+
+    <div className="glass mb16" style={{padding:18}}>
+      <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8,color:'var(--gold)'}}>
+        <Icon name="trophy" size={16}/> أفضل 10 مُحيلين
+      </div>
+      {topReferrers.length === 0 ? (
+        <div className="sm muted" style={{textAlign:'center',padding:20}}>لا يوجد مُحيلين بعد</div>
+      ) : (
+        topReferrers.map((r,i)=>{
+          const u = app.db.users.find(x=>x.id===r.user_id);
+          return <div key={r.user_id} className="flex center g12" style={{padding:'9px 0',borderBottom:'1px solid rgba(212,175,55,.08)'}}>
+            <div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div>
+            <div className="avatar" style={{width:34,height:34,fontSize:14}}>{u?.avatar||'👤'}</div>
+            <div style={{flex:1}}>
+              <div className="sm" style={{fontWeight:700}}>{u?.name || 'مستخدم محذوف'}</div>
+              <div className="xs muted">📍 {u?.governorate || '—'}</div>
+            </div>
+            <div className="flex g6">
+              <span className="pill pill-b">{r.count} إحالة</span>
+              <span className="pill pill-g">{r.rewarded} مكافأة</span>
+            </div>
+          </div>;
+        })
+      )}
+    </div>
+
+    <div className="glass" style={{padding:14}}>
+      <div className="h4 mb12" style={{color:'var(--gold)'}}>📋 سجل الإحالات</div>
+      {loading ? (
+        <div style={{textAlign:'center',padding:40}}>
+          <div className="spinner" style={{margin:'0 auto 14px'}}></div>
+          جارٍ التحميل...
+        </div>
+      ) : referrals.length === 0 ? (
+        <Empty icon="🎁" title="لا توجد إحالات" desc="لم يقم أي طالب بدعوة أصدقاء بعد"/>
+      ) : (
+        <div className="sx">
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th>المُحيل</th>
+                <th>→</th>
+                <th>المدعو</th>
+                <th>التاريخ</th>
+                <th>المكافأة</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              {referrals.map(r => {
+                const referrer = app.db.users.find(x=>x.id===r.referrer_id);
+                const referred = app.db.users.find(x=>x.id===r.referred_id);
+                return <tr key={r.id}>
+                  <td>
+                    <div className="flex center g8">
+                      <div className="avatar" style={{width:28,height:28,fontSize:12}}>{referrer?.avatar||'👤'}</div>
+                      <span className="sm">{referrer?.name || 'محذوف'}</span>
+                    </div>
+                  </td>
+                  <td className="muted">→</td>
+                  <td>
+                    <div className="flex center g8">
+                      <div className="avatar" style={{width:28,height:28,fontSize:12}}>{referred?.avatar||'👤'}</div>
+                      <span className="sm">{referred?.name || 'محذوف'}</span>
+                    </div>
+                  </td>
+                  <td className="xs muted">{DB.formatDateTime(r.created_at)}</td>
+                  <td>
+                    {r.rewarded
+                      ? <span className="pill pill-g">✓ +{r.reward_xp||50} XP</span>
+                      : <span className="pill pill-a">⏳ بانتظار</span>}
+                  </td>
+                  <td>
+                    <div className="flex g6">
+                      {!r.rewarded && (
+                        <button className="btn btn-ok btn-sm" onClick={()=>markRewarded(r)}>
+                          ✓ منح
+                        </button>
+                      )}
+                      <button className="btn btn-dn btn-sm" onClick={()=>del(r.id)}>
+                        <Icon name="trash" size={13}/>
+                      </button>
+                    </div>
+                  </td>
+                </tr>;
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  </>;
+}
