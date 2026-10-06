@@ -8,7 +8,7 @@ async function getClient() {
   if (!window.supabase) {
     await new Promise((resolve, reject) => {
       const s = document.createElement("script");
-      s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+      s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js";
       s.onload = resolve;
       s.onerror = reject;
       document.head.appendChild(s);
@@ -228,7 +228,7 @@ const API = {
     const sb = await getClient();
     const tables = ["users","grades","subjects","units","lessons","questions",
                     "exams","missions","achievements","levels","notifications","activity","roles","polls","poll_votes"];
-    
+
     const results = await Promise.all(
       tables.map(async (t) => {
         let res = await sb.from(t).select("*").order("created_at", { ascending: false }).limit(3000);
@@ -236,7 +236,7 @@ const API = {
         return res;
       })
     );
-    
+
     const db = {};
     tables.forEach((t, i) => {
       if (results[i].error) {
@@ -246,11 +246,11 @@ const API = {
         db[t] = results[i].data || [];
       }
     });
-    
+
     if (db.activity?.length) db.activity.sort((a, b) => (Number(b.at) || 0) - (Number(a.at) || 0));
     if (db.notifications?.length) db.notifications.sort((a, b) => (Number(b.created_at) || 0) - (Number(a.created_at) || 0));
     if (db.polls?.length) db.polls.sort((a, b) => (Number(b.created_at) || 0) - (Number(a.created_at) || 0));
-    
+
     console.log("✅ Loaded:", {
       activity: db.activity?.length || 0,
       users: db.users?.length || 0,
@@ -307,12 +307,13 @@ const API = {
     } catch (e) { console.warn("⚠️ Track activity error:", e.message); }
   },
 
-  async saveAttempt({ userId, examId, score, total, pct, passed, answers }) {
+  async saveAttempt({ userId, examId, score, total, pct, passed, answers, duration }) {
     const sb = await getClient();
     const now = Date.now();
     const row = {
       id: uid("att_"), user_id: userId, exam_id: examId,
       score, total, pct, passed, answers,
+      duration: duration || 0,
       at: now, created_at: now
     };
     const { data, error } = await sb.from("exam_attempts").insert([row]).select().single();
