@@ -5,6 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="theme-color" content="#04060e" />
 <title>MISSION EDU — منصة الطالب</title>
+
+<!-- ═══════════════ Meta Pixel ═══════════════ -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1430647709159941');
+fbq('track', 'PageView');
+</script>
+<noscript>
+  <img height="1" width="1" style="display:none"
+       src="https://www.facebook.com/tr?id=1430647709159941&ev=PageView&noscript=1"/>
+</noscript>
+<!-- ═══════════════ End Meta Pixel ═══════════════ -->
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
@@ -21,7 +41,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <style>
 /* ═══════════════════════════════════════
-   🛡 إصلاح الانزلاق الأفقي (Root Fix)
+   🛡 إصلاح الانزلاق الأفقي
    ═══════════════════════════════════════ */
 html, body {
   overflow-x: hidden !important;
@@ -219,13 +239,51 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 const {useState,useEffect,useMemo,useCallback,useRef,createContext,useContext}=React;
 const DB=window.MissionDB;
 
-/* ═══════════ أصوات ═══════════ */
-const SOUNDS={
-  notify:"data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT",
-  success:"data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQBvT18AAACAgICAf39/f39/f3+AgICAf39/f39/f3+AgICAf39/f39/f3+AgICAf39/f39/f3+AgICAf39/f39/f38="
-};
+/* ═══════════ أصوات (Web Audio API) ═══════════ */
+let _audioCtx=null;
+function getAudioCtx(){
+  if(!_audioCtx){
+    try{_audioCtx=new (window.AudioContext||window.webkitAudioContext)();}
+    catch(e){return null;}
+  }
+  return _audioCtx;
+}
+function beep(frequency,duration,type='sine',volume=0.15){
+  try{
+    const ctx=getAudioCtx();
+    if(!ctx) return;
+    if(ctx.state==='suspended') ctx.resume();
+    const osc=ctx.createOscillator();
+    const gain=ctx.createGain();
+    osc.type=type;
+    osc.frequency.value=frequency;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    gain.gain.setValueAtTime(volume,ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+duration/1000);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime+duration/1000);
+  }catch(e){}
+}
 function playSound(type='notify'){
-  try{const a=new Audio(SOUNDS[type]||SOUNDS.notify);a.volume=0.35;a.play().catch(()=>{});}catch(e){}
+  switch(type){
+    case 'success':
+      beep(523,100,'sine',0.18);
+      setTimeout(()=>beep(659,100,'sine',0.18),100);
+      setTimeout(()=>beep(784,200,'sine',0.18),200);
+      break;
+    case 'err':
+      beep(392,120,'square',0.15);
+      setTimeout(()=>beep(311,200,'square',0.15),120);
+      break;
+    case 'warn':
+      beep(440,150,'triangle',0.18);
+      setTimeout(()=>beep(440,150,'triangle',0.18),180);
+      break;
+    default:
+      beep(880,100,'sine',0.15);
+      setTimeout(()=>beep(1175,120,'sine',0.15),100);
+  }
 }
 
 /* ═══════════ Toast ═══════════ */
@@ -237,7 +295,9 @@ function ToastProvider({children}){
     const titles={ok:'تم بنجاح',err:'خطأ',warn:'تنبيه',info:'معلومة'};
     setItems(x=>[...x,{id,msg,type,title:title||titles[type]||'',duration}]);
     if(type==='ok') playSound('success');
-    else if(type==='err') playSound('notify');
+    else if(type==='err') playSound('err');
+    else if(type==='warn') playSound('warn');
+    else playSound('notify');
   },[]);
   const remove=useCallback(id=>setItems(x=>x.filter(t=>t.id!==id)),[]);
   return <ToastCtx.Provider value={{ok:(m,t)=>push(m,'ok',t),err:(m,t)=>push(m,'err',t),warn:(m,t)=>push(m,'warn',t),info:(m,t)=>push(m,'info',t)}}>
@@ -263,7 +323,7 @@ const AppCtx=createContext(null);
 const useApp=()=>useContext(AppCtx);
 
 function AppProvider({children}){
-  const [db,setDb]=useState({users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[]});
+  const [db,setDb]=useState({users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[],polls:[],poll_votes:[]});
   const [currentUser,setCurrentUser]=useState(null);
   const [attempts,setAttempts]=useState([]);
   const [errors,setErrors]=useState([]);
@@ -273,7 +333,11 @@ function AppProvider({children}){
   const toast=useToast();
 
   const reload=useCallback(async ()=>{
-    try{const data=await DB.loadAll();setDb(data);}catch(e){console.warn(e);}
+    try{
+      await DB.cleanupExpiredPolls();
+      const data=await DB.loadAll();
+      setDb(data);
+    }catch(e){console.warn(e);}
   },[]);
 
   const reloadUserData=useCallback(async ()=>{
@@ -313,6 +377,31 @@ function AppProvider({children}){
       }catch(e){console.warn(e);}
       setLoading(false);
     })();
+  },[]);
+
+  // ✅ حذف الاستطلاعات المنتهية كل 5 دقايق
+  useEffect(()=>{
+    const interval=setInterval(async ()=>{
+      const count=await DB.cleanupExpiredPolls();
+      if(count>0){ await reload(); }
+    },5*60*1000);
+    return ()=>clearInterval(interval);
+  },[reload]);
+
+  // ✅ تفعيل AudioContext بعد أول تفاعل
+  useEffect(()=>{
+    const unlock=()=>{
+      const ctx=getAudioCtx();
+      if(ctx&&ctx.state==='suspended') ctx.resume();
+      document.removeEventListener('click',unlock);
+      document.removeEventListener('touchstart',unlock);
+    };
+    document.addEventListener('click',unlock,{once:true});
+    document.addEventListener('touchstart',unlock,{once:true});
+    return ()=>{
+      document.removeEventListener('click',unlock);
+      document.removeEventListener('touchstart',unlock);
+    };
   },[]);
 
   const logout=useCallback(()=>{
@@ -439,7 +528,7 @@ function Ring({value,size=120,stroke=10,color='#2f7dff',children}){
   </div>;
 }
 
-/* ═══════════ 🍅 Pomodoro Timer ═══════════ */
+/* ═══════════ 🍅 Pomodoro ═══════════ */
 function PomodoroTimer({compact=false}){
   const app=useApp();
   const u=app.currentUser;
@@ -448,7 +537,6 @@ function PomodoroTimer({compact=false}){
   const [secondsLeft,setSecondsLeft]=useState(25*60);
   const [sessions,setSessions]=useState(0);
   const intervalRef=useRef(null);
-
   const WORK_TIME=25*60;
   const BREAK_TIME=5*60;
 
@@ -502,7 +590,6 @@ function PomodoroTimer({compact=false}){
   };
 
   const reset=()=>{ setRunning(false); setMode('work'); setSecondsLeft(WORK_TIME); };
-
   const total=mode==='work'?WORK_TIME:BREAK_TIME;
   const progress=((total-secondsLeft)/total)*100;
   const mins=Math.floor(secondsLeft/60);
@@ -548,29 +635,6 @@ function PomodoroTimer({compact=false}){
       <button className="btn btn-s" onClick={reset}><Icon name="refresh" size={14}/> إعادة</button>
     </div>
     {sessions > 0 && <div className="pill pill-g mt16" style={{display:'inline-flex'}}>✅ أكملت {sessions} جلسة النهاردة</div>}
-  </div>;
-}
-
-/* ═══════════ 📝 Notes Panel ═══════════ */
-function NotesPanel({lessonId}){
-  const app=useApp();
-  const [text,setText]=useState(()=>app.getNote(lessonId));
-  const [saving,setSaving]=useState(false);
-  const [saved,setSaved]=useState(false);
-  useEffect(()=>{ setText(app.getNote(lessonId)); setSaved(false); },[lessonId]);
-  const save=async ()=>{
-    setSaving(true);
-    try{ await app.saveNote(lessonId,text); setSaved(true); app.toast.ok('تم حفظ الملاحظات'); setTimeout(()=>setSaved(false),2000); }
-    catch(e){app.toast.err(e.message);}
-    setSaving(false);
-  };
-  return <div className="glass" style={{padding:16}}>
-    <div className="flex between center mb12">
-      <div className="h4" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="note" size={16}/> ملاحظاتي</div>
-      {saved && <span className="pill pill-g" style={{fontSize:10}}>✓ محفوظ</span>}
-    </div>
-    <textarea className="input" value={text} onChange={e=>{setText(e.target.value);setSaved(false);}} placeholder="اكتب ملاحظاتك على الدرس هنا..." rows="5"/>
-    <button className="btn btn-p btn-block mt12" onClick={save} disabled={saving}>{saving?'جارٍ الحفظ...':'💾 حفظ الملاحظات'}</button>
   </div>;
 }
 
@@ -671,75 +735,41 @@ function Home({onNav,setSelected}){
 
   return <>
     <div className="hero mb16" style={{padding:'clamp(16px,4vw,24px)'}}>
-  <div style={{
-    display:'flex',
-    flexDirection:'column',
-    alignItems:'center',
-    textAlign:'center',
-    gap:'16px'
-  }}>
-    {/* النص + الأزرار */}
-    <div style={{width:'100%'}}>
-      <div className="h2 mb6" style={{whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
-        أهلًا بك {u.name.split(' ')[0]} 👋
+      <div style={{display:'flex',flexDirection:'column',alignItems:'center',textAlign:'center',gap:'16px'}}>
+        <div style={{width:'100%'}}>
+          <div className="h2 mb6" style={{whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
+            أهلًا بك {u.name.split(' ')[0]} 👋
+          </div>
+          <div className="sm txt2 mb12">مهمتك الحالية في انتظارك.</div>
+        </div>
+
+        <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'20px',flexWrap:'wrap'}}>
+          <Ring value={progressPct} size={100} stroke={8} color="#2f7dff">
+            <div className="stat-n">{progressPct}%</div>
+            <div className="xs muted">التقدم</div>
+          </Ring>
+          <Ring value={next?DB.pct((u.xp-current.xp),next.xp-current.xp):100} size={80} stroke={7} color="#8b5cf6">
+            <div style={{fontWeight:900}}>Lv {current.level}</div>
+            <div className="xs muted">{current.name}</div>
+          </Ring>
+        </div>
+
+        <div style={{display:'flex',gap:'8px',width:'100%',flexWrap:'wrap'}}>
+          {lastLesson && (
+            <a href={`/student/lesson.html?id=${lastLesson.id}`}
+               className="btn btn-p"
+               style={{textDecoration:'none',flex:'1 1 auto',minWidth:'140px',fontSize:'13px',padding:'10px 16px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
+              ▶️ متابعة الدرس
+            </a>
+          )}
+          <button className="btn btn-g"
+                  onClick={()=>onNav('subjects')}
+                  style={{flex:'1 1 auto',minWidth:'140px',fontSize:'13px',padding:'10px 16px'}}>
+            <Icon name="book" size={14}/> استعرض المواد
+          </button>
+        </div>
       </div>
-      <div className="sm txt2 mb12">مهمتك الحالية في انتظارك.</div>
     </div>
-
-    {/* الدواير - عرضية على الشاشات كلها */}
-    <div style={{
-      display:'flex',
-      alignItems:'center',
-      justifyContent:'center',
-      gap:'20px',
-      flexWrap:'wrap'
-    }}>
-      <Ring value={progressPct} size={100} stroke={8} color="#2f7dff">
-        <div className="stat-n">{progressPct}%</div>
-        <div className="xs muted">التقدم</div>
-      </Ring>
-      <Ring value={next?DB.pct((u.xp-current.xp),next.xp-current.xp):100} size={80} stroke={7} color="#8b5cf6">
-        <div style={{fontWeight:900}}>Lv {current.level}</div>
-        <div className="xs muted">{current.name}</div>
-      </Ring>
-    </div>
-
-    {/* الأزرار - في صف واحد بالعرض الكامل */}
-    <div style={{
-      display:'flex',
-      gap:'8px',
-      width:'100%',
-      flexWrap:'wrap'
-    }}>
-      {lastLesson && (
-        <a href={`/student/lesson.html?id=${lastLesson.id}`}
-           className="btn btn-p"
-           style={{
-             textDecoration:'none',
-             flex:'1 1 auto',
-             minWidth:'140px',
-             fontSize:'13px',
-             padding:'10px 16px',
-             whiteSpace:'nowrap',
-             overflow:'hidden',
-             textOverflow:'ellipsis'
-           }}>
-          ▶️ متابعة الدرس
-        </a>
-      )}
-      <button className="btn btn-g"
-              onClick={()=>onNav('subjects')}
-              style={{
-                flex:'1 1 auto',
-                minWidth:'140px',
-                fontSize:'13px',
-                padding:'10px 16px'
-              }}>
-        <Icon name="book" size={14}/> استعرض المواد
-      </button>
-    </div>
-  </div>
-</div>
 
     <div className="grid g4 mb16">
       <Stat label="نقاط XP" value={DB.fmt(u.xp||0)} icon="zap" color="#5aa9ff"/>
@@ -820,7 +850,10 @@ function Subjects({setSelected,setTab}){
           const lessons=app.db.lessons.filter(l=>units.some(un=>un.id===l.unit_id)&&l.published!==false);
           const done=lessons.filter(l=>(u.completed_lessons||[]).includes(l.id)).length;
           const p=DB.pct(done,lessons.length);
-          return <div key={s.id} className="glass hv" style={{padding:20,cursor:'pointer'}} onClick={()=>{setSelected({type:'subject',id:s.id});setTab('subject');}}>
+          return <div key={s.id} className="glass hv" style={{padding:20,cursor:'pointer'}} onClick={()=>{
+            if(typeof fbq!=='undefined') fbq('trackCustom','ViewSubject',{subject:s.name});
+            setSelected({type:'subject',id:s.id});setTab('subject');
+          }}>
             <div className="flex between center mb12">
               <div style={{fontSize:38}}>{s.icon}</div>
               <span className="pill pill-b">{lessons.length} درس</span>
@@ -888,7 +921,8 @@ function SubjectDetail({subjectId,setSelected,setTab}){
               const done=(u.completed_lessons||[]).includes(l.id);
               const hasVideo=l.video&&l.video.url;
               const note=app.getNote(l.id);
-              return <a key={l.id} href={`/student/lesson.html?id=${l.id}`} className="glass-s hv" style={{padding:14,textDecoration:'none',color:'inherit'}}>
+              return <a key={l.id} href={`/student/lesson.html?id=${l.id}`} className="glass-s hv" style={{padding:14,textDecoration:'none',color:'inherit'}}
+                onClick={()=>{if(typeof fbq!=='undefined') fbq('trackCustom','ViewLesson',{lesson:l.title});}}>
                 <div className="flex between center mb6">
                   <span className={`pill ${done?'pill-g':'pill-b'}`}>{done?<Icon name="check" size={12}/>:<Icon name="play" size={12}/>}</span>
                   <div className="flex g6">
@@ -909,7 +943,8 @@ function SubjectDetail({subjectId,setSelected,setTab}){
             {exams.map(e=>{
               const attempts=(app.attempts||[]).filter(a=>a.exam_id===e.id);
               const best=attempts.length?Math.max(...attempts.map(a=>a.pct)):0;
-              return <a key={e.id} href={`/student/exam.html?id=${e.id}`} className="glass-s hv" style={{padding:14,textDecoration:'none',color:'inherit'}}>
+              return <a key={e.id} href={`/student/exam.html?id=${e.id}`} className="glass-s hv" style={{padding:14,textDecoration:'none',color:'inherit'}}
+                onClick={()=>{if(typeof fbq!=='undefined') fbq('track','InitiateCheckout',{content_name:e.title});}}>
                 <div className="flex between center mb6">
                   <span className={`pill ${best>=e.pass_score?'pill-g':'pill-a'}`}>{attempts.length?`أفضل: ${best}%`:'جديد'}</span>
                   <span className="xs muted">⏱ {e.duration}د</span>
@@ -938,6 +973,7 @@ function Missions({setSelected,setTab}){
         xp:(u.xp||0)+(m.xp||0)
       });
       DB.trackActivity({userId:u.id,userName:u.name,type:'mission_complete',target:m.title,details:{xp:m.xp}});
+      if(typeof fbq!=='undefined') fbq('trackCustom','CompleteMission',{mission:m.title,xp:m.xp});
       app.toast.ok(`🎉 أكملت المهمة! +${m.xp} XP`);
       await app.reload();
     }catch(e){app.toast.err(e.message);}
@@ -1119,7 +1155,78 @@ function Leaderboard(){
     }
   </>;
 }
-/* ═══════════ صفحة استطلاعات الرأي (طالب) ═══════════ */
+
+/* ═══════════ Notes Page ═══════════ */
+function NotesPage({setTab}){
+  const app=useApp();
+  const notes = app.notes || [];
+  const sortedNotes = useMemo(()=>[...notes].sort((a,b)=>(b.updated_at||0)-(a.updated_at||0)),[notes]);
+  const [editing,setEditing]=useState(null);
+  const [text,setText]=useState('');
+  const startEdit=(n)=>{setEditing(n.id);setText(n.text||'');};
+  const cancelEdit=()=>{setEditing(null);setText('');};
+  const saveEdit=async (n)=>{
+    try{await app.saveNote(n.lesson_id,text);app.toast.ok('تم الحفظ');setEditing(null);}
+    catch(e){app.toast.err(e.message);}
+  };
+  const delNote=async (n)=>{
+    const r=await Swal.fire({
+      title:'حذف الملاحظة؟',icon:'warning',showCancelButton:true,
+      confirmButtonText:'نعم',cancelButtonText:'إلغاء',
+      confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
+      background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',
+      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+    });
+    if(!r.isConfirmed) return;
+    try{
+      const sb=await DB.getClient();
+      await sb.from('notes').delete().eq('id',n.id);
+      app.reloadUserData();
+      app.toast.warn('تم الحذف');
+    }catch(e){app.toast.err(e.message);}
+  };
+  return <>
+    <div className="flex between center mb16 wrap g8">
+      <div>
+        <div className="h2 grad">📝 ملاحظاتي</div>
+        <div className="sm muted mt6">كل ملاحظاتك على الدروس في مكان واحد</div>
+      </div>
+      <span className="pill pill-b">{sortedNotes.length} ملاحظة</span>
+    </div>
+    {sortedNotes.length===0?<div className="glass" style={{padding:30}}><Empty icon="📝" title="لا توجد ملاحظات" desc="ابدأ بكتابة ملاحظاتك من صفحة الدرس"/></div>:
+      <div className="grid g2">
+        {sortedNotes.map(n=>{
+          const l = app.lesson(n.lesson_id);
+          const isEditing = editing===n.id;
+          return <div key={n.id} className="glass" style={{padding:16}}>
+            <div className="flex between center mb12">
+              <div className="flex center g8" style={{flex:1,minWidth:0}}>
+                <span className="pill pill-b" style={{fontSize:11}}><Icon name="note" size={11}/> درس</span>
+                {l?<a href={`/student/lesson.html?id=${l.id}`} className="sm" style={{fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{l.title}</a>:<span className="sm muted">درس محذوف</span>}
+              </div>
+              <span className="xs muted">{new Date(n.updated_at||n.created_at).toLocaleDateString('ar-EG')}</span>
+            </div>
+            {isEditing?<>
+              <textarea className="input" value={text} onChange={e=>setText(e.target.value)} rows="5"/>
+              <div className="flex g8 mt12">
+                <button className="btn btn-p btn-sm" style={{flex:1}} onClick={()=>saveEdit(n)}>💾 حفظ</button>
+                <button className="btn btn-s btn-sm" onClick={cancelEdit}>إلغاء</button>
+              </div>
+            </>:<>
+              <div className="sm txt2" style={{background:'rgba(0,0,0,.20)',padding:10,borderRadius:10,borderInlineStart:'2px solid var(--blue)',whiteSpace:'pre-wrap',minHeight:60}}>{n.text||'—'}</div>
+              <div className="flex g8 mt12">
+                <button className="btn btn-s btn-sm" style={{flex:1}} onClick={()=>startEdit(n)}><Icon name="edit" size={12}/> تعديل</button>
+                <button className="btn btn-dn btn-sm" onClick={()=>delNote(n)}><Icon name="trash" size={12}/></button>
+              </div>
+            </>}
+          </div>;
+        })}
+      </div>
+    }
+  </>;
+}
+
+/* ═══════════ Polls Page (طالب) ═══════════ */
 function PollsPage(){
   const app=useApp();
   const u=app.currentUser;
@@ -1130,6 +1237,7 @@ function PollsPage(){
 
   const loadData = useCallback(async ()=>{
     try{
+      await DB.cleanupExpiredPolls();
       const sb = await DB.getClient();
       const [pRes, vRes] = await Promise.all([
         sb.from('polls').select('*').eq('active', true).order('created_at',{ascending:false}),
@@ -1149,7 +1257,6 @@ function PollsPage(){
 
   const vote = async (poll, optionIndex) => {
     if(myVote(poll.id)) return app.toast.warn('صوّت بالفعل');
-
     setVoting(poll.id + ':' + optionIndex);
     try{
       const sb = await DB.getClient();
@@ -1162,6 +1269,7 @@ function PollsPage(){
       }]);
       await loadData();
       app.toast.ok('✅ تم تسجيل صوتك');
+      if(typeof fbq!=='undefined') fbq('trackCustom','PollVote',{poll:poll.question});
       DB.trackActivity({
         userId: u.id, userName: u.name, type: 'poll_vote',
         target: poll.question, details: { poll_id: poll.id, option: optionIndex }
@@ -1297,314 +1405,6 @@ function PollsPage(){
   </>;
 }
 
-/* ═══════════ Notes Page ═══════════ */
-function NotesPage({setTab}){
-  const app=useApp();
-  const notes = app.notes || [];
-  const sortedNotes = useMemo(()=>[...notes].sort((a,b)=>(b.updated_at||0)-(a.updated_at||0)),[notes]);
-  const [editing,setEditing]=useState(null);
-  const [text,setText]=useState('');
-  const startEdit=(n)=>{setEditing(n.id);setText(n.text||'');};
-  const cancelEdit=()=>{setEditing(null);setText('');};
-  const saveEdit=async (n)=>{
-    try{await app.saveNote(n.lesson_id,text);app.toast.ok('تم الحفظ');setEditing(null);}
-    catch(e){app.toast.err(e.message);}
-  };
-  const delNote=async (n)=>{
-    const r=await Swal.fire({
-      title:'حذف الملاحظة؟',icon:'warning',showCancelButton:true,
-      confirmButtonText:'نعم',cancelButtonText:'إلغاء',
-      confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
-      background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',
-      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
-    });
-    if(!r.isConfirmed) return;
-    try{
-      const sb=await DB.getClient();
-      await sb.from('notes').delete().eq('id',n.id);
-      app.reloadUserData();
-      app.toast.warn('تم الحذف');
-    }catch(e){app.toast.err(e.message);}
-  };
-  return <>
-    <div className="flex between center mb16 wrap g8">
-      <div>
-        <div className="h2 grad">📝 ملاحظاتي</div>
-        <div className="sm muted mt6">كل ملاحظاتك على الدروس في مكان واحد</div>
-      </div>
-      <span className="pill pill-b">{sortedNotes.length} ملاحظة</span>
-    </div>
-    {sortedNotes.length===0?<div className="glass" style={{padding:30}}><Empty icon="📝" title="لا توجد ملاحظات" desc="ابدأ بكتابة ملاحظاتك من صفحة الدرس"/></div>:
-      <div className="grid g2">
-        {sortedNotes.map(n=>{
-          const l = app.lesson(n.lesson_id);
-          const isEditing = editing===n.id;
-          return <div key={n.id} className="glass" style={{padding:16}}>
-            <div className="flex between center mb12">
-              <div className="flex center g8" style={{flex:1,minWidth:0}}>
-                <span className="pill pill-b" style={{fontSize:11}}><Icon name="note" size={11}/> درس</span>
-                {l?<a href={`/student/lesson.html?id=${l.id}`} className="sm" style={{fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{l.title}</a>:<span className="sm muted">درس محذوف</span>}
-              </div>
-              <span className="xs muted">{new Date(n.updated_at||n.created_at).toLocaleDateString('ar-EG')}</span>
-            </div>
-            {isEditing?<>
-              <textarea className="input" value={text} onChange={e=>setText(e.target.value)} rows="5"/>
-              <div className="flex g8 mt12">
-                <button className="btn btn-p btn-sm" style={{flex:1}} onClick={()=>saveEdit(n)}>💾 حفظ</button>
-                <button className="btn btn-s btn-sm" onClick={cancelEdit}>إلغاء</button>
-              </div>
-            </>:<>
-              <div className="sm txt2" style={{background:'rgba(0,0,0,.20)',padding:10,borderRadius:10,borderInlineStart:'2px solid var(--blue)',whiteSpace:'pre-wrap',minHeight:60}}>{n.text||'—'}</div>
-              <div className="flex g8 mt12">
-                <button className="btn btn-s btn-sm" style={{flex:1}} onClick={()=>startEdit(n)}><Icon name="edit" size={12}/> تعديل</button>
-                <button className="btn btn-dn btn-sm" onClick={()=>delNote(n)}><Icon name="trash" size={12}/></button>
-              </div>
-            </>}
-          </div>;
-        })}
-      </div>
-    }
-  </>;
-}
-
-/* ═══════════ Certificates Page ═══════════ */
-function CertificatesPage(){
-  const app=useApp();
-  const certs = app.certificates || [];
-  const [busy,setBusy]=useState(false);
-
-    const downloadPDF = async (cert) => {
-    setBusy(true);
-    try{
-      const { jsPDF } = window.jspdf;
-      const student = app.currentUser;
-      const subject = app.subject(cert.subject_id);
-
-      // ✅ 1) انتظار الخطوط
-      if (document.fonts && document.fonts.ready) {
-        await document.fonts.ready;
-      }
-
-      // ✅ 2) تحميل اللوجو من /logo.png
-      let logoBase64 = '';
-      try{
-        const res = await fetch('/logo.png', { cache: 'no-cache' });
-        if(!res.ok) throw new Error('Logo not found');
-        const blob = await res.blob();
-        logoBase64 = await new Promise((resolve, reject)=>{
-          const reader = new FileReader();
-          reader.onloadend = ()=>resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-        console.log('✅ Logo loaded:', logoBase64.length, 'chars');
-      }catch(e){
-        console.warn('⚠️ Logo failed:', e.message);
-      }
-
-      const certNumber = cert.id.slice(-12).toUpperCase();
-      const issueDate = new Date(cert.issued_at).toLocaleDateString('ar-EG',{
-        year:'numeric', month:'long', day:'numeric'
-      });
-
-      const studentName = student?.name || 'الطالب';
-      const subjectName = subject?.name || 'المادة';
-      const subjectIcon = subject?.icon || '📚';
-
-      // ✅ 3) بناء الشهادة بـ SVG (يدعم العربي 100%)
-      const W = 1123, H = 794;
-
-      const svgString = `
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
-  <defs>
-    <linearGradient id="topBar" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#2f7dff"/>
-      <stop offset="50%" stop-color="#8b5cf6"/>
-      <stop offset="100%" stop-color="#22d3ee"/>
-    </linearGradient>
-    <linearGradient id="dividerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="rgba(90,169,255,0)"/>
-      <stop offset="50%" stop-color="#5aa9ff"/>
-      <stop offset="100%" stop-color="rgba(90,169,255,0)"/>
-    </linearGradient>
-    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#5aa9ff"/>
-      <stop offset="55%" stop-color="#a78bfa"/>
-      <stop offset="100%" stop-color="#22d3ee"/>
-    </linearGradient>
-    <radialGradient id="bgGlow" cx="50%" cy="50%" r="75%">
-      <stop offset="0%" stop-color="#0b1122"/>
-      <stop offset="100%" stop-color="#04060e"/>
-    </radialGradient>
-  </defs>
-
-  <!-- خلفية -->
-  <rect width="${W}" height="${H}" fill="url(#bgGlow)"/>
-
-  <!-- شرايط علوية وسفلية -->
-  <rect x="0" y="0" width="${W}" height="8" fill="url(#topBar)"/>
-  <rect x="0" y="${H - 8}" width="${W}" height="8" fill="url(#topBar)"/>
-
-  <!-- إطار مزدوج -->
-  <rect x="22" y="22" width="${W - 44}" height="${H - 44}" fill="none" stroke="#5aa9ff" stroke-width="2" rx="8"/>
-  <rect x="32" y="32" width="${W - 64}" height="${H - 64}" fill="none" stroke="rgba(90,169,255,0.4)" stroke-width="1" rx="4"/>
-
-  <!-- زوايا متوهجة -->
-  <path d="M 12 82 L 12 12 L 82 12" fill="none" stroke="#5aa9ff" stroke-width="3"/>
-  <path d="M ${W - 82} 12 L ${W - 12} 12 L ${W - 12} 82" fill="none" stroke="#5aa9ff" stroke-width="3"/>
-  <path d="M 12 ${H - 82} L 12 ${H - 12} L 82 ${H - 12}" fill="none" stroke="#5aa9ff" stroke-width="3"/>
-  <path d="M ${W - 82} ${H - 12} L ${W - 12} ${H - 12} L ${W - 12} ${H - 82}" fill="none" stroke="#5aa9ff" stroke-width="3"/>
-
-  <!-- اللوجو (على اليمين) -->
-  ${logoBase64 ? `<image xlink:href="${logoBase64}" x="${W/2 + 80}" y="55" width="70" height="70" preserveAspectRatio="xMidYMid meet"/>` : `<circle cx="${W/2 + 115}" cy="90" r="35" fill="none" stroke="#5aa9ff" stroke-width="2"/>`}
-
-  <!-- اسم المنصة (على الشمال) -->
-  <text x="${W/2 - 40}" y="95" text-anchor="middle" font-family="Cairo, Tajawal, sans-serif" font-size="38" font-weight="900" fill="#5aa9ff" letter-spacing="2">MISSION EDU</text>
-  <text x="${W/2 - 40}" y="122" text-anchor="middle" font-family="Tajawal, Cairo, sans-serif" font-size="12" fill="#b7c6e4" letter-spacing="6">منصة تعليمية متكاملة</text>
-
-  <!-- فاصل -->
-  <line x1="${W/2 - 180}" y1="152" x2="${W/2 - 25}" y2="152" stroke="url(#dividerGrad)" stroke-width="1"/>
-  <line x1="${W/2 + 25}" y1="152" x2="${W/2 + 180}" y2="152" stroke="url(#dividerGrad)" stroke-width="1"/>
-  <circle cx="${W/2}" cy="152" r="4" fill="#5aa9ff"/>
-
-  <!-- عنوان الشهادة -->
-  <text x="${W/2}" y="215" text-anchor="middle" font-family="Tajawal, Cairo, sans-serif" font-size="48" font-weight="900" fill="#5aa9ff">شهادة إتمام</text>
-  <text x="${W/2}" y="240" text-anchor="middle" font-family="Cairo, sans-serif" font-size="12" fill="#b7c6e4" letter-spacing="8">CERTIFICATE OF COMPLETION</text>
-
-  <!-- نص -->
-  <text x="${W/2}" y="295" text-anchor="middle" font-family="Tajawal, Cairo, sans-serif" font-size="20" fill="#b7c6e4">تشهد المنصة بأن الطالب</text>
-
-  <!-- اسم الطالب -->
-  <text x="${W/2}" y="365" text-anchor="middle" font-family="Tajawal, Cairo, sans-serif" font-size="44" font-weight="900" fill="#a78bfa">${studentName}</text>
-  <line x1="${W/2 - 220}" y1="380" x2="${W/2 + 220}" y2="380" stroke="#5aa9ff" stroke-width="2"/>
-
-  <!-- نص -->
-  <text x="${W/2}" y="425" text-anchor="middle" font-family="Tajawal, Cairo, sans-serif" font-size="20" fill="#b7c6e4">قد أتم بنجاح دراسة مادة</text>
-
-  <!-- المادة -->
-  <rect x="${W/2 - 220}" y="448" width="440" height="58" rx="14" fill="rgba(90,169,255,0.12)" stroke="rgba(90,169,255,0.5)" stroke-width="2"/>
-  <text x="${W/2}" y="487" text-anchor="middle" font-family="Tajawal, Cairo, sans-serif" font-size="26" font-weight="900" fill="#5aa9ff">${subjectIcon} ${subjectName}</text>
-
-  <!-- فاصل -->
-  <line x1="${W/2 - 150}" y1="545" x2="${W/2 - 20}" y2="545" stroke="url(#dividerGrad)" stroke-width="1"/>
-  <line x1="${W/2 + 20}" y1="545" x2="${W/2 + 150}" y2="545" stroke="url(#dividerGrad)" stroke-width="1"/>
-  <circle cx="${W/2}" cy="545" r="3" fill="#5aa9ff"/>
-
-  <!-- التاريخ (يمين) -->
-  <text x="${W - 160}" y="600" text-anchor="middle" font-family="Tajawal, Cairo, sans-serif" font-size="12" fill="#7f93b8" font-weight="700" letter-spacing="2">تاريخ الإصدار</text>
-  <text x="${W - 160}" y="625" text-anchor="middle" font-family="Tajawal, Cairo, sans-serif" font-size="15" fill="#b7c6e4" font-weight="800">${issueDate}</text>
-  <line x1="${W - 220}" y1="640" x2="${W - 100}" y2="640" stroke="#5aa9ff" stroke-width="1" opacity="0.6"/>
-
-  <!-- الختم (وسط) -->
-  <circle cx="${W/2}" cy="620" r="50" fill="none" stroke="#5aa9ff" stroke-width="2"/>
-  <circle cx="${W/2}" cy="620" r="42" fill="none" stroke="rgba(90,169,255,0.8)" stroke-width="1" stroke-dasharray="4,4"/>
-  <text x="${W/2}" y="605" text-anchor="middle" font-family="Cairo, sans-serif" font-size="9" fill="#5aa9ff" font-weight="800" letter-spacing="2">OFFICIAL</text>
-  <text x="${W/2}" y="628" text-anchor="middle" font-family="Cairo, sans-serif" font-size="20" fill="#a78bfa">✦</text>
-  <text x="${W/2}" y="645" text-anchor="middle" font-family="Cairo, sans-serif" font-size="8" fill="#5aa9ff" font-weight="800" letter-spacing="1.5">MISSION EDU</text>
-
-  <!-- رقم الشهادة (شمال) -->
-  <text x="160" y="600" text-anchor="middle" font-family="Tajawal, Cairo, sans-serif" font-size="12" fill="#7f93b8" font-weight="700" letter-spacing="2">رقم الشهادة</text>
-  <text x="160" y="625" text-anchor="middle" font-family="monospace" font-size="14" fill="#b7c6e4" font-weight="800" letter-spacing="1">${certNumber}</text>
-  <line x1="100" y1="640" x2="220" y2="640" stroke="#5aa9ff" stroke-width="1" opacity="0.6"/>
-
-  <!-- التوقيع -->
-  <text x="${W/2}" y="710" text-anchor="middle" font-family="Cairo, Tajawal, sans-serif" font-size="18" font-style="italic" font-weight="900" fill="#5aa9ff">MISSION EDU</text>
-  <line x1="${W/2 - 70}" y1="722" x2="${W/2 + 70}" y2="722" stroke="#5aa9ff" stroke-width="1" opacity="0.6"/>
-  <text x="${W/2}" y="740" text-anchor="middle" font-family="Tajawal, Cairo, sans-serif" font-size="10" fill="#7f93b8" letter-spacing="2">التوقيع الرسمي</text>
-</svg>
-      `.trim();
-
-      // ✅ 4) تحويل SVG لصورة
-      const svgBlob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
-      const url = URL.createObjectURL(svgBlob);
-
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-
-      // ✅ ننتظر التحميل والفك الكامل للـ SVG
-await new Promise((resolve, reject) => {
-  img.onload = async () => {
-    try {
-      // ✅ ننتظر الـ decode كامل
-      if (img.decode) {
-        await img.decode();
-      }
-      // ✅ وقت إضافي للتأكد
-      await new Promise(r => setTimeout(r, 500));
-      resolve();
-    } catch (err) {
-      resolve();
-    }
-  };
-  img.onerror = (e) => reject(new Error('SVG load failed'));
-  img.src = url;
-});
-
-      // ✅ 5) رسم على canvas بدقة عالية
-      const canvas = document.createElement('canvas');
-canvas.width = W * 3;
-canvas.height = H * 3;
-const ctx = canvas.getContext('2d');
-
-// ✅ خلفية
-ctx.fillStyle = '#04060e';
-ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-// ✅ رسم SVG بحجمه الكامل
-ctx.imageSmoothingEnabled = true;
-ctx.imageSmoothingQuality = 'high';
-ctx.drawImage(img, 0, 0, W * 3, H * 3);
-
-      URL.revokeObjectURL(url);
-
-      // ✅ 6) تحويل لـ PDF
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
-      const pdf = new jsPDF({
-        orientation: 'landscape',
-        unit: 'px',
-        format: [W, H],
-        hotfixes: ['px_scaling']
-      });
-
-      pdf.addImage(imgData, 'JPEG', 0, 0, W, H, undefined, 'FAST');
-      pdf.save(`شهادة_${subjectName}.pdf`);
-
-      app.toast.ok('✅ تم تحميل الشهادة');
-    }catch(e){
-      console.error('❌ Certificate error:', e);
-      app.toast.err('❌ فشل: ' + e.message);
-    }
-      setBusy(false);
-};
-
-  return <>
-  <div className="flex between center mb16 wrap g8">
-      <div>
-        <div className="h2 grad">🏆 شهاداتي</div>
-        <div className="sm muted mt6">كل شهاداتك في مكان واحد</div>
-      </div>
-      <span className="pill pill-b">{certs.length} شهادة</span>
-    </div>
-    {certs.length===0?<div className="glass" style={{padding:30}}><Empty icon="🏆" title="لا توجد شهادات" desc="أكمل مادة كاملة للحصول على شهادة"/></div>:
-      <div className="grid g-auto">
-        {certs.map(c=>{
-          const s = app.subject(c.subject_id);
-          return <div key={c.id} className="glass hv" style={{padding:24,textAlign:'center'}}>
-            <div style={{fontSize:56,marginBottom:12}}>🏆</div>
-            <div className="h4 mb6">{s?.icon} {s?.name||'مادة'}</div>
-            <div className="xs muted mb16">صدرت في {new Date(c.issued_at).toLocaleDateString('ar-EG')}</div>
-            <div className="xs muted mb16" dir="ltr" style={{fontFamily:'monospace'}}>#{c.id.slice(-12).toUpperCase()}</div>
-            <button className="btn btn-p btn-block" onClick={()=>downloadPDF(c)} disabled={busy}>
-              {busy?'جارٍ...':<><Icon name="download" size={14}/> تحميل PDF</>}
-            </button>
-          </div>;
-        })}
-      </div>
-    }
-  </>;
-}
-
 /* ═══════════ Notifications ═══════════ */
 function Notifications(){
   const app=useApp();
@@ -1663,6 +1463,7 @@ function Footer(){
         userPhone: (u?.country_code || '+20') + (u?.phone || '—'),
         message: msg
       });
+      if(typeof fbq!=='undefined') fbq('track','Contact');
       Swal.fire({icon: sent?'success':'error', title: sent?'✅ تم الإرسال':'❌ فشل', text: sent?'شكرًا لك':'حاول مرة أخرى', confirmButtonColor:'#2f7dff', customClass:{popup:'swal-custom-popup',title:'swal-custom-title',confirmButton:'swal-custom-confirm'}});
     }
   };
@@ -1702,6 +1503,13 @@ function StudentApp(){
     }catch(e){}
   },[selected]);
 
+  // ✅ Meta Pixel: تتبع التنقل بين التابات
+  useEffect(()=>{
+    if(typeof fbq!=='undefined'){
+      fbq('trackCustom','Navigate',{tab});
+    }
+  },[tab]);
+
   const handleNav = (id)=>{
     if(id !== 'subject') setSelected(null);
     setTab(id);
@@ -1710,17 +1518,17 @@ function StudentApp(){
   const unread=app.db.notifications.filter(n=>(n.target==='all'||n.target===user.id)&&!(n.read_by||[]).includes(user.id)).length;
 
   const items=[{title:'',items:[
-  {id:'home',icon:'home',label:'الرئيسية'},
-  {id:'subjects',icon:'book',label:'المواد'},
-  {id:'missions',icon:'target',label:'المهام'},
-  {id:'achievements',icon:'trophy',label:'الإنجازات'},
-  {id:'notes',icon:'note',label:'ملاحظاتي',badge:app.notes?.length||null},
-  {id:'polls',icon:'activity',label:'استطلاعات الرأي'},
-  {id:'errors',icon:'alert',label:'دفتر أخطائي'},
-  {id:'leaderboard',icon:'medal',label:'المتصدرون'},
-  {id:'notifications',icon:'bell',label:'الإشعارات',badge:unread||null},
-  {id:'profile',icon:'user',label:'الملف الشخصي'}
-]}];
+    {id:'home',icon:'home',label:'الرئيسية'},
+    {id:'subjects',icon:'book',label:'المواد'},
+    {id:'missions',icon:'target',label:'المهام'},
+    {id:'achievements',icon:'trophy',label:'الإنجازات'},
+    {id:'notes',icon:'note',label:'ملاحظاتي',badge:app.notes?.length||null},
+    {id:'polls',icon:'activity',label:'استطلاعات الرأي'},
+    {id:'errors',icon:'alert',label:'دفتر أخطائي'},
+    {id:'leaderboard',icon:'medal',label:'المتصدرون'},
+    {id:'notifications',icon:'bell',label:'الإشعارات',badge:unread||null},
+    {id:'profile',icon:'user',label:'الملف الشخصي'}
+  ]}];
 
   const onSearch=q=>{
     const lc=q.toLowerCase(),res=[];
@@ -1761,12 +1569,13 @@ function StudentApp(){
       </div>
     </div>
     <div className="btmnav">
-  {[
-    {id:'home',icon:'home',label:'الرئيسية'},
-    {id:'subjects',icon:'book',label:'المواد'},
-    {id:'polls',icon:'activity',label:'استطلاعات'},
-    {id:'notes',icon:'note',label:'ملاحظاتي'}
-  ].map(it=><button key={it.id} className={tab===it.id?'on':''} onClick={()=>handleNav(it.id)}>
+      {[
+        {id:'home',icon:'home',label:'الرئيسية'},
+        {id:'subjects',icon:'book',label:'المواد'},
+        {id:'missions',icon:'target',label:'المهام'},
+        {id:'polls',icon:'activity',label:'استطلاعات'},
+        {id:'notes',icon:'note',label:'ملاحظاتي'}
+      ].map(it=><button key={it.id} className={tab===it.id?'on':''} onClick={()=>handleNav(it.id)}>
         <span className="i"><Icon name={it.icon} size={19}/></span>
         <span className="lbl-txt">{it.label}</span>
       </button>)}
