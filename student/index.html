@@ -1523,7 +1523,7 @@ function StudentApp(){
     {id:'missions',icon:'target',label:'المهام'},
     {id:'achievements',icon:'trophy',label:'الإنجازات'},
     {id:'notes',icon:'note',label:'ملاحظاتي',badge:app.notes?.length||null},
-    {id:'polls',icon:'activity',label:'استطلاعات الرأي'},
+    {id:'polls',icon:'check',label:'استطلاعات الرأي'},
     {id:'errors',icon:'alert',label:'دفتر أخطائي'},
     {id:'leaderboard',icon:'medal',label:'المتصدرون'},
     {id:'notifications',icon:'bell',label:'الإشعارات',badge:unread||null},
@@ -1573,7 +1573,7 @@ function StudentApp(){
         {id:'home',icon:'home',label:'الرئيسية'},
         {id:'subjects',icon:'book',label:'المواد'},
         {id:'missions',icon:'target',label:'المهام'},
-        {id:'polls',icon:'activity',label:'استطلاعات'},
+        {id:'polls',icon:'check',label:'استطلاعات'},
         {id:'notes',icon:'note',label:'ملاحظاتي'}
       ].map(it=><button key={it.id} className={tab===it.id?'on':''} onClick={()=>handleNav(it.id)}>
         <span className="i"><Icon name={it.icon} size={19}/></span>
