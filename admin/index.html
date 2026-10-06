@@ -2292,6 +2292,258 @@ function ReportsPage(){
     </div>
   </>;
 }
+/* ═══════════ صفحة استطلاعات الرأي (أدمن) ═══════════ */
+function PollsPage(){
+  const app=useApp();
+  const [loading,setLoading]=useState(true);
+  const [polls,setPolls]=useState([]);
+  const [votes,setVotes]=useState([]);
+  const [editing,setEditing]=useState(null);
+  const [form,setForm]=useState({question:'',options:['',''],active:true,allow_multiple:false,ends_at:''});
+  const [busy,setBusy]=useState(false);
+
+  const loadData = useCallback(async ()=>{
+    try{
+      const sb = await DB.getClient();
+      const [pRes, vRes] = await Promise.all([
+        sb.from('polls').select('*').order('created_at',{ascending:false}),
+        sb.from('poll_votes').select('*')
+      ]);
+      setPolls(pRes.data || []);
+      setVotes(vRes.data || []);
+    }catch(e){console.warn(e);}
+    setLoading(false);
+  },[]);
+
+  useEffect(()=>{ loadData(); },[loadData]);
+
+  const openNew = () => {
+    setForm({question:'',options:['',''],active:true,allow_multiple:false,ends_at:''});
+    setEditing('new');
+  };
+
+  const openEdit = (p) => {
+    setForm({
+      ...p,
+      options: Array.isArray(p.options) ? [...p.options] : ['',''],
+      ends_at: p.ends_at ? new Date(p.ends_at).toISOString().slice(0,10) : ''
+    });
+    setEditing(p.id);
+  };
+
+  const addOption = () => {
+    setForm(f => ({...f, options:[...f.options, '']}));
+  };
+  const removeOption = (idx) => {
+    if(form.options.length <= 2) return app.toast.warn('لازم خيارين على الأقل');
+    setForm(f => ({...f, options:f.options.filter((_,i)=>i!==idx)}));
+  };
+  const updateOption = (idx, val) => {
+    setForm(f => ({...f, options:f.options.map((o,i)=>i===idx?val:o)}));
+  };
+
+  const save = async () => {
+    const q = (form.question||'').trim();
+    const opts = (form.options||[]).map(o=>o.trim()).filter(Boolean);
+    if(!q || q.length < 3) return app.toast.warn('السؤال قصير');
+    if(opts.length < 2) return app.toast.warn('لازم خيارين على الأقل');
+
+    setBusy(true);
+    try{
+      const sb = await DB.getClient();
+      const record = {
+        id: editing === 'new' ? DB.uid('poll_') : editing,
+        question: q,
+        options: opts,
+        active: form.active !== false,
+        allow_multiple: !!form.allow_multiple,
+        ends_at: form.ends_at ? new Date(form.ends_at).getTime() : null,
+        created_at: form.created_at || Date.now()
+      };
+      const { error } = await sb.from('polls').upsert(record);
+      if(error) throw new Error(error.message);
+      await loadData();
+      app.toast.ok(editing==='new'?'تم إنشاء الاستطلاع':'تم الحفظ');
+      setEditing(null);
+    }catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
+
+  const del = async (id) => {
+    const r = await Swal.fire({
+      title:'حذف الاستطلاع؟',
+      text:'سيتم حذف كل الأصوات المرتبطة به',
+      icon:'warning',showCancelButton:true,
+      confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',
+      confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
+      background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',
+      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+    });
+    if(!r.isConfirmed) return;
+    try{
+      const sb = await DB.getClient();
+      await sb.from('poll_votes').delete().eq('poll_id', id);
+      await sb.from('polls').delete().eq('id', id);
+      await loadData();
+      app.toast.warn('تم الحذف');
+    }catch(e){app.toast.err(e.message);}
+  };
+
+  const toggleActive = async (p) => {
+    try{
+      const sb = await DB.getClient();
+      await sb.from('polls').update({active: !p.active}).eq('id', p.id);
+      await loadData();
+      app.toast.ok(p.active?'تم الإيقاف':'تم التفعيل');
+    }catch(e){app.toast.err(e.message);}
+  };
+
+  // حساب الأصوات لكل استطلاع
+  const getStats = (poll) => {
+    const pollVotes = votes.filter(v => v.poll_id === poll.id);
+    const total = pollVotes.length;
+    const counts = (poll.options||[]).map((_, i) =>
+      pollVotes.filter(v => v.option_index === i).length
+    );
+    return { total, counts };
+  };
+
+  return <>
+    <div className="flex between center mb16 wrap g8">
+      <div>
+        <div className="h2 grad">📊 استطلاعات الرأي</div>
+        <div className="sm muted mt6">اسأل طلابك واستقبل آرائهم</div>
+      </div>
+      <button className="btn btn-p" onClick={openNew}>
+        <Icon name="plus" size={15}/> استطلاع جديد
+      </button>
+    </div>
+
+    {loading ? (
+      <div className="glass" style={{padding:40,textAlign:'center'}}>
+        <div className="spinner" style={{margin:'0 auto 14px'}}></div>
+        جارٍ التحميل...
+      </div>
+    ) : polls.length === 0 ? (
+      <div className="glass" style={{padding:30}}>
+        <Empty icon="📊" title="لا توجد استطلاعات" desc="ابدأ بإنشاء استطلاع جديد"/>
+      </div>
+    ) : (
+      <div className="grid g2">
+        {polls.map(p => {
+          const { total, counts } = getStats(p);
+          const expired = p.ends_at && p.ends_at < Date.now();
+          return <div key={p.id} className="glass" style={{padding:20}}>
+            <div className="flex between center mb12 wrap g8">
+              <div className="flex g6 center">
+                {p.active && !expired
+                  ? <span className="pill pill-g">● نشط</span>
+                  : expired
+                  ? <span className="pill pill-r">منتهي</span>
+                  : <span className="pill pill-y">موقوف</span>}
+                <span className="pill pill-b">{total} صوت</span>
+              </div>
+              <div className="flex g6">
+                <button className="btn btn-s btn-sm" onClick={()=>toggleActive(p)} title={p.active?'إيقاف':'تفعيل'}>
+                  {p.active?'⏸':'▶️'}
+                </button>
+                <button className="btn btn-s btn-sm" onClick={()=>openEdit(p)}>
+                  <Icon name="edit" size={13}/>
+                </button>
+                <button className="btn btn-dn btn-sm" onClick={()=>del(p.id)}>
+                  <Icon name="trash" size={13}/>
+                </button>
+              </div>
+            </div>
+
+            <div className="h4 mb12" style={{lineHeight:1.5}}>{p.question}</div>
+
+            {/* النتائج */}
+            <div className="flex col g8">
+              {(p.options||[]).map((opt, i) => {
+                const cnt = counts[i] || 0;
+                const perc = total ? Math.round((cnt/total)*100) : 0;
+                return <div key={i}>
+                  <div className="flex between center mb6">
+                    <span className="sm">{opt}</span>
+                    <span className="xs muted">{cnt} ({perc}%)</span>
+                  </div>
+                  <div className="bar" style={{height:8}}>
+                    <div className="bar-f bar-b" style={{width:`${perc}%`}}/>
+                  </div>
+                </div>;
+              })}
+            </div>
+
+            {p.ends_at && (
+              <div className="xs muted mt12">
+                ⏰ ينتهي: {DB.formatDate(p.ends_at)}
+              </div>
+            )}
+          </div>;
+        })}
+      </div>
+    )}
+
+    {editing !== null && (
+      <Modal title={editing==='new'?'استطلاع جديد':'تعديل الاستطلاع'} onClose={()=>setEditing(null)} wide>
+        <Field label="السؤال">
+          <textarea className="input" rows="2" value={form.question||''} onChange={e=>setForm({...form,question:e.target.value})} placeholder="اكتب السؤال هنا..."/>
+        </Field>
+
+        <Field label={`الخيارات (${form.options.length})`}>
+          <div className="flex col g8">
+            {form.options.map((opt, i) => (
+              <div key={i} className="flex g8 center">
+                <span className="pill pill-b" style={{minWidth:32,justifyContent:'center'}}>{i+1}</span>
+                <input
+                  className="input"
+                  value={opt}
+                  onChange={e=>updateOption(i, e.target.value)}
+                  placeholder={`الخيار ${i+1}`}
+                />
+                {form.options.length > 2 && (
+                  <button className="btn btn-dn btn-sm" onClick={()=>removeOption(i)}>
+                    <Icon name="trash" size={12}/>
+                  </button>
+                )}
+              </div>
+            ))}
+            <button className="btn btn-s btn-sm" onClick={addOption} style={{alignSelf:'flex-start'}}>
+              <Icon name="plus" size={13}/> إضافة خيار
+            </button>
+          </div>
+        </Field>
+
+        <div className="grid g2">
+          <Field label="تاريخ الانتهاء (اختياري)">
+            <input type="date" className="input" value={form.ends_at||''} onChange={e=>setForm({...form,ends_at:e.target.value})}/>
+          </Field>
+          <Field label="الحالة">
+            <label className="flex center g8" style={{cursor:'pointer',marginTop:6}}>
+              <input type="checkbox" checked={form.active!==false} onChange={e=>setForm({...form,active:e.target.checked})}/>
+              <span className="sm">مفعّل</span>
+            </label>
+          </Field>
+        </div>
+
+        <Field label="السماح بأكثر من صوت">
+          <label className="flex center g8" style={{cursor:'pointer'}}>
+            <input type="checkbox" checked={!!form.allow_multiple} onChange={e=>setForm({...form,allow_multiple:e.target.checked})}/>
+            <span className="sm">يسمح للطالب بالتصويت أكثر من مرة (مش مفعّل حالياً)</span>
+          </label>
+        </Field>
+
+        <div className="flex g8 mt16">
+          <button className="btn btn-p" onClick={save} disabled={busy}>
+            {busy?'جارٍ...':'💾 حفظ'}
+          </button>
+          <button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button>
+        </div>
+      </Modal>
+    )}
+  </>;
+}
 
 /* ═══════════ Settings ═══════════ */
 function SettingsPage(){
@@ -3649,12 +3901,13 @@ function AdminApp(){
       ]
     },
     {
-      title:'النمو',
-      items:[
-        {id:'coupons',icon:'coupon',label:'الكوبونات'},
-        {id:'referrals',icon:'share',label:'الإحالات'}
-      ]
-    },
+  title:'النمو',
+  items:[
+    {id:'coupons',icon:'coupon',label:'الكوبونات'},
+    {id:'referrals',icon:'share',label:'الإحالات'},
+    {id:'polls',icon:'activity',label:'الاستطلاعات'}
+  ]
+},
     {
       title:'النظام',
       items:[
@@ -3714,6 +3967,7 @@ function AdminApp(){
         {tab==='reports'&&<ReportsPage/>}
         {tab==='coupons'&&<CouponsPage/>}
         {tab==='referrals'&&<ReferralsPage/>}
+        {tab==='polls'&&<PollsPage/>}
         {tab==='settings'&&<SettingsPage/>}
         <Footer/>
       </div>
