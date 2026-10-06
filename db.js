@@ -246,12 +246,111 @@ const API = {
     } catch (e) { return null; }
   },
 
+  async getUserSafe(id) {
+    if (!id) return null;
+    try {
+      const sb = await getClient();
+      const { data } = await sb.from("users")
+        .select("id,name,avatar,role,active,xp,streak,grade_id,governorate,completed_lessons,completed_missions,achievements,last_active,created_at,subscription,subscription_until,all_subjects,access_subjects")
+        .eq("id", id)
+        .maybeSingle();
+      return data || null;
+    } catch (e) { return null; }
+  },
+
+  async changePassword(userId, oldHashed, newHashed) {
+    try {
+      const sb = await getClient();
+      const { data: user } = await sb
+        .from("users")
+        .select("password, password_hash")
+        .eq("id", userId)
+        .maybeSingle();
+
+      if (!user) return { success: false, error: "المستخدم غير موجود" };
+
+      const stored = user.password_hash || user.password;
+      if (stored !== oldHashed) return { success: false, error: "كلمة المرور الحالية خطأ" };
+
+      const { error } = await sb.from("users")
+        .update({ password: newHashed, password_hash: newHashed })
+        .eq("id", userId);
+
+      if (error) return { success: false, error: error.message };
+      return { success: true };
+    } catch (e) {
+      return { success: false, error: e.message };
+    }
+  },
+
   async countUsers() {
     try {
       const sb = await getClient();
       const { count } = await sb.from("users").select("*", { count: "exact", head: true });
       return count || 0;
     } catch (e) { return 0; }
+  },
+
+  async loadPublicContent() {
+    const sb = await getClient();
+    const tables = ["grades","subjects","units","lessons","questions",
+                    "exams","missions","achievements","levels","notifications","activity","roles","polls","poll_votes"];
+    
+    const results = await Promise.all(
+      tables.map(async (t) => {
+        let res = await sb.from(t).select("*").order("created_at", { ascending: false }).limit(3000);
+        if (res.error) {
+          res = await sb.from(t).select("*").limit(3000);
+        }
+        return res;
+      })
+    );
+    
+    const db = {};
+    tables.forEach((t, i) => {
+      if (results[i].error) {
+        console.warn(`⚠️ فشل تحميل ${t}:`, results[i].error.message);
+        db[t] = [];
+      } else {
+        db[t] = results[i].data || [];
+      }
+    });
+
+    try {
+      const usersRes = await sb.from("users")
+        .select("id,name,avatar,role,active,xp,streak,grade_id,governorate,completed_lessons")
+        .eq("role", "student")
+        .limit(1000);
+      db.users = usersRes.data || [];
+    } catch (e) {
+      db.users = [];
+    }
+    
+    if (db.activity && db.activity.length > 0) {
+      db.activity.sort((a, b) => {
+        const aTime = Number(a.at) || 0;
+        const bTime = Number(b.at) || 0;
+        return bTime - aTime;
+      });
+    }
+    
+    if (db.notifications && db.notifications.length > 0) {
+      db.notifications.sort((a, b) => {
+        const aTime = Number(a.created_at) || 0;
+        const bTime = Number(b.created_at) || 0;
+        return bTime - aTime;
+      });
+    }
+
+    if (db.polls && db.polls.length > 0) {
+      db.polls.sort((a, b) => {
+        const aTime = Number(a.created_at) || 0;
+        const bTime = Number(b.created_at) || 0;
+        return bTime - aTime;
+      });
+    }
+    
+    return db;
   },
 
   async loadAll() {
@@ -338,7 +437,8 @@ const API = {
   async getTop10() {
     try {
       const sb = await getClient();
-      const { data } = await sb.from("users").select("*")
+      const { data } = await sb.from("users")
+        .select("id,name,avatar,role,active,xp,streak,grade_id,governorate")
         .eq("role", "student").eq("active", true)
         .order("xp", { ascending: false }).limit(10);
       return data || [];
@@ -363,20 +463,19 @@ const API = {
       
       if (error) {
         console.warn("⚠️ Track activity failed:", error.message);
-      } else {
-        console.log("✅ Activity tracked:", type);
       }
     } catch (e) {
       console.warn("⚠️ Track activity error:", e.message);
     }
   },
 
-  async saveAttempt({ userId, examId, score, total, pct, passed, answers }) {
+  async saveAttempt({ userId, examId, score, total, pct, passed, answers, duration }) {
     const sb = await getClient();
     const now = Date.now();
     const row = {
       id: uid("att_"), user_id: userId, exam_id: examId,
       score, total, pct, passed, answers,
+      duration: duration || null,
       at: now, created_at: now
     };
     const { data, error } = await sb.from("exam_attempts").insert([row]).select().single();
