@@ -1,3 +1,11 @@
+(function loadSupabase(){
+  if (window.supabase) return;
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+  script.async = false;
+  document.head.appendChild(script);
+  console.log('📦 Supabase script loading...');
+})();
 const SUPABASE_URL = "https://szuvpbdwixezecxnykjn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_NgBzisUuNn6Gdz9PE1XgWg_EYlC5zta";
 
