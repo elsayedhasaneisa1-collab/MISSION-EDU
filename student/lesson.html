@@ -91,7 +91,6 @@ ul{list-style:none}
 .swal-custom-title{color:#e8eefc !important;font-weight:800 !important;font-family:'Tajawal','Cairo',sans-serif !important}
 .swal-custom-input{background:rgba(10,16,32,.75) !important;border:1.5px solid rgba(90,140,230,.3) !important;color:#e8eefc !important;border-radius:12px !important}
 
-/* ═══════════════ مشغل الفيديو (Modal) ═══════════════ */
 .player-modal{position:fixed;inset:0;z-index:9999;background:rgba(3,5,12,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;padding:0;animation:pu .3s}
 .player-modal.open{display:flex}
 .player-box{position:relative;width:100%;max-width:1400px;background:#000;border-radius:0;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.9);display:flex;flex-direction:column;max-height:100vh}
@@ -117,7 +116,6 @@ ul{list-style:none}
 .player-modal.fullscreen .player-header:hover{opacity:1}
 .player-modal.fullscreen .player-stage{aspect-ratio:auto;height:100vh;flex:1}
 
-/* ═══════════════ Notes Panel ═══════════════ */
 .notes-panel{background:linear-gradient(180deg,rgba(21,31,56,.72),rgba(11,17,34,.62));border:1px solid var(--border);border-radius:16px;padding:16px;transition:.3s}
 .notes-panel:focus-within{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.10)}
 .notes-textarea{width:100%;background:rgba(10,16,32,.72);border:1.5px solid var(--border);border-radius:12px;padding:12px;color:var(--txt);font-family:inherit;font-size:13.5px;line-height:1.7;resize:vertical;min-height:120px;outline:none;transition:.22s}
@@ -160,7 +158,6 @@ ul{list-style:none}
   <div class="loading"><div class="spinner"></div>جارٍ تحميل الدرس...</div>
 </div>
 
-<!-- ═══════════════ مشغل الفيديو Modal ═══════════════ -->
 <div class="player-modal" id="playerModal">
   <div class="player-box">
     <div class="player-header">
@@ -220,8 +217,10 @@ ul{list-style:none}
     noteText: "",
     noteSaved: false,
     noteSaving: false,
+    noteId: null,
     watermarkTimer: null,
-    isFullscreen: false
+    isFullscreen: false,
+    protectionAttached: false
   };
 
   function esc(str){
@@ -234,7 +233,6 @@ ul{list-style:none}
     return m ? m[1] : "";
   }
 
-  /* ═══════════════ مشغل الفيديو ═══════════════ */
   function openPlayer(lesson, user){
     const video = lesson.video || {};
     const url = video.url || "";
@@ -373,6 +371,7 @@ ul{list-style:none}
 
   function startWatermarkMotion(){
     moveWatermark();
+    if(state.watermarkTimer) clearInterval(state.watermarkTimer);
     state.watermarkTimer = setInterval(moveWatermark, 5000);
   }
 
@@ -381,6 +380,9 @@ ul{list-style:none}
   }
 
   function attachProtection(){
+    if(state.protectionAttached) return;
+    state.protectionAttached = true;
+
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.addEventListener('keydown', e => {
       if(e.key === 'F12'){ e.preventDefault(); return false; }
@@ -404,7 +406,6 @@ ul{list-style:none}
     document.addEventListener('dblclick', e => e.preventDefault());
   }
 
-  /* ═══════════════ Notes Panel ═══════════════ */
   async function loadNote(){
     try{
       const sb = await DB.getClient();
@@ -454,7 +455,6 @@ ul{list-style:none}
     if(btn){ btn.disabled = false; btn.textContent = '💾 حفظ الملاحظات'; }
   }
 
-  /* ═══════════════ عرض الدرس ═══════════════ */
   function buildPlayerHTML(video, lessonTitle){
     if(!video || !video.url){
       return `<div class="vid-shell"><div class="vp-error"><div style="font-size:48px;opacity:.35;margin-bottom:12px">🎬</div><div>لا يوجد فيديو لهذا الدرس</div></div></div>`;
@@ -553,7 +553,6 @@ ul{list-style:none}
               <div class="xs muted mt8">${state.doneUnit} من ${state.totalUnit} دروس</div>
             </div>
 
-            <!-- ═══════════ 📝 ملاحظاتي ═══════════ -->
             <div class="notes-panel mb16">
               <div class="flex between center mb12">
                 <div class="h4" style="display:flex;align-items:center;gap:8px">
@@ -600,7 +599,6 @@ ul{list-style:none}
       </div>
     `;
 
-    // ربط زر فتح المشغل
     const openBtn = document.getElementById('btnOpenPlayer');
     if(openBtn){
       const openHandler = (e)=>{
@@ -612,7 +610,6 @@ ul{list-style:none}
       openBtn.addEventListener('touchend', openHandler, { passive: false });
     }
 
-    // زر إتمام الدرس
     document.getElementById("btnDone").addEventListener("click", async ()=>{
       if(state.isDone) return;
       try{
@@ -640,7 +637,6 @@ ul{list-style:none}
       }
     });
 
-    // زر المراجعة
     document.getElementById("btnReview").addEventListener("click", ()=>{
       Swal.fire({
         icon: 'info', title: 'تمت الإضافة', text: 'سجلنا هذا الدرس في قائمة المراجعة',
@@ -650,7 +646,6 @@ ul{list-style:none}
       });
     });
 
-    // 📝 ربط Notes
     const ta = document.getElementById('noteTextarea');
     if(ta){
       ta.addEventListener('input', (e)=>{
@@ -664,7 +659,6 @@ ul{list-style:none}
     if(btnSave) btnSave.addEventListener('click', saveNote);
   }
 
-  /* ═══════════════ تحميل البيانات ═══════════════ */
   async function load(){
     if(!lessonId){
       app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
@@ -688,7 +682,7 @@ ul{list-style:none}
 
     const { data: lesson, error } = await sb.from("lessons").select("*").eq("id", lessonId).maybeSingle();
     if(error || !lesson){
-      app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
+      app.innerHTML = `<div className="glass" style="padding:40px;text-align:center">
         <div class="h3 mb12">⚠️ الدرس غير موجود</div>
         <a href="/student/index.html" class="btn btn-p" style="text-decoration:none">العودة للرئيسية</a>
       </div>`;
@@ -725,12 +719,10 @@ ul{list-style:none}
       return lessonIds.includes(lesson.id);
     });
 
-    // 📝 تحميل الملاحظات
     await loadNote();
 
     render();
 
-    // ربط الأزرار
     const closeBtn = document.getElementById('playerClose');
     if(closeBtn) closeBtn.addEventListener('click', closePlayer);
 

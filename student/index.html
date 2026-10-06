@@ -6,7 +6,6 @@
 <meta name="theme-color" content="#04060e" />
 <title>MISSION EDU — منصة الطالب</title>
 
-<!-- ═══════════════ Meta Pixel ═══════════════ -->
 <script>
 !function(f,b,e,v,n,t,s)
 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -23,7 +22,6 @@ fbq('track', 'PageView');
   <img height="1" width="1" style="display:none"
        src="https://www.facebook.com/tr?id=1430647709159941&ev=PageView&noscript=1"/>
 </noscript>
-<!-- ═══════════════ End Meta Pixel ═══════════════ -->
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,9 +38,6 @@ fbq('track', 'PageView');
 <meta name="apple-mobile-web-app-title" content="MISSION EDU">
 <meta name="mobile-web-app-capable" content="yes">
 <style>
-/* ═══════════════════════════════════════
-   🛡 إصلاح الانزلاق الأفقي
-   ═══════════════════════════════════════ */
 html, body {
   overflow-x: hidden !important;
   max-width: 100% !important;
@@ -100,6 +95,7 @@ a{color:inherit;text-decoration:none}
 .btn-s{background:rgba(255,255,255,.05);color:var(--txt2);border:1px solid var(--border)}
 .btn-s:hover{background:rgba(255,255,255,.09);color:var(--txt)}
 .btn-ok{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;box-shadow:0 10px 26px rgba(34,197,94,.28)}
+.btn-dn{background:rgba(239,68,68,.14);color:#fca5a5;border:1px solid rgba(239,68,68,.32)}
 .btn-sm{padding:7px 13px;font-size:12.5px;border-radius:10px}
 .btn-lg{padding:15px 32px;font-size:16px;border-radius:16px}
 .btn-block{width:100%}
@@ -239,7 +235,6 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 const {useState,useEffect,useMemo,useCallback,useRef,createContext,useContext}=React;
 const DB=window.MissionDB;
 
-/* ═══════════ أصوات (Web Audio API) ═══════════ */
 let _audioCtx=null;
 function getAudioCtx(){
   if(!_audioCtx){
@@ -286,7 +281,6 @@ function playSound(type='notify'){
   }
 }
 
-/* ═══════════ Toast ═══════════ */
 const ToastCtx=createContext(null);
 function ToastProvider({children}){
   const [items,setItems]=useState([]);
@@ -318,7 +312,6 @@ function Toast({data,onClose}){
 }
 const useToast=()=>useContext(ToastCtx);
 
-/* ═══════════ App Provider ═══════════ */
 const AppCtx=createContext(null);
 const useApp=()=>useContext(AppCtx);
 
@@ -379,7 +372,6 @@ function AppProvider({children}){
     })();
   },[]);
 
-  // ✅ حذف الاستطلاعات المنتهية كل 5 دقايق
   useEffect(()=>{
     const interval=setInterval(async ()=>{
       const count=await DB.cleanupExpiredPolls();
@@ -388,7 +380,6 @@ function AppProvider({children}){
     return ()=>clearInterval(interval);
   },[reload]);
 
-  // ✅ تفعيل AudioContext بعد أول تفاعل
   useEffect(()=>{
     const unlock=()=>{
       const ctx=getAudioCtx();
@@ -466,7 +457,6 @@ function AppProvider({children}){
   }}>{children}</AppCtx.Provider>;
 }
 
-/* ═══════════ Icon ═══════════ */
 const Icon=({name,size=18,color='currentColor'})=>{
   const p={width:size,height:size,viewBox:'0 0 24 24',fill:'none',stroke:color,strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round'};
   const paths={
@@ -499,7 +489,6 @@ const Icon=({name,size=18,color='currentColor'})=>{
   return <svg {...p}>{paths[name]||paths.help}</svg>;
 };
 
-/* ═══════════ مكونات ═══════════ */
 function Stat({label,value,icon,color='var(--blue)',sub}){
   return <div className="glass-s hv" style={{padding:16}}>
     <div className="flex between center mb8">
@@ -528,7 +517,6 @@ function Ring({value,size=120,stroke=10,color='#2f7dff',children}){
   </div>;
 }
 
-/* ═══════════ 🍅 Pomodoro ═══════════ */
 function PomodoroTimer({compact=false}){
   const app=useApp();
   const u=app.currentUser;
@@ -537,6 +525,7 @@ function PomodoroTimer({compact=false}){
   const [secondsLeft,setSecondsLeft]=useState(25*60);
   const [sessions,setSessions]=useState(0);
   const intervalRef=useRef(null);
+  const lastSaveRef=useRef(0);
   const WORK_TIME=25*60;
   const BREAK_TIME=5*60;
 
@@ -578,10 +567,15 @@ function PomodoroTimer({compact=false}){
 
   const saveSession=async ()=>{
     try{
+      const now=Date.now();
+      if(now - lastSaveRef.current < 20*60*1000){
+        return;
+      }
+      lastSaveRef.current = now;
       const sb=await DB.getClient();
       await sb.from('pomodoro_sessions').insert([{
         id:DB.uid('pomo_'), user_id:u.id, duration:25,
-        completed_at:Date.now(), created_at:Date.now()
+        completed_at:now, created_at:now
       }]);
       setSessions(s=>s+1);
       await DB.updateUser(u.id,{xp:(u.xp||0)+5});
@@ -638,7 +632,6 @@ function PomodoroTimer({compact=false}){
   </div>;
 }
 
-/* ═══════════ Sidebar ═══════════ */
 function Sidebar({items,active,onNav,open,onClose}){
   return <>
     {open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.5)',zIndex:55}}/>}
@@ -666,7 +659,6 @@ function Sidebar({items,active,onNav,open,onClose}){
   </>;
 }
 
-/* ═══════════ Topbar ═══════════ */
 function Topbar({user,onMenu,onLogout,onSearch,searchResults,unreadNotifs=0,onOpenNotifications}){
   const [q,setQ]=useState('');
   const [open,setOpen]=useState(false);
@@ -715,7 +707,7 @@ function Topbar({user,onMenu,onLogout,onSearch,searchResults,unreadNotifs=0,onOp
     </div>
   </div>;
 }
-/* ═══════════ Home ═══════════ */
+
 function Home({onNav,setSelected}){
   const app=useApp();
   const u=app.currentUser;
@@ -835,7 +827,6 @@ function Home({onNav,setSelected}){
   </>;
 }
 
-/* ═══════════ Subjects ═══════════ */
 function Subjects({setSelected,setTab}){
   const app=useApp();
   const u=app.currentUser;
@@ -872,7 +863,6 @@ function Subjects({setSelected,setTab}){
   </>;
 }
 
-/* ═══════════ SubjectDetail ═══════════ */
 function SubjectDetail({subjectId,setSelected,setTab}){
   const app=useApp();
   const u=app.currentUser;
@@ -960,7 +950,6 @@ function SubjectDetail({subjectId,setSelected,setTab}){
   </>;
 }
 
-/* ═══════════ Missions ═══════════ */
 function Missions({setSelected,setTab}){
   const app=useApp();
   const u=app.currentUser;
@@ -1024,7 +1013,6 @@ function Missions({setSelected,setTab}){
   </>;
 }
 
-/* ═══════════ Achievements ═══════════ */
 function Achievements(){
   const app=useApp();
   const u=app.currentUser;
@@ -1046,7 +1034,6 @@ function Achievements(){
   </>;
 }
 
-/* ═══════════ ErrorBook ═══════════ */
 function ErrorBook(){
   const app=useApp();
   const errs=app.errors;
@@ -1083,7 +1070,6 @@ function ErrorBook(){
   </>;
 }
 
-/* ═══════════ Leaderboard ═══════════ */
 function Leaderboard(){
   const app=useApp();
   const u=app.currentUser;
@@ -1156,7 +1142,6 @@ function Leaderboard(){
   </>;
 }
 
-/* ═══════════ Notes Page ═══════════ */
 function NotesPage({setTab}){
   const app=useApp();
   const notes = app.notes || [];
@@ -1215,8 +1200,8 @@ function NotesPage({setTab}){
             </>:<>
               <div className="sm txt2" style={{background:'rgba(0,0,0,.20)',padding:10,borderRadius:10,borderInlineStart:'2px solid var(--blue)',whiteSpace:'pre-wrap',minHeight:60}}>{n.text||'—'}</div>
               <div className="flex g8 mt12">
-                <button className="btn btn-s btn-sm" style={{flex:1}} onClick={()=>startEdit(n)}><Icon name="edit" size={12}/> تعديل</button>
-                <button className="btn btn-dn btn-sm" onClick={()=>delNote(n)}><Icon name="trash" size={12}/></button>
+                <button className="btn btn-s btn-sm" style={{flex:1}} onClick={()=>startEdit(n)}>✏️ تعديل</button>
+                <button className="btn btn-dn btn-sm" onClick={()=>delNote(n)}>🗑️</button>
               </div>
             </>}
           </div>;
@@ -1226,7 +1211,6 @@ function NotesPage({setTab}){
   </>;
 }
 
-/* ═══════════ Polls Page (طالب) ═══════════ */
 function PollsPage(){
   const app=useApp();
   const u=app.currentUser;
@@ -1260,13 +1244,14 @@ function PollsPage(){
     setVoting(poll.id + ':' + optionIndex);
     try{
       const sb = await DB.getClient();
-      await sb.from('poll_votes').insert([{
+      const { error } = await sb.from('poll_votes').insert([{
         id: DB.uid('vote_'),
         poll_id: poll.id,
         user_id: u.id,
         option_index: optionIndex,
         created_at: Date.now()
       }]);
+      if(error) throw new Error(error.message);
       await loadData();
       app.toast.ok('✅ تم تسجيل صوتك');
       if(typeof fbq!=='undefined') fbq('trackCustom','PollVote',{poll:poll.question});
@@ -1405,7 +1390,6 @@ function PollsPage(){
   </>;
 }
 
-/* ═══════════ Notifications ═══════════ */
 function Notifications(){
   const app=useApp();
   const u=app.currentUser;
@@ -1437,13 +1421,11 @@ function Notifications(){
   </>;
 }
 
-/* ═══════════ Profile Redirect ═══════════ */
 function ProfileRedirect(){
   useEffect(()=>{ window.location.href = "/student/profile.html"; },[]);
   return <div className="loading"><div className="spinner"></div>جارٍ التحويل...</div>;
 }
 
-/* ═══════════ Footer ═══════════ */
 function Footer(){
   const app=useApp();
   const u=app.currentUser;
@@ -1479,7 +1461,6 @@ function Footer(){
   </div>;
 }
 
-/* ═══════════ StudentApp ═══════════ */
 function StudentApp(){
   const app=useApp();
   const user=app.currentUser;
@@ -1503,7 +1484,6 @@ function StudentApp(){
     }catch(e){}
   },[selected]);
 
-  // ✅ Meta Pixel: تتبع التنقل بين التابات
   useEffect(()=>{
     if(typeof fbq!=='undefined'){
       fbq('trackCustom','Navigate',{tab});
@@ -1583,7 +1563,6 @@ function StudentApp(){
   </div>;
 }
 
-/* ═══════════ Root + App ═══════════ */
 function Root(){
   const app=useApp();
   if(app.loading) return <div className="loading"><div className="spinner"></div>جارٍ التحميل...</div>;

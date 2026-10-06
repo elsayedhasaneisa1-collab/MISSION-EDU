@@ -135,11 +135,13 @@ a{color:inherit;text-decoration:none}
     attempts: [],
     started: false,
     submitted: false,
+    submitting: false,
     current: 0,
     answers: {},
     timeLeft: 0,
     timer: null,
-    result: null
+    result: null,
+    examStartedAt: null
   };
 
   function esc(str){
@@ -234,10 +236,12 @@ a{color:inherit;text-decoration:none}
   function startExam(){
     state.started = true;
     state.submitted = false;
+    state.submitting = false;
     state.current = 0;
     state.answers = {};
     state.timeLeft = state.exam.duration * 60;
     state.result = null;
+    state.examStartedAt = Date.now();
 
     DB.trackActivity({
       userId: state.user.id, userName: state.user.name,
@@ -332,7 +336,37 @@ a{color:inherit;text-decoration:none}
   }
 
   async function submitExam(){
+    if(state.submitting || state.submitted) return;
+    state.submitting = true;
+
     clearInterval(state.timer);
+
+    const elapsed = (Date.now() - state.examStartedAt) / 1000;
+    if(elapsed < 10){
+      state.submitting = false;
+      await Swal.fire({
+        icon:'warning', title:'وقت قصير جدًا',
+        text:'لازم تقعد على الأقل 10 ثواني في الاختبار',
+        background:'linear-gradient(180deg, #151f38, #0b1122)', color:'#e8eefc',
+        confirmButtonColor:'#2f7dff',
+        customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+      });
+      return;
+    }
+
+    const answeredCount = Object.keys(state.answers).length;
+    if(answeredCount < state.questions.length){
+      state.submitting = false;
+      const r = await Swal.fire({
+        icon:'warning', title:'أسئلة بدون إجابة',
+        text:`أجبت على ${answeredCount} من ${state.questions.length}. هل تريد الإرسال؟`,
+        showCancelButton:true, confirmButtonText:'نعم، إرسال', cancelButtonText:'رجوع',
+        confirmButtonColor:'#2f7dff', cancelButtonColor:'#64748b',
+        background:'linear-gradient(180deg, #151f38, #0b1122)', color:'#e8eefc',
+        customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+      });
+      if(!r.isConfirmed){ state.submitting = false; return; }
+    }
 
     let score = 0;
     for(let i=0; i<state.questions.length; i++){
@@ -364,7 +398,8 @@ a{color:inherit;text-decoration:none}
         userId: state.user.id,
         examId: state.exam.id,
         score, total, pct, passed,
-        answers: state.answers
+        answers: state.answers,
+        duration: Math.round(elapsed)
       });
     }catch(e){}
 
@@ -377,11 +412,12 @@ a{color:inherit;text-decoration:none}
     DB.trackActivity({
       userId: state.user.id, userName: state.user.name,
       type: "exam_submit", target: state.exam.title,
-      details: { score, total, pct, passed, gained, repeat: hasWonBefore }
+      details: { score, total, pct, passed, gained, repeat: hasWonBefore, duration: Math.round(elapsed) }
     });
 
     state.result = { score, total, pct, passed, gained, hasWonBefore };
     state.submitted = true;
+    state.submitting = false;
     renderResult();
   }
 
@@ -512,9 +548,6 @@ a{color:inherit;text-decoration:none}
     renderStart();
 
     document.addEventListener("contextmenu", e=>e.preventDefault());
-    document.addEventListener("keydown", e=>{
-      if(e.key === "F12" || (e.ctrlKey && e.shiftKey && ["I","J","C"].includes(e.key.toUpperCase()))) e.preventDefault();
-    });
   }
 
   window.openWhatsApp = ()=>{

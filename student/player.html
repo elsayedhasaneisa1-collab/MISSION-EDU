@@ -102,12 +102,6 @@ a{color:inherit;text-decoration:none}
   pointer-events:auto;
 }
 
-.shield{
-  position:absolute;inset:0;z-index:5;
-  background:transparent;
-  pointer-events:none;
-}
-
 .watermark{
   position:absolute;
   z-index:10;
@@ -127,9 +121,6 @@ a{color:inherit;text-decoration:none}
   letter-spacing:.5px;
   backdrop-filter:blur(2px);
   -webkit-backdrop-filter:blur(2px);
-}
-.watermark.moving{
-  transition:top 2s cubic-bezier(.4,0,.2,1), left 2s cubic-bezier(.4,0,.2,1), right 2s cubic-bezier(.4,0,.2,1);
 }
 
 .cover{
@@ -306,7 +297,8 @@ img,video,iframe{
     user: null,
     lesson: null,
     watermarkInterval: null,
-    currentCorner: 0
+    currentCorner: 0,
+    protectionAttached: false
   };
 
   function esc(str){
@@ -380,35 +372,11 @@ img,video,iframe{
     return '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:Tajawal,sans-serif">نوع الفيديو غير مدعوم</div>';
   }
 
-  const CORNERS = [
-    {top:'20px', right:'20px', left:'auto'},
-    {top:'20px', left:'20px', right:'auto'},
-    {bottom:'20px', left:'20px', right:'auto', top:'auto'},
-    {bottom:'20px', right:'20px', left:'auto', top:'auto'},
-    {top:'50%', left:'50%', right:'auto', bottom:'auto', transform:'translate(-50%,-50%)'}
-  ];
-
   function moveWatermark(){
     const wm = document.getElementById('watermark');
-    if(!wm) return;
-
-    state.currentCorner = (state.currentCorner + 1) % CORNERS.length;
-    const pos = CORNERS[state.currentCorner];
-
-    wm.style.top = '';
-    wm.style.bottom = '';
-    wm.style.left = '';
-    wm.style.right = '';
-    wm.style.transform = '';
-
-    if(pos.top) wm.style.top = pos.top;
-    if(pos.bottom) wm.style.bottom = pos.bottom;
-    if(pos.left) wm.style.left = pos.left;
-    if(pos.right) wm.style.right = pos.right;
-    if(pos.transform) wm.style.transform = pos.transform;
-
     const frame = document.getElementById('videoFrame');
-    if(!frame) return;
+    if(!wm || !frame) return;
+
     const w = frame.offsetWidth;
     const h = frame.offsetHeight;
 
@@ -424,6 +392,7 @@ img,video,iframe{
 
   function startWatermarkMotion(){
     moveWatermark();
+    if(state.watermarkInterval) clearInterval(state.watermarkInterval);
     state.watermarkInterval = setInterval(moveWatermark, 5000);
   }
 
@@ -526,7 +495,8 @@ img,video,iframe{
   }
 
   function attachProtection(){
-    const frame = document.getElementById('videoFrame');
+    if(state.protectionAttached) return;
+    state.protectionAttached = true;
 
     document.addEventListener('contextmenu', e => e.preventDefault());
 
@@ -541,11 +511,6 @@ img,video,iframe{
       }
     });
 
-    if(frame){
-      frame.addEventListener('dragstart', e => e.preventDefault());
-      frame.addEventListener('drop', e => e.preventDefault());
-    }
-
     document.addEventListener('selectstart', e => {
       const tag = e.target?.tagName?.toLowerCase();
       if(tag !== 'input' && tag !== 'textarea') e.preventDefault();
@@ -553,37 +518,7 @@ img,video,iframe{
 
     document.addEventListener('copy', e => e.preventDefault());
     document.addEventListener('cut', e => e.preventDefault());
-
-    document.querySelectorAll('img').forEach(img => {
-      img.setAttribute('draggable', 'false');
-      img.addEventListener('dragstart', e => e.preventDefault());
-    });
-
-    let devtoolsOpen = false;
-    const threshold = 160;
-    setInterval(() => {
-      const widthDiff = window.outerWidth - window.innerWidth;
-      const heightDiff = window.outerHeight - window.innerHeight;
-      if(widthDiff > threshold || heightDiff > threshold){
-        if(!devtoolsOpen){
-          devtoolsOpen = true;
-          try{
-            if(state.user && window.MissionDB?.trackActivity){
-              DB.trackActivity({
-                userId: state.user.id,
-                userName: state.user.name,
-                type: 'video_protect',
-                target: 'محاولة فتح DevTools',
-                details: {lesson: videoTitle}
-              });
-            }
-          }catch(e){}
-        }
-      } else {
-        devtoolsOpen = false;
-      }
-    }, 1500);
-
+    document.addEventListener('dragstart', e => e.preventDefault());
     document.addEventListener('dblclick', e => e.preventDefault());
 
     document.addEventListener('touchstart', e => {
@@ -607,8 +542,6 @@ img,video,iframe{
   }
 
   function handleResize(){
-    const frame = document.getElementById('videoFrame');
-    if(!frame) return;
     if(state.watermarkInterval){
       moveWatermark();
     }
@@ -620,8 +553,6 @@ img,video,iframe{
 
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', handleResize);
-
-    attachProtection();
 
     try{
       if(state.user && window.MissionDB?.trackActivity){
