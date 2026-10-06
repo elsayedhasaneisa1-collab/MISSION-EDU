@@ -1,5 +1,5 @@
 const SUPABASE_URL = "https://szuvpbdwixezecxnykjn.supabase.co";
-const SUPABASE_KEY = "sb_publishable_NgBzisUuNn6Gdz9PE1XgWg_EYlC5zta";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6dXZwYmR3aXhlemVjeG55a2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4Njc4MjAsImV4cCI6MjEwNDQ0MzgyMH0.RffdlO9yV0ob2H0gmSHKwyVGKhe8ZDdnJOBSuD5rahQ";
 
 let _client = null;
 
