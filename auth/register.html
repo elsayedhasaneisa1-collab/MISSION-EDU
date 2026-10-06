@@ -5,6 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="theme-color" content="#04060e" />
 <title>إنشاء حساب | MISSION EDU</title>
+<!-- ═══════════════ Meta Pixel ═══════════════ -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1430647709159941');
+fbq('track', 'PageView');
+</script>
+<noscript>
+  <img height="1" width="1" style="display:none"
+       src="https://www.facebook.com/tr?id=1430647709159941&ev=PageView&noscript=1"/>
+</noscript>
+<!-- ═══════════════ End Meta Pixel ═══════════════ -->
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="/logo.png">
@@ -499,8 +518,19 @@ select.input{cursor:pointer;appearance:none;padding-inline-start:38px;background
         }
       }
 
-      els.submitText.textContent = "تم الإنشاء ✓";
-      setTimeout(() => DB.redirectByRole(u), 600);
+      // ✅ Meta Pixel: تسجيل حساب جديد
+if(typeof fbq !== 'undefined'){
+  fbq('track', 'CompleteRegistration', {
+    value: 0,
+    currency: 'EGP',
+    content_name: u.name,
+    status: true
+  });
+  console.log('✅ Meta Pixel: CompleteRegistration tracked');
+}
+
+els.submitText.textContent = "تم الإنشاء ✓";
+setTimeout(() => DB.redirectByRole(u), 600);
     }catch(ex){
       showErr(ex.message);
       els.submitBtn.disabled = false;
