@@ -67,7 +67,7 @@ a{color:inherit;text-decoration:none}
 @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .fade-in{animation:fu .5s}
 .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(6,9,20,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.back-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--txt2);font-size:13.5px;font-weight:700;transition:.2s;text-decoration:none}
+.back-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--txt2);font-size:13.5px;font-weight:700;transition:.2s;text-decoration:none;cursor:pointer}
 .back-btn:hover{background:rgba(47,125,255,.15);color:var(--txt);border-color:var(--border2)}
 .footer-dev{display:flex;justify-content:center;gap:10px;padding:24px 20px 16px;margin-top:40px;border-top:1px solid rgba(90,140,230,.12);flex-wrap:wrap}
 .dev-btn{display:inline-flex;align-items:center;gap:9px;padding:10px 20px;border-radius:50px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .3s;border:1px solid rgba(90,140,230,.3);background:linear-gradient(135deg,rgba(47,125,255,.15),rgba(139,92,246,.15));color:var(--txt);position:relative;overflow:hidden}
@@ -99,7 +99,7 @@ a{color:inherit;text-decoration:none}
 <body>
 
 <div class="topbar">
-  <a href="/student/index.html" class="back-btn">
+  <a href="/student/index.html" class="back-btn" onclick="goBack(event)">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
     رجوع
   </a>
@@ -134,12 +134,37 @@ a{color:inherit;text-decoration:none}
   const app = document.getElementById("app");
   let state = { user: null, referralCount: 0 };
 
+  window.goBack = function(e) {
+    e.preventDefault();
+    try {
+      const ref = document.referrer || '';
+      if (ref && ref.includes('/student/') && window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = '/student/index.html';
+      }
+    } catch(err) {
+      window.location.href = '/student/index.html';
+    }
+  };
+
   async function load(){
     const sid = DB.getSessionId();
-    if(!sid){ window.location.replace("/auth/login.html"); return; }
+    if(!sid || !sid.trim() || sid === "null" || sid === "undefined"){
+      DB.clearSession();
+      window.location.replace("/auth/login.html");
+      return;
+    }
     const user = await DB.getUser(sid);
-    if(!user || user.active === false){ DB.clearSession(); window.location.replace("/auth/login.html"); return; }
-    if(user.role === "admin"){ window.location.replace("/admin/index.html"); return; }
+    if(!user || user.active === false){
+      DB.clearSession();
+      window.location.replace("/auth/login.html");
+      return;
+    }
+    if(user.role === "admin"){
+      window.location.replace("/admin/index.html");
+      return;
+    }
     state.user = user;
 
     try{
@@ -398,16 +423,37 @@ a{color:inherit;text-decoration:none}
       }
     });
 
-    document.getElementById("btnLogout").addEventListener("click", ()=>{
-      Swal.fire({
-        title:"تسجيل الخروج", text:"هل أنت متأكد؟", icon:"question",
-        showCancelButton:true, confirmButtonText:"نعم، خروج", cancelButtonText:"إلغاء",
-        confirmButtonColor:"#ef4444", cancelButtonColor:"#64748b",
-        background:"linear-gradient(180deg, #151f38, #0b1122)", color:"#e8eefc",
+    document.getElementById("btnLogout").addEventListener("click", async ()=>{
+      const r = await Swal.fire({
+        title:"تسجيل الخروج", 
+        text:"هل أنت متأكد؟", 
+        icon:"question",
+        showCancelButton:true, 
+        confirmButtonText:"نعم، خروج", 
+        cancelButtonText:"إلغاء",
+        confirmButtonColor:"#ef4444", 
+        cancelButtonColor:"#64748b",
+        background:"linear-gradient(180deg, #151f38, #0b1122)", 
+        color:"#e8eefc",
         customClass:{popup:"swal-custom-popup", title:"swal-custom-title"}
-      }).then(r=>{
-        if(r.isConfirmed){ DB.clearSession(); window.location.replace("/auth/login.html"); }
       });
+      
+      if(!r.isConfirmed) return;
+      
+      try {
+        DB.clearSession();
+        localStorage.removeItem("me_session");
+        localStorage.removeItem("me_session_at");
+        localStorage.removeItem("me_session_permanent");
+        localStorage.removeItem("student_tab");
+        localStorage.removeItem("student_selected");
+        localStorage.removeItem("student_last_lesson");
+        sessionStorage.clear();
+      } catch(e) {
+        console.warn("Clear error:", e);
+      }
+      
+      window.location.replace("/auth/login.html");
     });
   }
 
