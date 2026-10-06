@@ -10,10 +10,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <link rel="icon" type="image/png" href="/logo.png">
 <link rel="apple-touch-icon" href="/logo.png">
-<link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="MISSION EDU">
 <meta name="mobile-web-app-capable" content="yes">
 <style>
 :root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#8b5cf6;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.45)}
@@ -67,7 +65,7 @@ a{color:inherit;text-decoration:none}
 @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .fade-in{animation:fu .5s}
 .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(6,9,20,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.back-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--txt2);font-size:13.5px;font-weight:700;transition:.2s;text-decoration:none}
+.back-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--txt2);font-size:13.5px;font-weight:700;transition:.2s;text-decoration:none;cursor:pointer}
 .back-btn:hover{background:rgba(47,125,255,.15);color:var(--txt);border-color:var(--border2)}
 .footer-dev{display:flex;justify-content:center;gap:10px;padding:24px 20px 16px;margin-top:40px;border-top:1px solid rgba(90,140,230,.12);flex-wrap:wrap}
 .dev-btn{display:inline-flex;align-items:center;gap:9px;padding:10px 20px;border-radius:50px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .3s;border:1px solid rgba(90,140,230,.3);background:linear-gradient(135deg,rgba(47,125,255,.15),rgba(139,92,246,.15));color:var(--txt);position:relative;overflow:hidden}
@@ -79,12 +77,25 @@ a{color:inherit;text-decoration:none}
 .swal-custom-input{background:rgba(10,16,32,.75) !important;border:1.5px solid rgba(90,140,230,.3) !important;color:#e8eefc !important;border-radius:12px !important}
 .swal-custom-confirm{border-radius:12px !important;font-weight:700 !important;font-family:'Tajawal','Cairo',sans-serif !important;padding:10px 24px !important}
 .swal-custom-cancel{border-radius:12px !important;font-weight:700 !important;font-family:'Tajawal','Cairo',sans-serif !important;padding:10px 24px !important}
+.referral-box{background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(47,125,255,.10));border:1.5px solid rgba(139,92,246,.4);border-radius:16px;padding:18px;position:relative;overflow:hidden}
+.referral-box::before{content:"";position:absolute;top:-50%;right:-20%;width:200px;height:200px;background:radial-gradient(circle,rgba(139,92,246,.20),transparent 65%);pointer-events:none}
+.referral-code{display:inline-flex;align-items:center;gap:10px;background:rgba(10,16,32,.75);border:1.5px dashed rgba(139,92,246,.5);border-radius:12px;padding:12px 18px;font-family:monospace;font-size:18px;font-weight:900;letter-spacing:2px;color:#c4b5fd;margin:10px 0}
+.copy-btn{background:rgba(139,92,246,.20);border:1px solid rgba(139,92,246,.4);color:#c4b5fd;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;cursor:pointer;transition:.2s}
+.copy-btn:hover{background:rgba(139,92,246,.35);color:#fff}
+.sub-card{display:flex;align-items:center;gap:14px;padding:16px;border-radius:16px;position:relative;overflow:hidden}
+.sub-free{background:rgba(255,255,255,.04);border:1px solid var(--border)}
+.sub-paid{background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(47,125,255,.10));border:1.5px solid rgba(34,197,94,.4)}
+.sub-vip{background:linear-gradient(135deg,rgba(139,92,246,.20),rgba(251,191,36,.12));border:1.5px solid rgba(139,92,246,.5)}
+.sub-icon{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:24px;flex-shrink:0}
+.sub-free .sub-icon{background:rgba(255,255,255,.06)}
+.sub-paid .sub-icon{background:rgba(34,197,94,.20)}
+.sub-vip .sub-icon{background:linear-gradient(140deg,rgba(139,92,246,.35),rgba(251,191,36,.25))}
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <a href="/student/index.html" class="back-btn">
+  <a href="/student/index.html" class="back-btn" onclick="goBack(event)">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
     رجوع
   </a>
@@ -117,31 +128,77 @@ a{color:inherit;text-decoration:none}
 
   const DB = window.MissionDB;
   const app = document.getElementById("app");
-  let state = { user: null };
+  let state = { user: null, referralCount: 0 };
+
+  window.goBack = function(e) {
+    e.preventDefault();
+    try {
+      const ref = document.referrer || '';
+      if (ref && ref.includes('/student/') && window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = '/student/index.html';
+      }
+    } catch(err) {
+      window.location.href = '/student/index.html';
+    }
+  };
 
   async function load(){
     const sid = DB.getSessionId();
-    if(!sid){ window.location.replace("/auth/login.html"); return; }
+    if(!sid || !sid.trim() || sid === "null" || sid === "undefined"){
+      DB.clearSession();
+      window.location.replace("/auth/login.html");
+      return;
+    }
     const user = await DB.getUser(sid);
-    if(!user || user.active === false){ DB.clearSession(); window.location.replace("/auth/login.html"); return; }
-    if(user.role === "admin"){ window.location.replace("/admin/index.html"); return; }
+    if(!user || user.active === false){
+      DB.clearSession();
+      window.location.replace("/auth/login.html");
+      return;
+    }
+    if(user.role === "admin"){
+      window.location.replace("/admin/index.html");
+      return;
+    }
     state.user = user;
+
+    try{
+      const sb = await DB.getClient();
+      const { data } = await sb.from('referrals').select('id').eq('referrer_id', user.id);
+      state.referralCount = (data || []).length;
+    }catch(e){}
+
     render();
+  }
+
+  function getReferralCode(user){
+    return 'ME' + user.id.replace(/[^a-zA-Z0-9]/g,'').slice(-6).toUpperCase();
+  }
+
+  function esc(str){
+    return String(str||"").replace(/[&<>"']/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[s]);
   }
 
   function render(){
     const u = state.user;
-    
+    const code = getReferralCode(u);
+    const sub = u.subscription || 'free';
+    const subLabel = sub === 'vip' ? '💎 VIP' : sub === 'paid' ? '💳 مدفوع' : '🆓 مجاني';
+    const subClass = sub === 'vip' ? 'sub-vip' : sub === 'paid' ? 'sub-paid' : 'sub-free';
+
     app.innerHTML = `
       <div class="fade-in">
         <div class="glass mb16" style="padding:28px">
           <div class="flex center wrap-fl" style="gap:20px">
-            <div class="avatar-lg">${u.avatar || "🧑‍🎓"}</div>
+            <div class="avatar-lg">${esc(u.avatar || "🧑‍🎓")}</div>
             <div style="flex:1;min-width:200px">
-              <div class="h1 mb8">${u.name}</div>
-              <div class="sm muted mb12" dir="ltr">${(u.country_code || "+20")}${u.phone || ""}</div>
+              <div class="h1 mb8">${esc(u.name)}</div>
+              <div class="sm muted mb12" dir="ltr">${esc((u.country_code || "+20")+(u.phone || ""))}</div>
               <div class="flex wrap-fl g8">
                 <span class="pill pill-v">🔥 ${u.streak || 0} يوم متواصل</span>
+                <span class="pill pill-b">${subLabel}</span>
+                ${u.governorate ? `<span class="pill pill-b">📍 ${esc(u.governorate)}</span>` : ''}
               </div>
             </div>
           </div>
@@ -182,16 +239,59 @@ a{color:inherit;text-decoration:none}
         </div>
 
         <div class="glass mb16" style="padding:20px">
+          <div class="h4 mb16">💳 اشتراكي</div>
+          <div class="sub-card ${subClass}">
+            <div class="sub-icon">${sub === 'vip' ? '💎' : sub === 'paid' ? '💳' : '🆓'}</div>
+            <div style="flex:1">
+              <div class="h4" style="font-size:15px">${sub === 'vip' ? 'عضوية VIP' : sub === 'paid' ? 'عضوية مدفوعة' : 'الحساب المجاني'}</div>
+              <div class="xs muted mt8">
+                ${sub === 'free' ? 'للترقية، تواصل مع الإدارة' : `ينتهي في: ${u.subscription_until ? new Date(u.subscription_until).toLocaleDateString('ar-EG') : 'بلا نهاية'}`}
+              </div>
+            </div>
+            ${sub === 'free' ? `<button class="btn btn-p btn-sm" onclick="upgradePrompt()">ترقية</button>` : ''}
+          </div>
+        </div>
+
+        <div class="referral-box mb16">
+          <div class="flex between center mb8" style="position:relative;z-index:1">
+            <div class="h4">🎁 ادعُ أصدقاءك واكسب XP</div>
+            <span class="pill pill-v">${state.referralCount} إحالة</span>
+          </div>
+          <div class="sm txt2 mb12" style="position:relative;z-index:1">
+            شارك الكود ده مع أصحابك. لما يسجلوا ويستخدموه، إنت وهما تكسبوا XP!
+          </div>
+          <div class="flex center wrap-fl g8" style="position:relative;z-index:1">
+            <div class="referral-code" style="margin:0">
+              <span id="refCode">${code}</span>
+              <button class="copy-btn" onclick="copyRefCode('${code}')" title="نسخ">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+            <button class="btn btn-p" onclick="shareRefCode('${code}')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              مشاركة
+            </button>
+          </div>
+        </div>
+
+        <div class="glass mb16" style="padding:20px">
           <div class="h4 mb12">✏️ تعديل البيانات</div>
           <div class="field">
             <label class="lbl">الاسم الكامل</label>
-            <input id="inpName" class="input" value="${u.name || ""}" placeholder="اسمك"/>
+            <input id="inpName" class="input" value="${esc(u.name || "")}" placeholder="اسمك"/>
           </div>
           <div class="field">
             <label class="lbl">رقم الهاتف (لا يمكن تغييره)</label>
-            <input class="input" value="${(u.country_code || "+20")}${u.phone || ""}" disabled style="opacity:.6" dir="ltr"/>
+            <input class="input" value="${esc((u.country_code || "+20")+(u.phone || ""))}" disabled style="opacity:.6" dir="ltr"/>
           </div>
-          <button class="btn btn-p btn-block" id="btnSaveName">💾 حفظ الاسم</button>
+          <div class="field">
+            <label class="lbl">📍 المحافظة</label>
+            <select id="inpGov" class="input">
+              <option value="">— بدون —</option>
+              ${["القاهرة","الجيزة","الإسكندرية","الدقهلية","الشرقية","المنوفية","القليوبية","البحيرة","الغربية","بورسعيد","دمياط","الإسماعيلية","السويس","كفر الشيخ","الفيوم","بني سويف","المنيا","أسيوط","سوهاج","قنا","الأقصر","أسوان","البحر الأحمر","الوادي الجديد","مطروح","شمال سيناء","جنوب سيناء"].map(g => `<option value="${g}" ${u.governorate===g?'selected':''}>${g}</option>`).join('')}
+            </select>
+          </div>
+          <button class="btn btn-p btn-block" id="btnSaveName">💾 حفظ التعديلات</button>
         </div>
 
         <div class="glass mb16" style="padding:20px">
@@ -213,7 +313,7 @@ a{color:inherit;text-decoration:none}
 
         <div class="glass" style="padding:20px">
           <div class="h4 mb12">🚪 تسجيل الخروج</div>
-          <div class="sm muted mb16">سيتم إنهاء جلستك والعودة لصفحة الدخول.</div>
+          <div class="sm muted mb16">سيتم إنهاء جلستك والعودة لصفحة البداية.</div>
           <button class="btn btn-dn btn-block" id="btnLogout">تسجيل الخروج</button>
         </div>
       </div>
@@ -221,6 +321,7 @@ a{color:inherit;text-decoration:none}
 
     document.getElementById("btnSaveName").addEventListener("click", async ()=>{
       const newName = document.getElementById("inpName").value.trim();
+      const newGov = document.getElementById("inpGov").value || null;
       if(!newName || newName.length < 3){
         Swal.fire({
           icon:"warning", title:"الاسم قصير", text:"الاسم يجب أن يكون 3 أحرف على الأقل",
@@ -231,15 +332,17 @@ a{color:inherit;text-decoration:none}
         return;
       }
       try{
-        await DB.updateUser(u.id, { name: newName });
+        await DB.updateUser(u.id, { name: newName, governorate: newGov });
         state.user.name = newName;
+        state.user.governorate = newGov;
         Swal.fire({
-          icon:"success", title:"تم الحفظ", text:"تم تحديث اسمك بنجاح",
+          icon:"success", title:"تم الحفظ", text:"تم تحديث بياناتك بنجاح",
           background:"linear-gradient(180deg, #151f38, #0b1122)", color:"#e8eefc",
           confirmButtonColor:"#2f7dff",
           customClass:{popup:"swal-custom-popup", title:"swal-custom-title"},
           timer:1800, showConfirmButton:false
         });
+        render();
       }catch(e){
         Swal.fire({
           icon:"error", title:"خطأ", text:e.message,
@@ -283,23 +386,19 @@ a{color:inherit;text-decoration:none}
         return;
       }
 
-      const hashedOld = await DB.hashPassword(oldPass);
-      const stored = state.user.password_hash || state.user.password;
-      const valid = stored === hashedOld || stored === oldPass;
-      
-      if(!valid){
-        Swal.fire({
-          icon:"error", title:"كلمة المرور الحالية خطأ",
-          background:"linear-gradient(180deg, #151f38, #0b1122)", color:"#e8eefc",
-          confirmButtonColor:"#2f7dff",
-          customClass:{popup:"swal-custom-popup", title:"swal-custom-title"}
-        });
-        return;
-      }
-
       try{
+        const hashedOld = await DB.hashPassword(oldPass);
         const hashedNew = await DB.hashPassword(newPass);
-        await DB.updateUser(u.id, { password: hashedNew, password_hash: hashedNew });
+        const result = await DB.changePassword(u.id, hashedOld, hashedNew);
+        if(!result.success){
+          Swal.fire({
+            icon:"error", title:"كلمة المرور الحالية خطأ",
+            background:"linear-gradient(180deg, #151f38, #0b1122)", color:"#e8eefc",
+            confirmButtonColor:"#2f7dff",
+            customClass:{popup:"swal-custom-popup", title:"swal-custom-title"}
+          });
+          return;
+        }
         Swal.fire({
           icon:"success", title:"تم التغيير", text:"تم تحديث كلمة المرور بنجاح",
           background:"linear-gradient(180deg, #151f38, #0b1122)", color:"#e8eefc",
@@ -320,24 +419,114 @@ a{color:inherit;text-decoration:none}
       }
     });
 
-    document.getElementById("btnLogout").addEventListener("click", ()=>{
-      Swal.fire({
-        title:"تسجيل الخروج",
-        text:"هل أنت متأكد؟",
+    // ═══════════════════════════════════════════
+    // 🚪 زر تسجيل الخروج — يروح للصفحة الرئيسية /
+    // ═══════════════════════════════════════════
+    document.getElementById("btnLogout").addEventListener("click", async ()=>{
+      const r = await Swal.fire({
+        title:"تسجيل الخروج", 
+        text:"هل أنت متأكد؟", 
         icon:"question",
-        showCancelButton:true,
-        confirmButtonText:"نعم، خروج",
+        showCancelButton:true, 
+        confirmButtonText:"نعم، خروج", 
         cancelButtonText:"إلغاء",
-        confirmButtonColor:"#ef4444",
+        confirmButtonColor:"#ef4444", 
         cancelButtonColor:"#64748b",
-        background:"linear-gradient(180deg, #151f38, #0b1122)",
+        background:"linear-gradient(180deg, #151f38, #0b1122)", 
         color:"#e8eefc",
         customClass:{popup:"swal-custom-popup", title:"swal-custom-title"}
-      }).then(r=>{
-        if(r.isConfirmed){ DB.clearSession(); window.location.replace("/auth/login.html"); }
       });
+      
+      if(!r.isConfirmed) return;
+      
+      try {
+        // امسح كل حاجة
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // امسح الـ cookies
+        try {
+          document.cookie.split(";").forEach(c => {
+            document.cookie = c.replace(/^ +/, "")
+              .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+          });
+        } catch(e) {}
+        
+        // استدعِ دالة المسح من db.js
+        try { DB.clearSession(); } catch(e) {}
+        
+      } catch(e) {
+        console.warn("Clear error:", e);
+      }
+      
+      // ✅ روح للصفحة الرئيسية (مش صفحة الدخول)
+      window.location.href = "/";
     });
   }
+
+  window.copyRefCode = (code) => {
+    try{
+      navigator.clipboard.writeText(code);
+      Swal.fire({
+        icon:'success', title:'✅ تم النسخ',
+        text:`كود الإحالة: ${code}`,
+        background:'linear-gradient(180deg, #151f38, #0b1122)',
+        color:'#e8eefc', confirmButtonColor:'#2f7dff',
+        customClass:{popup:'swal-custom-popup',title:'swal-custom-title'},
+        timer:1800, showConfirmButton:false
+      });
+    }catch(e){
+      Swal.fire({
+        icon:'error', title:'فشل النسخ',
+        background:'linear-gradient(180deg, #151f38, #0b1122)',
+        color:'#e8eefc', confirmButtonColor:'#2f7dff',
+        customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+      });
+    }
+  };
+
+  window.shareRefCode = (code) => {
+    const text = `🎓 انضم لمنصة MISSION EDU التعليمية!\n\nاستخدم كود الإحالة: ${code}\n\nواحصل على XP إضافي عند التسجيل 🚀\n\nhttps://missionedu.com/auth/register.html?ref=${code}`;
+    if(navigator.share){
+      navigator.share({
+        title: 'MISSION EDU — دعوة',
+        text: text
+      }).catch(()=>{});
+    } else {
+      window.copyRefCode(code);
+    }
+  };
+
+  window.upgradePrompt = () => {
+    Swal.fire({
+      icon:'info',
+      title:'💳 ترقية الاشتراك',
+      html:`
+        <div style="text-align:right;font-size:14px;line-height:2">
+          <div>للحصول على مزايا إضافية:</div>
+          <ul style="padding-inline-start:20px;margin-top:12px">
+            <li>📚 وصول لجميع المواد</li>
+            <li>📝 اختبارات غير محدودة</li>
+            <li>🏆 شهادات معتمدة</li>
+            <li>💎 دعم فني مباشر</li>
+          </ul>
+          <div style="margin-top:16px;font-weight:800;color:#5aa9ff">تواصل مع الإدارة للترقية</div>
+        </div>
+      `,
+      showCancelButton:true,
+      confirmButtonText:'📱 واتساب',
+      cancelButtonText:'إغلاق',
+      confirmButtonColor:'#22c55e',
+      cancelButtonColor:'#64748b',
+      background:'linear-gradient(180deg, #151f38, #0b1122)',
+      color:'#e8eefc',
+      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+    }).then(r=>{
+      if(r.isConfirmed){
+        window.open("https://wa.me/201128351702?text="+encodeURIComponent("مرحبًا، أريد ترقية اشتراكي في MISSION EDU"),"_blank");
+      }
+    });
+  };
 
   window.openWhatsApp = ()=>{
     window.open("https://wa.me/201128351702?text=" + encodeURIComponent("مرحبًا، أريد الاستفسار عن منصة MISSION EDU"), "_blank");
