@@ -331,87 +331,51 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
   .mbar{display:flex}
   .content{padding:14px 14px 90px}
   .g2,.g3,.g4{grid-template-columns:1fr}
-  
-  /* ✅ إصلاح الهيدر */
-  .topbar{
-    padding: 8px 10px;
-    gap: 5px;
-    flex-wrap: nowrap;
-    overflow: hidden;
-  }
-  .topbar > div:first-of-type{
-    flex: 1 1 auto;
-    min-width: 0;
-    max-width: none;
-  }
-  .search{
-    max-width: 100%;
-    padding: 7px 10px;
-    gap: 6px;
-  }
-  .search input{
-    font-size: 13px;
-    min-width: 0;
-  }
-  .topbar .icon-btn{
-    width: 32px;
-    height: 32px;
-    flex-shrink: 0;
-  }
-  .topbar .avatar{
-    width: 26px !important;
-    height: 26px !important;
-    font-size: 12px !important;
-  }
-  .topbar .glass-s{
-    padding: 2px 6px !important;
-  }
-  .topbar > div:last-child{
-    gap: 3px;
-    flex-shrink: 0;
-    margin-inline-start: 0 !important;
-  }
+  .topbar{padding: 8px 10px;gap: 5px;flex-wrap: nowrap;overflow: hidden;}
+  .topbar > div:first-of-type{flex: 1 1 auto;min-width: 0;max-width: none;}
+  .search{max-width: 100%;padding: 7px 10px;gap: 6px;}
+  .search input{font-size: 13px;min-width: 0;}
+  .topbar .icon-btn{width: 32px;height: 32px;flex-shrink: 0;}
+  .topbar .avatar{width: 26px !important;height: 26px !important;font-size: 12px !important;}
+  .topbar .glass-s{padding: 2px 6px !important;}
+  .topbar > div:last-child{gap: 3px;flex-shrink: 0;margin-inline-start: 0 !important;}
 }
-html, body{
-  overflow-x: hidden;
-  max-width: 100%;
-  width: 100%;
-}
-.app{
-  overflow-x: hidden;
-  max-width: 100vw;
-  width: 100%;
-}
-.main{
-  overflow-x: hidden;
-  max-width: 100%;
-}
-.content{
-  overflow-x: hidden;
-}
-.sidebar{
-  max-width: 100%;
-}
-.toast-host{
-  max-width: calc(100vw - 32px);
-}
+html, body{overflow-x: hidden;max-width: 100%;width: 100%;}
+.app{overflow-x: hidden;max-width: 100vw;width: 100%;}
+.main{overflow-x: hidden;max-width: 100%;}
+.content{overflow-x: hidden;}
+.sidebar{max-width: 100%;}
+.toast-host{max-width: calc(100vw - 32px);}
 @media(max-width:860px){
-  .toast-host{
-    inset-inline-start: 12px;
-    inset-inline-end: 12px;
-    max-width: none;
-  }
-  .toast{
-    min-width: 0;
-    width: 100%;
-  }
+  .toast-host{inset-inline-start: 12px;inset-inline-end: 12px;max-width: none;}
+  .toast{min-width: 0;width: 100%;}
 }
-.sx{
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  max-width: 100%;
-}
+.sx{overflow-x: auto;-webkit-overflow-scrolling: touch;max-width: 100%;}
 
+/* ===== Theme: Light Mode ===== */
+body.light-mode{
+  --bg:#f5f0e1;
+  --bg2:#ebe4d0;
+  --txt:#1a1408;
+  --txt2:#4a3d1a;
+  --muted:#7a6a3a;
+  --border:rgba(139,105,20,.22);
+  --border2:rgba(139,105,20,.42);
+  --sh:0 18px 50px rgba(139,105,20,.15), 0 0 0 1px rgba(139,105,20,.06) inset;
+  background:
+    radial-gradient(1200px 620px at 85% -12%,rgba(212,175,55,.30),transparent 62%),
+    radial-gradient(950px 520px at -8% 18%,rgba(184,134,11,.20),transparent 60%),
+    var(--bg);
+}
+body.light-mode .glass{background:linear-gradient(180deg,rgba(255,253,245,.92),rgba(245,240,225,.88))}
+body.light-mode .glass-s{background:rgba(255,253,245,.85)}
+body.light-mode .sidebar{background:linear-gradient(180deg,rgba(245,240,225,.98),rgba(235,228,208,.95))}
+body.light-mode .topbar{background:rgba(245,240,225,.85)}
+body.light-mode .search{background:rgba(255,253,245,.85)}
+body.light-mode .input,body.light-mode select.input,body.light-mode textarea.input{background:rgba(255,253,245,.9)}
+body.light-mode .toast{background:linear-gradient(135deg,rgba(255,253,245,.98),rgba(245,240,225,.98))}
+body.light-mode .modal-bg{background:rgba(245,240,225,.85)}
+body.light-mode .act-row{background:rgba(212,175,55,.06)}
 </style>
 </head>
 <body>
@@ -426,29 +390,33 @@ const {useState,useEffect,useMemo,useCallback,useRef,createContext,useContext}=R
 const DB=window.MissionDB;
 
 /* ═══════════════════════════════════════════
-   🎵 أصوات الإشعارات — نسخة مصلّحة
+   🛡️ Helpers آمنة
    ═══════════════════════════════════════════ */
+function escapeHtml(str){
+  if(str == null) return '';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
 
-// ✅ Web Audio API — بيولّد الأصوات بدون files base64
+/* ═══════════════════════════════════════════
+   🎵 أصوات الإشعارات
+   ═══════════════════════════════════════════ */
 let _audioCtx = null;
 function getAudioCtx(){
   if(!_audioCtx){
-    try{
-      _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }catch(e){
-      console.warn('AudioContext failed:', e);
-      return null;
-    }
+    try{ _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e){ return null; }
   }
   return _audioCtx;
 }
-
-// ✅ نطق صوت "beep" بـ frequency معينة
 function beep(frequency, duration, type='sine', volume=0.15){
   try{
     const ctx = getAudioCtx();
     if(!ctx) return;
-    // resume لو موقوف (متصفحات الموبايل)
     if(ctx.state === 'suspended') ctx.resume();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -462,29 +430,23 @@ function beep(frequency, duration, type='sine', volume=0.15){
     osc.stop(ctx.currentTime + duration/1000);
   }catch(e){}
 }
-
-// ✅ تشغيل صوت حسب النوع
 function playSound(type='notify'){
   switch(type){
     case 'success':
-      // نغمة صاعدة (نجاح)
-      beep(523, 100, 'sine', 0.18); // C5
-      setTimeout(()=>beep(659, 100, 'sine', 0.18), 100); // E5
-      setTimeout(()=>beep(784, 200, 'sine', 0.18), 200); // G5
+      beep(523, 100, 'sine', 0.18);
+      setTimeout(()=>beep(659, 100, 'sine', 0.18), 100);
+      setTimeout(()=>beep(784, 200, 'sine', 0.18), 200);
       break;
     case 'err':
-      // نغمة هابطة (خطأ)
-      beep(392, 120, 'square', 0.15); // G4
-      setTimeout(()=>beep(311, 200, 'square', 0.15), 120); // Eb4
+      beep(392, 120, 'square', 0.15);
+      setTimeout(()=>beep(311, 200, 'square', 0.15), 120);
       break;
     case 'warn':
-      // نغمة تحذير
       beep(440, 150, 'triangle', 0.18);
       setTimeout(()=>beep(440, 150, 'triangle', 0.18), 180);
       break;
     case 'notify':
     default:
-      // نغمة إشعار عادية
       beep(880, 100, 'sine', 0.15);
       setTimeout(()=>beep(1175, 120, 'sine', 0.15), 100);
       break;
@@ -529,16 +491,16 @@ function AppProvider({children}){
   const [db,setDb]=useState({users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[],polls:[],poll_votes:[]});
   const [currentUser,setCurrentUser]=useState(null);
   const [loading,setLoading]=useState(true);
+  const [theme,setTheme]=useState(()=>{
+    try{ return localStorage.getItem('admin_theme') || 'dark'; }
+    catch(e){ return 'dark'; }
+  });
   const toast=useToast();
 
   const reload=useCallback(async ()=>{
     try{
-      // ✅ 1) حذف الاستطلاعات المنتهية أول حاجة
       const deleted = await DB.cleanupExpiredPolls();
-      if(deleted > 0){
-        console.log(`🗑️ تم حذف ${deleted} استطلاع منتهي`);
-      }
-      // ✅ 2) تحميل باقي البيانات
+      if(deleted > 0) console.log(`🗑️ تم حذف ${deleted} استطلاع منتهي`);
       const data=await DB.loadAll();
       setDb(data);
     }catch(e){console.warn(e);}
@@ -559,19 +521,22 @@ function AppProvider({children}){
     })();
   },[]);
 
-  // ✅ حذف الاستطلاعات المنتهية كل 5 دقايق تلقائيًا
+  // Theme apply
+  useEffect(()=>{
+    try{
+      document.body.classList.toggle('light-mode', theme === 'light');
+      localStorage.setItem('admin_theme', theme);
+    }catch(e){}
+  },[theme]);
+
   useEffect(()=>{
     const interval = setInterval(async ()=>{
       const count = await DB.cleanupExpiredPolls();
-      if(count > 0){
-        console.log(`🗑️ Auto-cleanup: حذف ${count} استطلاع`);
-        await reload();
-      }
+      if(count > 0){ await reload(); }
     }, 5 * 60 * 1000);
     return ()=>clearInterval(interval);
   },[reload]);
 
-  // ✅ تشغيل AudioContext بعد أول تفاعل من المستخدم
   useEffect(()=>{
     const unlock = () => {
       const ctx = getAudioCtx();
@@ -614,8 +579,11 @@ function AppProvider({children}){
     return {current:cur,next};
   },[db.levels]);
 
+  const students = useMemo(()=>db.users.filter(u=>u.role==='student'),[db.users]);
+
   return <AppCtx.Provider value={{
     db,currentUser,loading,logout,reload,save,remove,getLevel,toast,playSound,
+    theme,setTheme,students,
     subject:id=>db.subjects.find(s=>s.id===id),
     unit:id=>db.units.find(u=>u.id===id),
     lesson:id=>db.lessons.find(l=>l.id===id),
@@ -624,6 +592,7 @@ function AppProvider({children}){
     grade:id=>db.grades.find(g=>g.id===id)
   }}>{children}</AppCtx.Provider>;
 }
+
 const Icon=({name,size=18,color='currentColor'})=>{
   const p={width:size,height:size,viewBox:'0 0 24 24',fill:'none',stroke:color,strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round'};
   const paths={
@@ -659,7 +628,9 @@ const Icon=({name,size=18,color='currentColor'})=>{
     download:<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></>,
     coupon:<><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6"/><path d="M2 8h20v4H2z"/><line x1="12" y1="12" x2="12" y2="22"/><path d="M12 2v6"/></>,
     card:<><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></>,
-    share:<><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></>
+    share:<><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></>,
+    sun:<><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></>,
+    moon:<><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></>
   };
   return <svg {...p}>{paths[name]||paths.help}</svg>;
 };
@@ -803,7 +774,7 @@ function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick,theme
 
 function Dashboard(){
   const app=useApp();
-  const students=app.db.users.filter(u=>u.role==='student');
+  const students=app.students;
   const active=students.filter(s=>s.active!==false).length;
   const totalLessons=app.db.lessons.filter(l=>l.published!==false).length;
   let totalDone=0;
@@ -1054,11 +1025,12 @@ function Dashboard(){
     </div>
   </>;
 }
+
 function ActivityLog(){
   const app=useApp();
   const [filter,setFilter]=useState('all');
   const [studentFilter,setStudentFilter]=useState('all');
-  const students=app.db.users.filter(u=>u.role==='student');
+  const students=app.students;
   const typeFilters=[
     {id:'all',label:'الكل'},
     {id:'lesson_view',label:'دروس'},
@@ -1071,9 +1043,12 @@ function ActivityLog(){
     {id:'login',label:'دخول'}
   ];
   
-  let list=[...(app.db.activity||[])];
-  if(filter!=='all') list=list.filter(a=>a.type===filter);
-  if(studentFilter!=='all') list=list.filter(a=>a.user_id===studentFilter);
+  const list = useMemo(()=>{
+    let l=[...(app.db.activity||[])];
+    if(filter!=='all') l=l.filter(a=>a.type===filter);
+    if(studentFilter!=='all') l=l.filter(a=>a.user_id===studentFilter);
+    return l;
+  },[app.db.activity, filter, studentFilter]);
   
   const actLabel={
     login:'تسجيل دخول',register:'تسجيل جديد',lesson_view:'فتح درس',
@@ -1301,6 +1276,7 @@ function LessonsPage(){
     </Modal>}
   </>;
 }
+
 function QuestionsPage(){
   const app=useApp();
   const [editing,setEditing]=useState(null);
@@ -1394,17 +1370,16 @@ function QuestionsPage(){
     setBulkForm(f=>({...f,questions:f.questions.map((q,i)=>i===idx?{...q,...patch}:q)}));
   };
 
-  const filteredQuestions = filterLesson === 'all'
-    ? app.db.questions
-    : app.db.questions.filter(q=>q.lesson_id === filterLesson);
-
   const sortedQuestions = useMemo(()=>{
-    return [...filteredQuestions].sort((a,b)=>{
+    const filtered = filterLesson === 'all'
+      ? app.db.questions
+      : app.db.questions.filter(q=>q.lesson_id === filterLesson);
+    return [...filtered].sort((a,b)=>{
       const ta = new Date(a.created_at || a.createdAt || 0).getTime() || 0;
       const tb = new Date(b.created_at || b.createdAt || 0).getTime() || 0;
       return ta - tb;
     });
-  },[filteredQuestions]);
+  },[app.db.questions, filterLesson]);
 
   return <>
     <div className="flex between center mb16 wrap g8">
@@ -1672,6 +1647,7 @@ function MissionsPage(){
     </Modal>}
   </>;
 }
+
 function AchievementsPage(){
   return <Crud title="🏆 إدارة الإنجازات" collection="achievements" defaultItem={()=>({title:'',desc:'',icon:'🏆',type:'lessons',threshold:1})} fields={[
     {key:'title',label:'الاسم'},{key:'icon',label:'الأيقونة'},
@@ -1706,16 +1682,16 @@ function StudentsPage(){
     "مطروح", "شمال سيناء", "جنوب سيناء"
   ];
 
-  const allStudents = app.db.users.filter(u => u.role === 'student');
+  const allStudents = app.students;
   
-  const list = allStudents.filter(u => {
+  const list = useMemo(()=>allStudents.filter(u => {
     const matchesSearch = u.name.toLowerCase().includes(q.toLowerCase()) || (u.phone||'').includes(q);
     let matchesGov = true;
     if (govFilter === 'all') matchesGov = true;
     else if (govFilter === 'none') matchesGov = !u.governorate;
     else matchesGov = u.governorate === govFilter;
     return matchesSearch && matchesGov;
-  });
+  }),[allStudents, q, govFilter]);
 
   const open = s => { setForm(JSON.parse(JSON.stringify(s))); setEditing(s.id); };
 
@@ -1763,12 +1739,13 @@ function StudentsPage(){
     } catch(e) { app.toast.err(e.message); }
   };
 
-  const govCounts = {};
-  allStudents.forEach(u => {
-    if (u.governorate) {
-      govCounts[u.governorate] = (govCounts[u.governorate] || 0) + 1;
-    }
-  });
+  const govCounts = useMemo(()=>{
+    const counts = {};
+    allStudents.forEach(u => {
+      if (u.governorate) counts[u.governorate] = (counts[u.governorate] || 0) + 1;
+    });
+    return counts;
+  },[allStudents]);
 
   return <>
     <div className="flex between center mb16 wrap g8">
@@ -1807,6 +1784,7 @@ function StudentsPage(){
               <th>الهاتف</th>
               <th>📍 المحافظة</th>
               <th>XP</th>
+              <th>💳 الاشتراك</th>
               <th>الحالة</th>
               <th>إجراءات</th>
             </tr>
@@ -1828,17 +1806,17 @@ function StudentsPage(){
                   }
                 </td>
                 <td><b style={{color:'var(--gold)'}}>{DB.fmt(s.xp||0)}</b></td>
-<td>
-  {s.subscription === 'vip' ? <span className="pill pill-v">💎 VIP</span>
-   : s.subscription === 'paid' ? <span className="pill pill-g">💳 مدفوع</span>
-   : <span className="pill pill-y">🆓 مجاني</span>}
-</td>
-<td>
-  {s.active!==false
-    ? <span className="pill pill-g">نشط</span>
-    : <span className="pill pill-r">موقوف</span>
-  }
-</td>
+                <td>
+                  {s.subscription === 'vip' ? <span className="pill pill-v">💎 VIP</span>
+                   : s.subscription === 'paid' ? <span className="pill pill-g">💳 مدفوع</span>
+                   : <span className="pill pill-y">🆓 مجاني</span>}
+                </td>
+                <td>
+                  {s.active!==false
+                    ? <span className="pill pill-g">نشط</span>
+                    : <span className="pill pill-r">موقوف</span>
+                  }
+                </td>
                 <td>
                   <div className="flex g6">
                     <button className="btn btn-s btn-sm" onClick={()=>open(s)}>
@@ -1894,28 +1872,28 @@ function StudentsPage(){
         </div>
         <div className="div"/>
 
-          <div className="h4 mb12" style={{color:'var(--gold)'}}>💳 الاشتراك</div>
-<div className="grid g2">
-  <Field label="نوع الاشتراك">
-    <select
-      className="input"
-      value={form.subscription || 'free'}
-      onChange={e=>setForm({...form, subscription:e.target.value})}
-    >
-      <option value="free">🆓 مجاني</option>
-      <option value="paid">💳 مدفوع</option>
-      <option value="vip">💎 VIP</option>
-    </select>
-  </Field>
-  <Field label="تاريخ انتهاء الاشتراك">
-    <input
-      type="date"
-      className="input"
-      value={form.subscription_until || ''}
-      onChange={e=>setForm({...form, subscription_until:e.target.value})}
-    />
-  </Field>
-</div>
+        <div className="h4 mb12" style={{color:'var(--gold)'}}>💳 الاشتراك</div>
+        <div className="grid g2">
+          <Field label="نوع الاشتراك">
+            <select
+              className="input"
+              value={form.subscription || 'free'}
+              onChange={e=>setForm({...form, subscription:e.target.value})}
+            >
+              <option value="free">🆓 مجاني</option>
+              <option value="paid">💳 مدفوع</option>
+              <option value="vip">💎 VIP</option>
+            </select>
+          </Field>
+          <Field label="تاريخ انتهاء الاشتراك">
+            <input
+              type="date"
+              className="input"
+              value={form.subscription_until || ''}
+              onChange={e=>setForm({...form, subscription_until:e.target.value})}
+            />
+          </Field>
+        </div>
         <Field label="صلاحيات الوصول">
           <label className="flex center g8 mb12" style={{cursor:'pointer'}}>
             <input type="checkbox" checked={!!form.all_subjects} onChange={e=>setForm({...form,all_subjects:e.target.checked})}/>
@@ -1973,7 +1951,6 @@ function NotificationsPage(){
     try{
       await app.save('notifications',{...form,read_by:[]});
       app.toast.ok('تم الإرسال');
-      app.playSound && app.playSound('success');
       setForm({title:'',body:'',target:'all'});
     }
     catch(e){app.toast.err(e.message);}
@@ -1993,7 +1970,7 @@ function NotificationsPage(){
         <Field label="النص"><textarea className="input" value={form.body} onChange={e=>setForm({...form,body:e.target.value})}/></Field>
         <Field label="المستهدفون"><select className="input" value={form.target} onChange={e=>setForm({...form,target:e.target.value})}>
           <option value="all">كل الطلاب</option>
-          {app.db.users.filter(u=>u.role==='student').map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
+          {app.students.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
         </select></Field>
         <button className="btn btn-p btn-block" onClick={send} disabled={busy}>{busy?'جارٍ...':'📤 إرسال'}</button>
       </div>
@@ -2054,10 +2031,6 @@ function SettingsPage(){
     <div className="h2 mb16 grad">الإعدادات</div>
     <div className="glass" style={{padding:20,maxWidth:640}}>
       <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8,color:'var(--gold)'}}><Icon name="settings" size={16}/> معلومات النظام</div>
-      <div className="glass-s mb12" style={{padding:12}}>
-        <div className="xs muted">Supabase URL</div>
-        <div className="xs" style={{wordBreak:'break-all'}}>https://szuvpbdwixezecxnykjn.supabase.co</div>
-      </div>
       <div className="grid g3 mb16">
         <Stat label="المستخدمون" value={app.db.users.length} icon="users"/>
         <Stat label="سجل النشاط" value={app.db.activity.length} icon="activity"/>
@@ -2066,6 +2039,7 @@ function SettingsPage(){
     </div>
   </>;
 }
+
 function ErrorsAnalyticsPage(){
   const app=useApp();
   const [filterSubject,setFilterSubject]=useState('all');
@@ -2408,7 +2382,7 @@ function CertificatesPage(){
     })();
   },[]);
 
-  const students = app.db.users.filter(u=>u.role==='student');
+  const students = app.students;
 
   const issueCertificate = async () => {
     if(!studentId || !subjectId) return app.toast.warn('اختر الطالب والمادة');
@@ -2457,6 +2431,13 @@ function CertificatesPage(){
     const certNumber = cert.id.slice(-12).toUpperCase();
     const issueDate = new Date(cert.issued_at).toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
 
+    // ✅ Escape كل البيانات
+    const safeName = escapeHtml(student?.name || 'الطالب');
+    const safeSubjectName = escapeHtml(subject?.name || 'المادة');
+    const safeSubjectIcon = escapeHtml(subject?.icon || '📚');
+    const safeCertNumber = escapeHtml(certNumber);
+    const safeIssueDate = escapeHtml(issueDate);
+
     const container = document.createElement('div');
     container.setAttribute('dir', 'rtl');
     container.style.cssText = `
@@ -2502,20 +2483,20 @@ function CertificatesPage(){
       <div style="font-size:22px;color:#d4c79a;margin-bottom:18px">تشهد المنصة بأن الطالب</div>
 
       <div style="position:relative;margin-bottom:24px;padding:0 60px;width:100%;text-align:center">
-        <div style="font-size:48px;font-weight:900;color:#FFF3B0;padding:16px 48px;border-bottom:2px solid #FFD700;display:inline-block;text-shadow:0 4px 20px rgba(255,215,0,.5);max-width:900px;line-height:1.3">${student?.name || 'الطالب'}</div>
+        <div style="font-size:48px;font-weight:900;color:#FFF3B0;padding:16px 48px;border-bottom:2px solid #FFD700;display:inline-block;text-shadow:0 4px 20px rgba(255,215,0,.5);max-width:900px;line-height:1.3">${safeName}</div>
       </div>
 
       <div style="font-size:22px;color:#d4c79a;margin-bottom:20px">قد أتم بنجاح دراسة مادة</div>
 
       <div style="display:inline-flex;align-items:center;gap:14px;padding:14px 36px;background:rgba(212,175,55,.12);border:2px solid rgba(212,175,55,.5);border-radius:16px;margin-bottom:30px">
-        <span style="font-size:34px">${subject?.icon || '📚'}</span>
-        <span style="font-size:32px;font-weight:900;color:#FFD700">${subject?.name || 'المادة'}</span>
+        <span style="font-size:34px">${safeSubjectIcon}</span>
+        <span style="font-size:32px;font-weight:900;color:#FFD700">${safeSubjectName}</span>
       </div>
 
       <div style="display:flex;justify-content:space-between;align-items:flex-end;width:100%;padding:0 40px">
         <div style="text-align:center;min-width:180px">
           <div style="font-size:12px;color:#8a7d55;letter-spacing:2px;margin-bottom:10px;font-weight:700">تاريخ الإصدار</div>
-          <div style="font-size:16px;color:#d4c79a;font-weight:800">${issueDate}</div>
+          <div style="font-size:16px;color:#d4c79a;font-weight:800">${safeIssueDate}</div>
           <div style="width:130px;height:1px;background:#D4AF37;margin:10px auto 0;opacity:.6"></div>
         </div>
 
@@ -2531,7 +2512,7 @@ function CertificatesPage(){
 
         <div style="text-align:center;min-width:180px">
           <div style="font-size:12px;color:#8a7d55;letter-spacing:2px;margin-bottom:10px;font-weight:700">رقم الشهادة</div>
-          <div style="font-size:14px;color:#d4c79a;font-weight:800;font-family:monospace;direction:ltr">${certNumber}</div>
+          <div style="font-size:14px;color:#d4c79a;font-weight:800;font-family:monospace;direction:ltr">${safeCertNumber}</div>
           <div style="width:130px;height:1px;background:#D4AF37;margin:10px auto 0;opacity:.6"></div>
         </div>
       </div>
@@ -2547,7 +2528,7 @@ function CertificatesPage(){
 
     try{
       await document.fonts.ready;
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise(r => setTimeout(r, 1200));
 
       const canvas = await window.html2canvas(container, {
         scale: 2,
@@ -2777,15 +2758,14 @@ function CouponsPage(){
         <div className="sx">
           <table className="tbl">
             <thead>
-            <tr>
-  <th>الطالب</th>
-  <th>الهاتف</th>
-  <th>📍 المحافظة</th>
-  <th>XP</th>
-  <th>💳 الاشتراك</th>
-  <th>الحالة</th>
-  <th>إجراءات</th>
-</tr>
+              <tr>
+                <th>الكود</th>
+                <th>الخصم</th>
+                <th>الاستخدام</th>
+                <th>الانتهاء</th>
+                <th>الحالة</th>
+                <th>إجراءات</th>
+              </tr>
             </thead>
             <tbody>
               {coupons.map(c => {
@@ -3054,6 +3034,7 @@ function ReferralsPage(){
     </div>
   </>;
 }
+
 function PollsPage(){
   const app=useApp();
   const [loading,setLoading]=useState(true);
@@ -3563,6 +3544,8 @@ function AdminApp(){
         onSearch={onSearch}
         searchResults={searchResults}
         onResultClick={r=>setTab(r.nav)}
+        theme={app.theme}
+        onToggleTheme={()=>app.setTheme(app.theme==='dark'?'light':'dark')}
         unreadNotifs={unreadNotifs}
         onOpenNotifications={()=>setTab('notifications')}
       />
