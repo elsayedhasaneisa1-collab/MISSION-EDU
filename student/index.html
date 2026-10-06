@@ -235,7 +235,14 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="/db.js"></script>
-<script type="text/babel" data-presets="react">
+<script>
+  if (window.Babel && Babel.availablePresets && Babel.availablePresets['react']) {
+    Babel.registerPreset('react-classic', {
+      presets: [[Babel.availablePresets['react'], { runtime: 'classic' }]]
+    });
+  }
+</script>
+<script type="text/babel" data-presets="react-classic">
 const {useState,useEffect,useMemo,useCallback,useRef,createContext,useContext}=React;
 const DB=window.MissionDB;
 
@@ -378,8 +385,6 @@ function AppProvider({children}){
       setLoading(false);
     })();
   },[]);
-
-  // ✅ حذف الاستطلاعات المنتهية كل 5 دقايق
   useEffect(()=>{
     const interval=setInterval(async ()=>{
       const count=await DB.cleanupExpiredPolls();
@@ -387,8 +392,6 @@ function AppProvider({children}){
     },5*60*1000);
     return ()=>clearInterval(interval);
   },[reload]);
-
-  // ✅ تفعيل AudioContext بعد أول تفاعل
   useEffect(()=>{
     const unlock=()=>{
       const ctx=getAudioCtx();
@@ -1502,8 +1505,6 @@ function StudentApp(){
       else localStorage.removeItem('student_selected');
     }catch(e){}
   },[selected]);
-
-  // ✅ Meta Pixel: تتبع التنقل بين التابات
   useEffect(()=>{
     if(typeof fbq!=='undefined'){
       fbq('trackCustom','Navigate',{tab});
