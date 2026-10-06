@@ -2,1600 +2,957 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
 <meta name="theme-color" content="#04060e" />
-<title>MISSION EDU — منصة الطالب</title>
-
-<!-- ═══════════════ Meta Pixel ═══════════════ -->
-<script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '1430647709159941');
-fbq('track', 'PageView');
-</script>
-<noscript>
-  <img height="1" width="1" style="display:none"
-       src="https://www.facebook.com/tr?id=1430647709159941&ev=PageView&noscript=1"/>
-</noscript>
-<!-- ═══════════════ End Meta Pixel ═══════════════ -->
-
+<title>الدرس | MISSION EDU</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<link rel="icon" type="image/png" href="logo.png">
-<link rel="apple-touch-icon" href="logo.png">
+<link rel="icon" type="image/png" href="/logo.png">
+<link rel="apple-touch-icon" href="/logo.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MISSION EDU">
 <meta name="mobile-web-app-capable" content="yes">
 <style>
-/* ═══════════════════════════════════════
-   🛡 إصلاح الانزلاق الأفقي
-   ═══════════════════════════════════════ */
-html, body {
-  overflow-x: hidden !important;
-  max-width: 100% !important;
-  width: 100% !important;
-  position: relative;
-  overscroll-behavior-x: none;
-  touch-action: pan-y;
-}
-* { box-sizing: border-box; }
-*:not(iframe):not(video) { max-width: 100%; }
-img, video, iframe, svg { max-width: 100%; }
-.app, .main, .content, .topbar, .sidebar { max-width: 100%; overflow-x: hidden; }
-
 :root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#8b5cf6;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.45)}
-*{margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(47,125,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(139,92,246,.14),transparent 60%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;line-height:1.7}
 ::-webkit-scrollbar{width:10px;height:10px}
 ::-webkit-scrollbar-thumb{background:rgba(90,140,230,.25);border-radius:20px}
 button,input,select,textarea{font-family:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none}
-ul{list-style:none}
 a{color:inherit;text-decoration:none}
+ul{list-style:none}
 .glass{background:linear-gradient(180deg,rgba(21,31,56,.72),rgba(11,17,34,.62));border:1px solid var(--border);border-radius:var(--r);backdrop-filter:blur(16px);box-shadow:var(--sh)}
 .glass-s{background:rgba(21,31,56,.62);border:1px solid var(--border);border-radius:var(--rs)}
-.hv{transition:.28s cubic-bezier(.2,.8,.3,1)}
-.hv:hover{transform:translateY(-4px);border-color:var(--border2)}
-.app{display:flex;min-height:100vh}
-.sidebar{width:264px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;overflow-x:hidden;padding:18px 12px;display:flex;flex-direction:column;gap:6px;background:linear-gradient(180deg,rgba(9,14,29,.94),rgba(6,9,20,.9));border-inline-start:1px solid var(--border);z-index:60}
-.main{flex:1;min-width:0;display:flex;flex-direction:column}
-.content{padding:22px 26px 110px;max-width:1200px;width:100%;margin:0 auto;animation:fu .5s}
-@keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-@keyframes pu{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
-@keyframes slideIn{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:none}}
-@keyframes fadeOut{to{opacity:0;transform:translateX(-30px)}}
-@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
-@keyframes sp{to{transform:rotate(360deg)}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-.brand{display:flex;align-items:center;gap:11px;padding:8px 10px 16px}
-.brand-logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 8px 26px rgba(47,125,255,.45)}
-.brand-name{font-weight:900;font-size:17px}
-.brand-sub{font-size:10.5px;color:var(--muted);font-weight:600}
-.nav-i{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:13px;color:var(--txt2);font-size:14px;font-weight:600;transition:.22s;width:100%;text-align:right;position:relative}
-.nav-i:hover{background:rgba(47,125,255,.09);color:var(--txt)}
-.nav-i.on{background:linear-gradient(90deg,rgba(47,125,255,.22),rgba(47,125,255,.03));color:#fff}
-.nav-i.on::before{content:'';position:absolute;inset-inline-end:0;top:22%;height:56%;width:3px;border-radius:4px;background:linear-gradient(180deg,#2f7dff,#8b5cf6)}
-.nav-ico{font-size:16px;width:22px;text-align:center;display:flex;justify-content:center}
-.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:12px 26px;background:rgba(6,9,20,.72);backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
-.search{flex:1;max-width:520px;display:flex;align-items:center;gap:10px;background:rgba(18,26,48,.7);border:1px solid var(--border);border-radius:14px;padding:8px 14px}
-.search input{flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--txt)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:11px 20px;border-radius:13px;font-weight:700;font-size:14px;transition:.24s;white-space:nowrap;color:var(--txt)}
-.btn:active{transform:scale(.97)}
-.btn-p{background:linear-gradient(135deg,#2f7dff,#1f5fd6);color:#fff;box-shadow:0 10px 28px rgba(47,125,255,.36)}
-.btn-p:hover{box-shadow:0 14px 38px rgba(47,125,255,.55);transform:translateY(-2px)}
-.btn-g{background:rgba(47,125,255,.10);color:var(--blue2);border:1px solid var(--border2)}
-.btn-s{background:rgba(255,255,255,.05);color:var(--txt2);border:1px solid var(--border)}
-.btn-s:hover{background:rgba(255,255,255,.09);color:var(--txt)}
-.btn-ok{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;box-shadow:0 10px 26px rgba(34,197,94,.28)}
-.btn-sm{padding:7px 13px;font-size:12.5px;border-radius:10px}
-.btn-lg{padding:15px 32px;font-size:16px;border-radius:16px}
-.btn-block{width:100%}
-.btn:disabled{opacity:.42;cursor:not-allowed}
-.h1{font-size:clamp(21px,3.2vw,30px);font-weight:900;letter-spacing:-.7px}
+.wrap{max-width:1200px;margin:0 auto;padding:20px 20px 100px}
+.h1{font-size:clamp(20px,3vw,28px);font-weight:900;letter-spacing:-.5px}
 .h2{font-size:clamp(17px,2.3vw,22px);font-weight:800}
 .h3{font-size:16px;font-weight:800}
 .h4{font-size:14.5px;font-weight:700}
-.muted{color:var(--muted)}
-.txt2{color:var(--txt2)}
-.sm{font-size:12.5px}
-.xs{font-size:11.5px}
-.grad{background:linear-gradient(100deg,#5aa9ff,#a78bfa 55%,#22d3ee);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.grid{display:grid;gap:16px}
-.g2{grid-template-columns:repeat(2,1fr)}
-.g3{grid-template-columns:repeat(3,1fr)}
-.g4{grid-template-columns:repeat(4,1fr)}
-.g-auto{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
-.flex{display:flex}
-.between{justify-content:space-between}
-.center{align-items:center}
-.wrap{flex-wrap:wrap}
-.col{flex-direction:column}
-.g6{gap:6px}.g8{gap:8px}.g12{gap:12px}.g16{gap:16px}
-.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
+.sm{font-size:12.5px}.xs{font-size:11.5px}
+.muted{color:var(--muted)}.txt2{color:var(--txt2)}
+.flex{display:flex}.between{justify-content:space-between}.center{align-items:center}.col{flex-direction:column}.wrap-fl{flex-wrap:wrap}
+.g6{gap:6px}.g8{gap:8px}.g12{gap:12px}.g16{gap:16px}.g20{gap:20px}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}.mt24{margin-top:24px}
 .mb6{margin-bottom:6px}.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:12px 22px;border-radius:13px;font-weight:700;font-size:14.5px;transition:.24s;white-space:nowrap;color:var(--txt)}
+.btn-p{background:linear-gradient(135deg,#2f7dff,#1f5fd6);color:#fff;box-shadow:0 10px 28px rgba(47,125,255,.36)}
+.btn-p:hover{box-shadow:0 14px 38px rgba(47,125,255,.55);transform:translateY(-2px)}
+.btn-ok{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;box-shadow:0 10px 26px rgba(34,197,94,.28)}
+.btn-ok:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(34,197,94,.5)}
+.btn-wr{background:linear-gradient(135deg,#d97706,#f59e0b);color:#fff}
+.btn-wr:hover{transform:translateY(-2px)}
+.btn-s{background:rgba(255,255,255,.05);color:var(--txt2);border:1px solid var(--border)}
+.btn-s:hover{background:rgba(255,255,255,.09);color:var(--txt)}
+.btn-block{width:100%}
+.btn-lg{padding:15px 32px;font-size:16px;border-radius:16px}
+.btn:disabled{opacity:.42;cursor:not-allowed;transform:none!important}
 .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:40px;font-size:11.5px;font-weight:700;border:1px solid transparent}
 .pill-b{background:rgba(47,125,255,.15);color:#7db6ff;border-color:rgba(47,125,255,.28)}
 .pill-g{background:rgba(34,197,94,.14);color:#6ee7a0;border-color:rgba(34,197,94,.28)}
 .pill-a{background:rgba(245,158,11,.14);color:#fcd34d;border-color:rgba(245,158,11,.28)}
-.pill-r{background:rgba(239,68,68,.14);color:#fca5a5;border-color:rgba(239,68,68,.28)}
 .pill-v{background:rgba(139,92,246,.15);color:#c4b5fd;border-color:rgba(139,92,246,.28)}
 .pill-y{background:rgba(255,255,255,.06);color:var(--muted);border-color:var(--border)}
-.bar{height:9px;border-radius:20px;background:rgba(255,255,255,.07);overflow:hidden;position:relative}
-.bar-f{height:100%;border-radius:20px;transition:width .8s cubic-bezier(.2,.8,.3,1);position:relative;overflow:hidden}
-.bar-f::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);background-size:400px 100%;animation:shimmer 2.4s infinite linear}
-.bar-b{background:linear-gradient(90deg,#2f7dff,#5aa9ff)}
-.bar-g{background:linear-gradient(90deg,#16a34a,#4ade80)}
-.bar-v{background:linear-gradient(90deg,#7c3aed,#a78bfa)}
-.input,select.input,textarea.input{width:100%;padding:11px 14px;border-radius:12px;background:rgba(10,16,32,.72);border:1.5px solid var(--border);outline:none;font-size:14px;transition:.22s;color:var(--txt)}
-.input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.12)}
-select.input{cursor:pointer;appearance:none;padding-left:38px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237f93b8' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:left 14px center}
-textarea.input{resize:vertical;min-height:80px;font-family:inherit}
-.lbl{display:block;font-size:12.5px;font-weight:700;color:var(--txt2);margin-bottom:6px}
-.stat-n{font-size:clamp(21px,3vw,28px);font-weight:900;letter-spacing:-1px;line-height:1.1}
-.stat-l{font-size:11.5px;color:var(--muted);font-weight:600}
+.bar{height:9px;border-radius:20px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar-f{height:100%;border-radius:20px;transition:width .8s;background:linear-gradient(90deg,#2f7dff,#5aa9ff)}
 .div{height:1px;background:var(--border);margin:14px 0}
-.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
-.tbl th{text-align:right;padding:10px 12px;color:var(--muted);font-weight:700;font-size:11.5px;border-bottom:1px solid var(--border)}
-.tbl td{padding:11px 12px;border-bottom:1px solid rgba(90,140,230,.08)}
-.sx{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
+.loading{display:grid;place-items:center;min-height:60vh;color:var(--muted);font-size:16px}
+.spinner{width:40px;height:40px;border:3px solid rgba(90,140,230,.2);border-top-color:var(--blue);border-radius:50%;animation:sp 1s linear infinite;margin-bottom:14px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pulsePlay{0%,100%{box-shadow:0 16px 50px rgba(47,125,255,.55),0 0 0 0 rgba(47,125,255,.5)}50%{box-shadow:0 16px 50px rgba(47,125,255,.55),0 0 0 24px rgba(47,125,255,0)}}
+@keyframes pu{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes noteBlink{0%,100%{opacity:1}50%{opacity:.55}}
+.fade-in{animation:fu .5s}
+.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(6,9,20,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.back-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--txt2);font-size:13.5px;font-weight:700;transition:.2s;text-decoration:none}
+.back-btn:hover{background:rgba(47,125,255,.15);color:var(--txt);border-color:var(--border2)}
 .avatar{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:14px;background:linear-gradient(140deg,#2f7dff,#8b5cf6);color:#fff;flex-shrink:0}
-.avatar-lg{width:64px;height:64px;border-radius:18px;font-size:24px}
-.icon-btn{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid var(--border);transition:.2s;font-size:16px;color:var(--txt);position:relative}
-.icon-btn:hover{background:rgba(47,125,255,.15);border-color:var(--border2)}
-.hero{padding:24px;border-radius:22px;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(47,125,255,.18),rgba(139,92,246,.12) 50%,rgba(6,182,212,.08));border:1px solid var(--border)}
-.ring{position:relative;display:grid;place-items:center}
-.ring-t{position:absolute;text-align:center}
-.empty{text-align:center;padding:46px 20px;color:var(--muted)}
-.empty-ico{font-size:52px;opacity:.35;margin-bottom:12px}
-.eb{display:flex;align-items:flex-start;gap:12px;padding:14px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--border)}
-.rank{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-weight:900;font-size:15px;flex-shrink:0}
-.rank-1{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000}
-.rank-2{background:linear-gradient(135deg,#cbd5e1,#94a3b8);color:#000}
-.rank-3{background:linear-gradient(135deg,#d97706,#b45309);color:#fff}
-.rank-x{background:rgba(255,255,255,.06);color:var(--muted)}
-.lock{opacity:.45;filter:grayscale(.4);cursor:not-allowed}
-.loading{display:grid;place-items:center;min-height:100vh;font-size:18px;color:var(--muted)}
-.spinner{width:48px;height:48px;border:3px solid rgba(90,140,230,.2);border-top-color:var(--blue);border-radius:50%;animation:sp 1s linear infinite;margin-bottom:14px}
-.toast-host{position:fixed;bottom:26px;inset-inline-start:26px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:min(440px,92vw)}
-.toast{pointer-events:auto;min-width:280px;padding:14px 16px 16px;border-radius:16px;background:linear-gradient(135deg,rgba(21,31,56,.98),rgba(11,17,34,.98));border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.65);animation:slideIn .4s;position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:12px}
-.toast.out{animation:fadeOut .3s forwards}
-.toast-ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex-shrink:0}
-.toast-body{flex:1;min-width:0}
-.toast-title{font-weight:800;font-size:13.5px;margin-bottom:3px}
-.toast-msg{font-size:12.5px;color:var(--txt2);line-height:1.55}
-.toast-bar{position:absolute;bottom:0;inset-inline:0;height:3px;background:rgba(255,255,255,.06)}
-.toast-bar-f{height:100%;transition:width linear}
-.toast-close{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font-size:12px;color:var(--muted);background:rgba(255,255,255,.05);flex-shrink:0}
-.toast.ok .toast-ico{background:rgba(34,197,94,.18);color:#6ee7a0}
-.toast.ok .toast-bar-f{background:linear-gradient(90deg,#16a34a,#4ade80)}
-.toast.err .toast-ico{background:rgba(239,68,68,.18);color:#fca5a5}
-.toast.err .toast-bar-f{background:linear-gradient(90deg,#dc2626,#f87171)}
-.toast.warn .toast-ico{background:rgba(245,158,11,.18);color:#fcd34d}
-.toast.warn .toast-bar-f{background:linear-gradient(90deg,#d97706,#fbbf24)}
-.toast.info .toast-ico{background:rgba(47,125,255,.18);color:#7db6ff}
-.toast.info .toast-bar-f{background:linear-gradient(90deg,#2f7dff,#5aa9ff)}
-.modal-bg{position:fixed;inset:0;background:rgba(3,5,12,.82);backdrop-filter:blur(8px);z-index:900;display:grid;place-items:center;padding:18px;overflow-y:auto}
-.modal{width:100%;max-width:600px;max-height:90vh;overflow-y:auto;padding:22px;animation:pu .3s}
-.mbar{display:none}
-.btmnav{display:none}
-.footer-dev{display:flex;justify-content:center;gap:10px;padding:24px 20px 16px;margin-top:40px;border-top:1px solid rgba(90,140,230,.12);position:relative;flex-wrap:wrap}
-.footer-dev::before{content:"";position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:120px;height:1px;background:linear-gradient(90deg,transparent,#2f7dff,transparent)}
-.dev-btn,.tg-btn{display:inline-flex;align-items:center;gap:9px;padding:10px 20px;border-radius:50px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .32s;border:1px solid}
-.dev-btn{background:linear-gradient(135deg,rgba(47,125,255,.15),rgba(139,92,246,.15));border-color:rgba(90,140,230,.3);color:var(--txt);position:relative;overflow:hidden}
-.dev-btn::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);transform:translateX(-100%);transition:transform .7s}
-.dev-btn:hover::before{transform:translateX(100%)}
+.grid-main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px}
+@media(max-width:900px){.grid-main{grid-template-columns:1fr}}
+.vid-shell{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#000;border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.6);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;isolation:isolate;cursor:pointer}
+.vp-error{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:'Tajawal','Cairo',sans-serif;text-align:center;padding:20px}
+.example{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px}
+.example-q{font-size:13px;font-weight:700;margin-bottom:6px;color:var(--txt2)}
+.example-a{font-size:13px;color:var(--muted)}
+.kp{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start}
+.kp-dot{color:var(--blue2);font-weight:800;flex-shrink:0}
+.exam-card{display:block;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-radius:14px;background:rgba(21,31,56,.62);border:1px solid var(--border);transition:.28s cubic-bezier(.2,.8,.3,1)}
+.exam-card:hover{transform:translateY(-3px);border-color:var(--border2);box-shadow:0 12px 30px rgba(47,125,255,.15)}
+.notes-area{width:100%;min-height:140px;padding:12px 14px;border-radius:12px;background:rgba(10,16,32,.55);border:1.5px solid var(--border);color:var(--txt);font-size:13px;line-height:1.8;resize:vertical;outline:none;font-family:inherit;transition:.22s}
+.notes-area:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.12);background:rgba(10,16,32,.78)}
+.notes-area::placeholder{color:var(--muted)}
+.note-status-saving{animation:noteBlink 1s infinite}
+.footer-dev{display:flex;justify-content:center;gap:10px;padding:24px 20px 16px;margin-top:40px;border-top:1px solid rgba(90,140,230,.12);flex-wrap:wrap}
+.dev-btn{display:inline-flex;align-items:center;gap:9px;padding:10px 20px;border-radius:50px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .3s;border:1px solid rgba(90,140,230,.3);background:linear-gradient(135deg,rgba(47,125,255,.15),rgba(139,92,246,.15));color:var(--txt);position:relative;overflow:hidden}
 .dev-btn:hover{background:linear-gradient(135deg,rgba(47,125,255,.28),rgba(139,92,246,.28));border-color:#2f7dff;transform:translateY(-2px);box-shadow:0 12px 32px rgba(47,125,255,.35)}
-.dev-name b{background:linear-gradient(90deg,#5aa9ff,#a78bfa,#22d3ee,#5aa9ff);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 3s linear infinite;font-weight:900;letter-spacing:.3px}
+.dev-name b{background:linear-gradient(90deg,#5aa9ff,#a78bfa,#22d3ee,#5aa9ff);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 3s linear infinite;font-weight:900}
 @keyframes shine{0%{background-position:0% 50%}100%{background-position:300% 50%}}
-.tg-btn{background:rgba(34,158,217,.12);border-color:rgba(34,158,217,.3);color:#7dd3fc}
-.tg-btn:hover{background:rgba(34,158,217,.22);border-color:#229ed9;color:#fff;transform:translateY(-2px);box-shadow:0 10px 26px rgba(34,158,217,.3)}
-.swal-custom-popup{border:1px solid rgba(90,140,230,.3) !important;border-radius:22px !important;box-shadow:0 24px 70px rgba(0,0,0,.75) !important;font-family:'Tajawal','Cairo',sans-serif !important;backdrop-filter:blur(20px)}
-.swal-custom-title{color:#e8eefc !important;font-size:20px !important;font-weight:800 !important;font-family:'Tajawal','Cairo',sans-serif !important}
-.swal-custom-input{background:rgba(10,16,32,.75) !important;border:1.5px solid rgba(90,140,230,.3) !important;color:#e8eefc !important;border-radius:12px !important;font-family:'Tajawal','Cairo',sans-serif !important}
-.swal-custom-confirm{border-radius:12px !important;font-weight:700 !important;font-family:'Tajawal','Cairo',sans-serif !important;padding:10px 24px !important}
-.swal-custom-cancel{border-radius:12px !important;font-weight:700 !important;font-family:'Tajawal','Cairo',sans-serif !important;padding:10px 24px !important}
-@media(max-width:1080px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:860px){
-  .sidebar{position:fixed;inset-inline-end:0;top:0;transform:translateX(-105%);transition:transform .34s;width:280px;max-width:85vw;box-shadow:-20px 0 60px rgba(0,0,0,.7);overflow-x:hidden}
-  .sidebar.open{transform:translateX(0)!important}
-  .mbar{display:flex}
-  .content{padding:14px 14px 120px;overflow-x:hidden}
-  .topbar{padding:10px 14px}
-  .g2,.g3,.g4{grid-template-columns:1fr}
-  .g-auto{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
-  .btmnav{display:flex;position:fixed;bottom:0;inset-inline:0;z-index:55;background:rgba(6,9,20,.94);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:8px 6px;justify-content:space-around;padding-bottom:calc(8px + env(safe-area-inset-bottom));max-width:100vw;overflow-x:hidden}
-  .btmnav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;border-radius:11px;color:var(--muted);font-size:10.5px;font-weight:700;transition:.2s;min-width:0}
-  .btmnav button.on{color:var(--blue2);background:rgba(47,125,255,.12)}
-  .btmnav .i{font-size:19px;display:flex;justify-content:center}
-  .btmnav .lbl-txt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.swal-custom-popup{border:1px solid rgba(90,140,230,.3) !important;border-radius:22px !important;background:linear-gradient(180deg, #151f38, #0b1122) !important;color:#e8eefc !important;font-family:'Tajawal','Cairo',sans-serif !important}
+.swal-custom-title{color:#e8eefc !important;font-weight:800 !important;font-family:'Tajawal','Cairo',sans-serif !important}
+.swal-custom-input{background:rgba(10,16,32,.75) !important;border:1.5px solid rgba(90,140,230,.3) !important;color:#e8eefc !important;border-radius:12px !important}
+.player-modal{position:fixed;inset:0;z-index:9999;background:rgba(3,5,12,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;padding:0;animation:pu .3s}
+.player-modal.open{display:flex}
+.player-box{position:relative;width:100%;max-width:1400px;background:#000;border-radius:0;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.9);display:flex;flex-direction:column;max-height:100vh}
+.player-header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:linear-gradient(180deg,rgba(21,31,56,.98),rgba(11,17,34,.98));border-bottom:1px solid var(--border);flex-shrink:0}
+.player-title{flex:1;min-width:0;font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:20px;font-size:10.5px;font-weight:700;background:rgba(34,197,94,.12);color:#6ee7a0;border:1px solid rgba(34,197,94,.28)}
+.player-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:pulse 2s infinite}
+.player-btn{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(47,125,255,.12);border:1px solid rgba(47,125,255,.3);color:#7db6ff;font-size:16px;transition:.2s;cursor:pointer;flex-shrink:0}
+.player-btn:hover{background:rgba(47,125,255,.25);color:#fff}
+.player-close{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;font-size:18px;font-weight:900;transition:.2s;cursor:pointer;flex-shrink:0}
+.player-close:hover{background:rgba(239,68,68,.25);color:#fff}
+.player-stage{position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;isolation:isolate;flex:1}
+.player-stage iframe,.player-stage video{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;pointer-events:auto}
+.watermark{position:absolute;z-index:100;font-size:15px;font-weight:900;font-family:'Cairo','Tajawal',sans-serif;color:rgba(255,60,60,.32);text-shadow:0 0 4px rgba(255,60,60,.15),1px 1px 1px rgba(0,0,0,.3);padding:0;background:transparent;border:none;outline:none;pointer-events:none;user-select:none;-webkit-user-select:none;white-space:nowrap;transition:top 1.8s cubic-bezier(.4,0,.2,1),left 1.8s cubic-bezier(.4,0,.2,1);letter-spacing:1px;direction:ltr}
+.shield-overlay{position:absolute;inset:0;z-index:80;pointer-events:none}
+.shield-overlay::before{content:'';position:absolute;top:0;left:0;right:0;height:60px;background:transparent;pointer-events:auto;cursor:default}
+.shield-overlay::after{content:'';position:absolute;bottom:0;left:0;right:0;height:80px;background:transparent;pointer-events:auto;cursor:default}
+.shield-side{position:absolute;top:60px;bottom:80px;width:50px;background:transparent;z-index:80;pointer-events:auto;cursor:default}
+.shield-side.right{right:0;left:auto}
+.shield-side.left{left:0;right:auto}
+.player-modal.fullscreen .player-box{max-width:100vw;width:100vw;height:100vh;max-height:100vh;border-radius:0}
+.player-modal.fullscreen .player-header{position:absolute;top:0;left:0;right:0;z-index:150;background:linear-gradient(180deg,rgba(0,0,0,.85),transparent);border:none;transition:opacity .3s}
+.player-modal.fullscreen .player-header:hover{opacity:1}
+.player-modal.fullscreen .player-stage{aspect-ratio:auto;height:100vh;flex:1}
+@media(max-width:900px) and (orientation:landscape){
+.player-modal{padding:0}
+.player-box{border-radius:0;max-width:100vw}
+.player-header{padding:6px 12px}
+.player-title{font-size:12px}
+.player-badge{display:none}
+.player-btn,.player-close{width:32px;height:32px;font-size:14px}
+.watermark{font-size:12px}
 }
-.pomodoro-ring{position:relative;display:grid;place-items:center}
-.pomodoro-time{font-size:48px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-2px}
-.pomodoro-label{font-size:12px;color:var(--muted);margin-top:6px}
-@media(max-width:640px){.pomodoro-time{font-size:36px}}
+@media(max-width:640px){
+.player-modal{padding:0}
+.player-box{border-radius:0}
+.player-header{padding:8px 10px;gap:8px}
+.player-title{font-size:12px}
+.player-badge{display:none}
+.player-btn,.player-close{width:34px;height:34px;font-size:14px}
+.watermark{font-size:12px}
+}
 </style>
 </head>
 <body>
-<div id="root"></div>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<div class="topbar">
+<a href="/student/index.html" class="back-btn">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+رجوع
+</a>
+<div class="flex center g8" style="margin-inline-start:auto">
+<div id="userAvatar" class="avatar">👤</div>
+</div>
+</div>
+
+<div class="wrap" id="app">
+<div class="loading"><div class="spinner"></div>جارٍ تحميل الدرس...</div>
+</div>
+
+<div class="player-modal" id="playerModal">
+<div class="player-box">
+<div class="player-header">
+<div class="player-title" id="playerTitle">جارٍ التحميل...</div>
+<span class="player-badge">محمي</span>
+<button class="player-btn" id="playerFullscreen" title="ملء الشاشة">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+</svg>
+</button>
+<button class="player-close" id="playerClose" aria-label="إغلاق">✕</button>
+</div>
+<div class="player-stage" id="playerStage">
+<div class="shield-overlay"></div>
+<div class="shield-side left"></div>
+<div class="shield-side right"></div>
+<div class="watermark" id="watermark" style="top:20px;left:20px">MISSION EDU</div>
+<div id="playerContainer"></div>
+</div>
+</div>
+</div>
+
+<div class="footer-dev">
+<button class="dev-btn" onclick="openWhatsApp()">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+<span class="dev-name">Developed by <b>EL-sayed Hasan</b></span>
+</button>
+<button class="dev-btn" onclick="sendReport()">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+<span>بلاغ</span>
+</button>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="/db.js"></script>
 <script>
-  if (window.Babel && Babel.availablePresets && Babel.availablePresets['react']) {
-    Babel.registerPreset('react-classic', {
-      presets: [[Babel.availablePresets['react'], { runtime: 'classic' }]]
-    });
-  }
-</script>
-<script type="text/babel" data-presets="react-classic">
-const {useState,useEffect,useMemo,useCallback,useRef,createContext,useContext}=React;
-const DB=window.MissionDB;
+(function(){
+"use strict";
 
-/* ═══════════ أصوات (Web Audio API) ═══════════ */
-let _audioCtx=null;
-function getAudioCtx(){
-  if(!_audioCtx){
-    try{_audioCtx=new (window.AudioContext||window.webkitAudioContext)();}
-    catch(e){return null;}
-  }
-  return _audioCtx;
-}
-function beep(frequency,duration,type='sine',volume=0.15){
-  try{
-    const ctx=getAudioCtx();
-    if(!ctx) return;
-    if(ctx.state==='suspended') ctx.resume();
-    const osc=ctx.createOscillator();
-    const gain=ctx.createGain();
-    osc.type=type;
-    osc.frequency.value=frequency;
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    gain.gain.setValueAtTime(volume,ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+duration/1000);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime+duration/1000);
-  }catch(e){}
-}
-function playSound(type='notify'){
-  switch(type){
-    case 'success':
-      beep(523,100,'sine',0.18);
-      setTimeout(()=>beep(659,100,'sine',0.18),100);
-      setTimeout(()=>beep(784,200,'sine',0.18),200);
-      break;
-    case 'err':
-      beep(392,120,'square',0.15);
-      setTimeout(()=>beep(311,200,'square',0.15),120);
-      break;
-    case 'warn':
-      beep(440,150,'triangle',0.18);
-      setTimeout(()=>beep(440,150,'triangle',0.18),180);
-      break;
-    default:
-      beep(880,100,'sine',0.15);
-      setTimeout(()=>beep(1175,120,'sine',0.15),100);
-  }
-}
+const DB = window.MissionDB;
+const params = new URLSearchParams(window.location.search);
+const lessonId = params.get("id");
 
-/* ═══════════ Toast ═══════════ */
-const ToastCtx=createContext(null);
-function ToastProvider({children}){
-  const [items,setItems]=useState([]);
-  const push=useCallback((msg,type='info',title,duration=3800)=>{
-    const id=DB.uid('t_');
-    const titles={ok:'تم بنجاح',err:'خطأ',warn:'تنبيه',info:'معلومة'};
-    setItems(x=>[...x,{id,msg,type,title:title||titles[type]||'',duration}]);
-    if(type==='ok') playSound('success');
-    else if(type==='err') playSound('err');
-    else if(type==='warn') playSound('warn');
-    else playSound('notify');
-  },[]);
-  const remove=useCallback(id=>setItems(x=>x.filter(t=>t.id!==id)),[]);
-  return <ToastCtx.Provider value={{ok:(m,t)=>push(m,'ok',t),err:(m,t)=>push(m,'err',t),warn:(m,t)=>push(m,'warn',t),info:(m,t)=>push(m,'info',t)}}>
-    {children}
-    <div className="toast-host">{items.map(t=><Toast key={t.id} data={t} onClose={()=>remove(t.id)}/>)}</div>
-  </ToastCtx.Provider>;
-}
-function Toast({data,onClose}){
-  const [out,setOut]=useState(false);const [progress,setProgress]=useState(100);
-  useEffect(()=>{const start=Date.now();const t=setInterval(()=>{const p=Math.max(0,100-((Date.now()-start)/data.duration)*100);setProgress(p);if(p<=0){clearInterval(t);setOut(true);setTimeout(onClose,280);}},40);return()=>clearInterval(t);},[]);
-  const icons={ok:'✓',err:'✕',warn:'!',info:'i'};
-  return <div className={`toast ${data.type} ${out?'out':''}`}>
-    <div className="toast-ico">{icons[data.type]}</div>
-    <div className="toast-body">{data.title&&<div className="toast-title">{data.title}</div>}<div className="toast-msg">{data.msg}</div></div>
-    <button className="toast-close" onClick={()=>{setOut(true);setTimeout(onClose,280);}}>✕</button>
-    <div className="toast-bar"><div className="toast-bar-f" style={{width:`${progress}%`,transitionDuration:'40ms'}}/></div>
-  </div>;
-}
-const useToast=()=>useContext(ToastCtx);
+const app = document.getElementById("app");
+const userAvatar = document.getElementById("userAvatar");
 
-/* ═══════════ App Provider ═══════════ */
-const AppCtx=createContext(null);
-const useApp=()=>useContext(AppCtx);
-
-function AppProvider({children}){
-  const [db,setDb]=useState({users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[],polls:[],poll_votes:[]});
-  const [currentUser,setCurrentUser]=useState(null);
-  const [attempts,setAttempts]=useState([]);
-  const [errors,setErrors]=useState([]);
-  const [notes,setNotes]=useState([]);
-  const [certificates,setCertificates]=useState([]);
-  const [loading,setLoading]=useState(true);
-  const toast=useToast();
-
-  const reload=useCallback(async ()=>{
-    try{
-      await DB.cleanupExpiredPolls();
-      const data=await DB.loadAll();
-      setDb(data);
-    }catch(e){console.warn(e);}
-  },[]);
-
-  const reloadUserData=useCallback(async ()=>{
-    if(!currentUser) return;
-    try{
-      const sb=await DB.getClient();
-      const [a,e,n,c]=await Promise.all([
-        DB.getAttempts(currentUser.id),
-        DB.getErrors(currentUser.id),
-        sb.from('notes').select('*').eq('user_id',currentUser.id).then(r=>r.data||[]),
-        sb.from('certificates').select('*').eq('user_id',currentUser.id).then(r=>r.data||[])
-      ]);
-      setAttempts(a);setErrors(e);setNotes(n);setCertificates(c);
-      const u=await DB.getUser(currentUser.id);
-      if(u) setCurrentUser(u);
-    }catch(e){console.warn(e);}
-  },[currentUser]);
-
-  useEffect(()=>{
-    (async ()=>{
-      try{
-        const sid=DB.getSessionId();
-        if(!sid){window.location.replace('/auth/login.html');return;}
-        const u=await DB.getUser(sid);
-        if(!u||u.active===false){DB.clearSession();window.location.replace('/auth/login.html');return;}
-        if(u.role==='admin'){window.location.replace('/admin/index.html');return;}
-        setCurrentUser(u);
-        const sb=await DB.getClient();
-        const [a,e,n,c]=await Promise.all([
-          DB.getAttempts(u.id),
-          DB.getErrors(u.id),
-          sb.from('notes').select('*').eq('user_id',u.id).then(r=>r.data||[]),
-          sb.from('certificates').select('*').eq('user_id',u.id).then(r=>r.data||[])
-        ]);
-        setAttempts(a);setErrors(e);setNotes(n);setCertificates(c);
-        await reload();
-      }catch(e){console.warn(e);}
-      setLoading(false);
-    })();
-  },[]);
-  useEffect(()=>{
-    const interval=setInterval(async ()=>{
-      const count=await DB.cleanupExpiredPolls();
-      if(count>0){ await reload(); }
-    },5*60*1000);
-    return ()=>clearInterval(interval);
-  },[reload]);
-  useEffect(()=>{
-    const unlock=()=>{
-      const ctx=getAudioCtx();
-      if(ctx&&ctx.state==='suspended') ctx.resume();
-      document.removeEventListener('click',unlock);
-      document.removeEventListener('touchstart',unlock);
-    };
-    document.addEventListener('click',unlock,{once:true});
-    document.addEventListener('touchstart',unlock,{once:true});
-    return ()=>{
-      document.removeEventListener('click',unlock);
-      document.removeEventListener('touchstart',unlock);
-    };
-  },[]);
-
-  const logout=useCallback(()=>{
-    Swal.fire({
-      title:'تسجيل الخروج',text:'هل أنت متأكد؟',icon:'question',
-      showCancelButton:true,confirmButtonText:'نعم، خروج',cancelButtonText:'إلغاء',
-      confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
-      background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',
-      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
-    }).then(r=>{
-      if(r.isConfirmed){
-        try{localStorage.removeItem('student_tab');localStorage.removeItem('student_selected');}catch(e){}
-        DB.clearSession();
-        window.location.replace('/auth/login.html');
-      }
-    });
-  },[]);
-
-  const updateUser=useCallback(async (id,patch)=>{
-    const u=await DB.updateUser(id,patch);
-    setCurrentUser(u);
-    return u;
-  },[]);
-
-  const getLevel=useCallback((xp)=>{
-    const ls=[...db.levels].sort((a,b)=>a.xp-b.xp);
-    if(ls.length===0) return {current:{level:1,name:'مبتدئ',xp:0},next:null};
-    let cur=ls[0],next=null;
-    for(let i=0;i<ls.length;i++){if(xp>=ls[i].xp){cur=ls[i];next=ls[i+1]||null;}}
-    return {current:cur,next};
-  },[db.levels]);
-
-  const saveNote=useCallback(async (lessonId,text)=>{
-    if(!currentUser) return;
-    const sb=await DB.getClient();
-    const existing=notes.find(n=>n.lesson_id===lessonId);
-    const now=Date.now();
-    if(existing){
-      await sb.from('notes').update({text,updated_at:now}).eq('id',existing.id);
-      setNotes(x=>x.map(n=>n.id===existing.id?{...n,text,updated_at:now}:n));
-    } else {
-      const row={id:DB.uid('note_'),user_id:currentUser.id,lesson_id:lessonId,text,created_at:now,updated_at:now};
-      await sb.from('notes').insert([row]);
-      setNotes(x=>[...x,row]);
-    }
-  },[currentUser,notes]);
-
-  const getNote=useCallback((lessonId)=>{
-    return notes.find(n=>n.lesson_id===lessonId)?.text||'';
-  },[notes]);
-
-  return <AppCtx.Provider value={{
-    db,currentUser,attempts,errors,notes,certificates,loading,
-    logout,updateUser,reload,reloadUserData,getLevel,toast,playSound,
-    saveNote,getNote,
-    subject:id=>db.subjects.find(s=>s.id===id),
-    unit:id=>db.units.find(u=>u.id===id),
-    lesson:id=>db.lessons.find(l=>l.id===id),
-    exam:id=>db.exams.find(e=>e.id===id),
-    question:id=>db.questions.find(q=>q.id===id),
-    grade:id=>db.grades.find(g=>g.id===id)
-  }}>{children}</AppCtx.Provider>;
-}
-
-/* ═══════════ Icon ═══════════ */
-const Icon=({name,size=18,color='currentColor'})=>{
-  const p={width:size,height:size,viewBox:'0 0 24 24',fill:'none',stroke:color,strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round'};
-  const paths={
-    home:<><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></>,
-    activity:<><path d="M12 20v-6M18 20V4M6 20v-10"/></>,
-    book:<><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></>,
-    target:<><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></>,
-    trophy:<><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></>,
-    alert:<><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></>,
-    medal:<><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></>,
-    bell:<><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></>,
-    user:<><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></>,
-    menu:<><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></>,
-    search:<><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></>,
-    close:<><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>,
-    check:<><polyline points="20 6 9 17 4 12"/></>,
-    logout:<><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></>,
-    play:<><polygon points="5 3 19 12 5 21 5 3"/></>,
-    flame:<><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></>,
-    zap:<><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></>,
-    clipboard:<><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></>,
-    note:<><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></>,
-    clock:<><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></>,
-    award:<><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></>,
-    download:<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></>,
-    share:<><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></>,
-    coupon:<><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6"/><path d="M2 8h20v4H2z"/><line x1="12" y1="12" x2="12" y2="22"/><path d="M12 2v6"/></>,
-    pause:<><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></>,
-    refresh:<><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></>
-  };
-  return <svg {...p}>{paths[name]||paths.help}</svg>;
+let state = {
+user: null,
+lesson: null,
+unit: null,
+subject: null,
+relatedExams: [],
+unitPct: 0,
+doneUnit: 0,
+totalUnit: 0,
+isDone: false,
+watermarkTimer: null,
+isFullscreen: false,
+note: '',
+noteId: null,
+noteTimer: null,
+noteSaving: false,
+noteDirty: false
 };
 
-/* ═══════════ مكونات ═══════════ */
-function Stat({label,value,icon,color='var(--blue)',sub}){
-  return <div className="glass-s hv" style={{padding:16}}>
-    <div className="flex between center mb8">
-      <div className="stat-l">{label}</div>
-      <div style={{color}}>{typeof icon==='string'?<Icon name={icon} size={20}/>:icon}</div>
-    </div>
-    <div className="stat-n" style={{color}}>{value}</div>
-    {sub&&<div className="xs muted mt8">{sub}</div>}
-  </div>;
-}
-function Empty({icon='📭',title,desc}){
-  return <div className="empty">
-    <div className="empty-ico">{icon}</div>
-    <div className="h4 txt2 mb8">{title}</div>
-    {desc&&<div className="sm">{desc}</div>}
-  </div>;
-}
-function Ring({value,size=120,stroke=10,color='#2f7dff',children}){
-  const r=(size-stroke)/2,c=2*Math.PI*r,off=c-(value/100)*c;
-  return <div className="ring" style={{width:size,height:size}}>
-    <svg width={size} height={size} style={{transform:'rotate(-90deg)'}}>
-      <circle cx={size/2} cy={size/2} r={r} stroke="rgba(255,255,255,.07)" strokeWidth={stroke} fill="none"/>
-      <circle cx={size/2} cy={size/2} r={r} stroke={color} strokeWidth={stroke} fill="none" strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round" style={{transition:'stroke-dashoffset 1s'}}/>
-    </svg>
-    <div className="ring-t">{children}</div>
-  </div>;
+function esc(str){
+return String(str||"").replace(/[&<>"']/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[s]);
 }
 
-/* ═══════════ 🍅 Pomodoro ═══════════ */
-function PomodoroTimer({compact=false}){
-  const app=useApp();
-  const u=app.currentUser;
-  const [mode,setMode]=useState('work');
-  const [running,setRunning]=useState(false);
-  const [secondsLeft,setSecondsLeft]=useState(25*60);
-  const [sessions,setSessions]=useState(0);
-  const intervalRef=useRef(null);
-  const WORK_TIME=25*60;
-  const BREAK_TIME=5*60;
-
-  useEffect(()=>{
-    if(running){
-      intervalRef.current=setInterval(()=>{
-        setSecondsLeft(s=>{
-          if(s<=1){
-            clearInterval(intervalRef.current);
-            setRunning(false);
-            if(mode==='work'){
-              saveSession();
-              app.playSound('success');
-              Swal.fire({
-                icon:'success', title:'🎉 خلصت 25 دقيقة!', text:'خد راحة 5 دقايق',
-                background:'linear-gradient(180deg, #151f38, #0b1122)', color:'#e8eefc',
-                confirmButtonColor:'#2f7dff', confirmButtonText:'خد راحة',
-                customClass:{popup:'swal-custom-popup',title:'swal-custom-title'},
-                timer:5000, showConfirmButton:true
-              }).then(()=>{ setMode('break'); setSecondsLeft(BREAK_TIME); });
-            } else {
-              app.playSound('notify');
-              Swal.fire({
-                icon:'info', title:'☕ خلصت الراحة', text:'جاهز لـ 25 دقيقة جديدة؟',
-                background:'linear-gradient(180deg, #151f38, #0b1122)', color:'#e8eefc',
-                confirmButtonColor:'#2f7dff', confirmButtonText:'يلا نبدأ',
-                customClass:{popup:'swal-custom-popup',title:'swal-custom-title'},
-                timer:5000
-              }).then(()=>{ setMode('work'); setSecondsLeft(WORK_TIME); });
-            }
-            return 0;
-          }
-          return s-1;
-        });
-      },1000);
-    } else { clearInterval(intervalRef.current); }
-    return ()=>clearInterval(intervalRef.current);
-  },[running,mode]);
-
-  const saveSession=async ()=>{
-    try{
-      const sb=await DB.getClient();
-      await sb.from('pomodoro_sessions').insert([{
-        id:DB.uid('pomo_'), user_id:u.id, duration:25,
-        completed_at:Date.now(), created_at:Date.now()
-      }]);
-      setSessions(s=>s+1);
-      await DB.updateUser(u.id,{xp:(u.xp||0)+5});
-      app.reloadUserData();
-    }catch(e){console.warn(e);}
-  };
-
-  const reset=()=>{ setRunning(false); setMode('work'); setSecondsLeft(WORK_TIME); };
-  const total=mode==='work'?WORK_TIME:BREAK_TIME;
-  const progress=((total-secondsLeft)/total)*100;
-  const mins=Math.floor(secondsLeft/60);
-  const secs=secondsLeft%60;
-  const color=mode==='work'?'#f59e0b':'#22c55e';
-
-  if(compact){
-    return <div className="glass-s" style={{padding:12}}>
-      <div className="flex between center mb8">
-        <div className="flex center g8">
-          <span style={{color}}><Icon name="clock" size={16}/></span>
-          <span className="sm" style={{fontWeight:700}}>{mode==='work'?'🍅 مذاكرة':'☕ راحة'}</span>
-        </div>
-        <span className="h4" style={{fontVariantNumeric:'tabular-nums',color}}>
-          {String(mins).padStart(2,'0')}:{String(secs).padStart(2,'0')}
-        </span>
-      </div>
-      <div className="bar"><div className="bar-f" style={{width:`${progress}%`,background:color}}/></div>
-      <div className="flex g6 mt8">
-        <button className="btn btn-s btn-sm" style={{flex:1}} onClick={()=>setRunning(r=>!r)}>
-          {running?<><Icon name="pause" size={12}/> إيقاف</>:'▶️ تشغيل'}
-        </button>
-        <button className="btn btn-s btn-sm" onClick={reset}>
-          <Icon name="refresh" size={12}/>
-        </button>
-      </div>
-    </div>;
-  }
-
-  return <div className="glass" style={{padding:24,textAlign:'center'}}>
-    <div className="h3 mb16" style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
-      <span style={{color}}>{mode==='work'?'🍅':'☕'}</span>
-      {mode==='work'?'وقت المذاكرة':'وقت الراحة'}
-    </div>
-    <Ring value={progress} size={220} stroke={14} color={color}>
-      <div className="pomodoro-time">{String(mins).padStart(2,'0')}:{String(secs).padStart(2,'0')}</div>
-      <div className="pomodoro-label">{mode==='work'?'من 25 دقيقة':'من 5 دقايق'}</div>
-    </Ring>
-    <div className="flex center g8 mt20" style={{justifyContent:'center'}}>
-      <button className="btn btn-p" onClick={()=>setRunning(r=>!r)} style={{minWidth:140}}>
-        {running?<><Icon name="pause" size={14}/> إيقاف مؤقت</>:'▶️ ابدأ'}
-      </button>
-      <button className="btn btn-s" onClick={reset}><Icon name="refresh" size={14}/> إعادة</button>
-    </div>
-    {sessions > 0 && <div className="pill pill-g mt16" style={{display:'inline-flex'}}>✅ أكملت {sessions} جلسة النهاردة</div>}
-  </div>;
+function getYouTubeId(url){
+if(!url) return "";
+const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
+return m ? m[1] : "";
 }
 
-/* ═══════════ Sidebar ═══════════ */
-function Sidebar({items,active,onNav,open,onClose}){
-  return <>
-    {open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.5)',zIndex:55}}/>}
-    <aside className={`sidebar ${open?'open':''}`}>
-      <div className="brand">
-        <div className="brand-logo">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
-            <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
-            <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
-            <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
-          </svg>
-        </div>
-        <div><div className="brand-name">MISSION EDU</div><div className="brand-sub">منصة المهام</div></div>
-      </div>
-      {items.map((g,gi)=><div key={gi}>
-        {g.title&&<div style={{fontSize:10.5,fontWeight:800,color:'var(--muted)',letterSpacing:1,padding:'14px 14px 4px'}}>{g.title}</div>}
-        {g.items.map(it=><button key={it.id} className={`nav-i ${active===it.id?'on':''}`} onClick={()=>{onNav(it.id);onClose?.();}}>
-          <span className="nav-ico"><Icon name={it.icon} size={16}/></span>
-          <span>{it.label}</span>
-          {it.badge!=null&&<span className="pill pill-b" style={{marginInlineStart:'auto'}}>{it.badge}</span>}
-        </button>)}
-      </div>)}
-    </aside>
-  </>;
+async function loadNote(userId, lessonId){
+try{
+const sb = await DB.getClient();
+const { data } = await sb.from('notes').select('*').eq('user_id', userId).eq('lesson_id', lessonId).maybeSingle();
+if(data){
+state.note = data.text || '';
+state.noteId = data.id;
+}
+}catch(e){ console.warn('loadNote:', e); }
 }
 
-/* ═══════════ Topbar ═══════════ */
-function Topbar({user,onMenu,onLogout,onSearch,searchResults,unreadNotifs=0,onOpenNotifications}){
-  const [q,setQ]=useState('');
-  const [open,setOpen]=useState(false);
-  useEffect(()=>{
-    if(!q.trim()){setOpen(false);return;}
-    setOpen(true);
-    const t=setTimeout(()=>onSearch?.(q),150);
-    return()=>clearTimeout(t);
-  },[q]);
-  return <div className="topbar">
-    <button className="icon-btn mbar" onClick={onMenu}><Icon name="menu" size={16}/></button>
-    <div style={{position:'relative',flex:1,maxWidth:520,minWidth:0}}>
-      <div className="search">
-        <Icon name="search" size={15} color="var(--muted)"/>
-        <input value={q} onChange={e=>setQ(e.target.value)} placeholder="ابحث عن درس، اختبار..."/>
-        {q&&<button onClick={()=>{setQ('');setOpen(false);}} style={{opacity:.6,color:'var(--txt)'}}><Icon name="close" size={14}/></button>}
-      </div>
-      {open&&searchResults?.length>0&&<div className="glass" style={{position:'absolute',top:'calc(100% + 8px)',insetInline:0,padding:8,zIndex:80,maxHeight:340,overflowY:'auto'}}>
-        {searchResults.slice(0,10).map((r,i)=><a key={i} href={r.href} className="nav-i">
-          <span className="nav-ico">{r.icon}</span>
-          <div style={{flex:1,textAlign:'right',minWidth:0}}>
-            <div style={{fontSize:13.5}}>{r.title}</div>
-            <div className="xs muted">{r.type}</div>
-          </div>
-        </a>)}
-      </div>}
-    </div>
-    <div className="flex center g8" style={{marginInlineStart:'auto',flexShrink:0}}>
-      <button className="icon-btn" onClick={onOpenNotifications} title="الإشعارات">
-        <Icon name="bell" size={16}/>
-        {unreadNotifs > 0 && (
-          <span style={{
-            position:'absolute',top:-4,insetInlineEnd:-4,
-            minWidth:18,height:18,borderRadius:9,
-            background:'linear-gradient(135deg,#2f7dff,#8b5cf6)',
-            color:'#fff',fontSize:10,fontWeight:900,
-            display:'grid',placeItems:'center',padding:'0 5px',
-            boxShadow:'0 0 10px rgba(47,125,255,.7)',animation:'pulse 2s infinite'
-          }}>{unreadNotifs > 9 ? '9+' : unreadNotifs}</span>
-        )}
-      </button>
-      <div className="glass-s" style={{padding:'5px 12px',display:'flex',alignItems:'center',gap:8}}>
-        <div className="avatar" style={{width:32,height:32,fontSize:15}}>{user.avatar||'👤'}</div>
-      </div>
-      <button className="icon-btn" onClick={onLogout}><Icon name="logout" size={16}/></button>
-    </div>
-  </div>;
+function updateNoteStatus(status){
+const el = document.getElementById('noteStatus');
+if(!el) return;
+el.classList.remove('note-status-saving');
+if(status === 'saving'){
+el.textContent = '⏳ جارٍ الحفظ...';
+el.className = 'pill pill-a note-status-saving';
+} else if(status === 'saved'){
+el.textContent = '✅ محفوظ';
+el.className = 'pill pill-g';
+} else if(status === 'error'){
+el.textContent = '❌ فشل الحفظ';
+el.className = 'pill pill-r';
+} else if(status === 'empty'){
+el.textContent = 'فارغ';
+el.className = 'pill pill-y';
 }
-/* ═══════════ Home ═══════════ */
-function Home({onNav,setSelected}){
-  const app=useApp();
-  const u=app.currentUser;
-  const {current,next}=app.getLevel(u.xp||0);
-  const access=u.all_subjects?app.db.subjects.map(s=>s.id):(u.access_subjects||[]);
-  const accessibleLessons=app.db.lessons.filter(l=>{
-    const un=app.db.units.find(x=>x.id===l.unit_id);
-    return un&&access.includes(un.subject_id)&&l.published!==false;
-  });
-  const doneLessons=accessibleLessons.filter(l=>(u.completed_lessons||[]).includes(l.id));
-  const progressPct=DB.pct(doneLessons.length,accessibleLessons.length);
-  const top10=useMemo(()=>[...app.db.users.filter(x=>x.role==='student'&&x.active!==false)].sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,10),[app.db.users]);
-  const recentAttempts=useMemo(()=>[...(app.attempts||[])].slice(0,3),[app.attempts]);
-
-  const lastLessonId=(()=>{try{return localStorage.getItem('student_last_lesson');}catch(e){return null;}})();
-  const lastLesson = lastLessonId ? app.lesson(lastLessonId) : null;
-
-  return <>
-    <div className="hero mb16" style={{padding:'clamp(16px,4vw,24px)'}}>
-      <div style={{display:'flex',flexDirection:'column',alignItems:'center',textAlign:'center',gap:'16px'}}>
-        <div style={{width:'100%'}}>
-          <div className="h2 mb6" style={{whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
-            أهلًا بك {u.name.split(' ')[0]} 👋
-          </div>
-          <div className="sm txt2 mb12">مهمتك الحالية في انتظارك.</div>
-        </div>
-
-        <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'20px',flexWrap:'wrap'}}>
-          <Ring value={progressPct} size={100} stroke={8} color="#2f7dff">
-            <div className="stat-n">{progressPct}%</div>
-            <div className="xs muted">التقدم</div>
-          </Ring>
-          <Ring value={next?DB.pct((u.xp-current.xp),next.xp-current.xp):100} size={80} stroke={7} color="#8b5cf6">
-            <div style={{fontWeight:900}}>Lv {current.level}</div>
-            <div className="xs muted">{current.name}</div>
-          </Ring>
-        </div>
-
-        <div style={{display:'flex',gap:'8px',width:'100%',flexWrap:'wrap'}}>
-          {lastLesson && (
-            <a href={`/student/lesson.html?id=${lastLesson.id}`}
-               className="btn btn-p"
-               style={{textDecoration:'none',flex:'1 1 auto',minWidth:'140px',fontSize:'13px',padding:'10px 16px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
-              ▶️ متابعة الدرس
-            </a>
-          )}
-          <button className="btn btn-g"
-                  onClick={()=>onNav('subjects')}
-                  style={{flex:'1 1 auto',minWidth:'140px',fontSize:'13px',padding:'10px 16px'}}>
-            <Icon name="book" size={14}/> استعرض المواد
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div className="grid g4 mb16">
-      <Stat label="نقاط XP" value={DB.fmt(u.xp||0)} icon="zap" color="#5aa9ff"/>
-      <Stat label="سلسلة المذاكرة" value={`${u.streak||0}`} icon="flame" color="#f59e0b"/>
-      <Stat label="الدروس المكتملة" value={DB.fmt(doneLessons.length)} icon="book" color="#22c55e" sub={`من ${accessibleLessons.length}`}/>
-      <Stat label="الإنجازات" value={DB.fmt((u.achievements||[]).length)} icon="trophy" color="#8b5cf6"/>
-    </div>
-
-    <div className="grid g2 mb16">
-      <PomodoroTimer compact={true}/>
-      <div className="glass-s" style={{padding:12,cursor:'pointer'}} onClick={()=>onNav('notes')}>
-        <div className="flex between center mb8">
-          <div className="flex center g8">
-            <span style={{color:'var(--blue2)'}}><Icon name="note" size={16}/></span>
-            <span className="sm" style={{fontWeight:700}}>📝 ملاحظاتي</span>
-          </div>
-          <span className="pill pill-b">{app.notes?.length||0}</span>
-        </div>
-        <div className="xs muted">عندك {app.notes?.length||0} ملاحظة محفوظة</div>
-        <div className="xs mt8" style={{color:'var(--blue2)',fontWeight:700}}>اضغط لعرضهم ←</div>
-      </div>
-    </div>
-
-    <div className="glass mb16" style={{padding:18}}>
-      <div className="flex between center mb12">
-        <div className="h3" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="medal" size={18}/> المتصدرون العشرة</div>
-        <button className="btn btn-s btn-sm" onClick={()=>onNav('leaderboard')}>الكل</button>
-      </div>
-      {top10.length===0?<div className="sm muted" style={{textAlign:'center',padding:12}}>لا يوجد طلاب بعد</div>:
-        top10.map((s,i)=>{
-          const {current:c}=app.getLevel(s.xp||0);
-          const isMe=s.id===u.id;
-          return <div key={s.id} className="flex center g12" style={{padding:'9px 0',borderBottom:'1px solid rgba(90,140,230,.08)',background:isMe?'rgba(47,125,255,.06)':'transparent',borderRadius:isMe?10:0,paddingInline:isMe?10:0}}>
-            <div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div>
-            <div className="avatar" style={{width:34,height:34,fontSize:14}}>{s.avatar||'👤'}</div>
-            <div style={{flex:1,minWidth:0}}>
-              <div className="sm" style={{whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{s.name} {isMe&&<span className="pill pill-b" style={{marginInlineStart:6}}>أنت</span>}</div>
-              <div className="xs muted">Lv {c.level} — {c.name}</div>
-            </div>
-            <span className="pill pill-b">{DB.fmt(s.xp||0)} XP</span>
-          </div>;
-        })
-      }
-    </div>
-
-    <div className="glass" style={{padding:18}}>
-      <div className="h3 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="clipboard" size={18}/> آخر الاختبارات</div>
-      {recentAttempts.length===0?<div className="sm muted" style={{textAlign:'center',padding:12}}>لم تجرِ اختبارًا بعد</div>:
-        recentAttempts.map((a,i)=>{
-          const e=app.exam(a.exam_id);
-          if(!e) return null;
-          return <a key={i} href={`/student/exam.html?id=${e.id}`} className="flex center g12" style={{padding:'9px 0',borderBottom:'1px solid rgba(90,140,230,.08)'}}>
-            <div style={{color:a.passed?'var(--green)':'var(--red)'}}><Icon name={a.passed?'check':'close'} size={18}/></div>
-            <div style={{flex:1,minWidth:0}}>
-              <div className="sm" style={{whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{e.title}</div>
-              <div className="xs muted">{a.score}/{a.total} — {a.pct}%</div>
-            </div>
-            <span className={`pill ${a.passed?'pill-g':'pill-r'}`}>{a.pct}%</span>
-          </a>;
-        })
-      }
-    </div>
-  </>;
 }
 
-/* ═══════════ Subjects ═══════════ */
-function Subjects({setSelected,setTab}){
-  const app=useApp();
-  const u=app.currentUser;
-  const access=u.all_subjects?app.db.subjects.map(s=>s.id):(u.access_subjects||[]);
-  const subjects=app.db.subjects.filter(s=>access.includes(s.id)).sort((a,b)=>a.sort_order-b.sort_order);
-  return <>
-    <div className="h2 mb16">المواد المتاحة</div>
-    {subjects.length===0?<div className="glass" style={{padding:30}}><Empty icon="📚" title="لا توجد مواد متاحة لك"/></div>:
-      <div className="grid g-auto">
-        {subjects.map(s=>{
-          const units=app.db.units.filter(x=>x.subject_id===s.id);
-          const lessons=app.db.lessons.filter(l=>units.some(un=>un.id===l.unit_id)&&l.published!==false);
-          const done=lessons.filter(l=>(u.completed_lessons||[]).includes(l.id)).length;
-          const p=DB.pct(done,lessons.length);
-          return <div key={s.id} className="glass hv" style={{padding:20,cursor:'pointer'}} onClick={()=>{
-            if(typeof fbq!=='undefined') fbq('trackCustom','ViewSubject',{subject:s.name});
-            setSelected({type:'subject',id:s.id});setTab('subject');
-          }}>
-            <div className="flex between center mb12">
-              <div style={{fontSize:38}}>{s.icon}</div>
-              <span className="pill pill-b">{lessons.length} درس</span>
-            </div>
-            <div className="h3 mb6">{s.name}</div>
-            <div className="sm muted mb16" style={{minHeight:36}}>{s.desc}</div>
-            <div className="bar"><div className="bar-f bar-b" style={{width:`${p}%`}}/></div>
-            <div className="flex between center mt8">
-              <span className="xs muted">{done}/{lessons.length}</span>
-              <span className="xs" style={{color:'var(--blue2)',fontWeight:700}}>{p}%</span>
-            </div>
-          </div>;
-        })}
-      </div>
-    }
-  </>;
+async function saveNote(silent){
+if(!state.user || !state.lesson) return;
+if(!state.noteDirty && silent) return;
+
+state.noteSaving = true;
+updateNoteStatus('saving');
+
+try{
+const sb = await DB.getClient();
+const now = Date.now();
+const text = state.note;
+
+if(!text.trim()){
+if(state.noteId){
+await sb.from('notes').delete().eq('id', state.noteId);
+state.noteId = null;
+}
+state.noteDirty = false;
+state.noteSaving = false;
+updateNoteStatus('empty');
+return;
 }
 
-/* ═══════════ SubjectDetail ═══════════ */
-function SubjectDetail({subjectId,setSelected,setTab}){
-  const app=useApp();
-  const u=app.currentUser;
-  const s=app.subject(subjectId);
-  if(!s) return <Empty icon="❓" title="المادة غير موجودة"/>;
-  const units=app.db.units.filter(x=>x.subject_id===s.id).sort((a,b)=>a.sort_order-b.sort_order);
-  return <>
-    <button className="btn btn-s btn-sm mb16" onClick={()=>setTab('subjects')}>← المواد</button>
-    <div className="hero mb16">
-      <div className="flex center g16">
-        <div style={{fontSize:52}}>{s.icon}</div>
-        <div style={{flex:1,minWidth:0}}>
-          <div className="h1 mb6">{s.name}</div>
-          <div className="sm txt2">{s.desc}</div>
-        </div>
-      </div>
-    </div>
-
-    <div className="h3 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="book" size={18}/> الوحدات والدروس</div>
-    {units.map(un=>{
-      const lessons=app.db.lessons.filter(l=>l.unit_id===un.id&&l.published!==false).sort((a,b)=>{
-        const sa=Number(a.sort_order)||999999,sb=Number(b.sort_order)||999999;
-        if(sa!==sb) return sa-sb;
-        const ta=new Date(a.created_at||a.createdAt||0).getTime()||0;
-        const tb=new Date(b.created_at||b.createdAt||0).getTime()||0;
-        return ta-tb;
-      });
-      const exams=app.db.exams.filter(e=>e.unit_id===un.id&&e.published!==false).sort((a,b)=>{
-        const sa=Number(a.sort_order)||999999,sb=Number(b.sort_order)||999999;
-        if(sa!==sb) return sa-sb;
-        const ta=new Date(a.created_at||a.createdAt||0).getTime()||0;
-        const tb=new Date(b.created_at||b.createdAt||0).getTime()||0;
-        return ta-tb;
-      });
-      return <div key={un.id} className="glass mb16" style={{padding:18}}>
-        <div className="flex between center mb12">
-          <div style={{minWidth:0}}>
-            <div className="h4">{un.name}</div>
-            <div className="xs muted">{un.desc}</div>
-          </div>
-          <span className="pill pill-b">{lessons.length} درس</span>
-        </div>
-        {lessons.length===0?<div className="sm muted" style={{textAlign:'center',padding:12}}>لا توجد دروس في هذه الوحدة</div>:
-          <div className="grid g2">
-            {lessons.map(l=>{
-              const done=(u.completed_lessons||[]).includes(l.id);
-              const hasVideo=l.video&&l.video.url;
-              const note=app.getNote(l.id);
-              return <a key={l.id} href={`/student/lesson.html?id=${l.id}`} className="glass-s hv" style={{padding:14,textDecoration:'none',color:'inherit'}}
-                onClick={()=>{if(typeof fbq!=='undefined') fbq('trackCustom','ViewLesson',{lesson:l.title});}}>
-                <div className="flex between center mb6">
-                  <span className={`pill ${done?'pill-g':'pill-b'}`}>{done?<Icon name="check" size={12}/>:<Icon name="play" size={12}/>}</span>
-                  <div className="flex g6">
-                    {note && <span className="pill pill-y" style={{fontSize:10}}>📝</span>}
-                    {hasVideo&&<span className="pill pill-v" style={{fontSize:10}}>🎬</span>}
-                  </div>
-                </div>
-                <div className="h4" style={{fontSize:14}}>{l.title}</div>
-                <div className="xs muted mt6">⏱ {l.duration}د • +{l.xp} XP</div>
-              </a>;
-            })}
-          </div>
-        }
-        {exams.length>0&&<>
-          <div className="div"/>
-          <div className="h4 mb8" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="clipboard" size={14}/> اختبارات الوحدة</div>
-          <div className="grid g2">
-            {exams.map(e=>{
-              const attempts=(app.attempts||[]).filter(a=>a.exam_id===e.id);
-              const best=attempts.length?Math.max(...attempts.map(a=>a.pct)):0;
-              return <a key={e.id} href={`/student/exam.html?id=${e.id}`} className="glass-s hv" style={{padding:14,textDecoration:'none',color:'inherit'}}
-                onClick={()=>{if(typeof fbq!=='undefined') fbq('track','InitiateCheckout',{content_name:e.title});}}>
-                <div className="flex between center mb6">
-                  <span className={`pill ${best>=e.pass_score?'pill-g':'pill-a'}`}>{attempts.length?`أفضل: ${best}%`:'جديد'}</span>
-                  <span className="xs muted">⏱ {e.duration}د</span>
-                </div>
-                <div className="h4" style={{fontSize:14}}>{e.title}</div>
-                <div className="xs muted mt6">+{e.xp} XP • {(e.question_ids||[]).length} أسئلة</div>
-              </a>;
-            })}
-          </div>
-        </>}
-      </div>;
-    })}
-  </>;
+if(state.noteId){
+await sb.from('notes').update({text, updated_at: now}).eq('id', state.noteId);
+} else {
+const id = DB.uid('note_');
+await sb.from('notes').insert([{
+id,
+user_id: state.user.id,
+lesson_id: state.lesson.id,
+text,
+created_at: now,
+updated_at: now
+}]);
+state.noteId = id;
 }
 
-/* ═══════════ Missions ═══════════ */
-function Missions({setSelected,setTab}){
-  const app=useApp();
-  const u=app.currentUser;
-  const access=u.all_subjects?app.db.subjects.map(s=>s.id):(u.access_subjects||[]);
-  const missions=app.db.missions.filter(m=>access.includes(m.subject_id)).sort((a,b)=>a.sort_order-b.sort_order);
-  const complete=async m=>{
-    try{
-      await app.updateUser(u.id,{
-        completed_missions:[...(u.completed_missions||[]),m.id],
-        xp:(u.xp||0)+(m.xp||0)
-      });
-      DB.trackActivity({userId:u.id,userName:u.name,type:'mission_complete',target:m.title,details:{xp:m.xp}});
-      if(typeof fbq!=='undefined') fbq('trackCustom','CompleteMission',{mission:m.title,xp:m.xp});
-      app.toast.ok(`🎉 أكملت المهمة! +${m.xp} XP`);
-      await app.reload();
-    }catch(e){app.toast.err(e.message);}
-  };
-  return <>
-    <div className="h2 mb16">المهام</div>
-    {missions.length===0?<div className="glass" style={{padding:30}}><Empty icon="🎯" title="لا توجد مهام متاحة"/></div>:
-      <div className="grid g2">
-        {missions.map(m=>{
-          const done=(u.completed_missions||[]).includes(m.id);
-          const reqs=[];
-          (m.required_lessons||[]).forEach(lid=>{
-            const l=app.lesson(lid);
-            reqs.push({label:l?.title||'درس',done:(u.completed_lessons||[]).includes(lid)});
-          });
-          if(m.required_exam_id){
-            const e=app.exam(m.required_exam_id);
-            const passed=(app.attempts||[]).some(a=>a.exam_id===m.required_exam_id&&a.passed);
-            reqs.push({label:e?.title||'اختبار',done:passed});
-          }
-          const reqsDone=reqs.filter(r=>r.done).length;
-          const canComplete=reqs.length>0&&reqsDone===reqs.length;
-          const s=app.subject(m.subject_id);
-          return <div key={m.id} className="glass hv" style={{padding:20}}>
-            <div className="flex between center mb12">
-              <span className="pill pill-b">{s?.icon} {s?.name}</span>
-              <span className={`pill ${done?'pill-g':'pill-v'}`}>{done?'مكتملة':`+${m.xp} XP`}</span>
-            </div>
-            <div className="h3 mb6">{m.title}</div>
-            <div className="sm muted mb16">{m.desc}</div>
-            {reqs.length>0&&<div className="mb12">
-              <div className="flex between center mb8">
-                <span className="xs muted">المتطلبات</span>
-                <span className="xs" style={{color:'var(--blue2)',fontWeight:700}}>{reqsDone}/{reqs.length}</span>
-              </div>
-              {reqs.map((r,i)=><div key={i} className="flex g8 mb6" style={{alignItems:'center'}}>
-                <span style={{color:r.done?'var(--green)':'var(--muted)',fontWeight:800}}>{r.done?'✓':'○'}</span>
-                <span className="sm txt2">{r.label}</span>
-              </div>)}
-            </div>}
-            {!done&&canComplete&&<button className="btn btn-ok btn-block" onClick={()=>complete(m)}>🎉 استلام المكافأة</button>}
-            {!done&&!canComplete&&reqs.length>0&&<div className="sm muted" style={{textAlign:'center',padding:8}}>أكمل المتطلبات أعلاه</div>}
-            {done&&<div className="sm" style={{textAlign:'center',color:'var(--green)',fontWeight:700}}>🎯 مكتملة</div>}
-          </div>;
-        })}
-      </div>
-    }
-  </>;
+state.noteDirty = false;
+state.noteSaving = false;
+updateNoteStatus('saved');
+
+if(!silent){
+DB.trackActivity({
+userId: state.user.id,
+userName: state.user.name,
+type: "note_save",
+target: state.lesson.title,
+details: { lesson: state.lesson.title }
+});
+}
+}catch(e){
+console.warn('saveNote:', e);
+state.noteSaving = false;
+updateNoteStatus('error');
+if(!silent){
+Swal.fire({
+icon: 'error',
+title: 'خطأ',
+text: 'فشل حفظ الملاحظة',
+background: 'linear-gradient(180deg, #151f38, #0b1122)',
+color: '#e8eefc',
+confirmButtonColor: '#2f7dff',
+customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
+});
+}
+}
 }
 
-/* ═══════════ Achievements ═══════════ */
-function Achievements(){
-  const app=useApp();
-  const u=app.currentUser;
-  return <>
-    <div className="h2 mb16">الإنجازات</div>
-    {app.db.achievements.length===0?<div className="glass" style={{padding:30}}><Empty icon="🏆" title="لا توجد إنجازات"/></div>:
-      <div className="grid g-auto">
-        {app.db.achievements.map(a=>{
-          const got=(u.achievements||[]).includes(a.id);
-          return <div key={a.id} className={`glass hv ${got?'':'lock'}`} style={{padding:20,textAlign:'center'}}>
-            <div style={{fontSize:44,marginBottom:8}}>{a.icon}</div>
-            <div className="h4 mb6">{a.title}</div>
-            <div className="sm muted mb12">{a.desc}</div>
-            {got?<span className="pill pill-g">✓ محقق</span>:<span className="pill pill-y">🔒 مقفول</span>}
-          </div>;
-        })}
-      </div>
-    }
-  </>;
+function scheduleAutoSave(){
+if(state.noteTimer) clearTimeout(state.noteTimer);
+state.noteTimer = setTimeout(()=>{
+saveNote(true);
+}, 1500);
 }
 
-/* ═══════════ ErrorBook ═══════════ */
-function ErrorBook(){
-  const app=useApp();
-  const errs=app.errors;
-  return <>
-    <div className="h2 mb16">دفتر أخطائي</div>
-    {errs.length===0?<div className="glass" style={{padding:30}}><Empty icon="✨" title="لا توجد أخطاء — أحسنت!"/></div>:
-      errs.map((e,i)=>{
-        const q=app.question(e.question_id);
-        if(!q) return null;
-        const l=app.lesson(q.lesson_id);
-        return <div key={i} className="glass mb12" style={{padding:16}}>
-          <div className="flex between center mb8">
-            <span className="pill pill-r">أخطأت {e.count||1} مرة</span>
-            <span className="xs muted">{new Date(e.at).toLocaleDateString('ar-EG')}</span>
-          </div>
-          <div className="h4 mb12">{q.text}</div>
-          <div className="grid g2 mb12">
-            <div className="eb">
-              <div className="xs muted">إجابتك</div>
-              <div className="sm" style={{color:'var(--red)'}}>{q.options[e.given]||'—'}</div>
-            </div>
-            <div className="eb">
-              <div className="xs muted">الإجابة الصحيحة</div>
-              <div className="sm" style={{color:'var(--green)'}}>{q.options[q.correct[0]]}</div>
-            </div>
-          </div>
-          <div className="glass-s" style={{padding:10}}>
-            <div className="xs muted mb6"><b style={{color:'var(--blue2)'}}>💡 الشرح:</b> {q.explanation}</div>
-            {l&&<div className="xs">📖 الدرس: <b>{l.title}</b></div>}
-          </div>
-        </div>;
-      })
-    }
-  </>;
+function openPlayer(lesson, user){
+const video = lesson.video || {};
+const url = video.url || "";
+const type = video.type || "youtube";
+
+if(!url){
+Swal.fire({
+icon: 'warning',
+title: 'لا يوجد فيديو',
+text: 'هذا الدرس لا يحتوي على فيديو',
+background: 'linear-gradient(180deg, #151f38, #0b1122)',
+color: '#e8eefc',
+confirmButtonColor: '#2f7dff',
+customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
+});
+return;
 }
 
-/* ═══════════ Leaderboard ═══════════ */
-function Leaderboard(){
-  const app=useApp();
-  const u=app.currentUser;
-  const [period,setPeriod]=useState('week');
-  
-  const weekStart = useMemo(()=>{
-    const d=new Date();
-    const day=d.getDay();
-    const diff=d.getDate()-day;
-    const ws=new Date(d.setDate(diff));
-    ws.setHours(0,0,0,0);
-    return ws.getTime();
-  },[]);
+const playerTitle = document.getElementById('playerTitle');
+if(playerTitle) playerTitle.textContent = lesson.title || 'الدرس';
 
-  const weekXpByUser = useMemo(()=>{
-    const map={};
-    app.db.activity.forEach(a=>{
-      if(a.at && a.at >= weekStart && a.type === 'lesson_complete'){
-        const xp = (a.details && a.details.xp) || 20;
-        map[a.user_id] = (map[a.user_id] || 0) + xp;
-      }
-      if(a.at && a.at >= weekStart && a.type === 'exam_submit' && a.details && a.details.passed){
-        map[a.user_id] = (map[a.user_id] || 0) + 50;
-      }
-    });
-    return map;
-  }, [app.db.activity, weekStart]);
-
-  const sorted = useMemo(()=>{
-    return [...app.db.users.filter(x=>x.role==='student'&&x.active!==false)]
-      .map(s=>({...s,weekXp: period==='week' ? (weekXpByUser[s.id]||0) : (s.xp||0)}))
-      .sort((a,b)=>b.weekXp-a.weekXp).slice(0,10);
-  }, [app.db.users, weekXpByUser, period]);
-
-  return <>
-    <div className="flex between center mb16 wrap g8">
-      <div className="h2">🏅 المتصدرون</div>
-      <div className="flex g6" style={{background:'rgba(255,255,255,.03)',padding:5,borderRadius:13}}>
-        <button onClick={()=>setPeriod('week')} style={{padding:'8px 16px',borderRadius:10,background:period==='week'?'rgba(47,125,255,.22)':'transparent',border:period==='week'?'1px solid var(--blue)':'1px solid transparent',color:period==='week'?'#fff':'var(--txt2)',fontWeight:700,fontSize:13,cursor:'pointer',fontFamily:'inherit'}}>هذا الأسبوع</button>
-        <button onClick={()=>setPeriod('all')} style={{padding:'8px 16px',borderRadius:10,background:period==='all'?'rgba(47,125,255,.22)':'transparent',border:period==='all'?'1px solid var(--blue)':'1px solid transparent',color:period==='all'?'#fff':'var(--txt2)',fontWeight:700,fontSize:13,cursor:'pointer',fontFamily:'inherit'}}>الكل</button>
-      </div>
-    </div>
-    {period==='week'&&<div className="glass-s mb16" style={{padding:12,borderColor:'var(--border2)'}}>
-      <div className="xs muted" style={{textAlign:'center'}}>🔥 يتم تحديث الترتيب الأسبوعي تلقائيًا كل يوم أحد</div>
-    </div>}
-    {sorted.length===0?<div className="glass" style={{padding:30}}><Empty icon="🏅" title="لا يوجد طلاب بعد"/></div>:
-      <div className="glass" style={{padding:14}}>
-        <div className="sx">
-          <table className="tbl">
-            <thead><tr><th>#</th><th>الطالب</th><th>{period==='week'?'XP الأسبوع':'XP الكلي'}</th><th>المستوى</th></tr></thead>
-            <tbody>
-              {sorted.map((s,i)=>{
-                const {current}=app.getLevel(s.xp||0);
-                const isMe=s.id===u.id;
-                return <tr key={s.id} style={{background:isMe?'rgba(47,125,255,.06)':'transparent'}}>
-                  <td><div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div></td>
-                  <td><div className="flex center g8">
-                    <div className="avatar" style={{width:32,height:32,fontSize:14}}>{s.avatar||'👤'}</div>
-                    <span>{s.name} {isMe&&<span className="pill pill-b" style={{marginInlineStart:6}}>أنت</span>}</span>
-                  </div></td>
-                  <td><b>{DB.fmt(s.weekXp)}</b></td>
-                  <td><span className="pill pill-v">Lv {current.level} — {current.name}</span></td>
-                </tr>;
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    }
-  </>;
+const watermark = document.getElementById('watermark');
+if(watermark){
+const phone = (user.country_code || '') + (user.phone || '') || user.name || 'طالب';
+watermark.textContent = phone;
 }
 
-/* ═══════════ Notes Page ═══════════ */
-function NotesPage({setTab}){
-  const app=useApp();
-  const notes = app.notes || [];
-  const sortedNotes = useMemo(()=>[...notes].sort((a,b)=>(b.updated_at||0)-(a.updated_at||0)),[notes]);
-  const [editing,setEditing]=useState(null);
-  const [text,setText]=useState('');
-  const startEdit=(n)=>{setEditing(n.id);setText(n.text||'');};
-  const cancelEdit=()=>{setEditing(null);setText('');};
-  const saveEdit=async (n)=>{
-    try{await app.saveNote(n.lesson_id,text);app.toast.ok('تم الحفظ');setEditing(null);}
-    catch(e){app.toast.err(e.message);}
-  };
-  const delNote=async (n)=>{
-    const r=await Swal.fire({
-      title:'حذف الملاحظة؟',icon:'warning',showCancelButton:true,
-      confirmButtonText:'نعم',cancelButtonText:'إلغاء',
-      confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
-      background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',
-      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
-    });
-    if(!r.isConfirmed) return;
-    try{
-      const sb=await DB.getClient();
-      await sb.from('notes').delete().eq('id',n.id);
-      app.reloadUserData();
-      app.toast.warn('تم الحذف');
-    }catch(e){app.toast.err(e.message);}
-  };
-  return <>
-    <div className="flex between center mb16 wrap g8">
-      <div>
-        <div className="h2 grad">📝 ملاحظاتي</div>
-        <div className="sm muted mt6">كل ملاحظاتك على الدروس في مكان واحد</div>
-      </div>
-      <span className="pill pill-b">{sortedNotes.length} ملاحظة</span>
-    </div>
-    {sortedNotes.length===0?<div className="glass" style={{padding:30}}><Empty icon="📝" title="لا توجد ملاحظات" desc="ابدأ بكتابة ملاحظاتك من صفحة الدرس"/></div>:
-      <div className="grid g2">
-        {sortedNotes.map(n=>{
-          const l = app.lesson(n.lesson_id);
-          const isEditing = editing===n.id;
-          return <div key={n.id} className="glass" style={{padding:16}}>
-            <div className="flex between center mb12">
-              <div className="flex center g8" style={{flex:1,minWidth:0}}>
-                <span className="pill pill-b" style={{fontSize:11}}><Icon name="note" size={11}/> درس</span>
-                {l?<a href={`/student/lesson.html?id=${l.id}`} className="sm" style={{fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{l.title}</a>:<span className="sm muted">درس محذوف</span>}
-              </div>
-              <span className="xs muted">{new Date(n.updated_at||n.created_at).toLocaleDateString('ar-EG')}</span>
-            </div>
-            {isEditing?<>
-              <textarea className="input" value={text} onChange={e=>setText(e.target.value)} rows="5"/>
-              <div className="flex g8 mt12">
-                <button className="btn btn-p btn-sm" style={{flex:1}} onClick={()=>saveEdit(n)}>💾 حفظ</button>
-                <button className="btn btn-s btn-sm" onClick={cancelEdit}>إلغاء</button>
-              </div>
-            </>:<>
-              <div className="sm txt2" style={{background:'rgba(0,0,0,.20)',padding:10,borderRadius:10,borderInlineStart:'2px solid var(--blue)',whiteSpace:'pre-wrap',minHeight:60}}>{n.text||'—'}</div>
-              <div className="flex g8 mt12">
-                <button className="btn btn-s btn-sm" style={{flex:1}} onClick={()=>startEdit(n)}><Icon name="edit" size={12}/> تعديل</button>
-                <button className="btn btn-dn btn-sm" onClick={()=>delNote(n)}><Icon name="trash" size={12}/></button>
-              </div>
-            </>}
-          </div>;
-        })}
-      </div>
-    }
-  </>;
+const container = document.getElementById('playerContainer');
+if(container){
+if(type === 'youtube'){
+const ytId = getYouTubeId(url);
+if(ytId){
+container.innerHTML = `<iframe
+src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&fs=1&autoplay=1&showinfo=0&controls=1&disablekb=0"
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+allowfullscreen
+referrerpolicy="strict-origin-when-cross-origin"
+title="فيديو الدرس"
+></iframe>`;
+} else {
+container.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:Tajawal,sans-serif">رابط YouTube غير صالح</div>`;
+}
+} else if(type === 'vimeo'){
+const vId = (url.match(/vimeo\.com\/(?:video\/)?(\d+)/) || [])[1];
+container.innerHTML = `<iframe
+src="https://player.vimeo.com/video/${vId}?byline=0&portrait=0&title=0&dnt=1&autoplay=1"
+allow="autoplay; fullscreen; picture-in-picture"
+allowfullscreen
+title="فيديو الدرس"
+></iframe>`;
+} else if(type === 'mp4'){
+container.innerHTML = `<video
+id="mp4Video"
+controls
+controlsList="nodownload noremoteplayback noplaybackrate"
+disablePictureInPicture
+playsinline
+autoplay
+style="position:absolute;inset:0;width:100%;height:100%;background:#000;object-fit:contain"
+>
+<source src="${esc(url)}" type="video/mp4"/>
+</video>`;
+} else {
+container.innerHTML = `<iframe
+src="${esc(url)}"
+allowfullscreen
+sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"
+title="فيديو الدرس"
+></iframe>`;
+}
 }
 
-/* ═══════════ Polls Page (طالب) ═══════════ */
-function PollsPage(){
-  const app=useApp();
-  const u=app.currentUser;
-  const [loading,setLoading]=useState(true);
-  const [polls,setPolls]=useState([]);
-  const [votes,setVotes]=useState([]);
-  const [voting,setVoting]=useState(null);
-
-  const loadData = useCallback(async ()=>{
-    try{
-      await DB.cleanupExpiredPolls();
-      const sb = await DB.getClient();
-      const [pRes, vRes] = await Promise.all([
-        sb.from('polls').select('*').eq('active', true).order('created_at',{ascending:false}),
-        sb.from('poll_votes').select('*')
-      ]);
-      const now = Date.now();
-      const activePolls = (pRes.data || []).filter(p => !p.ends_at || p.ends_at > now);
-      setPolls(activePolls);
-      setVotes(vRes.data || []);
-    }catch(e){console.warn(e);}
-    setLoading(false);
-  },[]);
-
-  useEffect(()=>{ loadData(); },[loadData]);
-
-  const myVote = (pollId) => votes.find(v => v.poll_id === pollId && v.user_id === u.id);
-
-  const vote = async (poll, optionIndex) => {
-    if(myVote(poll.id)) return app.toast.warn('صوّت بالفعل');
-    setVoting(poll.id + ':' + optionIndex);
-    try{
-      const sb = await DB.getClient();
-      await sb.from('poll_votes').insert([{
-        id: DB.uid('vote_'),
-        poll_id: poll.id,
-        user_id: u.id,
-        option_index: optionIndex,
-        created_at: Date.now()
-      }]);
-      await loadData();
-      app.toast.ok('✅ تم تسجيل صوتك');
-      if(typeof fbq!=='undefined') fbq('trackCustom','PollVote',{poll:poll.question});
-      DB.trackActivity({
-        userId: u.id, userName: u.name, type: 'poll_vote',
-        target: poll.question, details: { poll_id: poll.id, option: optionIndex }
-      });
-    }catch(e){ app.toast.err(e.message); }
-    setVoting(null);
-  };
-
-  const getStats = (poll) => {
-    const pollVotes = votes.filter(v => v.poll_id === poll.id);
-    const total = pollVotes.length;
-    const counts = (poll.options||[]).map((_, i) =>
-      pollVotes.filter(v => v.option_index === i).length
-    );
-    return { total, counts };
-  };
-
-  return <>
-    <div className="flex between center mb16 wrap g8">
-      <div>
-        <div className="h2 grad">🗳️ استطلاعات الرأي</div>
-        <div className="sm muted mt6">شاركنا رأيك — صوتك يهمنا</div>
-      </div>
-      <span className="pill pill-b">{polls.length} استطلاع</span>
-    </div>
-
-    {loading ? (
-      <div className="glass" style={{padding:40,textAlign:'center'}}>
-        <div className="spinner" style={{margin:'0 auto 14px'}}></div>
-        جارٍ التحميل...
-      </div>
-    ) : polls.length === 0 ? (
-      <div className="glass" style={{padding:30}}>
-        <Empty icon="🗳️" title="لا توجد استطلاعات حالياً" desc="هيظهر هنا أي استطلاع جديد"/>
-      </div>
-    ) : (
-      <div className="flex col g16">
-        {polls.map(p => {
-          const { total, counts } = getStats(p);
-          const mine = myVote(p.id);
-          const hasVoted = !!mine;
-          return <div key={p.id} className="glass" style={{padding:22}}>
-            <div className="flex between center mb16 wrap g8">
-              <span className="pill pill-b">📊 {total} صوت</span>
-              {hasVoted && <span className="pill pill-g">✓ صوّتت</span>}
-            </div>
-
-            <div className="h3 mb16" style={{lineHeight:1.5}}>{p.question}</div>
-
-            <div className="flex col g10">
-              {(p.options||[]).map((opt, i) => {
-                const cnt = counts[i] || 0;
-                const perc = total ? Math.round((cnt/total)*100) : 0;
-                const isMyPick = mine && mine.option_index === i;
-                const isVoting = voting === p.id + ':' + i;
-
-                if(!hasVoted){
-                  return <button key={i}
-                    onClick={()=>vote(p, i)}
-                    disabled={!!voting}
-                    className="glass-s hv"
-                    style={{
-                      padding:'14px 18px',
-                      cursor: isVoting ? 'wait' : 'pointer',
-                      textAlign:'right',
-                      display:'flex',
-                      alignItems:'center',
-                      gap:12,
-                      border: '1.5px solid var(--border)',
-                      fontFamily:'inherit',
-                      color:'inherit',
-                      width:'100%',
-                      transition:'.2s'
-                    }}
-                  >
-                    <span style={{
-                      width:32,height:32,borderRadius:'50%',
-                      display:'grid',placeItems:'center',
-                      background:'rgba(47,125,255,.12)',
-                      border:'1.5px solid var(--border2)',
-                      fontWeight:800,fontSize:13,
-                      color:'var(--blue2)',
-                      flexShrink:0
-                    }}>{['أ','ب','ج','د','هـ','و'][i]}</span>
-                    <span style={{flex:1,fontWeight:600}}>{opt}</span>
-                    {isVoting && <span className="spinner" style={{width:16,height:16,borderWidth:2}}/>}
-                  </button>;
-                }
-
-                return <div key={i} className="glass-s" style={{
-                  padding:'14px 18px',
-                  border: isMyPick ? '1.5px solid var(--green)' : '1.5px solid var(--border)',
-                  background: isMyPick ? 'rgba(34,197,94,.08)' : 'rgba(21,31,56,.62)'
-                }}>
-                  <div className="flex between center mb8">
-                    <div className="flex g8 center">
-                      <span style={{
-                        width:32,height:32,borderRadius:'50%',
-                        display:'grid',placeItems:'center',
-                        background: isMyPick ? 'var(--green)' : 'rgba(47,125,255,.12)',
-                        color: isMyPick ? '#fff' : 'var(--blue2)',
-                        border: isMyPick ? 'none' : '1.5px solid var(--border2)',
-                        fontWeight:800,fontSize:13,
-                        flexShrink:0
-                      }}>{['أ','ب','ج','د','هـ','و'][i]}</span>
-                      <span style={{fontWeight:600}}>{opt}</span>
-                      {isMyPick && <span className="pill pill-g" style={{fontSize:10}}>اختيارك</span>}
-                    </div>
-                    <div className="flex g6 center">
-                      <span className="xs muted">{cnt}</span>
-                      <span className="sm" style={{fontWeight:800,color:isMyPick?'var(--green)':'var(--blue2)'}}>{perc}%</span>
-                    </div>
-                  </div>
-                  <div className="bar" style={{height:8}}>
-                    <div
-                      className={`bar-f ${isMyPick?'bar-g':'bar-b'}`}
-                      style={{width:`${perc}%`}}
-                    />
-                  </div>
-                </div>;
-              })}
-            </div>
-
-            {p.ends_at && (
-              <div className="xs muted mt16" style={{textAlign:'center'}}>
-                ⏰ ينتهي: {DB.formatDate(p.ends_at)}
-              </div>
-            )}
-          </div>;
-        })}
-      </div>
-    )}
-  </>;
+const modal = document.getElementById('playerModal');
+if(modal){
+modal.classList.add('open');
+document.body.style.overflow = 'hidden';
 }
 
-/* ═══════════ Notifications ═══════════ */
-function Notifications(){
-  const app=useApp();
-  const u=app.currentUser;
-  const list=app.db.notifications.filter(n=>n.target==='all'||n.target===u.id).sort((a,b)=>b.created_at-a.created_at);
-  const markRead=async id=>{
-    try{
-      const n=list.find(x=>x.id===id);
-      const readBy=[...(n.read_by||[])];
-      if(!readBy.includes(u.id)) readBy.push(u.id);
-      await DB.save('notifications',{...n,read_by:readBy});
-      await app.reload();
-    }catch(e){}
-  };
-  return <>
-    <div className="h2 mb16">الإشعارات</div>
-    {list.length===0?<div className="glass" style={{padding:30}}><Empty icon="🔕" title="لا توجد إشعارات"/></div>:
-      list.map(n=>{
-        const read=(n.read_by||[]).includes(u.id);
-        return <div key={n.id} className="glass mb12" style={{padding:16,borderColor:read?'var(--border)':'var(--border2)'}}>
-          <div className="flex between center mb6">
-            <div className="h4">{n.title} {!read&&<span className="pill pill-b" style={{marginInlineStart:8}}>جديد</span>}</div>
-            <span className="xs muted">{new Date(n.created_at).toLocaleDateString('ar-EG')}</span>
-          </div>
-          <div className="sm txt2 mb12">{n.body}</div>
-          {!read&&<button className="btn btn-s btn-sm" onClick={()=>markRead(n.id)}>تحديد كمقروء</button>}
-        </div>;
-      })
-    }
-  </>;
+setTimeout(()=>{
+enterFullscreenLandscape();
+}, 100);
+
+startWatermarkMotion();
+
+try{
+DB.trackActivity({
+userId: user.id, userName: user.name,
+type: "video_play", target: lesson.title,
+details: { lesson: lesson.title }
+});
+}catch(e){}
 }
 
-/* ═══════════ Profile Redirect ═══════════ */
-function ProfileRedirect(){
-  useEffect(()=>{ window.location.href = "/student/profile.html"; },[]);
-  return <div className="loading"><div className="spinner"></div>جارٍ التحويل...</div>;
+function closePlayer(){
+const modal = document.getElementById('playerModal');
+if(modal){
+modal.classList.remove('open');
+modal.classList.remove('fullscreen');
+}
+document.body.style.overflow = '';
+
+exitFullscreen();
+lockOrientation('portrait');
+
+const container = document.getElementById('playerContainer');
+if(container) container.innerHTML = '';
+
+stopWatermarkMotion();
 }
 
-/* ═══════════ Footer ═══════════ */
-function Footer(){
-  const app=useApp();
-  const u=app.currentUser;
-  const sendReport=async ()=>{
-    const { value: msg } = await Swal.fire({
-      title: '🚨 بلاغ عن مشكلة', input: 'textarea',
-      inputPlaceholder: 'اكتب رسالتك هنا...',
-      showCancelButton: true, confirmButtonText: '📤 إرسال', cancelButtonText: 'إلغاء',
-      confirmButtonColor: '#2f7dff', cancelButtonColor: '#64748b',
-      inputValidator: v => { if(!v || v.trim().length < 5) return 'يرجى كتابة رسالة واضحة'; },
-      customClass: {popup:'swal-custom-popup',title:'swal-custom-title',input:'swal-custom-input',confirmButton:'swal-custom-confirm',cancelButton:'swal-custom-cancel'}
-    });
-    if(msg){
-      Swal.fire({title:'جارٍ الإرسال...',allowOutsideClick:false,didOpen:()=>Swal.showLoading(),customClass:{popup:'swal-custom-popup'}});
-      const sent = await DB.reportIssue({
-        userName: u?.name || 'زائر',
-        userPhone: (u?.country_code || '+20') + (u?.phone || '—'),
-        message: msg
-      });
-      if(typeof fbq!=='undefined') fbq('track','Contact');
-      Swal.fire({icon: sent?'success':'error', title: sent?'✅ تم الإرسال':'❌ فشل', text: sent?'شكرًا لك':'حاول مرة أخرى', confirmButtonColor:'#2f7dff', customClass:{popup:'swal-custom-popup',title:'swal-custom-title',confirmButton:'swal-custom-confirm'}});
-    }
-  };
-  return <div className="footer-dev">
-    <button className="dev-btn" onClick={()=>window.open("https://wa.me/201128351702?text="+encodeURIComponent("مرحبًا، أريد الاستفسار عن منصة MISSION EDU"),"_blank")}>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      <span className="dev-name">Developed by <b>EL-sayed Hasan</b></span>
-    </button>
-    <button className="tg-btn" onClick={sendReport}>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-      <span>بلاغ</span>
-    </button>
-  </div>;
+async function enterFullscreenLandscape(){
+const modal = document.getElementById('playerModal');
+const box = modal?.querySelector('.player-box');
+
+try{
+if(box){
+if(box.requestFullscreen){
+await box.requestFullscreen();
+} else if(box.webkitRequestFullscreen){
+box.webkitRequestFullscreen();
+} else if(box.msRequestFullscreen){
+box.msRequestFullscreen();
+}
 }
 
-/* ═══════════ StudentApp ═══════════ */
-function StudentApp(){
-  const app=useApp();
-  const user=app.currentUser;
-
-  const [tab,setTab]=useState(()=>{
-    try{return localStorage.getItem('student_tab')||'home';}catch(e){return 'home';}
-  });
-
-  const [selected,setSelected]=useState(()=>{
-    try{const saved=localStorage.getItem('student_selected');return saved?JSON.parse(saved):null;}catch(e){return null;}
-  });
-
-  const [sidebarOpen,setSidebarOpen]=useState(false);
-  const [searchResults,setSearchResults]=useState([]);
-
-  useEffect(()=>{try{localStorage.setItem('student_tab',tab);}catch(e){}},[tab]);
-  useEffect(()=>{
-    try{
-      if(selected) localStorage.setItem('student_selected',JSON.stringify(selected));
-      else localStorage.removeItem('student_selected');
-    }catch(e){}
-  },[selected]);
-  useEffect(()=>{
-    if(typeof fbq!=='undefined'){
-      fbq('trackCustom','Navigate',{tab});
-    }
-  },[tab]);
-
-  const handleNav = (id)=>{
-    if(id !== 'subject') setSelected(null);
-    setTab(id);
-  };
-
-  const unread=app.db.notifications.filter(n=>(n.target==='all'||n.target===user.id)&&!(n.read_by||[]).includes(user.id)).length;
-
-  const items=[{title:'',items:[
-    {id:'home',icon:'home',label:'الرئيسية'},
-    {id:'subjects',icon:'book',label:'المواد'},
-    {id:'missions',icon:'target',label:'المهام'},
-    {id:'achievements',icon:'trophy',label:'الإنجازات'},
-    {id:'notes',icon:'note',label:'ملاحظاتي',badge:app.notes?.length||null},
-    {id:'polls',icon:'activity',label:'استطلاعات الرأي'},
-    {id:'errors',icon:'alert',label:'دفتر أخطائي'},
-    {id:'leaderboard',icon:'medal',label:'المتصدرون'},
-    {id:'notifications',icon:'bell',label:'الإشعارات',badge:unread||null},
-    {id:'profile',icon:'user',label:'الملف الشخصي'}
-  ]}];
-
-  const onSearch=q=>{
-    const lc=q.toLowerCase(),res=[];
-    const access=user.all_subjects?app.db.subjects.map(s=>s.id):(user.access_subjects||[]);
-    app.db.lessons.filter(l=>{
-      const un=app.unit(l.unit_id);
-      return un&&access.includes(un.subject_id)&&l.published!==false&&(l.title.toLowerCase().includes(lc)||(l.desc||'').toLowerCase().includes(lc));
-    }).slice(0,5).forEach(l=>res.push({type:'درس',icon:<Icon name="book" size={16}/>,title:l.title,href:`/student/lesson.html?id=${l.id}`}));
-    app.db.exams.filter(e=>access.includes(e.subject_id)&&e.title.toLowerCase().includes(lc)).forEach(e=>res.push({type:'اختبار',icon:<Icon name="clipboard" size={16}/>,title:e.title,href:`/student/exam.html?id=${e.id}`}));
-    setSearchResults(res);
-  };
-
-  return <div className="app">
-    <Sidebar items={items} active={tab} onNav={handleNav} open={sidebarOpen} onClose={()=>setSidebarOpen(false)}/>
-    <div className="main">
-      <Topbar
-        user={user}
-        onMenu={()=>setSidebarOpen(true)}
-        onLogout={app.logout}
-        onSearch={onSearch}
-        searchResults={searchResults}
-        unreadNotifs={unread}
-        onOpenNotifications={()=>handleNav('notifications')}
-      />
-      <div className="content">
-        {tab==='home'&&<Home onNav={setTab} setSelected={setSelected}/>}
-        {tab==='subjects'&&<Subjects setSelected={setSelected} setTab={setTab}/>}
-        {tab==='subject'&&selected&&<SubjectDetail subjectId={selected.id} setSelected={setSelected} setTab={setTab}/>}
-        {tab==='missions'&&<Missions setSelected={setSelected} setTab={setTab}/>}
-        {tab==='achievements'&&<Achievements/>}
-        {tab==='notes'&&<NotesPage setTab={setTab}/>}
-        {tab==='polls'&&<PollsPage/>}
-        {tab==='errors'&&<ErrorBook/>}
-        {tab==='leaderboard'&&<Leaderboard/>}
-        {tab==='notifications'&&<Notifications/>}
-        {tab==='profile'&&<ProfileRedirect/>}
-        <Footer/>
-      </div>
-    </div>
-    <div className="btmnav">
-      {[
-        {id:'home',icon:'home',label:'الرئيسية'},
-        {id:'subjects',icon:'book',label:'المواد'},
-        {id:'missions',icon:'target',label:'المهام'},
-        {id:'polls',icon:'activity',label:'استطلاعات'},
-        {id:'notes',icon:'note',label:'ملاحظاتي'}
-      ].map(it=><button key={it.id} className={tab===it.id?'on':''} onClick={()=>handleNav(it.id)}>
-        <span className="i"><Icon name={it.icon} size={19}/></span>
-        <span className="lbl-txt">{it.label}</span>
-      </button>)}
-    </div>
-  </div>;
+if(screen.orientation && screen.orientation.lock){
+try{
+await screen.orientation.lock('landscape');
+}catch(e){
+console.warn('Orientation lock failed:', e.message);
+}
 }
 
-/* ═══════════ Root + App ═══════════ */
-function Root(){
-  const app=useApp();
-  if(app.loading) return <div className="loading"><div className="spinner"></div>جارٍ التحميل...</div>;
-  if(!app.currentUser) return null;
-  if(app.currentUser.role==='admin') return null;
-  return <StudentApp/>;
+modal.classList.add('fullscreen');
+state.isFullscreen = true;
+
+}catch(e){
+console.warn('Fullscreen failed:', e.message);
+modal.classList.add('fullscreen');
+state.isFullscreen = true;
+}
 }
 
-function App(){return <ToastProvider><AppProvider><Root/></AppProvider></ToastProvider>;}
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+async function exitFullscreen(){
+try{
+if(document.fullscreenElement){
+if(document.exitFullscreen) await document.exitFullscreen();
+else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+else if(document.msExitFullscreen) document.msExitFullscreen();
+}
+}catch(e){}
+
+state.isFullscreen = false;
+
+if(screen.orientation && screen.orientation.unlock){
+try{ screen.orientation.unlock(); }catch(e){}
+}
+}
+
+async function lockOrientation(mode){
+if(screen.orientation && screen.orientation.lock){
+try{
+await screen.orientation.lock(mode);
+}catch(e){}
+}
+}
+
+function toggleFullscreen(){
+const modal = document.getElementById('playerModal');
+if(!modal) return;
+
+if(state.isFullscreen){
+exitFullscreen().then(()=>{
+modal.classList.remove('fullscreen');
+lockOrientation('portrait');
+});
+} else {
+enterFullscreenLandscape();
+}
+}
+
+function moveWatermark(){
+const wm = document.getElementById('watermark');
+const stage = document.getElementById('playerStage');
+if(!wm || !stage) return;
+
+const w = stage.offsetWidth;
+const h = stage.offsetHeight;
+
+const maxX = Math.max(20, w - 180);
+const maxY = Math.max(20, h - 50);
+
+const x = Math.floor(Math.random() * maxX) + 10;
+const y = Math.floor(Math.random() * maxY) + 10;
+
+wm.style.left = x + 'px';
+wm.style.top = y + 'px';
+wm.style.right = 'auto';
+wm.style.bottom = 'auto';
+}
+
+function startWatermarkMotion(){
+moveWatermark();
+state.watermarkTimer = setInterval(moveWatermark, 5000);
+}
+
+function stopWatermarkMotion(){
+if(state.watermarkTimer){
+clearInterval(state.watermarkTimer);
+state.watermarkTimer = null;
+}
+}
+
+function attachProtection(){
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+document.addEventListener('keydown', e => {
+if(e.key === 'F12'){ e.preventDefault(); return false; }
+if(e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())){ e.preventDefault(); return false; }
+if(e.ctrlKey && e.key.toUpperCase() === 'U'){ e.preventDefault(); return false; }
+if(e.ctrlKey && e.key.toUpperCase() === 'S'){ e.preventDefault(); return false; }
+if(e.ctrlKey && e.key.toUpperCase() === 'P'){ e.preventDefault(); return false; }
+if(e.key === 'PrintScreen'){
+try{ navigator.clipboard.writeText(''); }catch(err){}
+}
+if(e.key === 'Escape'){
+const modal = document.getElementById('playerModal');
+if(modal && modal.classList.contains('open')) closePlayer();
+}
+});
+
+document.addEventListener('copy', e => e.preventDefault());
+document.addEventListener('cut', e => e.preventDefault());
+document.addEventListener('dragstart', e => e.preventDefault());
+document.addEventListener('selectstart', e => {
+const t = e.target?.tagName?.toLowerCase();
+if(t !== 'input' && t !== 'textarea') e.preventDefault();
+});
+document.addEventListener('dblclick', e => e.preventDefault());
+
+document.addEventListener('fullscreenchange', ()=>{
+const modal = document.getElementById('playerModal');
+if(!document.fullscreenElement && modal && modal.classList.contains('open')){
+}
+});
+}
+
+function buildPlayerHTML(video, lessonTitle){
+if(!video || !video.url){
+return `<div class="vid-shell"><div class="vp-error"><div style="font-size:48px;opacity:.35;margin-bottom:12px">🎬</div><div>لا يوجد فيديو لهذا الدرس</div></div></div>`;
+}
+
+return `
+<div class="vid-shell" id="vidShell">
+<div class="vp-error" style="background:linear-gradient(135deg,rgba(4,6,14,.92),rgba(11,18,38,.94));display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%">
+<div id="btnOpenPlayer" style="width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 16px 50px rgba(47,125,255,.55);padding-right:6px;margin-bottom:20px;cursor:pointer;animation:pulsePlay 2.5s ease-in-out infinite">
+<svg width="36" height="36" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+</div>
+<div style="font-size:20px;font-weight:900;color:#e8eefc;margin-bottom:8px;text-align:center;padding:0 16px">${esc(lessonTitle)}</div>
+<div style="font-size:13px;color:#7f93b8;margin-bottom:20px">اضغط لتشغيل الفيديو في وضع ملء الشاشة</div>
+<div style="font-size:11.5px;color:#7f93b8;opacity:.7">🛡 المشاهدة محمية — لا يمكن التحميل أو النسخ</div>
+</div>
+</div>
+`;
+}
+
+function render(){
+const l = state.lesson;
+const u = state.user;
+
+app.innerHTML = `
+<div class="fade-in">
+<div class="flex between center wrap-fl g12 mb16">
+<div>
+<div class="h1 mb6">${esc(l.title)}</div>
+<div class="flex wrap-fl g8 xs muted">
+<span>⏱ ${l.duration || 15} دقيقة</span>
+<span>•</span>
+<span>+${l.xp || 20} XP</span>
+${state.subject ? `<span>•</span><span>${esc(state.subject.name)}</span>` : ''}
+${state.unit ? `<span>•</span><span>${esc(state.unit.name)}</span>` : ''}
+</div>
+</div>
+${state.isDone ? '<span class="pill pill-g">✅ مكتمل</span>' : '<span class="pill pill-b">▶️ لم يُكمل</span>'}
+</div>
+
+<div class="grid-main">
+<div>
+<div class="glass" style="padding:20px">
+${l.desc ? `<div class="sm txt2 mb16">${esc(l.desc)}</div>` : ''}
+
+<div class="mb20" id="playerHost">
+${buildPlayerHTML(l.video, l.title)}
+</div>
+
+${l.summary ? `
+<div class="h4 mb8">📝 ملخص الدرس</div>
+<div class="sm txt2 mb16">${esc(l.summary)}</div>
+` : ''}
+
+${(l.key_points || []).length > 0 ? `
+<div class="h4 mb8">💡 النقاط المهمة</div>
+<div class="mb16">
+${(l.key_points || []).map(k => `
+<div class="kp"><span class="kp-dot">◆</span><span class="sm txt2">${esc(k)}</span></div>
+`).join('')}
+</div>
+` : ''}
+
+${(l.examples || []).length > 0 ? `
+<div class="h4 mb8">🧮 أمثلة محلولة</div>
+<div class="mb16">
+${(l.examples || []).map(ex => `
+<div class="example">
+<div class="example-q"><b>س:</b> ${esc(ex.q)}</div>
+<div class="example-a"><b>ج:</b> ${esc(ex.a)}</div>
+</div>
+`).join('')}
+</div>
+` : ''}
+
+${l.notes ? `
+<div class="h4 mb8">📌 ملاحظات</div>
+<div class="sm txt2 mb16">${esc(l.notes)}</div>
+` : ''}
+
+<div class="flex wrap-fl g8 mt20">
+<button class="btn btn-ok" id="btnDone" ${state.isDone ? 'disabled' : ''}>
+${state.isDone ? '✅ تم إكمال الدرس' : '✓ فهمت الدرس'}
+</button>
+<button class="btn btn-wr" id="btnReview">🔄 أحتاج مراجعة</button>
+</div>
+</div>
+</div>
+
+<div>
+<div class="glass mb16" style="padding:16px">
+<div class="flex between center mb12">
+<div class="h4">📝 ملاحظاتي</div>
+<span class="pill pill-y" id="noteStatus">فارغ</span>
+</div>
+<textarea id="lessonNote" class="notes-area" placeholder="اكتب ملاحظاتك على الدرس هنا..."></textarea>
+<div class="flex g8 mt12">
+<button class="btn btn-p btn-sm" id="btnSaveNote" style="flex:1">💾 حفظ</button>
+<button class="btn btn-s btn-sm" id="btnClearNote" title="مسح الملاحظة">🗑</button>
+</div>
+<div class="xs muted mt8" style="text-align:center">💡 يتم الحفظ تلقائيًا أثناء الكتابة</div>
+</div>
+
+<div class="glass mb16" style="padding:16px">
+<div class="h4 mb12">📊 تقدمك في الوحدة</div>
+<div class="flex between center mb8">
+<span class="sm muted">${state.unit ? esc(state.unit.name) : ''}</span>
+<span class="sm" style="font-weight:700;color:var(--blue2)">${state.unitPct}%</span>
+</div>
+<div class="bar"><div class="bar-f" style="width:${state.unitPct}%"></div></div>
+<div class="xs muted mt8">${state.doneUnit} من ${state.totalUnit} دروس</div>
+</div>
+
+${state.relatedExams.length > 0 ? `
+<div class="glass" style="padding:16px">
+<div class="h4 mb12">📝 اختبارات مرتبطة (${state.relatedExams.length})</div>
+${state.relatedExams.map(e => `
+<a href="/student/exam.html?id=${e.id}" class="exam-card">
+<div class="flex between center mb6">
+<span class="pill pill-b">${(e.question_ids||[]).length} أسئلة</span>
+<span class="pill pill-v">+${e.xp} XP</span>
+</div>
+<div style="font-size:14px;font-weight:700;color:#e8eefc">${esc(e.title)}</div>
+<div style="font-size:11.5px;color:#7f93b8;margin-top:6px">⏱ ${e.duration}د • درجة النجاح: ${e.pass_score}%</div>
+</a>
+`).join('')}
+</div>
+` : `
+<div class="glass" style="padding:16px">
+<div class="h4 mb12">📝 اختبارات مرتبطة</div>
+<div class="sm muted" style="text-align:center;padding:16px">لا توجد اختبارات مرتبطة بهذا الدرس</div>
+</div>
+`}
+</div>
+</div>
+</div>
+`;
+
+const openBtn = document.getElementById('btnOpenPlayer');
+if(openBtn){
+const openHandler = (e)=>{
+e.preventDefault();
+e.stopPropagation();
+openPlayer(l, u);
+};
+openBtn.addEventListener('click', openHandler);
+openBtn.addEventListener('touchend', openHandler, { passive: false });
+}
+
+document.getElementById("btnDone").addEventListener("click", async ()=>{
+if(state.isDone) return;
+try{
+const sb = await DB.getClient();
+const { data: userData } = await sb.from("users").select("completed_lessons, xp").eq("id", u.id).maybeSingle();
+const completed = userData?.completed_lessons || [];
+const currentXp = userData?.xp || 0;
+const newCompleted = [...completed, l.id];
+const newXp = currentXp + (l.xp || 0);
+
+await DB.updateUser(u.id, { completed_lessons: newCompleted, xp: newXp });
+DB.trackActivity({userId:u.id,userName:u.name,type:"lesson_complete",target:l.title,details:{xp:l.xp}});
+
+await Swal.fire({
+icon: 'success',
+title: 'أحسنت!',
+text: `+${l.xp} XP`,
+background: 'linear-gradient(180deg, #151f38, #0b1122)',
+color: '#e8eefc',
+confirmButtonColor: '#2f7dff',
+customClass: {popup:'swal-custom-popup', title:'swal-custom-title'},
+timer: 1800,
+showConfirmButton: false
+});
+
+location.reload();
+}catch(e){
+Swal.fire({icon:'error', title:'خطأ', text:e.message, background:'linear-gradient(180deg, #151f38, #0b1122)', color:'#e8eefc', confirmButtonColor:'#2f7dff', customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+}
+});
+
+document.getElementById("btnReview").addEventListener("click", ()=>{
+Swal.fire({
+icon: 'info',
+title: 'تمت الإضافة',
+text: 'سجلنا هذا الدرس في قائمة المراجعة',
+background: 'linear-gradient(180deg, #151f38, #0b1122)',
+color: '#e8eefc',
+confirmButtonColor: '#2f7dff',
+customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
+});
+});
+
+const noteEl = document.getElementById('lessonNote');
+if(noteEl){
+noteEl.value = state.note || '';
+if(state.note && state.note.trim()){
+updateNoteStatus('saved');
+} else {
+updateNoteStatus('empty');
+}
+
+noteEl.addEventListener('input', ()=>{
+state.note = noteEl.value;
+state.noteDirty = true;
+updateNoteStatus('saving');
+scheduleAutoSave();
+});
+
+noteEl.addEventListener('blur', ()=>{
+if(state.noteDirty) saveNote(true);
+});
+}
+
+const btnSave = document.getElementById('btnSaveNote');
+if(btnSave){
+btnSave.addEventListener('click', ()=>{
+state.noteDirty = true;
+saveNote(false);
+});
+}
+
+const btnClear = document.getElementById('btnClearNote');
+if(btnClear){
+btnClear.addEventListener('click', async ()=>{
+if(!state.note.trim() && !state.noteId) return;
+const r = await Swal.fire({
+title: 'مسح الملاحظة؟',
+text: 'سيتم حذف الملاحظة نهائيًا',
+icon: 'warning',
+showCancelButton: true,
+confirmButtonText: 'نعم، امسح',
+cancelButtonText: 'إلغاء',
+confirmButtonColor: '#ef4444',
+cancelButtonColor: '#64748b',
+background: 'linear-gradient(180deg, #151f38, #0b1122)',
+color: '#e8eefc',
+customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
+});
+if(!r.isConfirmed) return;
+const el = document.getElementById('lessonNote');
+if(el) el.value = '';
+state.note = '';
+state.noteDirty = true;
+await saveNote(false);
+});
+}
+}
+
+async function load(){
+if(!lessonId){
+app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
+<div class="h3 mb12">⚠️ لم يتم تحديد الدرس</div>
+<p class="sm muted mb16">يرجى فتح الدرس من داخل المنصة</p>
+<a href="/student/index.html" class="btn btn-p" style="text-decoration:none">العودة للرئيسية</a>
+</div>`;
+return;
+}
+
+const sid = DB.getSessionId();
+if(!sid){ window.location.replace("/auth/login.html"); return; }
+
+const user = await DB.getUser(sid);
+if(!user || user.active === false){ DB.clearSession(); window.location.replace("/auth/login.html"); return; }
+
+state.user = user;
+userAvatar.textContent = user.avatar || "🧑‍🎓";
+
+const sb = await DB.getClient();
+
+const { data: lesson, error } = await sb.from("lessons").select("*").eq("id", lessonId).maybeSingle();
+if(error || !lesson){
+app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
+<div class="h3 mb12">⚠️ الدرس غير موجود</div>
+<a href="/student/index.html" class="btn btn-p" style="text-decoration:none">العودة للرئيسية</a>
+</div>`;
+return;
+}
+
+state.lesson = lesson;
+
+DB.trackActivity({
+userId: user.id, userName: user.name,
+type: "lesson_view", target: lesson.title,
+details: { lesson: lesson.title }
+});
+
+const { data: unit } = await sb.from("units").select("*").eq("id", lesson.unit_id).maybeSingle();
+state.unit = unit;
+
+if(unit){
+const { data: subject } = await sb.from("subjects").select("*").eq("id", unit.subject_id).maybeSingle();
+state.subject = subject;
+}
+
+const { data: unitLessons } = await sb.from("lessons").select("id").eq("unit_id", lesson.unit_id).eq("published", true);
+const { data: userData } = await sb.from("users").select("completed_lessons").eq("id", user.id).maybeSingle();
+const completed = userData?.completed_lessons || [];
+state.totalUnit = unitLessons?.length || 1;
+state.doneUnit = (unitLessons || []).filter(l => completed.includes(l.id)).length;
+state.unitPct = Math.round((state.doneUnit / state.totalUnit) * 100);
+state.isDone = completed.includes(lesson.id);
+
+const { data: allExams } = await sb.from("exams").select("*").eq("published", true);
+state.relatedExams = (allExams || []).filter(e => {
+const lessonIds = Array.isArray(e.lesson_ids) ? e.lesson_ids : [];
+return lessonIds.includes(lesson.id);
+});
+
+await loadNote(user.id, lesson.id);
+
+render();
+
+const closeBtn = document.getElementById('playerClose');
+if(closeBtn) closeBtn.addEventListener('click', closePlayer);
+
+const fsBtn = document.getElementById('playerFullscreen');
+if(fsBtn) fsBtn.addEventListener('click', toggleFullscreen);
+
+const modal = document.getElementById('playerModal');
+if(modal){
+modal.addEventListener('click', (e)=>{
+if(e.target === modal) closePlayer();
+});
+}
+
+attachProtection();
+
+window.addEventListener('beforeunload', ()=>{
+if(state.noteDirty){
+try{
+const sb2 = DB.getClient();
+state.noteDirty = false;
+}catch(e){}
+}
+});
+
+try{
+localStorage.setItem('student_last_lesson', lessonId);
+}catch(e){}
+}
+
+window.openWhatsApp = ()=>{
+window.open("https://wa.me/201128351702?text=" + encodeURIComponent("مرحبًا، أريد الاستفسار عن منصة MISSION EDU"), "_blank");
+};
+
+window.sendReport = async ()=>{
+const user = state.user || await DB.getUser(DB.getSessionId());
+const { value: msg } = await Swal.fire({
+title: '🚨 بلاغ عن مشكلة',
+input: 'textarea',
+inputPlaceholder: 'اكتب رسالتك هنا...',
+showCancelButton: true,
+confirmButtonText: '📤 إرسال',
+cancelButtonText: 'إلغاء',
+confirmButtonColor: '#2f7dff',
+cancelButtonColor: '#64748b',
+inputValidator: v => { if(!v || v.trim().length < 5) return 'يرجى كتابة رسالة واضحة'; },
+customClass: {popup:'swal-custom-popup',title:'swal-custom-title',input:'swal-custom-input'}
+});
+if(msg){
+const sent = await DB.reportIssue({
+userName: user?.name || 'زائر',
+userPhone: (user?.country_code||'+20')+(user?.phone||'—'),
+message: msg
+});
+Swal.fire({icon: sent?'success':'error', title: sent?'✅ تم الإرسال':'❌ فشل', text: sent?'شكرًا لك':'حاول مرة أخرى', background:'linear-gradient(180deg, #151f38, #0b1122)', color:'#e8eefc', confirmButtonColor:'#2f7dff', customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+}
+};
+
+load();
+})();
 </script>
 </body>
 </html>

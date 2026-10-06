@@ -90,821 +90,673 @@ ul{list-style:none}
 .swal-custom-popup{border:1px solid rgba(90,140,230,.3) !important;border-radius:22px !important;background:linear-gradient(180deg, #151f38, #0b1122) !important;color:#e8eefc !important;font-family:'Tajawal','Cairo',sans-serif !important}
 .swal-custom-title{color:#e8eefc !important;font-weight:800 !important;font-family:'Tajawal','Cairo',sans-serif !important}
 .swal-custom-input{background:rgba(10,16,32,.75) !important;border:1.5px solid rgba(90,140,230,.3) !important;color:#e8eefc !important;border-radius:12px !important}
-
-.player-modal{
-  position:fixed;inset:0;z-index:9999;
-  background:rgba(3,5,12,.96);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:0;
-  animation:pu .3s;
-}
+.player-modal{position:fixed;inset:0;z-index:9999;background:rgba(3,5,12,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;padding:0;animation:pu .3s}
 .player-modal.open{display:flex}
-.player-box{
-  position:relative;
-  width:100%;max-width:1400px;
-  background:#000;
-  border-radius:0;
-  overflow:hidden;
-  box-shadow:0 30px 90px rgba(0,0,0,.9);
-  display:flex;
-  flex-direction:column;
-  max-height:100vh;
-}
-.player-header{
-  display:flex;align-items:center;gap:12px;
-  padding:10px 16px;
-  background:linear-gradient(180deg,rgba(21,31,56,.98),rgba(11,17,34,.98));
-  border-bottom:1px solid var(--border);
-  flex-shrink:0;
-}
-.player-title{
-  flex:1;min-width:0;
-  font-size:14px;font-weight:800;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.player-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:4px 11px;border-radius:20px;
-  font-size:10.5px;font-weight:700;
-  background:rgba(34,197,94,.12);
-  color:#6ee7a0;
-  border:1px solid rgba(34,197,94,.28);
-}
-.player-badge::before{
-  content:'';width:6px;height:6px;border-radius:50%;
-  background:#22c55e;box-shadow:0 0 8px #22c55e;
-  animation:pulse 2s infinite;
-}
-.player-btn{
-  width:38px;height:38px;border-radius:11px;
-  display:grid;place-items:center;
-  background:rgba(47,125,255,.12);
-  border:1px solid rgba(47,125,255,.3);
-  color:#7db6ff;
-  font-size:16px;
-  transition:.2s;
-  cursor:pointer;flex-shrink:0;
-}
+.player-box{position:relative;width:100%;max-width:1400px;background:#000;border-radius:0;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.9);display:flex;flex-direction:column;max-height:100vh}
+.player-header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:linear-gradient(180deg,rgba(21,31,56,.98),rgba(11,17,34,.98));border-bottom:1px solid var(--border);flex-shrink:0}
+.player-title{flex:1;min-width:0;font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:20px;font-size:10.5px;font-weight:700;background:rgba(34,197,94,.12);color:#6ee7a0;border:1px solid rgba(34,197,94,.28)}
+.player-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:pulse 2s infinite}
+.player-btn{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(47,125,255,.12);border:1px solid rgba(47,125,255,.3);color:#7db6ff;font-size:16px;transition:.2s;cursor:pointer;flex-shrink:0}
 .player-btn:hover{background:rgba(47,125,255,.25);color:#fff}
-.player-close{
-  width:38px;height:38px;border-radius:11px;
-  display:grid;place-items:center;
-  background:rgba(239,68,68,.12);
-  border:1px solid rgba(239,68,68,.3);
-  color:#fca5a5;
-  font-size:18px;font-weight:900;
-  transition:.2s;
-  cursor:pointer;flex-shrink:0;
-}
+.player-close{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;font-size:18px;font-weight:900;transition:.2s;cursor:pointer;flex-shrink:0}
 .player-close:hover{background:rgba(239,68,68,.25);color:#fff}
-
-.player-stage{
-  position:relative;
-  width:100%;
-  aspect-ratio:16/9;
-  background:#000;
-  overflow:hidden;
-  user-select:none;-webkit-user-select:none;
-  -webkit-touch-callout:none;
-  isolation:isolate;
-  flex:1;
-}
-.player-stage iframe,.player-stage video{
-  position:absolute;inset:0;
-  width:100%;height:100%;
-  border:0;display:block;
-  pointer-events:auto;
-}
-
-.watermark{
-  position:absolute;
-  z-index:100;
-  font-size:15px;
-  font-weight:900;
-  font-family:'Cairo','Tajawal',sans-serif;
-  color:rgba(255,60,60,.32);
-  text-shadow:0 0 4px rgba(255,60,60,.15),1px 1px 1px rgba(0,0,0,.3);
-  padding:0;
-  background:transparent;
-  border:none;
-  outline:none;
-  pointer-events:none;
-  user-select:none;
-  -webkit-user-select:none;
-  white-space:nowrap;
-  transition:top 1.8s cubic-bezier(.4,0,.2,1),left 1.8s cubic-bezier(.4,0,.2,1);
-  letter-spacing:1px;
-  direction:ltr;
-}
-
-.shield-overlay{
-  position:absolute;
-  inset:0;
-  z-index:80;
-  pointer-events:none;
-}
-.shield-overlay::before{
-  content:'';
-  position:absolute;
-  top:0;left:0;right:0;
-  height:60px;
-  background:transparent;
-  pointer-events:auto;
-  cursor:default;
-}
-.shield-overlay::after{
-  content:'';
-  position:absolute;
-  bottom:0;left:0;right:0;
-  height:80px;
-  background:transparent;
-  pointer-events:auto;
-  cursor:default;
-}
-.shield-side{
-  position:absolute;
-  top:60px;bottom:80px;
-  width:50px;
-  background:transparent;
-  z-index:80;
-  pointer-events:auto;
-  cursor:default;
-}
+.player-stage{position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;isolation:isolate;flex:1}
+.player-stage iframe,.player-stage video{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;pointer-events:auto}
+.watermark{position:absolute;z-index:100;font-size:15px;font-weight:900;font-family:'Cairo','Tajawal',sans-serif;color:rgba(255,60,60,.32);text-shadow:0 0 4px rgba(255,60,60,.15),1px 1px 1px rgba(0,0,0,.3);padding:0;background:transparent;border:none;outline:none;pointer-events:none;user-select:none;-webkit-user-select:none;white-space:nowrap;transition:top 1.8s cubic-bezier(.4,0,.2,1),left 1.8s cubic-bezier(.4,0,.2,1);letter-spacing:1px;direction:ltr}
+.shield-overlay{position:absolute;inset:0;z-index:80;pointer-events:none}
+.shield-overlay::before{content:'';position:absolute;top:0;left:0;right:0;height:60px;background:transparent;pointer-events:auto;cursor:default}
+.shield-overlay::after{content:'';position:absolute;bottom:0;left:0;right:0;height:80px;background:transparent;pointer-events:auto;cursor:default}
+.shield-side{position:absolute;top:60px;bottom:80px;width:50px;background:transparent;z-index:80;pointer-events:auto;cursor:default}
 .shield-side.right{right:0;left:auto}
 .shield-side.left{left:0;right:auto}
-
-.player-modal.fullscreen .player-box{
-  max-width:100vw;
-  width:100vw;
-  height:100vh;
-  max-height:100vh;
-  border-radius:0;
-}
-.player-modal.fullscreen .player-header{
-  position:absolute;
-  top:0;left:0;right:0;
-  z-index:150;
-  background:linear-gradient(180deg,rgba(0,0,0,.85),transparent);
-  border:none;
-  transition:opacity .3s;
-}
+.player-modal.fullscreen .player-box{max-width:100vw;width:100vw;height:100vh;max-height:100vh;border-radius:0}
+.player-modal.fullscreen .player-header{position:absolute;top:0;left:0;right:0;z-index:150;background:linear-gradient(180deg,rgba(0,0,0,.85),transparent);border:none;transition:opacity .3s}
 .player-modal.fullscreen .player-header:hover{opacity:1}
-.player-modal.fullscreen .player-stage{
-  aspect-ratio:auto;
-  height:100vh;
-  flex:1;
-}
-
+.player-modal.fullscreen .player-stage{aspect-ratio:auto;height:100vh;flex:1}
 @media(max-width:900px) and (orientation:landscape){
-  .player-modal{padding:0}
-  .player-box{border-radius:0;max-width:100vw}
-  .player-header{padding:6px 12px}
-  .player-title{font-size:12px}
-  .player-badge{display:none}
-  .player-btn,.player-close{width:32px;height:32px;font-size:14px}
-  .watermark{font-size:12px}
+.player-modal{padding:0}
+.player-box{border-radius:0;max-width:100vw}
+.player-header{padding:6px 12px}
+.player-title{font-size:12px}
+.player-badge{display:none}
+.player-btn,.player-close{width:32px;height:32px;font-size:14px}
+.watermark{font-size:12px}
 }
 @media(max-width:640px){
-  .player-modal{padding:0}
-  .player-box{border-radius:0}
-  .player-header{padding:8px 10px;gap:8px}
-  .player-title{font-size:12px}
-  .player-badge{display:none}
-  .player-btn,.player-close{width:34px;height:34px;font-size:14px}
-  .watermark{font-size:12px}
+.player-modal{padding:0}
+.player-box{border-radius:0}
+.player-header{padding:8px 10px;gap:8px}
+.player-title{font-size:12px}
+.player-badge{display:none}
+.player-btn,.player-close{width:34px;height:34px;font-size:14px}
+.watermark{font-size:12px}
 }
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <a href="/student/index.html" class="back-btn">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
-    رجوع
-  </a>
-  <div class="flex center g8" style="margin-inline-start:auto">
-    <div id="userAvatar" class="avatar">👤</div>
-  </div>
+<a href="/student/index.html" class="back-btn">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+رجوع
+</a>
+<div class="flex center g8" style="margin-inline-start:auto">
+<div id="userAvatar" class="avatar">👤</div>
+</div>
 </div>
 
 <div class="wrap" id="app">
-  <div class="loading"><div class="spinner"></div>جارٍ تحميل الدرس...</div>
+<div class="loading"><div class="spinner"></div>جارٍ تحميل الدرس...</div>
 </div>
 
 <div class="player-modal" id="playerModal">
-  <div class="player-box">
-    <div class="player-header">
-      <div class="player-title" id="playerTitle">جارٍ التحميل...</div>
-      <span class="player-badge">محمي</span>
-      <button class="player-btn" id="playerFullscreen" title="ملء الشاشة">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
-        </svg>
-      </button>
-      <button class="player-close" id="playerClose" aria-label="إغلاق">✕</button>
-    </div>
-    <div class="player-stage" id="playerStage">
-      <div class="shield-overlay"></div>
-      <div class="shield-side left"></div>
-      <div class="shield-side right"></div>
-
-      <div class="watermark" id="watermark" style="top:20px;left:20px">MISSION EDU</div>
-
-      <div id="playerContainer"></div>
-    </div>
-  </div>
+<div class="player-box">
+<div class="player-header">
+<div class="player-title" id="playerTitle">جارٍ التحميل...</div>
+<span class="player-badge">محمي</span>
+<button class="player-btn" id="playerFullscreen" title="ملء الشاشة">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+</svg>
+</button>
+<button class="player-close" id="playerClose" aria-label="إغلاق">✕</button>
+</div>
+<div class="player-stage" id="playerStage">
+<div class="shield-overlay"></div>
+<div class="shield-side left"></div>
+<div class="shield-side right"></div>
+<div class="watermark" id="watermark" style="top:20px;left:20px">MISSION EDU</div>
+<div id="playerContainer"></div>
+</div>
+</div>
 </div>
 
 <div class="footer-dev">
-  <button class="dev-btn" onclick="openWhatsApp()">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-    <span class="dev-name">Developed by <b>EL-sayed Hasan</b></span>
-  </button>
-  <button class="dev-btn" onclick="sendReport()">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-    <span>بلاغ</span>
-  </button>
+<button class="dev-btn" onclick="openWhatsApp()">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+<span class="dev-name">Developed by <b>EL-sayed Hasan</b></span>
+</button>
+<button class="dev-btn" onclick="sendReport()">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+<span>بلاغ</span>
+</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="/db.js"></script>
 <script>
 (function(){
-  "use strict";
+"use strict";
 
-  const DB = window.MissionDB;
-  const params = new URLSearchParams(window.location.search);
-  const lessonId = params.get("id");
+const DB = window.MissionDB;
+const params = new URLSearchParams(window.location.search);
+const lessonId = params.get("id");
 
-  const app = document.getElementById("app");
-  const userAvatar = document.getElementById("userAvatar");
+const app = document.getElementById("app");
+const userAvatar = document.getElementById("userAvatar");
 
-  let state = {
-    user: null,
-    lesson: null,
-    unit: null,
-    subject: null,
-    relatedExams: [],
-    unitPct: 0,
-    doneUnit: 0,
-    totalUnit: 0,
-    isDone: false,
-    watermarkTimer: null,
-    isFullscreen: false
-  };
+let state = {
+user: null,
+lesson: null,
+unit: null,
+subject: null,
+relatedExams: [],
+unitPct: 0,
+doneUnit: 0,
+totalUnit: 0,
+isDone: false,
+watermarkTimer: null,
+isFullscreen: false
+};
 
-  function esc(str){
-    return String(str||"").replace(/[&<>"']/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[s]);
-  }
+function esc(str){
+return String(str||"").replace(/[&<>"']/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[s]);
+}
 
-  function getYouTubeId(url){
-    if(!url) return "";
-    const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
-    return m ? m[1] : "";
-  }
+function getYouTubeId(url){
+if(!url) return "";
+const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
+return m ? m[1] : "";
+}
 
-  function openPlayer(lesson, user){
-    const video = lesson.video || {};
-    const url = video.url || "";
-    const type = video.type || "youtube";
+function openPlayer(lesson, user){
+const video = lesson.video || {};
+const url = video.url || "";
+const type = video.type || "youtube";
 
-    if(!url){
-      Swal.fire({
-        icon: 'warning',
-        title: 'لا يوجد فيديو',
-        text: 'هذا الدرس لا يحتوي على فيديو',
-        background: 'linear-gradient(180deg, #151f38, #0b1122)',
-        color: '#e8eefc',
-        confirmButtonColor: '#2f7dff',
-        customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
-      });
-      return;
-    }
+if(!url){
+Swal.fire({
+icon: 'warning',
+title: 'لا يوجد فيديو',
+text: 'هذا الدرس لا يحتوي على فيديو',
+background: 'linear-gradient(180deg, #151f38, #0b1122)',
+color: '#e8eefc',
+confirmButtonColor: '#2f7dff',
+customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
+});
+return;
+}
 
-    const playerTitle = document.getElementById('playerTitle');
-    if(playerTitle) playerTitle.textContent = lesson.title || 'الدرس';
+const playerTitle = document.getElementById('playerTitle');
+if(playerTitle) playerTitle.textContent = lesson.title || 'الدرس';
 
-    const watermark = document.getElementById('watermark');
-    if(watermark){
-      const phone = (user.country_code || '') + (user.phone || '') || user.name || 'طالب';
-      watermark.textContent = phone;
-    }
+const watermark = document.getElementById('watermark');
+if(watermark){
+const phone = (user.country_code || '') + (user.phone || '') || user.name || 'طالب';
+watermark.textContent = phone;
+}
 
-    const container = document.getElementById('playerContainer');
-    if(container){
-      if(type === 'youtube'){
-        const ytId = getYouTubeId(url);
-        if(ytId){
-          container.innerHTML = `<iframe
-            src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&fs=1&autoplay=1&showinfo=0&controls=1&disablekb=0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-            allowfullscreen
-            referrerpolicy="strict-origin-when-cross-origin"
-            title="فيديو الدرس"
-          ></iframe>`;
-        } else {
-          container.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:Tajawal,sans-serif">رابط YouTube غير صالح</div>`;
-        }
-      } else if(type === 'vimeo'){
-        const vId = (url.match(/vimeo\.com\/(?:video\/)?(\d+)/) || [])[1];
-        container.innerHTML = `<iframe
-          src="https://player.vimeo.com/video/${vId}?byline=0&portrait=0&title=0&dnt=1&autoplay=1"
-          allow="autoplay; fullscreen; picture-in-picture"
-          allowfullscreen
-          title="فيديو الدرس"
-        ></iframe>`;
-      } else if(type === 'mp4'){
-        container.innerHTML = `<video
-          id="mp4Video"
-          controls
-          controlsList="nodownload noremoteplayback noplaybackrate"
-          disablePictureInPicture
-          playsinline
-          autoplay
-          style="position:absolute;inset:0;width:100%;height:100%;background:#000;object-fit:contain"
-        >
-          <source src="${esc(url)}" type="video/mp4"/>
-        </video>`;
-      } else {
-        container.innerHTML = `<iframe
-          src="${esc(url)}"
-          allowfullscreen
-          sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"
-          title="فيديو الدرس"
-        ></iframe>`;
-      }
-    }
+const container = document.getElementById('playerContainer');
+if(container){
+if(type === 'youtube'){
+const ytId = getYouTubeId(url);
+if(ytId){
+container.innerHTML = `<iframe
+src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&fs=1&autoplay=1&showinfo=0&controls=1&disablekb=0"
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+allowfullscreen
+referrerpolicy="strict-origin-when-cross-origin"
+title="فيديو الدرس"
+></iframe>`;
+} else {
+container.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:Tajawal,sans-serif">رابط YouTube غير صالح</div>`;
+}
+} else if(type === 'vimeo'){
+const vId = (url.match(/vimeo\.com\/(?:video\/)?(\d+)/) || [])[1];
+container.innerHTML = `<iframe
+src="https://player.vimeo.com/video/${vId}?byline=0&portrait=0&title=0&dnt=1&autoplay=1"
+allow="autoplay; fullscreen; picture-in-picture"
+allowfullscreen
+title="فيديو الدرس"
+></iframe>`;
+} else if(type === 'mp4'){
+container.innerHTML = `<video
+id="mp4Video"
+controls
+controlsList="nodownload noremoteplayback noplaybackrate"
+disablePictureInPicture
+playsinline
+autoplay
+style="position:absolute;inset:0;width:100%;height:100%;background:#000;object-fit:contain"
+>
+<source src="${esc(url)}" type="video/mp4"/>
+</video>`;
+} else {
+container.innerHTML = `<iframe
+src="${esc(url)}"
+allowfullscreen
+sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"
+title="فيديو الدرس"
+></iframe>`;
+}
+}
 
-    const modal = document.getElementById('playerModal');
-    if(modal){
-      modal.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
+const modal = document.getElementById('playerModal');
+if(modal){
+modal.classList.add('open');
+document.body.style.overflow = 'hidden';
+}
 
-    setTimeout(()=>{
-      enterFullscreenLandscape();
-    }, 100);
+setTimeout(()=>{
+enterFullscreenLandscape();
+}, 100);
 
-    startWatermarkMotion();
+startWatermarkMotion();
 
-    try{
-      DB.trackActivity({
-        userId: user.id, userName: user.name,
-        type: "video_play", target: lesson.title,
-        details: { lesson: lesson.title }
-      });
-    }catch(e){}
-  }
+try{
+DB.trackActivity({
+userId: user.id, userName: user.name,
+type: "video_play", target: lesson.title,
+details: { lesson: lesson.title }
+});
+}catch(e){}
+}
 
-  function closePlayer(){
-    const modal = document.getElementById('playerModal');
-    if(modal){
-      modal.classList.remove('open');
-      modal.classList.remove('fullscreen');
-    }
-    document.body.style.overflow = '';
+function closePlayer(){
+const modal = document.getElementById('playerModal');
+if(modal){
+modal.classList.remove('open');
+modal.classList.remove('fullscreen');
+}
+document.body.style.overflow = '';
 
-    exitFullscreen();
+exitFullscreen();
+lockOrientation('portrait');
 
-    lockOrientation('portrait');
+const container = document.getElementById('playerContainer');
+if(container) container.innerHTML = '';
 
-    const container = document.getElementById('playerContainer');
-    if(container) container.innerHTML = '';
+stopWatermarkMotion();
+}
 
-    stopWatermarkMotion();
-  }
+async function enterFullscreenLandscape(){
+const modal = document.getElementById('playerModal');
+const box = modal?.querySelector('.player-box');
 
-  async function enterFullscreenLandscape(){
-    const modal = document.getElementById('playerModal');
-    const box = modal?.querySelector('.player-box');
+try{
+if(box){
+if(box.requestFullscreen){
+await box.requestFullscreen();
+} else if(box.webkitRequestFullscreen){
+box.webkitRequestFullscreen();
+} else if(box.msRequestFullscreen){
+box.msRequestFullscreen();
+}
+}
 
-    try{
-      if(box){
-        if(box.requestFullscreen){
-          await box.requestFullscreen();
-        } else if(box.webkitRequestFullscreen){
-          box.webkitRequestFullscreen();
-        } else if(box.msRequestFullscreen){
-          box.msRequestFullscreen();
-        }
-      }
+if(screen.orientation && screen.orientation.lock){
+try{
+await screen.orientation.lock('landscape');
+}catch(e){
+console.warn('Orientation lock failed:', e.message);
+}
+}
 
-      if(screen.orientation && screen.orientation.lock){
-        try{
-          await screen.orientation.lock('landscape');
-        }catch(e){
-          console.warn('Orientation lock failed:', e.message);
-        }
-      }
+modal.classList.add('fullscreen');
+state.isFullscreen = true;
 
-      modal.classList.add('fullscreen');
-      state.isFullscreen = true;
+}catch(e){
+console.warn('Fullscreen failed:', e.message);
+modal.classList.add('fullscreen');
+state.isFullscreen = true;
+}
+}
 
-    }catch(e){
-      console.warn('Fullscreen failed:', e.message);
-      modal.classList.add('fullscreen');
-      state.isFullscreen = true;
-    }
-  }
+async function exitFullscreen(){
+try{
+if(document.fullscreenElement){
+if(document.exitFullscreen) await document.exitFullscreen();
+else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+else if(document.msExitFullscreen) document.msExitFullscreen();
+}
+}catch(e){}
 
-  async function exitFullscreen(){
-    try{
-      if(document.fullscreenElement){
-        if(document.exitFullscreen) await document.exitFullscreen();
-        else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
-        else if(document.msExitFullscreen) document.msExitFullscreen();
-      }
-    }catch(e){}
+state.isFullscreen = false;
 
-    state.isFullscreen = false;
+if(screen.orientation && screen.orientation.unlock){
+try{ screen.orientation.unlock(); }catch(e){}
+}
+}
 
-    if(screen.orientation && screen.orientation.unlock){
-      try{ screen.orientation.unlock(); }catch(e){}
-    }
-  }
+async function lockOrientation(mode){
+if(screen.orientation && screen.orientation.lock){
+try{
+await screen.orientation.lock(mode);
+}catch(e){}
+}
+}
 
-  async function lockOrientation(mode){
-    if(screen.orientation && screen.orientation.lock){
-      try{
-        await screen.orientation.lock(mode);
-      }catch(e){}
-    }
-  }
+function toggleFullscreen(){
+const modal = document.getElementById('playerModal');
+if(!modal) return;
 
-  function toggleFullscreen(){
-    const modal = document.getElementById('playerModal');
-    if(!modal) return;
+if(state.isFullscreen){
+exitFullscreen().then(()=>{
+modal.classList.remove('fullscreen');
+lockOrientation('portrait');
+});
+} else {
+enterFullscreenLandscape();
+}
+}
 
-    if(state.isFullscreen){
-      exitFullscreen().then(()=>{
-        modal.classList.remove('fullscreen');
-        lockOrientation('portrait');
-      });
-    } else {
-      enterFullscreenLandscape();
-    }
-  }
+function moveWatermark(){
+const wm = document.getElementById('watermark');
+const stage = document.getElementById('playerStage');
+if(!wm || !stage) return;
 
-  function moveWatermark(){
-    const wm = document.getElementById('watermark');
-    const stage = document.getElementById('playerStage');
-    if(!wm || !stage) return;
+const w = stage.offsetWidth;
+const h = stage.offsetHeight;
 
-    const w = stage.offsetWidth;
-    const h = stage.offsetHeight;
+const maxX = Math.max(20, w - 180);
+const maxY = Math.max(20, h - 50);
 
-    const maxX = Math.max(20, w - 180);
-    const maxY = Math.max(20, h - 50);
+const x = Math.floor(Math.random() * maxX) + 10;
+const y = Math.floor(Math.random() * maxY) + 10;
 
-    const x = Math.floor(Math.random() * maxX) + 10;
-    const y = Math.floor(Math.random() * maxY) + 10;
+wm.style.left = x + 'px';
+wm.style.top = y + 'px';
+wm.style.right = 'auto';
+wm.style.bottom = 'auto';
+}
 
-    wm.style.left = x + 'px';
-    wm.style.top = y + 'px';
-    wm.style.right = 'auto';
-    wm.style.bottom = 'auto';
-  }
+function startWatermarkMotion(){
+moveWatermark();
+state.watermarkTimer = setInterval(moveWatermark, 5000);
+}
 
-  function startWatermarkMotion(){
-    moveWatermark();
-    state.watermarkTimer = setInterval(moveWatermark, 5000);
-  }
+function stopWatermarkMotion(){
+if(state.watermarkTimer){
+clearInterval(state.watermarkTimer);
+state.watermarkTimer = null;
+}
+}
 
-  function stopWatermarkMotion(){
-    if(state.watermarkTimer){
-      clearInterval(state.watermarkTimer);
-      state.watermarkTimer = null;
-    }
-  }
+function attachProtection(){
+document.addEventListener('contextmenu', e => e.preventDefault());
 
-  function attachProtection(){
-    document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+if(e.key === 'F12'){ e.preventDefault(); return false; }
+if(e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())){ e.preventDefault(); return false; }
+if(e.ctrlKey && e.key.toUpperCase() === 'U'){ e.preventDefault(); return false; }
+if(e.ctrlKey && e.key.toUpperCase() === 'S'){ e.preventDefault(); return false; }
+if(e.ctrlKey && e.key.toUpperCase() === 'P'){ e.preventDefault(); return false; }
+if(e.key === 'PrintScreen'){
+try{ navigator.clipboard.writeText(''); }catch(err){}
+}
+if(e.key === 'Escape'){
+const modal = document.getElementById('playerModal');
+if(modal && modal.classList.contains('open')) closePlayer();
+}
+});
 
-    document.addEventListener('keydown', e => {
-      if(e.key === 'F12'){ e.preventDefault(); return false; }
-      if(e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())){ e.preventDefault(); return false; }
-      if(e.ctrlKey && e.key.toUpperCase() === 'U'){ e.preventDefault(); return false; }
-      if(e.ctrlKey && e.key.toUpperCase() === 'S'){ e.preventDefault(); return false; }
-      if(e.ctrlKey && e.key.toUpperCase() === 'P'){ e.preventDefault(); return false; }
-      if(e.key === 'PrintScreen'){
-        try{ navigator.clipboard.writeText(''); }catch(err){}
-      }
-      if(e.key === 'Escape'){
-        const modal = document.getElementById('playerModal');
-        if(modal && modal.classList.contains('open')) closePlayer();
-      }
-    });
+document.addEventListener('copy', e => e.preventDefault());
+document.addEventListener('cut', e => e.preventDefault());
+document.addEventListener('dragstart', e => e.preventDefault());
+document.addEventListener('selectstart', e => {
+const t = e.target?.tagName?.toLowerCase();
+if(t !== 'input' && t !== 'textarea') e.preventDefault();
+});
+document.addEventListener('dblclick', e => e.preventDefault());
 
-    document.addEventListener('copy', e => e.preventDefault());
-    document.addEventListener('cut', e => e.preventDefault());
-    document.addEventListener('dragstart', e => e.preventDefault());
-    document.addEventListener('selectstart', e => {
-      const t = e.target?.tagName?.toLowerCase();
-      if(t !== 'input' && t !== 'textarea') e.preventDefault();
-    });
-    document.addEventListener('dblclick', e => e.preventDefault());
+document.addEventListener('fullscreenchange', ()=>{
+const modal = document.getElementById('playerModal');
+if(!document.fullscreenElement && modal && modal.classList.contains('open')){
+}
+});
+}
 
-    document.addEventListener('fullscreenchange', ()=>{
-      const modal = document.getElementById('playerModal');
-      if(!document.fullscreenElement && modal && modal.classList.contains('open')){
-      }
-    });
-  }
+function buildPlayerHTML(video, lessonTitle){
+if(!video || !video.url){
+return `<div class="vid-shell"><div class="vp-error"><div style="font-size:48px;opacity:.35;margin-bottom:12px">🎬</div><div>لا يوجد فيديو لهذا الدرس</div></div></div>`;
+}
 
-  function buildPlayerHTML(video, lessonTitle){
-    if(!video || !video.url){
-      return `<div class="vid-shell"><div class="vp-error"><div style="font-size:48px;opacity:.35;margin-bottom:12px">🎬</div><div>لا يوجد فيديو لهذا الدرس</div></div></div>`;
-    }
-
-    return `
-      <div class="vid-shell" id="vidShell">
-        <div class="vp-error" style="background:linear-gradient(135deg,rgba(4,6,14,.92),rgba(11,18,38,.94));display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:10px 15px">
-          <div id="btnOpenPlayer" style="width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 10px 30px rgba(47,125,255,.55);padding-right:4px;margin-bottom:12px;cursor:pointer;animation:pulsePlay 2.5s ease-in-out infinite">
-  <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+return `
+<div class="vid-shell" id="vidShell">
+<div class="vp-error" style="background:linear-gradient(135deg,rgba(4,6,14,.92),rgba(11,18,38,.94));display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:10px 14px">
+<button id="btnOpenPlayer" style="width:clamp(50px,13vw,80px);height:clamp(50px,13vw,80px);border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 10px 30px rgba(47,125,255,.55);padding-right:4px;margin-bottom:clamp(8px,2vw,16px);cursor:pointer;animation:pulsePlay 2.5s ease-in-out infinite;border:none;outline:none;flex-shrink:0">
+<svg width="clamp(20,5vw,32)" height="clamp(20,5vw,32)" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+</button>
+<div style="font-size:clamp(12px,3.5vw,18px);font-weight:900;color:#e8eefc;margin-bottom:clamp(4px,1vw,8px);text-align:center;padding:0 8px;line-height:1.3">${esc(lessonTitle)}</div>
+<div style="font-size:clamp(10px,2.6vw,13px);color:#7f93b8;margin-bottom:clamp(8px,2vw,16px);text-align:center;line-height:1.4">اضغط لتشغيل الفيديو في وضع ملء الشاشة</div>
+<div style="font-size:clamp(9px,2.3vw,11px);color:#7f93b8;opacity:.7;text-align:center;line-height:1.4">🛡 المشاهدة محمية — لا يمكن التحميل أو النسخ</div>
 </div>
-<div style="font-size:16px;font-weight:900;color:#e8eefc;margin-bottom:4px;text-align:center;padding:0 16px">${esc(lessonTitle)}</div>
-<div style="font-size:12px;color:#7f93b8;margin-bottom:12px">اضغط لتشغيل الفيديو في وضع ملء الشاشة</div>
-<div style="font-size:10.5px;color:#7f93b8;opacity:.7">🛡 المشاهدة محمية — لا يمكن التحميل أو النسخ</div>
-        </div>
-      </div>
-    `;
-  }
+</div>
+`;
+}
 
-  function render(){
-    const l = state.lesson;
-    const u = state.user;
+function render(){
+const l = state.lesson;
+const u = state.user;
 
-    app.innerHTML = `
-      <div class="fade-in">
-        <div class="flex between center wrap-fl g12 mb16">
-          <div>
-            <div class="h1 mb6">${esc(l.title)}</div>
-            <div class="flex wrap-fl g8 xs muted">
-              <span>⏱ ${l.duration || 15} دقيقة</span>
-              <span>•</span>
-              <span>+${l.xp || 20} XP</span>
-              ${state.subject ? `<span>•</span><span>${esc(state.subject.name)}</span>` : ''}
-              ${state.unit ? `<span>•</span><span>${esc(state.unit.name)}</span>` : ''}
-            </div>
-          </div>
-          ${state.isDone ? '<span class="pill pill-g">✅ مكتمل</span>' : '<span class="pill pill-b">▶️ لم يُكمل</span>'}
-        </div>
+app.innerHTML = `
+<div class="fade-in">
+<div class="flex between center wrap-fl g12 mb16">
+<div>
+<div class="h1 mb6">${esc(l.title)}</div>
+<div class="flex wrap-fl g8 xs muted">
+<span>⏱ ${l.duration || 15} دقيقة</span>
+<span>•</span>
+<span>+${l.xp || 20} XP</span>
+${state.subject ? `<span>•</span><span>${esc(state.subject.name)}</span>` : ''}
+${state.unit ? `<span>•</span><span>${esc(state.unit.name)}</span>` : ''}
+</div>
+</div>
+${state.isDone ? '<span class="pill pill-g">✅ مكتمل</span>' : '<span class="pill pill-b">▶️ لم يُكمل</span>'}
+</div>
 
-        <div class="grid-main">
-          <div>
-            <div class="glass" style="padding:20px">
-              ${l.desc ? `<div class="sm txt2 mb16">${esc(l.desc)}</div>` : ''}
+<div class="grid-main">
+<div>
+<div class="glass" style="padding:20px">
+${l.desc ? `<div class="sm txt2 mb16">${esc(l.desc)}</div>` : ''}
 
-              <div class="mb20" id="playerHost">
-                ${buildPlayerHTML(l.video, l.title)}
-              </div>
+<div class="mb20" id="playerHost">
+${buildPlayerHTML(l.video, l.title)}
+</div>
 
-              ${l.summary ? `
-                <div class="h4 mb8">📝 ملخص الدرس</div>
-                <div class="sm txt2 mb16">${esc(l.summary)}</div>
-              ` : ''}
+${l.summary ? `
+<div class="h4 mb8">📝 ملخص الدرس</div>
+<div class="sm txt2 mb16">${esc(l.summary)}</div>
+` : ''}
 
-              ${(l.key_points || []).length > 0 ? `
-                <div class="h4 mb8">💡 النقاط المهمة</div>
-                <div class="mb16">
-                  ${(l.key_points || []).map(k => `
-                    <div class="kp"><span class="kp-dot">◆</span><span class="sm txt2">${esc(k)}</span></div>
-                  `).join('')}
-                </div>
-              ` : ''}
+${(l.key_points || []).length > 0 ? `
+<div class="h4 mb8">💡 النقاط المهمة</div>
+<div class="mb16">
+${(l.key_points || []).map(k => `
+<div class="kp"><span class="kp-dot">◆</span><span class="sm txt2">${esc(k)}</span></div>
+`).join('')}
+</div>
+` : ''}
 
-              ${(l.examples || []).length > 0 ? `
-                <div class="h4 mb8">🧮 أمثلة محلولة</div>
-                <div class="mb16">
-                  ${(l.examples || []).map(ex => `
-                    <div class="example">
-                      <div class="example-q"><b>س:</b> ${esc(ex.q)}</div>
-                      <div class="example-a"><b>ج:</b> ${esc(ex.a)}</div>
-                    </div>
-                  `).join('')}
-                </div>
-              ` : ''}
+${(l.examples || []).length > 0 ? `
+<div class="h4 mb8">🧮 أمثلة محلولة</div>
+<div class="mb16">
+${(l.examples || []).map(ex => `
+<div class="example">
+<div class="example-q"><b>س:</b> ${esc(ex.q)}</div>
+<div class="example-a"><b>ج:</b> ${esc(ex.a)}</div>
+</div>
+`).join('')}
+</div>
+` : ''}
 
-              ${l.notes ? `
-                <div class="h4 mb8">📌 ملاحظات</div>
-                <div class="sm txt2 mb16">${esc(l.notes)}</div>
-              ` : ''}
+${l.notes ? `
+<div class="h4 mb8">📌 ملاحظات</div>
+<div class="sm txt2 mb16">${esc(l.notes)}</div>
+` : ''}
 
-              <div class="flex wrap-fl g8 mt20">
-                <button class="btn btn-ok" id="btnDone" ${state.isDone ? 'disabled' : ''}>
-                  ${state.isDone ? '✅ تم إكمال الدرس' : '✓ فهمت الدرس'}
-                </button>
-                <button class="btn btn-wr" id="btnReview">🔄 أحتاج مراجعة</button>
-              </div>
-            </div>
-          </div>
+<div class="flex wrap-fl g8 mt20">
+<button class="btn btn-ok" id="btnDone" ${state.isDone ? 'disabled' : ''}>
+${state.isDone ? '✅ تم إكمال الدرس' : '✓ فهمت الدرس'}
+</button>
+<button class="btn btn-wr" id="btnReview">🔄 أحتاج مراجعة</button>
+</div>
+</div>
+</div>
 
-          <div>
-            <div class="glass mb16" style="padding:16px">
-              <div class="h4 mb12">📊 تقدمك في الوحدة</div>
-              <div class="flex between center mb8">
-                <span class="sm muted">${state.unit ? esc(state.unit.name) : ''}</span>
-                <span class="sm" style="font-weight:700;color:var(--blue2)">${state.unitPct}%</span>
-              </div>
-              <div class="bar"><div class="bar-f" style="width:${state.unitPct}%"></div></div>
-              <div class="xs muted mt8">${state.doneUnit} من ${state.totalUnit} دروس</div>
-            </div>
+<div>
+<div class="glass mb16" style="padding:16px">
+<div class="h4 mb12">📊 تقدمك في الوحدة</div>
+<div class="flex between center mb8">
+<span class="sm muted">${state.unit ? esc(state.unit.name) : ''}</span>
+<span class="sm" style="font-weight:700;color:var(--blue2)">${state.unitPct}%</span>
+</div>
+<div class="bar"><div class="bar-f" style="width:${state.unitPct}%"></div></div>
+<div class="xs muted mt8">${state.doneUnit} من ${state.totalUnit} دروس</div>
+</div>
 
-            ${state.relatedExams.length > 0 ? `
-              <div class="glass" style="padding:16px">
-                <div class="h4 mb12">📝 اختبارات مرتبطة (${state.relatedExams.length})</div>
-                ${state.relatedExams.map(e => `
-                  <a href="/student/exam.html?id=${e.id}" class="exam-card">
-                    <div class="flex between center mb6">
-                      <span class="pill pill-b">${(e.question_ids||[]).length} أسئلة</span>
-                      <span class="pill pill-v">+${e.xp} XP</span>
-                    </div>
-                    <div style="font-size:14px;font-weight:700;color:#e8eefc">${esc(e.title)}</div>
-                    <div style="font-size:11.5px;color:#7f93b8;margin-top:6px">⏱ ${e.duration}د • درجة النجاح: ${e.pass_score}%</div>
-                  </a>
-                `).join('')}
-              </div>
-            ` : `
-              <div class="glass" style="padding:16px">
-                <div class="h4 mb12">📝 اختبارات مرتبطة</div>
-                <div class="sm muted" style="text-align:center;padding:16px">لا توجد اختبارات مرتبطة بهذا الدرس</div>
-              </div>
-            `}
-          </div>
-        </div>
-      </div>
-    `;
+${state.relatedExams.length > 0 ? `
+<div class="glass" style="padding:16px">
+<div class="h4 mb12">📝 اختبارات مرتبطة (${state.relatedExams.length})</div>
+${state.relatedExams.map(e => `
+<a href="/student/exam.html?id=${e.id}" class="exam-card">
+<div class="flex between center mb6">
+<span class="pill pill-b">${(e.question_ids||[]).length} أسئلة</span>
+<span class="pill pill-v">+${e.xp} XP</span>
+</div>
+<div style="font-size:14px;font-weight:700;color:#e8eefc">${esc(e.title)}</div>
+<div style="font-size:11.5px;color:#7f93b8;margin-top:6px">⏱ ${e.duration}د • درجة النجاح: ${e.pass_score}%</div>
+</a>
+`).join('')}
+</div>
+` : `
+<div class="glass" style="padding:16px">
+<div class="h4 mb12">📝 اختبارات مرتبطة</div>
+<div class="sm muted" style="text-align:center;padding:16px">لا توجد اختبارات مرتبطة بهذا الدرس</div>
+</div>
+`}
+</div>
+</div>
+</div>
+`;
 
-    const openBtn = document.getElementById('btnOpenPlayer');
-    if(openBtn){
-      const openHandler = (e)=>{
-        e.preventDefault();
-        e.stopPropagation();
-        openPlayer(l, u);
-      };
-      openBtn.addEventListener('click', openHandler);
-      openBtn.addEventListener('touchend', openHandler, { passive: false });
-    }
+const openBtn = document.getElementById('btnOpenPlayer');
+if(openBtn){
+const openHandler = (e)=>{
+e.preventDefault();
+e.stopPropagation();
+openPlayer(l, u);
+};
+openBtn.addEventListener('click', openHandler);
+openBtn.addEventListener('touchend', openHandler, { passive: false });
+}
 
-    document.getElementById("btnDone").addEventListener("click", async ()=>{
-      if(state.isDone) return;
-      try{
-        const sb = await DB.getClient();
-        const { data: userData } = await sb.from("users").select("completed_lessons, xp").eq("id", u.id).maybeSingle();
-        const completed = userData?.completed_lessons || [];
-        const currentXp = userData?.xp || 0;
-        const newCompleted = [...completed, l.id];
-        const newXp = currentXp + (l.xp || 0);
+document.getElementById("btnDone").addEventListener("click", async ()=>{
+if(state.isDone) return;
+try{
+const sb = await DB.getClient();
+const { data: userData } = await sb.from("users").select("completed_lessons, xp").eq("id", u.id).maybeSingle();
+const completed = userData?.completed_lessons || [];
+const currentXp = userData?.xp || 0;
+const newCompleted = [...completed, l.id];
+const newXp = currentXp + (l.xp || 0);
 
-        await DB.updateUser(u.id, { completed_lessons: newCompleted, xp: newXp });
-        DB.trackActivity({userId:u.id,userName:u.name,type:"lesson_complete",target:l.title,details:{xp:l.xp}});
+await DB.updateUser(u.id, { completed_lessons: newCompleted, xp: newXp });
+DB.trackActivity({userId:u.id,userName:u.name,type:"lesson_complete",target:l.title,details:{xp:l.xp}});
 
-        await Swal.fire({
-          icon: 'success',
-          title: 'أحسنت!',
-          text: `+${l.xp} XP`,
-          background: 'linear-gradient(180deg, #151f38, #0b1122)',
-          color: '#e8eefc',
-          confirmButtonColor: '#2f7dff',
-          customClass: {popup:'swal-custom-popup', title:'swal-custom-title'},
-          timer: 1800,
-          showConfirmButton: false
-        });
+await Swal.fire({
+icon: 'success',
+title: 'أحسنت!',
+text: `+${l.xp} XP`,
+background: 'linear-gradient(180deg, #151f38, #0b1122)',
+color: '#e8eefc',
+confirmButtonColor: '#2f7dff',
+customClass: {popup:'swal-custom-popup', title:'swal-custom-title'},
+timer: 1800,
+showConfirmButton: false
+});
 
-        location.reload();
-      }catch(e){
-        Swal.fire({icon:'error', title:'خطأ', text:e.message, background:'linear-gradient(180deg, #151f38, #0b1122)', color:'#e8eefc', confirmButtonColor:'#2f7dff', customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
-      }
-    });
+location.reload();
+}catch(e){
+Swal.fire({icon:'error', title:'خطأ', text:e.message, background:'linear-gradient(180deg, #151f38, #0b1122)', color:'#e8eefc', confirmButtonColor:'#2f7dff', customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+}
+});
 
-    document.getElementById("btnReview").addEventListener("click", ()=>{
-      Swal.fire({
-        icon: 'info',
-        title: 'تمت الإضافة',
-        text: 'سجلنا هذا الدرس في قائمة المراجعة',
-        background: 'linear-gradient(180deg, #151f38, #0b1122)',
-        color: '#e8eefc',
-        confirmButtonColor: '#2f7dff',
-        customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
-      });
-    });
-  }
+document.getElementById("btnReview").addEventListener("click", ()=>{
+Swal.fire({
+icon: 'info',
+title: 'تمت الإضافة',
+text: 'سجلنا هذا الدرس في قائمة المراجعة',
+background: 'linear-gradient(180deg, #151f38, #0b1122)',
+color: '#e8eefc',
+confirmButtonColor: '#2f7dff',
+customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
+});
+});
+}
 
-  async function load(){
-    if(!lessonId){
-      app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
-        <div class="h3 mb12">⚠️ لم يتم تحديد الدرس</div>
-        <p class="sm muted mb16">يرجى فتح الدرس من داخل المنصة</p>
-        <a href="/student/index.html" class="btn btn-p" style="text-decoration:none">العودة للرئيسية</a>
-      </div>`;
-      return;
-    }
+async function load(){
+if(!lessonId){
+app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
+<div class="h3 mb12">⚠️ لم يتم تحديد الدرس</div>
+<p class="sm muted mb16">يرجى فتح الدرس من داخل المنصة</p>
+<a href="/student/index.html" class="btn btn-p" style="text-decoration:none">العودة للرئيسية</a>
+</div>`;
+return;
+}
 
-    const sid = DB.getSessionId();
-    if(!sid){ window.location.replace("/auth/login.html"); return; }
+const sid = DB.getSessionId();
+if(!sid){ window.location.replace("/auth/login.html"); return; }
 
-    const user = await DB.getUser(sid);
-    if(!user || user.active === false){ DB.clearSession(); window.location.replace("/auth/login.html"); return; }
+const user = await DB.getUser(sid);
+if(!user || user.active === false){ DB.clearSession(); window.location.replace("/auth/login.html"); return; }
 
-    state.user = user;
-    userAvatar.textContent = user.avatar || "🧑‍🎓";
+state.user = user;
+userAvatar.textContent = user.avatar || "🧑‍🎓";
 
-    const sb = await DB.getClient();
+const sb = await DB.getClient();
 
-    const { data: lesson, error } = await sb.from("lessons").select("*").eq("id", lessonId).maybeSingle();
-    if(error || !lesson){
-      app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
-        <div class="h3 mb12">⚠️ الدرس غير موجود</div>
-        <a href="/student/index.html" class="btn btn-p" style="text-decoration:none">العودة للرئيسية</a>
-      </div>`;
-      return;
-    }
+const { data: lesson, error } = await sb.from("lessons").select("*").eq("id", lessonId).maybeSingle();
+if(error || !lesson){
+app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
+<div class="h3 mb12">⚠️ الدرس غير موجود</div>
+<a href="/student/index.html" class="btn btn-p" style="text-decoration:none">العودة للرئيسية</a>
+</div>`;
+return;
+}
 
-    state.lesson = lesson;
+state.lesson = lesson;
 
-    DB.trackActivity({
-      userId: user.id, userName: user.name,
-      type: "lesson_view", target: lesson.title,
-      details: { lesson: lesson.title }
-    });
+DB.trackActivity({
+userId: user.id, userName: user.name,
+type: "lesson_view", target: lesson.title,
+details: { lesson: lesson.title }
+});
 
-    const { data: unit } = await sb.from("units").select("*").eq("id", lesson.unit_id).maybeSingle();
-    state.unit = unit;
+const { data: unit } = await sb.from("units").select("*").eq("id", lesson.unit_id).maybeSingle();
+state.unit = unit;
 
-    if(unit){
-      const { data: subject } = await sb.from("subjects").select("*").eq("id", unit.subject_id).maybeSingle();
-      state.subject = subject;
-    }
+if(unit){
+const { data: subject } = await sb.from("subjects").select("*").eq("id", unit.subject_id).maybeSingle();
+state.subject = subject;
+}
 
-    const { data: unitLessons } = await sb.from("lessons").select("id").eq("unit_id", lesson.unit_id).eq("published", true);
-    const { data: userData } = await sb.from("users").select("completed_lessons").eq("id", user.id).maybeSingle();
-    const completed = userData?.completed_lessons || [];
-    state.totalUnit = unitLessons?.length || 1;
-    state.doneUnit = (unitLessons || []).filter(l => completed.includes(l.id)).length;
-    state.unitPct = Math.round((state.doneUnit / state.totalUnit) * 100);
-    state.isDone = completed.includes(lesson.id);
+const { data: unitLessons } = await sb.from("lessons").select("id").eq("unit_id", lesson.unit_id).eq("published", true);
+const { data: userData } = await sb.from("users").select("completed_lessons").eq("id", user.id).maybeSingle();
+const completed = userData?.completed_lessons || [];
+state.totalUnit = unitLessons?.length || 1;
+state.doneUnit = (unitLessons || []).filter(l => completed.includes(l.id)).length;
+state.unitPct = Math.round((state.doneUnit / state.totalUnit) * 100);
+state.isDone = completed.includes(lesson.id);
 
-    const { data: allExams } = await sb.from("exams").select("*").eq("published", true);
-    state.relatedExams = (allExams || []).filter(e => {
-      const lessonIds = Array.isArray(e.lesson_ids) ? e.lesson_ids : [];
-      return lessonIds.includes(lesson.id);
-    });
+const { data: allExams } = await sb.from("exams").select("*").eq("published", true);
+state.relatedExams = (allExams || []).filter(e => {
+const lessonIds = Array.isArray(e.lesson_ids) ? e.lesson_ids : [];
+return lessonIds.includes(lesson.id);
+});
 
-    render();
+render();
 
-    const closeBtn = document.getElementById('playerClose');
-    if(closeBtn) closeBtn.addEventListener('click', closePlayer);
+const closeBtn = document.getElementById('playerClose');
+if(closeBtn) closeBtn.addEventListener('click', closePlayer);
 
-    const fsBtn = document.getElementById('playerFullscreen');
-    if(fsBtn) fsBtn.addEventListener('click', toggleFullscreen);
+const fsBtn = document.getElementById('playerFullscreen');
+if(fsBtn) fsBtn.addEventListener('click', toggleFullscreen);
 
-    const modal = document.getElementById('playerModal');
-    if(modal){
-      modal.addEventListener('click', (e)=>{
-        if(e.target === modal) closePlayer();
-      });
-    }
+const modal = document.getElementById('playerModal');
+if(modal){
+modal.addEventListener('click', (e)=>{
+if(e.target === modal) closePlayer();
+});
+}
 
-    attachProtection();
+attachProtection();
 
-    try{
-      localStorage.setItem('student_last_lesson', lessonId);
-    }catch(e){}
-  }
+try{
+localStorage.setItem('student_last_lesson', lessonId);
+}catch(e){}
+}
 
-  window.openWhatsApp = ()=>{
-    window.open("https://wa.me/201128351702?text=" + encodeURIComponent("مرحبًا، أريد الاستفسار عن منصة MISSION EDU"), "_blank");
-  };
+window.openWhatsApp = ()=>{
+window.open("https://wa.me/201128351702?text=" + encodeURIComponent("مرحبًا، أريد الاستفسار عن منصة MISSION EDU"), "_blank");
+};
 
-  window.sendReport = async ()=>{
-    const user = state.user || await DB.getUser(DB.getSessionId());
-    const { value: msg } = await Swal.fire({
-      title: '🚨 بلاغ عن مشكلة',
-      input: 'textarea',
-      inputPlaceholder: 'اكتب رسالتك هنا...',
-      showCancelButton: true,
-      confirmButtonText: '📤 إرسال',
-      cancelButtonText: 'إلغاء',
-      confirmButtonColor: '#2f7dff',
-      cancelButtonColor: '#64748b',
-      inputValidator: v => { if(!v || v.trim().length < 5) return 'يرجى كتابة رسالة واضحة'; },
-      customClass: {popup:'swal-custom-popup',title:'swal-custom-title',input:'swal-custom-input'}
-    });
-    if(msg){
-      const sent = await DB.reportIssue({
-        userName: user?.name || 'زائر',
-        userPhone: (user?.country_code||'+20')+(user?.phone||'—'),
-        message: msg
-      });
-      Swal.fire({icon: sent?'success':'error', title: sent?'✅ تم الإرسال':'❌ فشل', text: sent?'شكرًا لك':'حاول مرة أخرى', background:'linear-gradient(180deg, #151f38, #0b1122)', color:'#e8eefc', confirmButtonColor:'#2f7dff', customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
-    }
-  };
+window.sendReport = async ()=>{
+const user = state.user || await DB.getUser(DB.getSessionId());
+const { value: msg } = await Swal.fire({
+title: '🚨 بلاغ عن مشكلة',
+input: 'textarea',
+inputPlaceholder: 'اكتب رسالتك هنا...',
+showCancelButton: true,
+confirmButtonText: '📤 إرسال',
+cancelButtonText: 'إلغاء',
+confirmButtonColor: '#2f7dff',
+cancelButtonColor: '#64748b',
+inputValidator: v => { if(!v || v.trim().length < 5) return 'يرجى كتابة رسالة واضحة'; },
+customClass: {popup:'swal-custom-popup',title:'swal-custom-title',input:'swal-custom-input'}
+});
+if(msg){
+const sent = await DB.reportIssue({
+userName: user?.name || 'زائر',
+userPhone: (user?.country_code||'+20')+(user?.phone||'—'),
+message: msg
+});
+Swal.fire({icon: sent?'success':'error', title: sent?'✅ تم الإرسال':'❌ فشل', text: sent?'شكرًا لك':'حاول مرة أخرى', background:'linear-gradient(180deg, #151f38, #0b1122)', color:'#e8eefc', confirmButtonColor:'#2f7dff', customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+}
+};
 
-  load();
+load();
 })();
 </script>
 </body>
