@@ -1119,6 +1119,183 @@ function Leaderboard(){
     }
   </>;
 }
+/* ═══════════ صفحة استطلاعات الرأي (طالب) ═══════════ */
+function PollsPage(){
+  const app=useApp();
+  const u=app.currentUser;
+  const [loading,setLoading]=useState(true);
+  const [polls,setPolls]=useState([]);
+  const [votes,setVotes]=useState([]);
+  const [voting,setVoting]=useState(null);
+
+  const loadData = useCallback(async ()=>{
+    try{
+      const sb = await DB.getClient();
+      const [pRes, vRes] = await Promise.all([
+        sb.from('polls').select('*').eq('active', true).order('created_at',{ascending:false}),
+        sb.from('poll_votes').select('*')
+      ]);
+      const now = Date.now();
+      const activePolls = (pRes.data || []).filter(p => !p.ends_at || p.ends_at > now);
+      setPolls(activePolls);
+      setVotes(vRes.data || []);
+    }catch(e){console.warn(e);}
+    setLoading(false);
+  },[]);
+
+  useEffect(()=>{ loadData(); },[loadData]);
+
+  const myVote = (pollId) => votes.find(v => v.poll_id === pollId && v.user_id === u.id);
+
+  const vote = async (poll, optionIndex) => {
+    if(myVote(poll.id)) return app.toast.warn('صوّت بالفعل');
+
+    setVoting(poll.id + ':' + optionIndex);
+    try{
+      const sb = await DB.getClient();
+      await sb.from('poll_votes').insert([{
+        id: DB.uid('vote_'),
+        poll_id: poll.id,
+        user_id: u.id,
+        option_index: optionIndex,
+        created_at: Date.now()
+      }]);
+      await loadData();
+      app.toast.ok('✅ تم تسجيل صوتك');
+      DB.trackActivity({
+        userId: u.id, userName: u.name, type: 'poll_vote',
+        target: poll.question, details: { poll_id: poll.id, option: optionIndex }
+      });
+    }catch(e){ app.toast.err(e.message); }
+    setVoting(null);
+  };
+
+  const getStats = (poll) => {
+    const pollVotes = votes.filter(v => v.poll_id === poll.id);
+    const total = pollVotes.length;
+    const counts = (poll.options||[]).map((_, i) =>
+      pollVotes.filter(v => v.option_index === i).length
+    );
+    return { total, counts };
+  };
+
+  return <>
+    <div className="flex between center mb16 wrap g8">
+      <div>
+        <div className="h2 grad">🗳️ استطلاعات الرأي</div>
+        <div className="sm muted mt6">شاركنا رأيك — صوتك يهمنا</div>
+      </div>
+      <span className="pill pill-b">{polls.length} استطلاع</span>
+    </div>
+
+    {loading ? (
+      <div className="glass" style={{padding:40,textAlign:'center'}}>
+        <div className="spinner" style={{margin:'0 auto 14px'}}></div>
+        جارٍ التحميل...
+      </div>
+    ) : polls.length === 0 ? (
+      <div className="glass" style={{padding:30}}>
+        <Empty icon="🗳️" title="لا توجد استطلاعات حالياً" desc="هيظهر هنا أي استطلاع جديد"/>
+      </div>
+    ) : (
+      <div className="flex col g16">
+        {polls.map(p => {
+          const { total, counts } = getStats(p);
+          const mine = myVote(p.id);
+          const hasVoted = !!mine;
+          return <div key={p.id} className="glass" style={{padding:22}}>
+            <div className="flex between center mb16 wrap g8">
+              <span className="pill pill-b">📊 {total} صوت</span>
+              {hasVoted && <span className="pill pill-g">✓ صوّتت</span>}
+            </div>
+
+            <div className="h3 mb16" style={{lineHeight:1.5}}>{p.question}</div>
+
+            <div className="flex col g10">
+              {(p.options||[]).map((opt, i) => {
+                const cnt = counts[i] || 0;
+                const perc = total ? Math.round((cnt/total)*100) : 0;
+                const isMyPick = mine && mine.option_index === i;
+                const isVoting = voting === p.id + ':' + i;
+
+                if(!hasVoted){
+                  return <button key={i}
+                    onClick={()=>vote(p, i)}
+                    disabled={!!voting}
+                    className="glass-s hv"
+                    style={{
+                      padding:'14px 18px',
+                      cursor: isVoting ? 'wait' : 'pointer',
+                      textAlign:'right',
+                      display:'flex',
+                      alignItems:'center',
+                      gap:12,
+                      border: '1.5px solid var(--border)',
+                      fontFamily:'inherit',
+                      color:'inherit',
+                      width:'100%',
+                      transition:'.2s'
+                    }}
+                  >
+                    <span style={{
+                      width:32,height:32,borderRadius:'50%',
+                      display:'grid',placeItems:'center',
+                      background:'rgba(47,125,255,.12)',
+                      border:'1.5px solid var(--border2)',
+                      fontWeight:800,fontSize:13,
+                      color:'var(--blue2)',
+                      flexShrink:0
+                    }}>{['أ','ب','ج','د','هـ','و'][i]}</span>
+                    <span style={{flex:1,fontWeight:600}}>{opt}</span>
+                    {isVoting && <span className="spinner" style={{width:16,height:16,borderWidth:2}}/>}
+                  </button>;
+                }
+
+                return <div key={i} className="glass-s" style={{
+                  padding:'14px 18px',
+                  border: isMyPick ? '1.5px solid var(--green)' : '1.5px solid var(--border)',
+                  background: isMyPick ? 'rgba(34,197,94,.08)' : 'rgba(21,31,56,.62)'
+                }}>
+                  <div className="flex between center mb8">
+                    <div className="flex g8 center">
+                      <span style={{
+                        width:32,height:32,borderRadius:'50%',
+                        display:'grid',placeItems:'center',
+                        background: isMyPick ? 'var(--green)' : 'rgba(47,125,255,.12)',
+                        color: isMyPick ? '#fff' : 'var(--blue2)',
+                        border: isMyPick ? 'none' : '1.5px solid var(--border2)',
+                        fontWeight:800,fontSize:13,
+                        flexShrink:0
+                      }}>{['أ','ب','ج','د','هـ','و'][i]}</span>
+                      <span style={{fontWeight:600}}>{opt}</span>
+                      {isMyPick && <span className="pill pill-g" style={{fontSize:10}}>اختيارك</span>}
+                    </div>
+                    <div className="flex g6 center">
+                      <span className="xs muted">{cnt}</span>
+                      <span className="sm" style={{fontWeight:800,color:isMyPick?'var(--green)':'var(--blue2)'}}>{perc}%</span>
+                    </div>
+                  </div>
+                  <div className="bar" style={{height:8}}>
+                    <div
+                      className={`bar-f ${isMyPick?'bar-g':'bar-b'}`}
+                      style={{width:`${perc}%`}}
+                    />
+                  </div>
+                </div>;
+              })}
+            </div>
+
+            {p.ends_at && (
+              <div className="xs muted mt16" style={{textAlign:'center'}}>
+                ⏰ ينتهي: {DB.formatDate(p.ends_at)}
+              </div>
+            )}
+          </div>;
+        })}
+      </div>
+    )}
+  </>;
+}
 
 /* ═══════════ Notes Page ═══════════ */
 function NotesPage({setTab}){
@@ -1538,6 +1715,7 @@ function StudentApp(){
   {id:'missions',icon:'target',label:'المهام'},
   {id:'achievements',icon:'trophy',label:'الإنجازات'},
   {id:'notes',icon:'note',label:'ملاحظاتي',badge:app.notes?.length||null},
+  {id:'polls',icon:'activity',label:'استطلاعات الرأي'},
   {id:'errors',icon:'alert',label:'دفتر أخطائي'},
   {id:'leaderboard',icon:'medal',label:'المتصدرون'},
   {id:'notifications',icon:'bell',label:'الإشعارات',badge:unread||null},
@@ -1574,6 +1752,7 @@ function StudentApp(){
         {tab==='missions'&&<Missions setSelected={setSelected} setTab={setTab}/>}
         {tab==='achievements'&&<Achievements/>}
         {tab==='notes'&&<NotesPage setTab={setTab}/>}
+        {tab==='polls'&&<PollsPage/>}
         {tab==='errors'&&<ErrorBook/>}
         {tab==='leaderboard'&&<Leaderboard/>}
         {tab==='notifications'&&<Notifications/>}
@@ -1585,7 +1764,7 @@ function StudentApp(){
   {[
     {id:'home',icon:'home',label:'الرئيسية'},
     {id:'subjects',icon:'book',label:'المواد'},
-    {id:'missions',icon:'target',label:'المهام'},
+    {id:'polls',icon:'activity',label:'استطلاعات'},
     {id:'notes',icon:'note',label:'ملاحظاتي'}
   ].map(it=><button key={it.id} className={tab===it.id?'on':''} onClick={()=>handleNav(it.id)}>
         <span className="i"><Icon name={it.icon} size={19}/></span>
