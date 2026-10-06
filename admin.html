@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#04060e" />
+<title>404 — الصفحة غير موجودة | MISSION EDU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="/logo.png">
+<style>
+:root{--bg:#04060e;--blue:#2f7dff;--txt:#e8eefc;--muted:#7f93b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(47,125,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(139,92,246,.14),transparent 60%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;display:grid;place-items:center;padding:20px;text-align:center;overflow:hidden}
+.wrap{max-width:600px;position:relative;z-index:1}
+.err-code{font-size:clamp(120px,25vw,200px);font-weight:900;line-height:1;background:linear-gradient(100deg,#5aa9ff,#a78bfa 55%,#22d3ee);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:float 3s ease-in-out infinite;filter:drop-shadow(0 20px 60px rgba(47,125,255,.5))}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.emoji{font-size:80px;margin-bottom:16px;display:inline-block;animation:sway 4s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(0)}25%{transform:rotate(-15deg)}75%{transform:rotate(15deg)}}
+h1{font-size:clamp(22px,4vw,30px);font-weight:900;letter-spacing:-.7px;margin-bottom:12px}
+p{color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:32px;max-width:480px;margin-inline:auto}
+.actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 26px;border-radius:14px;font-weight:700;font-size:14.5px;text-decoration:none;transition:.28s;cursor:pointer;border:none;font-family:inherit}
+.btn-p{background:linear-gradient(135deg,#2f7dff,#1f5fd6);color:#fff;box-shadow:0 10px 30px rgba(47,125,255,.4)}
+.btn-p:hover{transform:translateY(-3px);box-shadow:0 16px 44px rgba(47,125,255,.6)}
+.btn-s{background:rgba(255,255,255,.05);color:#e8eefc;border:1px solid rgba(90,140,230,.3)}
+.btn-s:hover{background:rgba(255,255,255,.1);transform:translateY(-3px)}
+.brand{position:fixed;top:20px;right:20px;display:flex;align-items:center;gap:10px;opacity:.6;font-weight:900;font-size:16px}
+.brand img{width:32px;height:32px}
+</style>
+</head>
+<body>
+
+<div class="brand">
+  <img src="/logo.png" alt="MISSION EDU" onerror="this.style.display='none'">
+  <span>MISSION EDU</span>
+</div>
+
+<div class="wrap">
+  <div class="emoji">🖕🏻</div>
+  <div class="err-code">404</div>
+  <h1>كسمك يابن المتناكه</h1>
+  <p>عمك سسيؤدهه هيركب دين امك</p>
+  <div class="actions">
+    <a href="/" class="btn btn-p">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      ارجع 😑
+    </a>
+    <button class="btn btn-s" onclick="history.back()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+      ارجع اكسمك
+    </button>
+  </div>
+</div>
+
+</body>
+</html>
