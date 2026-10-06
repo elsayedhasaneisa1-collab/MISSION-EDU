@@ -333,6 +333,46 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
   .topbar{padding:10px 14px}
   .g2,.g3,.g4{grid-template-columns:1fr}
 }
+html, body{
+  overflow-x: hidden;
+  max-width: 100%;
+  width: 100%;
+}
+.app{
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+.main{
+  overflow-x: hidden;
+  max-width: 100%;
+}
+.content{
+  overflow-x: hidden;
+}
+.sidebar{
+  max-width: 100%;
+}
+.toast-host{
+  max-width: calc(100vw - 32px);
+}
+@media(max-width:860px){
+  .toast-host{
+    inset-inline-start: 12px;
+    inset-inline-end: 12px;
+    max-width: none;
+  }
+  .toast{
+    min-width: 0;
+    width: 100%;
+  }
+}
+.sx{
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+
 </style>
 </head>
 <body>
