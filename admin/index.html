@@ -204,6 +204,128 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
   .topbar{padding:10px 14px}
   .g2,.g3,.g4{grid-template-columns:1fr}
 }
+
+[data-theme="light"]{
+  --bg:#f5f1e8; --bg2:#ebe5d5;
+  --txt:#1a1206; --txt2:#3d3320; --muted:#7a6a3d;
+  --border:rgba(139,105,20,.22); --border2:rgba(139,105,20,.42); --border3:rgba(184,134,11,.55);
+  --sh:0 18px 40px rgba(139,105,20,.10), 0 0 0 1px rgba(139,105,20,.05) inset;
+  --sh-gold:0 10px 30px rgba(139,105,20,.22);
+  --sh-gold-h:0 14px 40px rgba(139,105,20,.32);
+}
+[data-theme="light"] body{
+  background:
+    radial-gradient(1200px 620px at 85% -12%,rgba(212,175,55,.20),transparent 62%),
+    radial-gradient(950px 520px at -8% 18%,rgba(184,134,11,.12),transparent 60%),
+    radial-gradient(700px 400px at 50% 110%,rgba(255,215,0,.10),transparent 70%),
+    #f5f1e8;
+  color:var(--txt);
+}
+[data-theme="light"] .glass{
+  background:linear-gradient(180deg,rgba(255,252,242,.94),rgba(245,240,225,.88));
+  border-color:var(--border);
+  box-shadow:0 18px 40px rgba(139,105,20,.10), 0 0 0 1px rgba(255,255,255,.5) inset;
+}
+[data-theme="light"] .glass::before{
+  background:linear-gradient(135deg,rgba(184,134,11,.28),rgba(212,175,55,.05) 40%,rgba(184,134,11,.22));
+}
+[data-theme="light"] .glass-s{
+  background:rgba(255,252,242,.85);
+  border-color:var(--border);
+}
+[data-theme="light"] .sidebar{
+  background:linear-gradient(180deg,rgba(255,252,242,.99),rgba(245,240,225,.96));
+  border-inline-start-color:var(--border);
+}
+[data-theme="light"] .topbar{
+  background:rgba(245,241,232,.85);
+  border-bottom-color:var(--border);
+}
+[data-theme="light"] .search{
+  background:rgba(255,252,242,.9);
+  border-color:var(--border);
+}
+[data-theme="light"] .search input{color:var(--txt)}
+[data-theme="light"] .input,
+[data-theme="light"] select.input,
+[data-theme="light"] textarea.input{
+  background:rgba(255,252,242,.92);
+  border-color:var(--border);
+  color:var(--txt);
+}
+[data-theme="light"] .input::placeholder{color:var(--muted)}
+[data-theme="light"] select.input{
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238B6914' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>");
+}
+[data-theme="light"] .modal-bg{background:rgba(245,241,232,.88)}
+[data-theme="light"] .nav-i{color:var(--txt2)}
+[data-theme="light"] .nav-i:hover{background:rgba(212,175,55,.15);color:var(--txt)}
+[data-theme="light"] .nav-i.on{
+  background:linear-gradient(90deg,rgba(212,175,55,.32),rgba(212,175,55,.05));
+  color:#5c4509;
+}
+[data-theme="light"] .nav-ico{color:var(--gold-d)}
+[data-theme="light"] .brand-sub{color:var(--muted)}
+[data-theme="light"] .icon-btn{
+  background:rgba(212,175,55,.12);
+  border-color:var(--border);
+  color:var(--gold-d);
+}
+[data-theme="light"] .icon-btn:hover{
+  background:rgba(212,175,55,.22);
+  border-color:var(--border2);
+}
+[data-theme="light"] .tbl th{
+  color:#5c4509;
+  border-bottom-color:var(--border2);
+}
+[data-theme="light"] .tbl td{border-bottom-color:rgba(139,105,20,.12)}
+[data-theme="light"] .tbl tr:hover td{background:rgba(212,175,55,.08)}
+[data-theme="light"] .bar{background:rgba(139,105,20,.15)}
+[data-theme="light"] .act-row{background:rgba(212,175,55,.08);border-color:var(--border)}
+[data-theme="light"] .act-ico{background:rgba(212,175,55,.20);color:var(--gold-d)}
+[data-theme="light"] .hero{
+  background:linear-gradient(135deg,rgba(212,175,55,.28),rgba(184,134,11,.16) 50%,rgba(255,215,0,.12));
+  border-color:var(--border2);
+  box-shadow:0 20px 50px rgba(139,105,20,.14);
+}
+[data-theme="light"] .grad{
+  background:linear-gradient(100deg,#8B6914,#D4AF37 50%,#5c4509 100%);
+  background-size:200% 100%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+[data-theme="light"] .toast{
+  background:linear-gradient(135deg,rgba(255,252,242,.99),rgba(245,240,225,.99));
+  border-color:var(--border2);
+  box-shadow:0 20px 60px rgba(139,105,20,.20), 0 0 30px rgba(212,175,55,.15);
+}
+[data-theme="light"] .toast-title{color:#8B6914}
+[data-theme="light"] .toast-msg{color:var(--txt2)}
+[data-theme="light"] .toast-close{background:rgba(139,105,20,.12);color:var(--muted)}
+[data-theme="light"] .pill-y{background:rgba(139,105,20,.10);color:var(--muted);border-color:var(--border)}
+[data-theme="light"] .empty{color:var(--muted)}
+[data-theme="light"] .footer-dev{border-top-color:rgba(139,105,20,.18)}
+[data-theme="light"] .dev-btn{
+  background:linear-gradient(135deg,rgba(212,175,55,.22),rgba(184,134,11,.18));
+  border-color:rgba(139,105,20,.45);
+  color:var(--txt);
+}
+[data-theme="light"] .tg-btn{
+  background:rgba(212,175,55,.15);
+  border-color:rgba(139,105,20,.40);
+  color:#8B6914;
+}
+[data-theme="light"] .swal-custom-title{color:#1a1206 !important}
+[data-theme="light"] .swal-custom-input{
+  background:rgba(255,252,242,.95) !important;
+  border-color:rgba(139,105,20,.35) !important;
+  color:#1a1206 !important;
+}
+[data-theme="light"] ::-webkit-scrollbar-track{background:rgba(139,105,20,.06)}
+[data-theme="light"] ::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,#D4AF37,#8B6914);
+}
+
 </style>
 </head>
 <body>
@@ -3058,17 +3180,9 @@ function AdminApp(){
   },[tab]);
 
   useEffect(()=>{
-    try{ localStorage.setItem('admin_theme', theme); }catch(e){}
-    if(theme === 'light'){
-      document.documentElement.style.setProperty('--bg','#f5f1e8');
-      document.documentElement.style.setProperty('--txt','#1a1206');
-      document.documentElement.style.setProperty('--txt2','#3d3320');
-    } else {
-      document.documentElement.style.setProperty('--bg','#0a0805');
-      document.documentElement.style.setProperty('--txt','#f7f0dd');
-      document.documentElement.style.setProperty('--txt2','#d4c79a');
-    }
-  },[theme]);
+  try{ localStorage.setItem('admin_theme', theme); }catch(e){}
+  document.documentElement.setAttribute('data-theme', theme);
+},[theme]);
 
   const unreadNotifs = useMemo(()=>{
     return (app.db.notifications||[]).filter(n => {
