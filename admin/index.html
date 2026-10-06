@@ -213,7 +213,14 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="/db.js"></script>
-<script type="text/babel" data-presets="react">
+<script>
+  if (window.Babel) {
+    Babel.registerPreset('react-classic', {
+      presets: [[Babel.availablePresets['react'], { runtime: 'classic' }]]
+    });
+  }
+</script>
+<script type="text/babel" data-presets="react-classic">
 const {useState,useEffect,useMemo,useCallback,useRef,createContext,useContext}=React;
 const DB=window.MissionDB;
 
@@ -1450,8 +1457,6 @@ function StudentsPage(){
   });
 
   const open = s => { setForm(JSON.parse(JSON.stringify(s))); setEditing(s.id); };
-
-  // ✅ save — دالة مستقلة مكتملة
   const save = async () => {
     setBusy(true);
     try {
@@ -1474,8 +1479,6 @@ function StudentsPage(){
     }
     setBusy(false);
   };
-
-  // ✅ toggle — دالة مستقلة خارج save
   const toggle = async s => {
     const action = s.active !== false ? 'إيقاف' : 'تفعيل';
     const r = await Swal.fire({
@@ -1498,8 +1501,6 @@ function StudentsPage(){
       app.toast.warn(s.active !== false ? 'تم الإيقاف' : 'تم التفعيل');
     } catch(e) { app.toast.err(e.message); }
   };
-
-  // ✅ govCounts — بره الدوال
   const govCounts = {};
   allStudents.forEach(u => {
     if (u.governorate) {
