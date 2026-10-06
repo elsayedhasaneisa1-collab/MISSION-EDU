@@ -47,14 +47,16 @@ ul{list-style:none}
 .btn-wr:hover{transform:translateY(-2px)}
 .btn-s{background:rgba(255,255,255,.05);color:var(--txt2);border:1px solid var(--border)}
 .btn-s:hover{background:rgba(255,255,255,.09);color:var(--txt)}
+.btn-dn{background:rgba(239,68,68,.14);color:#fca5a5;border:1px solid rgba(239,68,68,.32)}
+.btn-sm{padding:7px 13px;font-size:12.5px;border-radius:10px}
 .btn-block{width:100%}
-.btn-lg{padding:15px 32px;font-size:16px;border-radius:16px}
 .btn:disabled{opacity:.42;cursor:not-allowed;transform:none!important}
 .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:40px;font-size:11.5px;font-weight:700;border:1px solid transparent}
 .pill-b{background:rgba(47,125,255,.15);color:#7db6ff;border-color:rgba(47,125,255,.28)}
 .pill-g{background:rgba(34,197,94,.14);color:#6ee7a0;border-color:rgba(34,197,94,.28)}
 .pill-a{background:rgba(245,158,11,.14);color:#fcd34d;border-color:rgba(245,158,11,.28)}
 .pill-v{background:rgba(139,92,246,.15);color:#c4b5fd;border-color:rgba(139,92,246,.28)}
+.pill-r{background:rgba(239,68,68,.14);color:#fca5a5;border-color:rgba(239,68,68,.28)}
 .pill-y{background:rgba(255,255,255,.06);color:var(--muted);border-color:var(--border)}
 .bar{height:9px;border-radius:20px;background:rgba(255,255,255,.07);overflow:hidden}
 .bar-f{height:100%;border-radius:20px;transition:width .8s;background:linear-gradient(90deg,#2f7dff,#5aa9ff)}
@@ -66,6 +68,7 @@ ul{list-style:none}
 @keyframes pulsePlay{0%,100%{box-shadow:0 16px 50px rgba(47,125,255,.55),0 0 0 0 rgba(47,125,255,.5)}50%{box-shadow:0 16px 50px rgba(47,125,255,.55),0 0 0 24px rgba(47,125,255,0)}}
 @keyframes pu{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes noteBlink{0%,100%{opacity:1}50%{opacity:.55}}
 .fade-in{animation:fu .5s}
 .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(6,9,20,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
 .back-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--txt2);font-size:13.5px;font-weight:700;transition:.2s;text-decoration:none}
@@ -82,6 +85,10 @@ ul{list-style:none}
 .kp-dot{color:var(--blue2);font-weight:800;flex-shrink:0}
 .exam-card{display:block;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-radius:14px;background:rgba(21,31,56,.62);border:1px solid var(--border);transition:.28s cubic-bezier(.2,.8,.3,1)}
 .exam-card:hover{transform:translateY(-3px);border-color:var(--border2);box-shadow:0 12px 30px rgba(47,125,255,.15)}
+.notes-area{width:100%;min-height:130px;padding:12px 14px;border-radius:12px;background:rgba(10,16,32,.55);border:1.5px solid var(--border);color:var(--txt);font-size:13px;line-height:1.8;resize:vertical;outline:none;font-family:inherit;transition:.22s}
+.notes-area:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.12);background:rgba(10,16,32,.78)}
+.notes-area::placeholder{color:var(--muted)}
+.note-status-saving{animation:noteBlink 1s infinite}
 .footer-dev{display:flex;justify-content:center;gap:10px;padding:24px 20px 16px;margin-top:40px;border-top:1px solid rgba(90,140,230,.12);flex-wrap:wrap}
 .dev-btn{display:inline-flex;align-items:center;gap:9px;padding:10px 20px;border-radius:50px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .3s;border:1px solid rgba(90,140,230,.3);background:linear-gradient(135deg,rgba(47,125,255,.15),rgba(139,92,246,.15));color:var(--txt);position:relative;overflow:hidden}
 .dev-btn:hover{background:linear-gradient(135deg,rgba(47,125,255,.28),rgba(139,92,246,.28));border-color:#2f7dff;transform:translateY(-2px);box-shadow:0 12px 32px rgba(47,125,255,.35)}
@@ -207,7 +214,12 @@ doneUnit: 0,
 totalUnit: 0,
 isDone: false,
 watermarkTimer: null,
-isFullscreen: false
+isFullscreen: false,
+note: '',
+noteId: null,
+noteTimer: null,
+noteSaving: false,
+noteDirty: false
 };
 
 function esc(str){
@@ -218,6 +230,112 @@ function getYouTubeId(url){
 if(!url) return "";
 const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
 return m ? m[1] : "";
+}
+
+async function loadNote(userId, lessonId){
+try{
+const sb = await DB.getClient();
+const { data } = await sb.from('notes').select('*').eq('user_id', userId).eq('lesson_id', lessonId).maybeSingle();
+if(data){
+state.note = data.text || '';
+state.noteId = data.id;
+}
+}catch(e){ console.warn('loadNote:', e); }
+}
+
+function updateNoteStatus(status){
+const el = document.getElementById('noteStatus');
+if(!el) return;
+el.classList.remove('note-status-saving');
+if(status === 'saving'){
+el.textContent = '⏳ جارٍ الحفظ...';
+el.className = 'pill pill-a note-status-saving';
+} else if(status === 'saved'){
+el.textContent = '✅ محفوظ';
+el.className = 'pill pill-g';
+} else if(status === 'error'){
+el.textContent = '❌ فشل الحفظ';
+el.className = 'pill pill-r';
+} else if(status === 'empty'){
+el.textContent = 'فارغ';
+el.className = 'pill pill-y';
+}
+}
+
+async function saveNote(silent){
+if(!state.user || !state.lesson) return;
+if(!state.noteDirty && silent) return;
+
+state.noteSaving = true;
+updateNoteStatus('saving');
+
+try{
+const sb = await DB.getClient();
+const now = Date.now();
+const text = state.note;
+
+if(!text.trim()){
+if(state.noteId){
+await sb.from('notes').delete().eq('id', state.noteId);
+state.noteId = null;
+}
+state.noteDirty = false;
+state.noteSaving = false;
+updateNoteStatus('empty');
+return;
+}
+
+if(state.noteId){
+await sb.from('notes').update({text, updated_at: now}).eq('id', state.noteId);
+} else {
+const id = DB.uid('note_');
+await sb.from('notes').insert([{
+id,
+user_id: state.user.id,
+lesson_id: state.lesson.id,
+text,
+created_at: now,
+updated_at: now
+}]);
+state.noteId = id;
+}
+
+state.noteDirty = false;
+state.noteSaving = false;
+updateNoteStatus('saved');
+
+if(!silent){
+DB.trackActivity({
+userId: state.user.id,
+userName: state.user.name,
+type: "note_save",
+target: state.lesson.title,
+details: { lesson: state.lesson.title }
+});
+}
+}catch(e){
+console.warn('saveNote:', e);
+state.noteSaving = false;
+updateNoteStatus('error');
+if(!silent){
+Swal.fire({
+icon: 'error',
+title: 'خطأ',
+text: 'فشل حفظ الملاحظة',
+background: 'linear-gradient(180deg, #151f38, #0b1122)',
+color: '#e8eefc',
+confirmButtonColor: '#2f7dff',
+customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
+});
+}
+}
+}
+
+function scheduleAutoSave(){
+if(state.noteTimer) clearTimeout(state.noteTimer);
+state.noteTimer = setTimeout(()=>{
+saveNote(true);
+}, 1500);
 }
 
 function openPlayer(lesson, user){
@@ -451,20 +569,20 @@ if(modal && modal.classList.contains('open')) closePlayer();
 }
 });
 
-document.addEventListener('copy', e => e.preventDefault());
-document.addEventListener('cut', e => e.preventDefault());
+document.addEventListener('copy', e => {
+const t = e.target?.tagName?.toLowerCase();
+if(t !== 'input' && t !== 'textarea') e.preventDefault();
+});
+document.addEventListener('cut', e => {
+const t = e.target?.tagName?.toLowerCase();
+if(t !== 'input' && t !== 'textarea') e.preventDefault();
+});
 document.addEventListener('dragstart', e => e.preventDefault());
 document.addEventListener('selectstart', e => {
 const t = e.target?.tagName?.toLowerCase();
 if(t !== 'input' && t !== 'textarea') e.preventDefault();
 });
 document.addEventListener('dblclick', e => e.preventDefault());
-
-document.addEventListener('fullscreenchange', ()=>{
-const modal = document.getElementById('playerModal');
-if(!document.fullscreenElement && modal && modal.classList.contains('open')){
-}
-});
 }
 
 function buildPlayerHTML(video, lessonTitle){
@@ -542,7 +660,7 @@ ${(l.examples || []).map(ex => `
 ` : ''}
 
 ${l.notes ? `
-<div class="h4 mb8">📌 ملاحظات</div>
+<div class="h4 mb8">📌 ملاحظات المعلم</div>
 <div class="sm txt2 mb16">${esc(l.notes)}</div>
 ` : ''}
 
@@ -556,6 +674,19 @@ ${state.isDone ? '✅ تم إكمال الدرس' : '✓ فهمت الدرس'}
 </div>
 
 <div>
+<div class="glass mb16" style="padding:16px">
+<div class="flex between center mb12">
+<div class="h4">📝 ملاحظاتي</div>
+<span class="pill pill-y" id="noteStatus">فارغ</span>
+</div>
+<textarea id="lessonNote" class="notes-area" placeholder="اكتب ملاحظاتك على الدرس هنا... هتظهر في تبويب ملاحظاتي بالرئيسية"></textarea>
+<div class="flex g8 mt12">
+<button class="btn btn-p btn-sm" id="btnSaveNote" style="flex:1">💾 حفظ</button>
+<button class="btn btn-dn btn-sm" id="btnClearNote" title="مسح الملاحظة">🗑</button>
+</div>
+<div class="xs muted mt8" style="text-align:center">💡 يتم الحفظ تلقائيًا أثناء الكتابة</div>
+</div>
+
 <div class="glass mb16" style="padding:16px">
 <div class="h4 mb12">📊 تقدمك في الوحدة</div>
 <div class="flex between center mb8">
@@ -644,6 +775,61 @@ confirmButtonColor: '#2f7dff',
 customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
 });
 });
+
+const noteEl = document.getElementById('lessonNote');
+if(noteEl){
+noteEl.value = state.note || '';
+if(state.note && state.note.trim()){
+updateNoteStatus('saved');
+} else {
+updateNoteStatus('empty');
+}
+
+noteEl.addEventListener('input', ()=>{
+state.note = noteEl.value;
+state.noteDirty = true;
+updateNoteStatus('saving');
+scheduleAutoSave();
+});
+
+noteEl.addEventListener('blur', ()=>{
+if(state.noteDirty) saveNote(true);
+});
+}
+
+const btnSave = document.getElementById('btnSaveNote');
+if(btnSave){
+btnSave.addEventListener('click', ()=>{
+state.noteDirty = true;
+saveNote(false);
+});
+}
+
+const btnClear = document.getElementById('btnClearNote');
+if(btnClear){
+btnClear.addEventListener('click', async ()=>{
+if(!state.note.trim() && !state.noteId) return;
+const r = await Swal.fire({
+title: 'مسح الملاحظة؟',
+text: 'سيتم حذف الملاحظة نهائيًا',
+icon: 'warning',
+showCancelButton: true,
+confirmButtonText: 'نعم، امسح',
+cancelButtonText: 'إلغاء',
+confirmButtonColor: '#ef4444',
+cancelButtonColor: '#64748b',
+background: 'linear-gradient(180deg, #151f38, #0b1122)',
+color: '#e8eefc',
+customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
+});
+if(!r.isConfirmed) return;
+const el = document.getElementById('lessonNote');
+if(el) el.value = '';
+state.note = '';
+state.noteDirty = true;
+await saveNote(false);
+});
+}
 }
 
 async function load(){
@@ -706,6 +892,8 @@ const lessonIds = Array.isArray(e.lesson_ids) ? e.lesson_ids : [];
 return lessonIds.includes(lesson.id);
 });
 
+await loadNote(user.id, lesson.id);
+
 render();
 
 const closeBtn = document.getElementById('playerClose');
@@ -722,6 +910,12 @@ if(e.target === modal) closePlayer();
 }
 
 attachProtection();
+
+window.addEventListener('beforeunload', ()=>{
+if(state.noteDirty){
+saveNote(true);
+}
+});
 
 try{
 localStorage.setItem('student_last_lesson', lessonId);
