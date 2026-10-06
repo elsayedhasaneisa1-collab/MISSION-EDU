@@ -1,0 +1,43 @@
+{
+  "name": "MISSION EDU — منصة المهام التعليمية",
+  "short_name": "MISSION EDU",
+  "description": "منصة تعليمية تحوّل المنهج إلى مهام وتحديات — تابع تقدمك، اختبر نفسك، وطوّر مستواك خطوة بخطوة.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#04060e",
+  "theme_color": "#04060e",
+  "categories": ["education", "productivity"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "الرئيسية",
+      "short_name": "الرئيسية",
+      "url": "/",
+      "icons": [{ "src": "/logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "تسجيل الدخول",
+      "short_name": "الدخول",
+      "url": "/auth/login.html",
+      "icons": [{ "src": "/logo.png", "sizes": "192x192" }]
+    }
+  ]
+}

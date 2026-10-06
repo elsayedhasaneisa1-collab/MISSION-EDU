@@ -1,5 +1,5 @@
 const SUPABASE_URL = "https://szuvpbdwixezecxnykjn.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6dXZwYmR3aXhlemVjeG55a2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4Njc4MjAsImV4cCI6MjEwNDQ0MzgyMH0.RffdlO9yV0ob2H0gmSHKwyVGKhe8ZDdnJOBSuD5rahQ";
+const SUPABASE_KEY = "sb_publishable_NgBzisUuNn6Gdz9PE1XgWg_EYlC5zta";
 
 let _client = null;
 
@@ -8,7 +8,7 @@ async function getClient() {
   if (!window.supabase) {
     await new Promise((resolve, reject) => {
       const s = document.createElement("script");
-      s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js";
+      s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
       s.onload = resolve;
       s.onerror = reject;
       document.head.appendChild(s);
@@ -27,15 +27,23 @@ const daysBetween = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000)
 const fmt = (n) => new Intl.NumberFormat("ar-EG").format(n || 0);
 const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
 
+// ═══════════════ تنسيق الوقت ═══════════════
 const formatTime = (timestamp) => {
   if (!timestamp) return "—";
   try {
     let ms = Number(timestamp);
+    // لو timestamp بالثواني (10 أرقام) → نحوّله للملي ثانية
     if (ms < 10000000000) ms = ms * 1000;
     const d = new Date(ms);
     if (isNaN(d.getTime())) return "—";
-    return d.toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit", hour12: true });
-  } catch (e) { return "—"; }
+    return d.toLocaleTimeString("ar-EG", { 
+      hour: "2-digit", 
+      minute: "2-digit",
+      hour12: true 
+    });
+  } catch (e) {
+    return "—";
+  }
 };
 
 const formatDate = (timestamp) => {
@@ -45,8 +53,14 @@ const formatDate = (timestamp) => {
     if (ms < 10000000000) ms = ms * 1000;
     const d = new Date(ms);
     if (isNaN(d.getTime())) return "—";
-    return d.toLocaleDateString("ar-EG", { day: "numeric", month: "short", year: "numeric" });
-  } catch (e) { return "—"; }
+    return d.toLocaleDateString("ar-EG", { 
+      day: "numeric", 
+      month: "short", 
+      year: "numeric" 
+    });
+  } catch (e) {
+    return "—";
+  }
 };
 
 const formatDateTime = (timestamp) => {
@@ -56,8 +70,16 @@ const formatDateTime = (timestamp) => {
     if (ms < 10000000000) ms = ms * 1000;
     const d = new Date(ms);
     if (isNaN(d.getTime())) return "—";
-    return d.toLocaleString("ar-EG", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: true });
-  } catch (e) { return "—"; }
+    return d.toLocaleString("ar-EG", { 
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true
+    });
+  } catch (e) {
+    return "—";
+  }
 };
 
 const hashPassword = async (password) => {
@@ -65,8 +87,12 @@ const hashPassword = async (password) => {
     const enc = new TextEncoder();
     const data = enc.encode(password + "::me::salt::" + SUPABASE_URL);
     const buf = await crypto.subtle.digest("SHA-256", data);
-    return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
-  } catch (e) { return password; }
+    return Array.from(new Uint8Array(buf))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+  } catch (e) {
+    return password;
+  }
 };
 
 const setSession = (userId) => {
@@ -81,7 +107,9 @@ const setSession = (userId) => {
 const getSessionId = () => {
   try {
     return localStorage.getItem("me_session") || sessionStorage.getItem("me_session");
-  } catch (e) { return null; }
+  } catch (e) {
+    return null;
+  }
 };
 
 const clearSession = () => {
@@ -89,14 +117,8 @@ const clearSession = () => {
     localStorage.removeItem("me_session");
     localStorage.removeItem("me_session_at");
     localStorage.removeItem("me_session_permanent");
-    localStorage.removeItem("student_tab");
-    localStorage.removeItem("student_selected");
-    localStorage.removeItem("student_last_lesson");
-  } catch (e) {}
-  try {
     sessionStorage.removeItem("me_session");
     sessionStorage.removeItem("me_session_at");
-    sessionStorage.clear();
   } catch (e) {}
 };
 
@@ -109,7 +131,11 @@ const sendToTelegram = async (message) => {
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: "HTML" })
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message,
+        parse_mode: "HTML"
+      })
     });
     return res.ok;
   } catch (e) { return false; }
@@ -126,8 +152,11 @@ const API = {
     const cleanPhone = String(phone).replace(/\D/g, "");
     if (!cleanPhone) throw new Error("رقم الهاتف مطلوب");
 
-    const { data, error } = await sb.from("users").select("*")
-      .eq("phone", cleanPhone).eq("country_code", countryCode).maybeSingle();
+    const { data, error } = await sb
+      .from("users").select("*")
+      .eq("phone", cleanPhone)
+      .eq("country_code", countryCode)
+      .maybeSingle();
     if (error) throw new Error(error.message);
     if (!data) throw new Error("رقم الهاتف غير مسجل");
 
@@ -144,38 +173,53 @@ const API = {
       streak = d === 1 ? streak + 1 : 1;
     } else if (!data.last_active) streak = 1;
 
-    const { data: updated } = await sb.from("users")
-      .update({ last_active: t, streak }).eq("id", data.id).select().single();
+    const { data: updated } = await sb
+      .from("users")
+      .update({ last_active: t, streak })
+      .eq("id", data.id).select().single();
 
     setSession(data.id);
     API.trackActivity({
       userId: data.id, userName: data.name, userRole: data.role,
       type: "login", target: data.name, details: { streak }
     });
+
     return updated;
   },
 
   async register({ name, phone, password, gradeId, countryCode = "+20", governorate = "" }) {
     if (!name || !phone || !password) throw new Error("يرجى تعبئة جميع الحقول");
     if (password.length < 6) throw new Error("كلمة المرور يجب أن تكون 6 أحرف على الأقل");
+
     const cleanPhone = String(phone).replace(/\D/g, "");
     if (cleanPhone.length < 8) throw new Error("رقم الهاتف غير صالح");
 
     const sb = await getClient();
-    const { data: exist } = await sb.from("users").select("id")
-      .eq("phone", cleanPhone).eq("country_code", countryCode).maybeSingle();
+    const { data: exist } = await sb
+      .from("users").select("id")
+      .eq("phone", cleanPhone)
+      .eq("country_code", countryCode)
+      .maybeSingle();
     if (exist) throw new Error("رقم الهاتف مستخدم بالفعل");
 
-    const { data: roleRow } = await sb.from("roles").select("id").eq("name", "student").maybeSingle();
+    const { data: roleRow } = await sb
+      .from("roles").select("id").eq("name", "student").maybeSingle();
+
     const hashed = await hashPassword(password);
 
     const u = {
-      id: uid("u_"), phone: cleanPhone, country_code: countryCode,
-      governorate: governorate || null, email: null,
-      password: hashed, password_hash: hashed,
-      name: name.trim(), role: "student",
+      id: uid("u_"),
+      phone: cleanPhone,
+      country_code: countryCode,
+      governorate: governorate || null,
+      email: null,
+      password: hashed,
+      password_hash: hashed,
+      name: name.trim(),
+      role: "student",
       role_id: roleRow ? roleRow.id : "role_student",
-      avatar: "🧑‍🎓", grade_id: gradeId || "",
+      avatar: "🧑‍🎓",
+      grade_id: gradeId || "",
       xp: 0, streak: 1, last_active: today(),
       created_at: Date.now(), active: true,
       all_subjects: true, access_subjects: [],
@@ -191,6 +235,7 @@ const API = {
       type: "register", target: u.name,
       details: { role: "student", phone: cleanPhone, governorate }
     });
+
     return data;
   },
 
@@ -203,19 +248,6 @@ const API = {
     } catch (e) { return null; }
   },
 
-  async changePassword(userId, oldHashed, newHashed) {
-    try {
-      const sb = await getClient();
-      const { data: user } = await sb.from("users").select("password, password_hash").eq("id", userId).maybeSingle();
-      if (!user) return { success: false, error: "المستخدم غير موجود" };
-      const stored = user.password_hash || user.password;
-      if (stored !== oldHashed) return { success: false, error: "كلمة المرور الحالية خطأ" };
-      const { error } = await sb.from("users").update({ password: newHashed, password_hash: newHashed }).eq("id", userId);
-      if (error) return { success: false, error: error.message };
-      return { success: true };
-    } catch (e) { return { success: false, error: e.message }; }
-  },
-
   async countUsers() {
     try {
       const sb = await getClient();
@@ -224,19 +256,24 @@ const API = {
     } catch (e) { return 0; }
   },
 
+  // ═══════════════ loadAll (بعد الإصلاح) ═══════════════
   async loadAll() {
     const sb = await getClient();
     const tables = ["users","grades","subjects","units","lessons","questions",
-                    "exams","missions","achievements","levels","notifications","activity","roles","polls","poll_votes"];
-
+                    "exams","missions","achievements","levels","notifications","activity","roles"];
+    
     const results = await Promise.all(
       tables.map(async (t) => {
+        // محاولة بـ created_at desc
         let res = await sb.from(t).select("*").order("created_at", { ascending: false }).limit(3000);
-        if (res.error) res = await sb.from(t).select("*").limit(3000);
+        // لو فشل، جرّب بدون ترتيب
+        if (res.error) {
+          res = await sb.from(t).select("*").limit(3000);
+        }
         return res;
       })
     );
-
+    
     const db = {};
     tables.forEach((t, i) => {
       if (results[i].error) {
@@ -246,17 +283,31 @@ const API = {
         db[t] = results[i].data || [];
       }
     });
-
-    if (db.activity?.length) db.activity.sort((a, b) => (Number(b.at) || 0) - (Number(a.at) || 0));
-    if (db.notifications?.length) db.notifications.sort((a, b) => (Number(b.created_at) || 0) - (Number(a.created_at) || 0));
-    if (db.polls?.length) db.polls.sort((a, b) => (Number(b.created_at) || 0) - (Number(a.created_at) || 0));
-
+    
+    // ترتيب يدوي للأنشطة (بـ at)
+    if (db.activity && db.activity.length > 0) {
+      db.activity.sort((a, b) => {
+        const aTime = Number(a.at) || 0;
+        const bTime = Number(b.at) || 0;
+        return bTime - aTime;
+      });
+    }
+    
+    // ترتيب الإشعارات
+    if (db.notifications && db.notifications.length > 0) {
+      db.notifications.sort((a, b) => {
+        const aTime = Number(a.created_at) || 0;
+        const bTime = Number(b.created_at) || 0;
+        return bTime - aTime;
+      });
+    }
+    
     console.log("✅ Loaded:", {
       activity: db.activity?.length || 0,
       users: db.users?.length || 0,
-      notifications: db.notifications?.length || 0,
-      polls: db.polls?.length || 0
+      notifications: db.notifications?.length || 0
     });
+    
     return db;
   },
 
@@ -292,28 +343,39 @@ const API = {
     } catch (e) { return []; }
   },
 
+  // ═══════════════ trackActivity (مضمون) ═══════════════
   async trackActivity({ userId, userName, userRole, type, target, details }) {
     try {
       const sb = await getClient();
       const now = Date.now();
       const { error } = await sb.from("activity").insert([{
-        id: uid("act_"), user_id: userId, user_name: userName,
-        user_role: userRole || "student", type,
-        target: target || "", details: details || {},
-        at: now, created_at: now
+        id: uid("act_"),
+        user_id: userId,
+        user_name: userName,
+        user_role: userRole || "student",
+        type,
+        target: target || "",
+        details: details || {},
+        at: now,
+        created_at: now
       }]);
-      if (error) console.warn("⚠️ Track activity failed:", error.message);
-      else console.log("✅ Activity tracked:", type);
-    } catch (e) { console.warn("⚠️ Track activity error:", e.message); }
+      
+      if (error) {
+        console.warn("⚠️ Track activity failed:", error.message);
+      } else {
+        console.log("✅ Activity tracked:", type);
+      }
+    } catch (e) {
+      console.warn("⚠️ Track activity error:", e.message);
+    }
   },
 
-  async saveAttempt({ userId, examId, score, total, pct, passed, answers, duration }) {
+  async saveAttempt({ userId, examId, score, total, pct, passed, answers }) {
     const sb = await getClient();
     const now = Date.now();
     const row = {
       id: uid("att_"), user_id: userId, exam_id: examId,
       score, total, pct, passed, answers,
-      duration: duration || 0,
       at: now, created_at: now
     };
     const { data, error } = await sb.from("exam_attempts").insert([row]).select().single();
@@ -325,7 +387,8 @@ const API = {
     if (!userId) return [];
     try {
       const sb = await getClient();
-      const { data } = await sb.from("exam_attempts").select("*").eq("user_id", userId).order("at", { ascending: false });
+      const { data } = await sb.from("exam_attempts").select("*")
+        .eq("user_id", userId).order("at", { ascending: false });
       return data || [];
     } catch (e) { return []; }
   },
@@ -334,8 +397,12 @@ const API = {
     const sb = await getClient();
     const { data: exist } = await sb.from("user_errors").select("*")
       .eq("user_id", userId).eq("question_id", questionId).maybeSingle();
+
     if (exist) {
-      return API.save("user_errors", { ...exist, given, correct, count: (exist.count || 1) + 1, at: Date.now() });
+      return API.save("user_errors", {
+        ...exist, given, correct,
+        count: (exist.count || 1) + 1, at: Date.now()
+      });
     }
     return API.save("user_errors", {
       id: uid("err_"), user_id: userId, question_id: questionId,
@@ -348,24 +415,10 @@ const API = {
     if (!userId) return [];
     try {
       const sb = await getClient();
-      const { data } = await sb.from("user_errors").select("*").eq("user_id", userId).order("at", { ascending: false });
+      const { data } = await sb.from("user_errors").select("*")
+        .eq("user_id", userId).order("at", { ascending: false });
       return data || [];
     } catch (e) { return []; }
-  },
-
-  async cleanupExpiredPolls() {
-    try {
-      const sb = await getClient();
-      const now = Date.now();
-      const { data: expired, error } = await sb.from("polls").select("id")
-        .not("ends_at", "is", null).lt("ends_at", now);
-      if (error || !expired?.length) return 0;
-      const ids = expired.map(p => p.id);
-      await sb.from("poll_votes").delete().in("poll_id", ids);
-      await sb.from("polls").delete().in("id", ids);
-      console.log(`🗑️ حذف ${ids.length} استطلاع منتهي`);
-      return ids.length;
-    } catch (e) { console.warn("⚠️ Cleanup failed:", e.message); return 0; }
   },
 
   async reportIssue({ userName, userPhone, message }) {
@@ -375,6 +428,7 @@ const API = {
       `📱 <b>الهاتف:</b> ${userPhone || "غير معروف"}\n` +
       `🕐 <b>التاريخ:</b> ${new Date().toLocaleString("ar-EG")}\n\n` +
       `📝 <b>الرسالة:</b>\n${message}`;
+
     try {
       const sb = await getClient();
       await sb.from("reports").insert([{
@@ -384,6 +438,7 @@ const API = {
         message, sent_to_telegram: true, created_at: Date.now()
       }]);
     } catch (e) {}
+
     return await sendToTelegram(text);
   },
 
@@ -400,9 +455,15 @@ const API = {
   },
 
   redirectByRole(user) {
-    if (!user) { window.location.replace("/auth/login.html"); return; }
-    if (user.role === "admin") { window.location.replace("/admin/index.html"); }
-    else { window.location.replace("/student/index.html"); }
+    if (!user) {
+      window.location.replace("/auth/login.html");
+      return;
+    }
+    if (user.role === "admin") {
+      window.location.replace("/admin/index.html");
+    } else {
+      window.location.replace("/student/index.html");
+    }
   },
 
   gotoLogin() { window.location.replace("/auth/login.html"); },
