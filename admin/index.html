@@ -814,13 +814,16 @@ function Dashboard(){
 
   return <>
     <div className="hero mb16">
-  <div className="flex between center wrap g8">
-    <div className="h3 grad">لوحة تحكم الأدمن</div>
-    <button className="btn btn-p btn-sm" onClick={exportToCSV}>
-      <Icon name="file" size={14}/> تصدير Excel
-    </button>
-  </div>
-</div>
+      <div className="flex between center wrap g12">
+        <div>
+          <div className="h2 mb6 grad">لوحة تحكم الأدمن</div>
+          <div className="sm txt2">إدارة كاملة لكل محتوى المنصة</div>
+        </div>
+        <button className="btn btn-p" onClick={exportToCSV}>
+          <Icon name="file" size={15}/> تصدير Excel
+        </button>
+      </div>
+    </div>
     
     <div className="grid g4 mb16">
       <Stat label="إجمالي الطلاب" value={DB.fmt(students.length)} icon="users" color="#FFD700"/>
