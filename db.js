@@ -27,12 +27,10 @@ const daysBetween = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000)
 const fmt = (n) => new Intl.NumberFormat("ar-EG").format(n || 0);
 const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
 
-// ═══════════════ تنسيق الوقت ═══════════════
 const formatTime = (timestamp) => {
   if (!timestamp) return "—";
   try {
     let ms = Number(timestamp);
-    // لو timestamp بالثواني (10 أرقام) → نحوّله للملي ثانية
     if (ms < 10000000000) ms = ms * 1000;
     const d = new Date(ms);
     if (isNaN(d.getTime())) return "—";
@@ -256,17 +254,14 @@ const API = {
     } catch (e) { return 0; }
   },
 
-  // ═══════════════ loadAll (بعد الإصلاح) ═══════════════
   async loadAll() {
     const sb = await getClient();
     const tables = ["users","grades","subjects","units","lessons","questions",
-                    "exams","missions","achievements","levels","notifications","activity","roles"];
+                    "exams","missions","achievements","levels","notifications","activity","roles","polls","poll_votes"];
     
     const results = await Promise.all(
       tables.map(async (t) => {
-        // محاولة بـ created_at desc
         let res = await sb.from(t).select("*").order("created_at", { ascending: false }).limit(3000);
-        // لو فشل، جرّب بدون ترتيب
         if (res.error) {
           res = await sb.from(t).select("*").limit(3000);
         }
@@ -284,7 +279,6 @@ const API = {
       }
     });
     
-    // ترتيب يدوي للأنشطة (بـ at)
     if (db.activity && db.activity.length > 0) {
       db.activity.sort((a, b) => {
         const aTime = Number(a.at) || 0;
@@ -293,9 +287,16 @@ const API = {
       });
     }
     
-    // ترتيب الإشعارات
     if (db.notifications && db.notifications.length > 0) {
       db.notifications.sort((a, b) => {
+        const aTime = Number(a.created_at) || 0;
+        const bTime = Number(b.created_at) || 0;
+        return bTime - aTime;
+      });
+    }
+
+    if (db.polls && db.polls.length > 0) {
+      db.polls.sort((a, b) => {
         const aTime = Number(a.created_at) || 0;
         const bTime = Number(b.created_at) || 0;
         return bTime - aTime;
@@ -305,7 +306,8 @@ const API = {
     console.log("✅ Loaded:", {
       activity: db.activity?.length || 0,
       users: db.users?.length || 0,
-      notifications: db.notifications?.length || 0
+      notifications: db.notifications?.length || 0,
+      polls: db.polls?.length || 0
     });
     
     return db;
@@ -343,7 +345,6 @@ const API = {
     } catch (e) { return []; }
   },
 
-  // ═══════════════ trackActivity (مضمون) ═══════════════
   async trackActivity({ userId, userName, userRole, type, target, details }) {
     try {
       const sb = await getClient();
@@ -419,6 +420,32 @@ const API = {
         .eq("user_id", userId).order("at", { ascending: false });
       return data || [];
     } catch (e) { return []; }
+  },
+
+  async cleanupExpiredPolls() {
+    try {
+      const sb = await getClient();
+      const now = Date.now();
+
+      const { data: expired, error } = await sb
+        .from("polls")
+        .select("id")
+        .not("ends_at", "is", null)
+        .lt("ends_at", now);
+
+      if (error || !expired || expired.length === 0) return 0;
+
+      const ids = expired.map(p => p.id);
+
+      await sb.from("poll_votes").delete().in("poll_id", ids);
+      await sb.from("polls").delete().in("id", ids);
+
+      console.log(`🗑️ حذف ${ids.length} استطلاع منتهي`);
+      return ids.length;
+    } catch (e) {
+      console.warn("⚠️ Cleanup failed:", e.message);
+      return 0;
+    }
   },
 
   async reportIssue({ userName, userPhone, message }) {
