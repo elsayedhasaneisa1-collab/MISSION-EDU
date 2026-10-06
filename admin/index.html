@@ -1641,17 +1641,19 @@ function StudentsPage(){
   const open = s => { setForm(JSON.parse(JSON.stringify(s))); setEditing(s.id); };
 
   const save = async () => {
-    setBusy(true);
-    try {
-      await DB.updateUser(editing, {
-        name: form.name,
-        phone: form.phone,
-        xp: form.xp,
-        grade_id: form.grade_id,
-        governorate: form.governorate || null,
-        all_subjects: form.all_subjects,
-        access_subjects: form.access_subjects || []
-      });
+  setBusy(true);
+  try {
+    await DB.updateUser(editing, {
+      name: form.name,
+      phone: form.phone,
+      xp: form.xp,
+      grade_id: form.grade_id,
+      governorate: form.governorate || null,
+      all_subjects: form.all_subjects,
+      access_subjects: form.access_subjects || [],
+      subscription: form.subscription || 'free',
+      subscription_until: form.subscription_until || null
+    });
       await app.reload();
       app.toast.ok('تم الحفظ');
       setEditing(null);
@@ -1747,12 +1749,17 @@ function StudentsPage(){
                   }
                 </td>
                 <td><b style={{color:'var(--gold)'}}>{DB.fmt(s.xp||0)}</b></td>
-                <td>
-                  {s.active!==false
-                    ? <span className="pill pill-g">نشط</span>
-                    : <span className="pill pill-r">موقوف</span>
-                  }
-                </td>
+<td>
+  {s.subscription === 'vip' ? <span className="pill pill-v">💎 VIP</span>
+   : s.subscription === 'paid' ? <span className="pill pill-g">💳 مدفوع</span>
+   : <span className="pill pill-y">🆓 مجاني</span>}
+</td>
+<td>
+  {s.active!==false
+    ? <span className="pill pill-g">نشط</span>
+    : <span className="pill pill-r">موقوف</span>
+  }
+</td>
                 <td>
                   <div className="flex g6">
                     <button className="btn btn-s btn-sm" onClick={()=>open(s)}>
@@ -1806,7 +1813,30 @@ function StudentsPage(){
             </select>
           </Field>
         </div>
+        <div className="div"/>
 
+          <div className="h4 mb12" style={{color:'var(--gold)'}}>💳 الاشتراك</div>
+<div className="grid g2">
+  <Field label="نوع الاشتراك">
+    <select
+      className="input"
+      value={form.subscription || 'free'}
+      onChange={e=>setForm({...form, subscription:e.target.value})}
+    >
+      <option value="free">🆓 مجاني</option>
+      <option value="paid">💳 مدفوع</option>
+      <option value="vip">💎 VIP</option>
+    </select>
+  </Field>
+  <Field label="تاريخ انتهاء الاشتراك">
+    <input
+      type="date"
+      className="input"
+      value={form.subscription_until || ''}
+      onChange={e=>setForm({...form, subscription_until:e.target.value})}
+    />
+  </Field>
+</div>
         <Field label="صلاحيات الوصول">
           <label className="flex center g8 mb12" style={{cursor:'pointer'}}>
             <input type="checkbox" checked={!!form.all_subjects} onChange={e=>setForm({...form,all_subjects:e.target.checked})}/>
@@ -2668,14 +2698,15 @@ function CouponsPage(){
         <div className="sx">
           <table className="tbl">
             <thead>
-              <tr>
-                <th>الكود</th>
-                <th>الخصم</th>
-                <th>الاستخدامات</th>
-                <th>الانتهاء</th>
-                <th>الحالة</th>
-                <th>إجراءات</th>
-              </tr>
+            <tr>
+  <th>الطالب</th>
+  <th>الهاتف</th>
+  <th>📍 المحافظة</th>
+  <th>XP</th>
+  <th>💳 الاشتراك</th>
+  <th>الحالة</th>
+  <th>إجراءات</th>
+</tr>
             </thead>
             <tbody>
               {coupons.map(c => {
