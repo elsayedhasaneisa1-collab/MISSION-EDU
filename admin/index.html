@@ -330,88 +330,9 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
   .sidebar.open{transform:translateX(0)!important}
   .mbar{display:flex}
   .content{padding:14px 14px 90px}
+  .topbar{padding:10px 14px}
   .g2,.g3,.g4{grid-template-columns:1fr}
-  
-  /* ✅ إصلاح الهيدر */
-  .topbar{
-    padding: 8px 10px;
-    gap: 5px;
-    flex-wrap: nowrap;
-    overflow: hidden;
-  }
-  .topbar > div:first-of-type{
-    flex: 1 1 auto;
-    min-width: 0;
-    max-width: none;
-  }
-  .search{
-    max-width: 100%;
-    padding: 7px 10px;
-    gap: 6px;
-  }
-  .search input{
-    font-size: 13px;
-    min-width: 0;
-  }
-  .topbar .icon-btn{
-    width: 32px;
-    height: 32px;
-    flex-shrink: 0;
-  }
-  .topbar .avatar{
-    width: 26px !important;
-    height: 26px !important;
-    font-size: 12px !important;
-  }
-  .topbar .glass-s{
-    padding: 2px 6px !important;
-  }
-  .topbar > div:last-child{
-    gap: 3px;
-    flex-shrink: 0;
-    margin-inline-start: 0 !important;
-  }
 }
-html, body{
-  overflow-x: hidden;
-  max-width: 100%;
-  width: 100%;
-}
-.app{
-  overflow-x: hidden;
-  max-width: 100vw;
-  width: 100%;
-}
-.main{
-  overflow-x: hidden;
-  max-width: 100%;
-}
-.content{
-  overflow-x: hidden;
-}
-.sidebar{
-  max-width: 100%;
-}
-.toast-host{
-  max-width: calc(100vw - 32px);
-}
-@media(max-width:860px){
-  .toast-host{
-    inset-inline-start: 12px;
-    inset-inline-end: 12px;
-    max-width: none;
-  }
-  .toast{
-    min-width: 0;
-    width: 100%;
-  }
-}
-.sx{
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  max-width: 100%;
-}
-
 </style>
 </head>
 <body>
@@ -1733,12 +1654,6 @@ function StudentsPage(){
       subscription: form.subscription || 'free',
       subscription_until: form.subscription_until || null
     });
-      await app.reload();
-      app.toast.ok('تم الحفظ');
-      setEditing(null);
-    } catch(e) { app.toast.err(e.message); }
-    setBusy(false);
-  };
 
   const toggle = async s => {
     const action = s.active !== false ? 'إيقاف' : 'تفعيل';
@@ -1883,18 +1798,9 @@ function StudentsPage(){
               {app.db.grades.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}
             </select>
           </Field>
-          <Field label="📍 المحافظة" full>
-            <select className="input" value={form.governorate||''} onChange={e=>setForm({...form,governorate:e.target.value})}>
-              <option value="">— بدون —</option>
-              {GOVERNORATES.map(gov => (
-                <option key={gov} value={gov}>{gov}</option>
-              ))}
-            </select>
-          </Field>
-        </div>
-        <div className="div"/>
+          <div className="div"/>
 
-          <div className="h4 mb12" style={{color:'var(--gold)'}}>💳 الاشتراك</div>
+<div className="h4 mb12" style={{color:'var(--gold)'}}>💳 الاشتراك</div>
 <div className="grid g2">
   <Field label="نوع الاشتراك">
     <select
@@ -1916,6 +1822,7 @@ function StudentsPage(){
     />
   </Field>
 </div>
+
         <Field label="صلاحيات الوصول">
           <label className="flex center g8 mb12" style={{cursor:'pointer'}}>
             <input type="checkbox" checked={!!form.all_subjects} onChange={e=>setForm({...form,all_subjects:e.target.checked})}/>
@@ -2627,13 +2534,15 @@ function CertificatesPage(){
         <div className="sx">
           <table className="tbl">
             <thead>
-              <tr>
-                <th>الطالب</th>
-                <th>المادة</th>
-                <th>تاريخ الإصدار</th>
-                <th>رقم الشهادة</th>
-                <th>إجراءات</th>
-              </tr>
+             <tr>
+  <th>الطالب</th>
+  <th>الهاتف</th>
+  <th>📍 المحافظة</th>
+  <th>XP</th>
+  <th>💳 الاشتراك</th>
+  <th>الحالة</th>
+  <th>إجراءات</th>
+</tr>
             </thead>
             <tbody>
               {certs.map(c => {
@@ -2777,15 +2686,14 @@ function CouponsPage(){
         <div className="sx">
           <table className="tbl">
             <thead>
-            <tr>
-  <th>الطالب</th>
-  <th>الهاتف</th>
-  <th>📍 المحافظة</th>
-  <th>XP</th>
-  <th>💳 الاشتراك</th>
-  <th>الحالة</th>
-  <th>إجراءات</th>
-</tr>
+              <tr>
+                <th>الكود</th>
+                <th>الخصم</th>
+                <th>الاستخدامات</th>
+                <th>الانتهاء</th>
+                <th>الحالة</th>
+                <th>إجراءات</th>
+              </tr>
             </thead>
             <tbody>
               {coupons.map(c => {
