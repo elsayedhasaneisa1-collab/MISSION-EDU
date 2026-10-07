@@ -541,20 +541,34 @@ function Ring({value,size=120,stroke=10,color='#2f7dff',children}){
   </div>;
 }
 
+function parseVideo(v){
+  if(!v) return null;
+  if(typeof v === 'string'){
+    try{ return JSON.parse(v); }catch(e){ return null; }
+  }
+  return v;
+}
+
 function isPaidContent(item){
   if(!item) return false;
-  if(item.is_free === false) return true;
-  if(item.is_free === 'paid') return true;
-  if(item.video && item.video.is_free === false) return true;
-  if(item.video && item.video.is_free === 'paid') return true;
+  const checkFlag = (val)=>{
+    if(val === false) return true;
+    if(val === 'false') return true;
+    if(val === 'paid') return true;
+    if(val === 0) return true;
+    return false;
+  };
+  if(checkFlag(item.is_free)) return true;
+  const video = parseVideo(item.video);
+  if(video && checkFlag(video.is_free)) return true;
   return false;
 }
 
 function hasSubscriptionAccess(user){
   if(!user) return false;
-  if(user.all_subjects === true) return true;
-  if(user.subscription === 'vip') return true;
-  if(user.subscription === 'paid'){
+  if(user.all_subjects === true || user.all_subjects === 'true') return true;
+  if(user.subscription === 'vip' || user.subscription === 'VIP') return true;
+  if(user.subscription === 'paid' || user.subscription === 'PAID'){
     if(!user.subscription_until) return true;
     const until = typeof user.subscription_until === 'number'
       ? user.subscription_until
@@ -567,6 +581,20 @@ function hasSubscriptionAccess(user){
 function hasAccess(user, item){
   if(!isPaidContent(item)) return true;
   return hasSubscriptionAccess(user);
+}
+
+function getLockReason(user, item){
+  if(!isPaidContent(item)) return '';
+  if(!user) return 'no_user';
+  if(user.all_subjects === true || user.all_subjects === 'true') return '';
+  if(user.subscription === 'vip' || user.subscription === 'VIP') return '';
+  if(user.subscription === 'paid' || user.subscription === 'PAID'){
+    if(!user.subscription_until) return '';
+    const until = typeof user.subscription_until === 'number' ? user.subscription_until : new Date(user.subscription_until).getTime();
+    if(until > Date.now()) return '';
+    return 'expired';
+  }
+  return 'no_subscription';
 }
 
 function showLockedMessage(){
@@ -599,9 +627,9 @@ function showLockedMessage(){
 
 function getSubscriptionBadge(user){
   if(!user) return '';
-  if(user.all_subjects === true) return <span className="pill pill-vip"><i className="fa-solid fa-crown"></i> وصول كامل</span>;
-  if(user.subscription === 'vip') return <span className="pill pill-vip"><i className="fa-solid fa-crown"></i> VIP</span>;
-  if(user.subscription === 'paid'){
+  if(user.all_subjects === true || user.all_subjects === 'true') return <span className="pill pill-vip"><i className="fa-solid fa-crown"></i> وصول كامل</span>;
+  if(user.subscription === 'vip' || user.subscription === 'VIP') return <span className="pill pill-vip"><i className="fa-solid fa-crown"></i> VIP</span>;
+  if(user.subscription === 'paid' || user.subscription === 'PAID'){
     if(user.subscription_until){
       const until = typeof user.subscription_until === 'number' ? user.subscription_until : new Date(user.subscription_until).getTime();
       if(until > Date.now()){
@@ -1023,7 +1051,8 @@ function SubjectDetail({subjectId,setSelected,setTab}){
           <div className="grid g2">
             {lessons.map(l=>{
               const done=(u.completed_lessons||[]).includes(l.id);
-              const hasVideo=l.video&&l.video.url;
+              const video = parseVideo(l.video);
+              const hasVideo = video && video.url;
               const note=app.getNote(l.id);
               const paid = isPaidContent(l);
               const allowed = hasAccess(u, l);
@@ -1635,6 +1664,17 @@ function StudentApp(){
       fbq('trackCustom','Navigate',{tab});
     }
   },[tab]);
+  useEffect(()=>{
+    if(user){
+      console.log('=== USER SUBSCRIPTION INFO ===');
+      console.log('Name:', user.name);
+      console.log('subscription:', user.subscription);
+      console.log('subscription_until:', user.subscription_until);
+      console.log('all_subjects:', user.all_subjects);
+      console.log('hasSubscriptionAccess:', hasSubscriptionAccess(user));
+      console.log('==============================');
+    }
+  },[user]);
 
   const handleNav = (id)=>{
     if(id !== 'subject') setSelected(null);

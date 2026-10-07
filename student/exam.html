@@ -186,18 +186,34 @@ a{color:inherit;text-decoration:none}
     `;
   }
 
+  function parseVideo(v){
+    if(!v) return null;
+    if(typeof v === 'string'){
+      try{ return JSON.parse(v); }catch(e){ return null; }
+    }
+    return v;
+  }
+
   function isPaidContent(item){
     if(!item) return false;
-    if(item.is_free === false) return true;
-    if(item.is_free === 'paid') return true;
+    const checkFlag = (val)=>{
+      if(val === false) return true;
+      if(val === 'false') return true;
+      if(val === 'paid') return true;
+      if(val === 0) return true;
+      return false;
+    };
+    if(checkFlag(item.is_free)) return true;
+    const video = parseVideo(item.video);
+    if(video && checkFlag(video.is_free)) return true;
     return false;
   }
 
   function hasSubscriptionAccess(user){
     if(!user) return false;
-    if(user.all_subjects === true) return true;
-    if(user.subscription === 'vip') return true;
-    if(user.subscription === 'paid'){
+    if(user.all_subjects === true || user.all_subjects === 'true') return true;
+    if(user.subscription === 'vip' || user.subscription === 'VIP') return true;
+    if(user.subscription === 'paid' || user.subscription === 'PAID'){
       if(!user.subscription_until) return true;
       const until = typeof user.subscription_until === 'number'
         ? user.subscription_until
@@ -212,10 +228,25 @@ a{color:inherit;text-decoration:none}
     return hasSubscriptionAccess(user);
   }
 
+  function getLockReason(user, item){
+    if(!isPaidContent(item)) return '';
+    if(!user) return 'no_user';
+    if(user.all_subjects === true || user.all_subjects === 'true') return '';
+    if(user.subscription === 'vip' || user.subscription === 'VIP') return '';
+    if(user.subscription === 'paid' || user.subscription === 'PAID'){
+      if(!user.subscription_until) return '';
+      const until = typeof user.subscription_until === 'number' ? user.subscription_until : new Date(user.subscription_until).getTime();
+      if(until > Date.now()) return '';
+      return 'expired';
+    }
+    return 'no_subscription';
+  }
+
   function getSubscriptionBadge(user){
     if(!user) return '';
-    if(user.subscription === 'vip') return '<span class="pill pill-vip"><i class="fa-solid fa-crown"></i> VIP</span>';
-    if(user.subscription === 'paid'){
+    if(user.all_subjects === true || user.all_subjects === 'true') return '<span class="pill pill-vip"><i class="fa-solid fa-crown"></i> وصول كامل</span>';
+    if(user.subscription === 'vip' || user.subscription === 'VIP') return '<span class="pill pill-vip"><i class="fa-solid fa-crown"></i> VIP</span>';
+    if(user.subscription === 'paid' || user.subscription === 'PAID'){
       if(user.subscription_until){
         const until = typeof user.subscription_until === 'number' ? user.subscription_until : new Date(user.subscription_until).getTime();
         if(until > Date.now()){
@@ -629,6 +660,26 @@ a{color:inherit;text-decoration:none}
 
     state.exam = exam;
     state.hasAccess = hasAccess(user, exam);
+
+    console.log('=== DEBUG EXAM ACCESS ===');
+    console.log('User data:', {
+      id: user.id,
+      name: user.name,
+      subscription: user.subscription,
+      subscription_until: user.subscription_until,
+      all_subjects: user.all_subjects
+    });
+    console.log('Exam data:', {
+      id: exam.id,
+      title: exam.title,
+      is_free: exam.is_free,
+      is_free_type: typeof exam.is_free
+    });
+    console.log('isPaidContent:', isPaidContent(exam));
+    console.log('hasSubscriptionAccess:', hasSubscriptionAccess(user));
+    console.log('Final hasAccess:', state.hasAccess);
+    console.log('Lock reason:', getLockReason(user, exam));
+    console.log('=========================');
 
     if(!state.hasAccess){
       renderLocked();

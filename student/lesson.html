@@ -109,7 +109,7 @@ ul{list-style:none}
 .notes-area:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.12);background:rgba(10,16,32,.78)}
 .notes-area::placeholder{color:var(--muted)}
 .note-status-saving{animation:noteBlink 1s infinite}
-.pdf-box{display:flex;align-items:center;gap:14px;padding:16px;border-radius:14px;background:linear-gradient(135deg,rgba(239,68,68,.10),rgba(239,68,68,.03));border:1px solid rgba(239,68,68,.28);transition:.28s;text-decoration:none;color:inherit}
+.pdf-box{display:flex;align-items:center;gap:14px;padding:16px;border-radius:14px;background:linear-gradient(135deg,rgba(239,68,68,.10),rgba(239,68,68,.03));border:1px solid rgba(239,68,68,.28);transition:.28s;text-decoration:none;color:inherit;cursor:pointer;border:none;width:100%;text-align:right;font-family:inherit}
 .pdf-box:hover{transform:translateY(-3px);border-color:rgba(239,68,68,.5);box-shadow:0 12px 30px rgba(239,68,68,.20)}
 .pdf-icon{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;font-size:11px;font-weight:900;flex-shrink:0;box-shadow:0 8px 20px rgba(239,68,68,.35);letter-spacing:.5px}
 .pdf-info{flex:1;min-width:0}
@@ -248,7 +248,8 @@ noteTimer: null,
 noteSaving: false,
 noteDirty: false,
 hasVideoAccess: false,
-hasExamAccess: {}
+hasExamAccess: {},
+debugReason: ''
 };
 
 function esc(str){
@@ -261,21 +262,34 @@ const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|short
 return m ? m[1] : "";
 }
 
-/* ================== منطق الوصول (Access Logic) ================== */
+function parseVideo(v){
+if(!v) return null;
+if(typeof v === 'string'){
+try{ return JSON.parse(v); }catch(e){ return null; }
+}
+return v;
+}
+
 function isPaidContent(item){
 if(!item) return false;
-if(item.is_free === false) return true;
-if(item.is_free === 'paid') return true;
-if(item.video && item.video.is_free === false) return true;
-if(item.video && item.video.is_free === 'paid') return true;
+const checkFlag = (val)=>{
+if(val === false) return true;
+if(val === 'false') return true;
+if(val === 'paid') return true;
+if(val === 0) return true;
+return false;
+};
+if(checkFlag(item.is_free)) return true;
+const video = parseVideo(item.video);
+if(video && checkFlag(video.is_free)) return true;
 return false;
 }
 
 function hasSubscriptionAccess(user){
 if(!user) return false;
-if(user.all_subjects === true) return true;
-if(user.subscription === 'vip') return true;
-if(user.subscription === 'paid'){
+if(user.all_subjects === true || user.all_subjects === 'true') return true;
+if(user.subscription === 'vip' || user.subscription === 'VIP') return true;
+if(user.subscription === 'paid' || user.subscription === 'PAID'){
 if(!user.subscription_until) return true;
 const until = typeof user.subscription_until === 'number'
 ? user.subscription_until
@@ -286,8 +300,24 @@ return false;
 }
 
 function hasAccess(user, item){
-if(!isPaidContent(item)) return true;
-return hasSubscriptionAccess(user);
+const paid = isPaidContent(item);
+if(!paid) return true;
+const sub = hasSubscriptionAccess(user);
+return sub;
+}
+
+function getLockReason(user, item){
+if(!isPaidContent(item)) return '';
+if(!user) return 'no_user';
+if(user.all_subjects === true) return '';
+if(user.subscription === 'vip') return '';
+if(user.subscription === 'paid'){
+if(!user.subscription_until) return '';
+const until = typeof user.subscription_until === 'number' ? user.subscription_until : new Date(user.subscription_until).getTime();
+if(until > Date.now()) return '';
+return 'expired';
+}
+return 'no_subscription';
 }
 
 function showLockedMessage(){
@@ -310,7 +340,7 @@ confirmButtonText: '<i class="fa-brands fa-whatsapp"></i> تواصل واتسا�
 cancelButtonText: 'إلغاء',
 confirmButtonColor: '#25d366',
 cancelButtonColor: '#64748b',
-customClass: {popup:'swal-custom-popup', title:'swal-custom-title', confirmButton:'swal-custom-confirm'}
+customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
 }).then(r=>{
 if(r.isConfirmed){
 window.open("https://wa.me/201128351702?text=" + encodeURIComponent("مرحبًا، أريد الاشتراك في منصة MISSION EDU للوصول للمحتوى المدفوع"), "_blank");
@@ -318,7 +348,45 @@ window.open("https://wa.me/201128351702?text=" + encodeURIComponent("مرحبً�
 });
 }
 
-/* ================== الملاحظات ================== */
+function getSubscriptionBadge(user){
+if(!user) return '';
+if(user.all_subjects === true || user.all_subjects === 'true') return '<span class="pill pill-vip"><i class="fa-solid fa-crown"></i> وصول كامل</span>';
+if(user.subscription === 'vip' || user.subscription === 'VIP') return '<span class="pill pill-vip"><i class="fa-solid fa-crown"></i> VIP</span>';
+if(user.subscription === 'paid' || user.subscription === 'PAID'){
+if(user.subscription_until){
+const until = typeof user.subscription_until === 'number' ? user.subscription_until : new Date(user.subscription_until).getTime();
+if(until > Date.now()){
+const days = Math.ceil((until - Date.now()) / 86400000);
+return `<span class="pill pill-paid"><i class="fa-solid fa-crown"></i> مشترك (${days} يوم)</span>`;
+}
+return '<span class="pill pill-r"><i class="fa-solid fa-circle-xmark"></i> اشتراك منتهي</span>';
+}
+return '<span class="pill pill-paid"><i class="fa-solid fa-crown"></i> مشترك</span>';
+}
+return '<span class="pill pill-free"><i class="fa-solid fa-user"></i> مجاني</span>';
+}
+
+async function downloadPdf(url, filename){
+try{
+const res = await fetch(url, { mode: 'cors' });
+if(!res.ok) throw new Error('HTTP ' + res.status);
+const blob = await res.blob();
+const blobUrl = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = blobUrl;
+a.download = filename || 'lesson.pdf';
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+setTimeout(()=>URL.revokeObjectURL(blobUrl), 1500);
+return true;
+}catch(e){
+console.warn('PDF download failed, opening in new tab:', e);
+window.open(url, '_blank');
+return false;
+}
+}
+
 async function loadNote(userId, lessonId){
 try{
 const sb = await DB.getClient();
@@ -425,14 +493,13 @@ saveNote(true);
 }, 1500);
 }
 
-/* ================== مشغل الفيديو ================== */
 function openPlayer(lesson, user){
 if(!state.hasVideoAccess){
 showLockedMessage();
 return;
 }
 
-const video = lesson.video || {};
+const video = parseVideo(lesson.video) || {};
 const url = video.url || "";
 const type = video.type || "youtube";
 
@@ -678,9 +745,9 @@ if(t !== 'input' && t !== 'textarea') e.preventDefault();
 document.addEventListener('dblclick', e => e.preventDefault());
 }
 
-/* ================== بناء HTML ================== */
 function buildPlayerHTML(video, lessonTitle, hasAccess){
-if(!video || !video.url){
+const v = parseVideo(video);
+if(!v || !v.url){
 return `<div class="vid-shell"><div class="vp-error"><div style="font-size:48px;opacity:.35;margin-bottom:12px">🎬</div><div>لا يوجد فيديو لهذا الدرس</div></div></div>`;
 }
 
@@ -694,7 +761,7 @@ return `
 </div>
 <div class="lock-title">هذا الفيديو مدفوع</div>
 <div class="lock-desc">اشترك للوصول إلى محتوى الدرس كامل</div>
-<button class="lock-btn" onclick="showLockedMessage()">
+<button class="lock-btn" id="btnLockedSubscribe">
 <i class="fa-solid fa-crown"></i>
 اشترك الآن
 </button>
@@ -718,8 +785,10 @@ return `
 `;
 }
 
-function buildPdfHTML(pdfUrl){
+function buildPdfHTML(pdfUrl, lessonTitle){
 if(!pdfUrl || !pdfUrl.trim()) return '';
+
+const fileName = (lessonTitle || 'lesson').replace(/[^\u0600-\u06FFa-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_') + '.pdf';
 
 return `
 <div class="glass mb20" style="padding:16px">
@@ -727,15 +796,15 @@ return `
 <span style="font-size:18px">📄</span>
 ملف الشرح (PDF)
 </div>
-<a href="${esc(pdfUrl)}" target="_blank" rel="noopener noreferrer" class="pdf-box" id="pdfLink">
+<button type="button" class="pdf-box" id="pdfLink" data-url="${esc(pdfUrl)}" data-filename="${esc(fileName)}">
 <div class="pdf-icon">PDF</div>
 <div class="pdf-info">
-<div class="pdf-title">اضغط لعرض ملف الشرح</div>
+<div class="pdf-title">اضغط لتحميل ملف الشرح</div>
 <div class="pdf-desc">ملف PDF يحتوي على شرح تفصيلي للدرس</div>
 </div>
-<div class="pdf-arrow">↗</div>
-</a>
-<div class="xs muted mt12" style="text-align:center">💡 يفتح الملف في نافذة جديدة</div>
+<div class="pdf-arrow"><i class="fa-solid fa-download"></i></div>
+</button>
+<div class="xs muted mt12" style="text-align:center">💡 يتحمّل تلقائيًا على جهازك</div>
 </div>
 `;
 }
@@ -780,23 +849,6 @@ ${locked ? '<div class="pill pill-paid" style="margin-top:8px;font-size:10px"><i
 `;
 }
 
-function getSubscriptionBadge(user){
-if(!user) return '';
-if(user.subscription === 'vip') return '<span class="pill pill-vip"><i class="fa-solid fa-crown"></i> VIP</span>';
-if(user.subscription === 'paid'){
-if(user.subscription_until){
-const until = typeof user.subscription_until === 'number' ? user.subscription_until : new Date(user.subscription_until).getTime();
-if(until > Date.now()){
-const days = Math.ceil((until - Date.now()) / 86400000);
-return `<span class="pill pill-paid"><i class="fa-solid fa-crown"></i> مشترك (${days} يوم)</span>`;
-}
-return '<span class="pill pill-r"><i class="fa-solid fa-circle-xmark"></i> اشتراك منتهي</span>';
-}
-return '<span class="pill pill-paid"><i class="fa-solid fa-crown"></i> مشترك</span>';
-}
-return '<span class="pill pill-free"><i class="fa-solid fa-user"></i> مجاني</span>';
-}
-
 function render(){
 const l = state.lesson;
 const u = state.user;
@@ -832,7 +884,7 @@ ${l.desc ? `<div class="sm txt2 mb16">${esc(l.desc)}</div>` : ''}
 ${buildPlayerHTML(l.video, l.title, state.hasVideoAccess)}
 </div>
 
-${buildPdfHTML(l.pdf_url)}
+${buildPdfHTML(l.pdf_url, l.title)}
 
 ${l.summary ? `
 <div class="h4 mb8">📝 ملخص الدرس</div>
@@ -883,9 +935,9 @@ ${state.isDone ? '<i class="fa-solid fa-check"></i> تم إكمال الدرس' 
 <span class="pill pill-y" id="noteStatus">فارغ</span>
 </div>
 <textarea id="lessonNote" class="notes-area" placeholder="اكتب ملاحظاتك على الدرس هنا..."></textarea>
-<div class="flex g8 mt12">
-<button class="btn btn-p btn-sm" id="btnSaveNote" style="flex:1"><i class="fa-solid fa-floppy-disk"></i> حفظ</button>
-<button class="btn btn-s btn-sm" id="btnClearNote" title="مسح الملاحظة"><i class="fa-solid fa-trash"></i></button>
+<div className="flex g8 mt12">
+<button className="btn btn-p btn-sm" id="btnSaveNote" style="flex:1"><i class="fa-solid fa-floppy-disk"></i> حفظ</button>
+<button className="btn btn-s btn-sm" id="btnClearNote" title="مسح الملاحظة"><i className="fa-solid fa-trash"></i></button>
 </div>
 <div class="xs muted mt8" style="text-align:center"><i class="fa-solid fa-circle-info"></i> يتم الحفظ تلقائيًا أثناء الكتابة</div>
 </div>
@@ -905,6 +957,9 @@ ${buildRelatedExamsHTML(state.relatedExams)}
 </div>
 </div>
 `;
+
+const lockedSubscribeBtn = document.getElementById('btnLockedSubscribe');
+if(lockedSubscribeBtn) lockedSubscribeBtn.addEventListener('click', showLockedMessage);
 
 const openBtn = document.getElementById('btnOpenPlayer');
 if(openBtn){
@@ -928,7 +983,7 @@ showLockedMessage();
 
 const pdfLink = document.getElementById('pdfLink');
 if(pdfLink){
-pdfLink.addEventListener('click', ()=>{
+pdfLink.addEventListener('click', async ()=>{
 try{
 DB.trackActivity({
 userId: u.id, userName: u.name,
@@ -936,6 +991,9 @@ type: "pdf_open", target: l.title,
 details: { lesson: l.title, pdf: l.pdf_url }
 });
 }catch(e){}
+const url = pdfLink.dataset.url;
+const fname = pdfLink.dataset.filename || 'lesson.pdf';
+await downloadPdf(url, fname);
 });
 }
 
@@ -1052,7 +1110,6 @@ await saveNote(false);
 }
 }
 
-/* ================== تحميل البيانات ================== */
 async function load(){
 if(!lessonId){
 app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
@@ -1085,6 +1142,27 @@ return;
 
 state.lesson = lesson;
 
+console.log('=== DEBUG LESSON ACCESS ===');
+console.log('User data:', {
+id: user.id,
+name: user.name,
+subscription: user.subscription,
+subscription_until: user.subscription_until,
+all_subjects: user.all_subjects
+});
+console.log('Lesson data:', {
+id: lesson.id,
+title: lesson.title,
+is_free: lesson.is_free,
+video: lesson.video,
+video_type: typeof lesson.video
+});
+console.log('isPaidContent:', isPaidContent(lesson));
+console.log('hasSubscriptionAccess:', hasSubscriptionAccess(user));
+console.log('Final access:', hasAccess(user, lesson));
+console.log('Lock reason:', getLockReason(user, lesson));
+console.log('============================');
+
 DB.trackActivity({
 userId: user.id, userName: user.name,
 type: "lesson_view", target: lesson.title,
@@ -1113,7 +1191,6 @@ const lessonIds = Array.isArray(e.lesson_ids) ? e.lesson_ids : [];
 return lessonIds.includes(lesson.id);
 });
 
-/* تحديد الوصول للمحتوى المدفوع */
 state.hasVideoAccess = hasAccess(user, lesson);
 state.hasExamAccess = {};
 state.relatedExams.forEach(e=>{
