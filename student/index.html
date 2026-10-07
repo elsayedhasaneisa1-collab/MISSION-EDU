@@ -39,19 +39,11 @@ fbq('track', 'PageView');
 <meta name="apple-mobile-web-app-title" content="MISSION EDU">
 <meta name="mobile-web-app-capable" content="yes">
 <style>
-html, body {
-  overflow-x: hidden !important;
-  max-width: 100% !important;
-  width: 100% !important;
-  position: relative;
-  overscroll-behavior-x: none;
-  touch-action: pan-y;
-}
+html, body {overflow-x: hidden !important;max-width: 100% !important;width: 100% !important;position: relative;overscroll-behavior-x: none;touch-action: pan-y;}
 * { box-sizing: border-box; }
 *:not(iframe):not(video) { max-width: 100%; }
 img, video, iframe, svg { max-width: 100%; }
 .app, .main, .content, .topbar, .sidebar { max-width: 100%; overflow-x: hidden; }
-
 :root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#8b5cf6;--gold:#fbbf24;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.45)}
 *{margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(47,125,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(139,92,246,.14),transparent 60%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;line-height:1.7}
@@ -208,17 +200,12 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 .swal-custom-input{background:rgba(10,16,32,.75) !important;border:1.5px solid rgba(90,140,230,.3) !important;color:#e8eefc !important;border-radius:12px !important;font-family:'Tajawal','Cairo',sans-serif !important}
 .swal-custom-confirm{border-radius:12px !important;font-weight:700 !important;font-family:'Tajawal','Cairo',sans-serif !important;padding:10px 24px !important}
 .swal-custom-cancel{border-radius:12px !important;font-weight:700 !important;font-family:'Tajawal','Cairo',sans-serif !important;padding:10px 24px !important}
-
 .locked-lesson-card{border-color:rgba(251,191,36,.35) !important;background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(21,31,56,.62)) !important;position:relative !important}
 .locked-lesson-card:hover{border-color:rgba(251,191,36,.6) !important;box-shadow:0 12px 30px rgba(251,191,36,.20) !important}
 .lock-badge-mini{position:absolute;top:10px;left:10px;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#fbbf24,#f59e0b);display:grid;place-items:center;box-shadow:0 4px 14px rgba(251,191,36,.5);animation:lockFloat 3s ease-in-out infinite}
 .lock-badge-mini i{font-size:12px;color:#1a1206}
 .lock-overlay-tag{position:absolute;bottom:8px;left:8px;display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:800;background:linear-gradient(135deg,rgba(251,191,36,.9),rgba(245,158,11,.9));color:#1a1206;box-shadow:0 4px 12px rgba(251,191,36,.4)}
 .lock-overlay-tag i{font-size:9px}
-
-.sub-lock-ribbon{position:absolute;top:0;left:0;right:0;padding:6px 12px;background:linear-gradient(135deg,rgba(251,191,36,.95),rgba(245,158,11,.95));color:#1a1206;font-size:10.5px;font-weight:900;text-align:center;letter-spacing:.3px;box-shadow:0 4px 14px rgba(0,0,0,.35);z-index:2;display:flex;align-items:center;justify-content:center;gap:6px}
-.sub-lock-ribbon i{font-size:11px}
-
 @media(max-width:1080px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:860px){
   .sidebar{position:fixed;inset-inline-end:0;top:0;transform:translateX(-105%);transition:transform .34s;width:280px;max-width:85vw;box-shadow:-20px 0 60px rgba(0,0,0,.7);overflow-x:hidden}
@@ -257,7 +244,6 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 <script type="text/babel" data-presets="react-classic">
 const {useState,useEffect,useMemo,useCallback,useRef,createContext,useContext}=React;
 const DB=window.MissionDB;
-
 let _audioCtx=null;
 function getAudioCtx(){
   if(!_audioCtx){
@@ -303,7 +289,6 @@ function playSound(type='notify'){
       setTimeout(()=>beep(1175,120,'sine',0.15),100);
   }
 }
-
 const ToastCtx=createContext(null);
 function ToastProvider({children}){
   const [items,setItems]=useState([]);
@@ -334,10 +319,8 @@ function Toast({data,onClose}){
   </div>;
 }
 const useToast=()=>useContext(ToastCtx);
-
 const AppCtx=createContext(null);
 const useApp=()=>useContext(AppCtx);
-
 function AppProvider({children}){
   const [db,setDb]=useState({users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[],polls:[],poll_votes:[]});
   const [currentUser,setCurrentUser]=useState(null);
@@ -347,7 +330,6 @@ function AppProvider({children}){
   const [certificates,setCertificates]=useState([]);
   const [loading,setLoading]=useState(true);
   const toast=useToast();
-
   const reload=useCallback(async ()=>{
     try{
       await DB.cleanupExpiredPolls();
@@ -355,7 +337,6 @@ function AppProvider({children}){
       setDb(data);
     }catch(e){console.warn(e);}
   },[]);
-
   const reloadUserData=useCallback(async ()=>{
     if(!currentUser) return;
     try{
@@ -371,7 +352,6 @@ function AppProvider({children}){
       if(u) setCurrentUser(u);
     }catch(e){console.warn(e);}
   },[currentUser]);
-
   useEffect(()=>{
     (async ()=>{
       try{
@@ -415,7 +395,6 @@ function AppProvider({children}){
       document.removeEventListener('touchstart',unlock);
     };
   },[]);
-
   const logout=useCallback(()=>{
     Swal.fire({
       title:'تسجيل الخروج',text:'هل أنت متأكد؟',icon:'question',
@@ -431,13 +410,11 @@ function AppProvider({children}){
       }
     });
   },[]);
-
   const updateUser=useCallback(async (id,patch)=>{
     const u=await DB.updateUser(id,patch);
     setCurrentUser(u);
     return u;
   },[]);
-
   const getLevel=useCallback((xp)=>{
     const ls=[...db.levels].sort((a,b)=>a.xp-b.xp);
     if(ls.length===0) return {current:{level:1,name:'مبتدئ',xp:0},next:null};
@@ -445,7 +422,6 @@ function AppProvider({children}){
     for(let i=0;i<ls.length;i++){if(xp>=ls[i].xp){cur=ls[i];next=ls[i+1]||null;}}
     return {current:cur,next};
   },[db.levels]);
-
   const saveNote=useCallback(async (lessonId,text)=>{
     if(!currentUser) return;
     const sb=await DB.getClient();
@@ -460,11 +436,9 @@ function AppProvider({children}){
       setNotes(x=>[...x,row]);
     }
   },[currentUser,notes]);
-
   const getNote=useCallback((lessonId)=>{
     return notes.find(n=>n.lesson_id===lessonId)?.text||'';
   },[notes]);
-
   return <AppCtx.Provider value={{
     db,currentUser,attempts,errors,notes,certificates,loading,
     logout,updateUser,reload,reloadUserData,getLevel,toast,playSound,
@@ -477,7 +451,6 @@ function AppProvider({children}){
     grade:id=>db.grades.find(g=>g.id===id)
   }}>{children}</AppCtx.Provider>;
 }
-
 const Icon=({name,size=18,color='currentColor'})=>{
   const p={width:size,height:size,viewBox:'0 0 24 24',fill:'none',stroke:color,strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round'};
   const paths={
@@ -512,7 +485,6 @@ const Icon=({name,size=18,color='currentColor'})=>{
   };
   return <svg {...p}>{paths[name]||paths.help}</svg>;
 };
-
 function Stat({label,value,icon,color='var(--blue)',sub}){
   return <div className="glass-s hv" style={{padding:16}}>
     <div className="flex between center mb8">
@@ -540,7 +512,6 @@ function Ring({value,size=120,stroke=10,color='#2f7dff',children}){
     <div className="ring-t">{children}</div>
   </div>;
 }
-
 function parseVideo(v){
   if(!v) return null;
   if(typeof v === 'string'){
@@ -548,7 +519,6 @@ function parseVideo(v){
   }
   return v;
 }
-
 function isPaidContent(item){
   if(!item) return false;
   const checkFlag = (val)=>{
@@ -563,7 +533,6 @@ function isPaidContent(item){
   if(video && checkFlag(video.is_free)) return true;
   return false;
 }
-
 function hasSubscriptionAccess(user){
   if(!user) return false;
   if(user.subscription === 'vip' || user.subscription === 'VIP') return true;
@@ -576,16 +545,13 @@ function hasSubscriptionAccess(user){
   }
   return false;
 }
-
 function hasAccess(user, item){
   if(!isPaidContent(item)) return true;
   return hasSubscriptionAccess(user);
 }
-
 function getLockReason(user, item){
   if(!isPaidContent(item)) return '';
   if(!user) return 'no_user';
-  if(user.all_subjects === true || user.all_subjects === 'true') return '';
   if(user.subscription === 'vip' || user.subscription === 'VIP') return '';
   if(user.subscription === 'paid' || user.subscription === 'PAID'){
     if(!user.subscription_until) return '';
@@ -595,7 +561,6 @@ function getLockReason(user, item){
   }
   return 'no_subscription';
 }
-
 function showLockedMessage(){
   Swal.fire({
     icon: 'warning',
@@ -623,10 +588,8 @@ function showLockedMessage(){
     }
   });
 }
-
 function getSubscriptionBadge(user){
   if(!user) return '';
-  if(user.all_subjects === true || user.all_subjects === 'true') return <span className="pill pill-vip"><i className="fa-solid fa-crown"></i> وصول كامل</span>;
   if(user.subscription === 'vip' || user.subscription === 'VIP') return <span className="pill pill-vip"><i className="fa-solid fa-crown"></i> VIP</span>;
   if(user.subscription === 'paid' || user.subscription === 'PAID'){
     if(user.subscription_until){
@@ -641,7 +604,6 @@ function getSubscriptionBadge(user){
   }
   return <span className="pill pill-free"><i className="fa-solid fa-user"></i> مجاني</span>;
 }
-
 function PomodoroTimer({compact=false}){
   const app=useApp();
   const u=app.currentUser;
@@ -652,7 +614,6 @@ function PomodoroTimer({compact=false}){
   const intervalRef=useRef(null);
   const WORK_TIME=25*60;
   const BREAK_TIME=5*60;
-
   useEffect(()=>{
     if(running){
       intervalRef.current=setInterval(()=>{
@@ -688,7 +649,6 @@ function PomodoroTimer({compact=false}){
     } else { clearInterval(intervalRef.current); }
     return ()=>clearInterval(intervalRef.current);
   },[running,mode]);
-
   const saveSession=async ()=>{
     try{
       const sb=await DB.getClient();
@@ -701,14 +661,12 @@ function PomodoroTimer({compact=false}){
       app.reloadUserData();
     }catch(e){console.warn(e);}
   };
-
   const reset=()=>{ setRunning(false); setMode('work'); setSecondsLeft(WORK_TIME); };
   const total=mode==='work'?WORK_TIME:BREAK_TIME;
   const progress=((total-secondsLeft)/total)*100;
   const mins=Math.floor(secondsLeft/60);
   const secs=secondsLeft%60;
   const color=mode==='work'?'#f59e0b':'#22c55e';
-
   if(compact){
     return <div className="glass-s" style={{padding:12}}>
       <div className="flex between center mb8">
@@ -731,7 +689,6 @@ function PomodoroTimer({compact=false}){
       </div>
     </div>;
   }
-
   return <div className="glass" style={{padding:24,textAlign:'center'}}>
     <div className="h3 mb16" style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
       <span style={{color}}>{mode==='work'?'🍅':'☕'}</span>
@@ -750,7 +707,6 @@ function PomodoroTimer({compact=false}){
     {sessions > 0 && <div className="pill pill-g mt16" style={{display:'inline-flex'}}>✅ أكملت {sessions} جلسة النهاردة</div>}
   </div>;
 }
-
 function Sidebar({items,active,onNav,open,onClose}){
   return <>
     {open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.5)',zIndex:55}}/>}
@@ -777,7 +733,6 @@ function Sidebar({items,active,onNav,open,onClose}){
     </aside>
   </>;
 }
-
 function Topbar({user,onMenu,onLogout,onSearch,searchResults,unreadNotifs=0,onOpenNotifications}){
   const [q,setQ]=useState('');
   const [open,setOpen]=useState(false);
@@ -826,7 +781,6 @@ function Topbar({user,onMenu,onLogout,onSearch,searchResults,unreadNotifs=0,onOp
     </div>
   </div>;
 }
-
 function Home({onNav,setSelected}){
   const app=useApp();
   const u=app.currentUser;
@@ -840,11 +794,9 @@ function Home({onNav,setSelected}){
   const progressPct=DB.pct(doneLessons.length,accessibleLessons.length);
   const top10=useMemo(()=>[...app.db.users.filter(x=>x.role==='student'&&x.active!==false)].sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,10),[app.db.users]);
   const recentAttempts=useMemo(()=>[...(app.attempts||[])].slice(0,3),[app.attempts]);
-
   const lastLessonId=(()=>{try{return localStorage.getItem('student_last_lesson');}catch(e){return null;}})();
   const lastLesson = lastLessonId ? app.lesson(lastLessonId) : null;
   const lastLessonAccess = lastLesson ? hasAccess(u, lastLesson) : false;
-
   return <>
     <div className="hero mb16" style={{padding:'clamp(16px,4vw,24px)'}}>
       <div style={{display:'flex',flexDirection:'column',alignItems:'center',textAlign:'center',gap:'16px'}}>
@@ -857,7 +809,6 @@ function Home({onNav,setSelected}){
             {getSubscriptionBadge(u)}
           </div>
         </div>
-
         <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'20px',flexWrap:'wrap'}}>
           <Ring value={progressPct} size={100} stroke={8} color="#2f7dff">
             <div className="stat-n">{progressPct}%</div>
@@ -868,7 +819,6 @@ function Home({onNav,setSelected}){
             <div className="xs muted">{current.name}</div>
           </Ring>
         </div>
-
         <div style={{display:'flex',gap:'8px',width:'100%',flexWrap:'wrap'}}>
           {lastLesson && (
             lastLessonAccess ? (
@@ -893,14 +843,12 @@ function Home({onNav,setSelected}){
         </div>
       </div>
     </div>
-
     <div className="grid g4 mb16">
       <Stat label="نقاط XP" value={DB.fmt(u.xp||0)} icon="zap" color="#5aa9ff"/>
       <Stat label="سلسلة المذاكرة" value={`${u.streak||0}`} icon="flame" color="#f59e0b"/>
       <Stat label="الدروس المكتملة" value={DB.fmt(doneLessons.length)} icon="book" color="#22c55e" sub={`من ${accessibleLessons.length}`}/>
       <Stat label="الإنجازات" value={DB.fmt((u.achievements||[]).length)} icon="trophy" color="#8b5cf6"/>
     </div>
-
     <div className="grid g2 mb16">
       <PomodoroTimer compact={true}/>
       <div className="glass-s" style={{padding:12,cursor:'pointer'}} onClick={()=>onNav('notes')}>
@@ -915,7 +863,6 @@ function Home({onNav,setSelected}){
         <div className="xs mt8" style={{color:'var(--blue2)',fontWeight:700}}>اضغط لعرضهم ←</div>
       </div>
     </div>
-
     <div className="glass mb16" style={{padding:18}}>
       <div className="flex between center mb12">
         <div className="h3" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="medal" size={18}/> المتصدرون العشرة</div>
@@ -937,7 +884,6 @@ function Home({onNav,setSelected}){
         })
       }
     </div>
-
     <div className="glass" style={{padding:18}}>
       <div className="h3 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="clipboard" size={18}/> آخر الاختبارات</div>
       {recentAttempts.length===0?<div className="sm muted" style={{textAlign:'center',padding:12}}>لم تجرِ اختبارًا بعد</div>:
@@ -957,7 +903,6 @@ function Home({onNav,setSelected}){
     </div>
   </>;
 }
-
 function Subjects({setSelected,setTab}){
   const app=useApp();
   const u=app.currentUser;
@@ -999,7 +944,6 @@ function Subjects({setSelected,setTab}){
     }
   </>;
 }
-
 function SubjectDetail({subjectId,setSelected,setTab}){
   const app=useApp();
   const u=app.currentUser;
@@ -1017,12 +961,10 @@ function SubjectDetail({subjectId,setSelected,setTab}){
         </div>
       </div>
     </div>
-
     <div className="flex between center mb12 wrap g8">
       <div className="h3" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="book" size={18}/> الوحدات والدروس</div>
       {getSubscriptionBadge(u)}
     </div>
-
     {units.map(un=>{
       const lessons=app.db.lessons.filter(l=>l.unit_id===un.id&&l.published!==false).sort((a,b)=>{
         const sa=Number(a.sort_order)||999999,sb=Number(b.sort_order)||999999;
@@ -1071,13 +1013,11 @@ function SubjectDetail({subjectId,setSelected,setTab}){
                 <div className="h4" style={{fontSize:14}}>{l.title}</div>
                 <div className="xs muted mt6">⏱ {l.duration}د • +{l.xp} XP</div>
               </>;
-
               if(locked){
                 return <div key={l.id} className="glass-s hv locked-lesson-card" style={{padding:14,textDecoration:'none',color:'inherit',cursor:'pointer'}} onClick={showLockedMessage}>
                   {cardContent}
                 </div>;
               }
-
               return <a key={l.id} href={`/student/lesson.html?id=${l.id}`} className="glass-s hv" style={{padding:14,textDecoration:'none',color:'inherit'}}
                 onClick={()=>{if(typeof fbq!=='undefined') fbq('trackCustom','ViewLesson',{lesson:l.title});}}>
                 {cardContent}
@@ -1095,7 +1035,6 @@ function SubjectDetail({subjectId,setSelected,setTab}){
               const paid = isPaidContent(e);
               const allowed = hasAccess(u, e);
               const locked = paid && !allowed;
-
               const content = <>
                 {locked && <div className="lock-badge-mini"><i className="fa-solid fa-lock"></i></div>}
                 <div className="flex between center mb6">
@@ -1107,13 +1046,11 @@ function SubjectDetail({subjectId,setSelected,setTab}){
                 <div className="h4" style={{fontSize:14}}>{e.title}</div>
                 <div className="xs muted mt6">+{e.xp} XP • {(e.question_ids||[]).length} أسئلة</div>
               </>;
-
               if(locked){
                 return <div key={e.id} className="glass-s hv locked-lesson-card" style={{padding:14,textDecoration:'none',color:'inherit',cursor:'pointer'}} onClick={showLockedMessage}>
                   {content}
                 </div>;
               }
-
               return <a key={e.id} href={`/student/exam.html?id=${e.id}`} className="glass-s hv" style={{padding:14,textDecoration:'none',color:'inherit'}}
                 onClick={()=>{if(typeof fbq!=='undefined') fbq('track','InitiateCheckout',{content_name:e.title});}}>
                 {content}
@@ -1125,7 +1062,6 @@ function SubjectDetail({subjectId,setSelected,setTab}){
     })}
   </>;
 }
-
 function Missions({setSelected,setTab}){
   const app=useApp();
   const u=app.currentUser;
@@ -1188,7 +1124,6 @@ function Missions({setSelected,setTab}){
     }
   </>;
 }
-
 function Achievements(){
   const app=useApp();
   const u=app.currentUser;
@@ -1209,7 +1144,6 @@ function Achievements(){
     }
   </>;
 }
-
 function ErrorBook(){
   const app=useApp();
   const errs=app.errors;
@@ -1245,12 +1179,10 @@ function ErrorBook(){
     }
   </>;
 }
-
 function Leaderboard(){
   const app=useApp();
   const u=app.currentUser;
   const [period,setPeriod]=useState('week');
-
   const weekStart = useMemo(()=>{
     const d=new Date();
     const day=d.getDay();
@@ -1259,7 +1191,6 @@ function Leaderboard(){
     ws.setHours(0,0,0,0);
     return ws.getTime();
   },[]);
-
   const weekXpByUser = useMemo(()=>{
     const map={};
     app.db.activity.forEach(a=>{
@@ -1273,13 +1204,11 @@ function Leaderboard(){
     });
     return map;
   }, [app.db.activity, weekStart]);
-
   const sorted = useMemo(()=>{
     return [...app.db.users.filter(x=>x.role==='student'&&x.active!==false)]
       .map(s=>({...s,weekXp: period==='week' ? (weekXpByUser[s.id]||0) : (s.xp||0)}))
       .sort((a,b)=>b.weekXp-a.weekXp).slice(0,10);
   }, [app.db.users, weekXpByUser, period]);
-
   return <>
     <div className="flex between center mb16 wrap g8">
       <div className="h2">🏅 المتصدرون</div>
@@ -1317,7 +1246,6 @@ function Leaderboard(){
     }
   </>;
 }
-
 function NotesPage({setTab}){
   const app=useApp();
   const notes = app.notes || [];
@@ -1386,7 +1314,6 @@ function NotesPage({setTab}){
     }
   </>;
 }
-
 function PollsPage(){
   const app=useApp();
   const u=app.currentUser;
@@ -1394,7 +1321,6 @@ function PollsPage(){
   const [polls,setPolls]=useState([]);
   const [votes,setVotes]=useState([]);
   const [voting,setVoting]=useState(null);
-
   const loadData = useCallback(async ()=>{
     try{
       await DB.cleanupExpiredPolls();
@@ -1410,11 +1336,8 @@ function PollsPage(){
     }catch(e){console.warn(e);}
     setLoading(false);
   },[]);
-
   useEffect(()=>{ loadData(); },[loadData]);
-
   const myVote = (pollId) => votes.find(v => v.poll_id === pollId && v.user_id === u.id);
-
   const vote = async (poll, optionIndex) => {
     if(myVote(poll.id)) return app.toast.warn('صوّت بالفعل');
     setVoting(poll.id + ':' + optionIndex);
@@ -1437,7 +1360,6 @@ function PollsPage(){
     }catch(e){ app.toast.err(e.message); }
     setVoting(null);
   };
-
   const getStats = (poll) => {
     const pollVotes = votes.filter(v => v.poll_id === poll.id);
     const total = pollVotes.length;
@@ -1446,7 +1368,6 @@ function PollsPage(){
     );
     return { total, counts };
   };
-
   return <>
     <div className="flex between center mb16 wrap g8">
       <div>
@@ -1455,7 +1376,6 @@ function PollsPage(){
       </div>
       <span className="pill pill-b">{polls.length} استطلاع</span>
     </div>
-
     {loading ? (
       <div className="glass" style={{padding:40,textAlign:'center'}}>
         <div className="spinner" style={{margin:'0 auto 14px'}}></div>
@@ -1476,16 +1396,13 @@ function PollsPage(){
               <span className="pill pill-b">📊 {total} صوت</span>
               {hasVoted && <span className="pill pill-g">✓ صوّتت</span>}
             </div>
-
             <div className="h3 mb16" style={{lineHeight:1.5}}>{p.question}</div>
-
             <div className="flex col g10">
               {(p.options||[]).map((opt, i) => {
                 const cnt = counts[i] || 0;
                 const perc = total ? Math.round((cnt/total)*100) : 0;
                 const isMyPick = mine && mine.option_index === i;
                 const isVoting = voting === p.id + ':' + i;
-
                 if(!hasVoted){
                   return <button key={i}
                     onClick={()=>vote(p, i)}
@@ -1518,7 +1435,6 @@ function PollsPage(){
                     {isVoting && <span className="spinner" style={{width:16,height:16,borderWidth:2}}/>}
                   </button>;
                 }
-
                 return <div key={i} className="glass-s" style={{
                   padding:'14px 18px',
                   border: isMyPick ? '1.5px solid var(--green)' : '1.5px solid var(--border)',
@@ -1552,7 +1468,6 @@ function PollsPage(){
                 </div>;
               })}
             </div>
-
             {p.ends_at && (
               <div className="xs muted mt16" style={{textAlign:'center'}}>
                 ⏰ ينتهي: {DB.formatDate(p.ends_at)}
@@ -1564,7 +1479,6 @@ function PollsPage(){
     )}
   </>;
 }
-
 function Notifications(){
   const app=useApp();
   const u=app.currentUser;
@@ -1595,12 +1509,10 @@ function Notifications(){
     }
   </>;
 }
-
 function ProfileRedirect(){
   useEffect(()=>{ window.location.href = "/student/profile.html"; },[]);
   return <div className="loading"><div className="spinner"></div>جارٍ التحويل...</div>;
 }
-
 function Footer(){
   const app=useApp();
   const u=app.currentUser;
@@ -1635,22 +1547,17 @@ function Footer(){
     </button>
   </div>;
 }
-
 function StudentApp(){
   const app=useApp();
   const user=app.currentUser;
-
   const [tab,setTab]=useState(()=>{
     try{return localStorage.getItem('student_tab')||'home';}catch(e){return 'home';}
   });
-
   const [selected,setSelected]=useState(()=>{
     try{const saved=localStorage.getItem('student_selected');return saved?JSON.parse(saved):null;}catch(e){return null;}
   });
-
   const [sidebarOpen,setSidebarOpen]=useState(false);
   const [searchResults,setSearchResults]=useState([]);
-
   useEffect(()=>{try{localStorage.setItem('student_tab',tab);}catch(e){}},[tab]);
   useEffect(()=>{
     try{
@@ -1663,25 +1570,11 @@ function StudentApp(){
       fbq('trackCustom','Navigate',{tab});
     }
   },[tab]);
-  useEffect(()=>{
-    if(user){
-      console.log('=== USER SUBSCRIPTION INFO ===');
-      console.log('Name:', user.name);
-      console.log('subscription:', user.subscription);
-      console.log('subscription_until:', user.subscription_until);
-      console.log('all_subjects:', user.all_subjects);
-      console.log('hasSubscriptionAccess:', hasSubscriptionAccess(user));
-      console.log('==============================');
-    }
-  },[user]);
-
   const handleNav = (id)=>{
     if(id !== 'subject') setSelected(null);
     setTab(id);
   };
-
   const unread=app.db.notifications.filter(n=>(n.target==='all'||n.target===user.id)&&!(n.read_by||[]).includes(user.id)).length;
-
   const items=[{title:'',items:[
     {id:'home',icon:'home',label:'الرئيسية'},
     {id:'subjects',icon:'book',label:'المواد'},
@@ -1694,7 +1587,6 @@ function StudentApp(){
     {id:'notifications',icon:'bell',label:'الإشعارات',badge:unread||null},
     {id:'profile',icon:'user',label:'الملف الشخصي'}
   ]}];
-
   const onSearch=q=>{
     const lc=q.toLowerCase(),res=[];
     const access=user.all_subjects?app.db.subjects.map(s=>s.id):(user.access_subjects||[]);
@@ -1705,7 +1597,6 @@ function StudentApp(){
     app.db.exams.filter(e=>access.includes(e.subject_id)&&e.title.toLowerCase().includes(lc)).forEach(e=>res.push({type:'اختبار',icon:<Icon name="clipboard" size={16}/>,title:e.title,href:`/student/exam.html?id=${e.id}`}));
     setSearchResults(res);
   };
-
   return <div className="app">
     <Sidebar items={items} active={tab} onNav={handleNav} open={sidebarOpen} onClose={()=>setSidebarOpen(false)}/>
     <div className="main">
@@ -1747,7 +1638,6 @@ function StudentApp(){
     </div>
   </div>;
 }
-
 function Root(){
   const app=useApp();
   if(app.loading) return <div className="loading"><div className="spinner"></div>جارٍ التحميل...</div>;
@@ -1755,7 +1645,6 @@ function Root(){
   if(app.currentUser.role==='admin') return null;
   return <StudentApp/>;
 }
-
 function App(){return <ToastProvider><AppProvider><Root/></AppProvider></ToastProvider>;}
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>

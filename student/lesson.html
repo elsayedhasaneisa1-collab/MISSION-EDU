@@ -56,6 +56,7 @@ ul{list-style:none}
 .pill-g{background:rgba(34,197,94,.14);color:#6ee7a0;border-color:rgba(34,197,94,.28)}
 .pill-a{background:rgba(245,158,11,.14);color:#fcd34d;border-color:rgba(245,158,11,.28)}
 .pill-v{background:rgba(139,92,246,.15);color:#c4b5fd;border-color:rgba(139,92,246,.28)}
+.pill-r{background:rgba(239,68,68,.14);color:#fca5a5;border-color:rgba(239,68,68,.28)}
 .pill-y{background:rgba(255,255,255,.06);color:var(--muted);border-color:var(--border)}
 .pill-paid{background:linear-gradient(135deg,rgba(251,191,36,.25),rgba(251,191,36,.10));color:#fbbf24;border:1px solid rgba(251,191,36,.5);box-shadow:0 0 14px rgba(251,191,36,.22)}
 .pill-free{background:linear-gradient(135deg,rgba(34,197,94,.22),rgba(34,197,94,.10));color:#86efac;border:1px solid rgba(34,197,94,.42)}
@@ -109,7 +110,7 @@ ul{list-style:none}
 .notes-area:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.12);background:rgba(10,16,32,.78)}
 .notes-area::placeholder{color:var(--muted)}
 .note-status-saving{animation:noteBlink 1s infinite}
-.pdf-box{display:flex;align-items:center;gap:14px;padding:16px;border-radius:14px;background:linear-gradient(135deg,rgba(239,68,68,.10),rgba(239,68,68,.03));border:1px solid rgba(239,68,68,.28);transition:.28s;text-decoration:none;color:inherit;cursor:pointer;border:none;width:100%;text-align:right;font-family:inherit}
+.pdf-box{display:flex;align-items:center;gap:14px;padding:16px;border-radius:14px;background:linear-gradient(135deg,rgba(239,68,68,.10),rgba(239,68,68,.03));border:1px solid rgba(239,68,68,.28);transition:.28s;text-decoration:none;color:inherit;cursor:pointer;border-width:1px;width:100%;text-align:right;font-family:inherit}
 .pdf-box:hover{transform:translateY(-3px);border-color:rgba(239,68,68,.5);box-shadow:0 12px 30px rgba(239,68,68,.20)}
 .pdf-icon{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;font-size:11px;font-weight:900;flex-shrink:0;box-shadow:0 8px 20px rgba(239,68,68,.35);letter-spacing:.5px}
 .pdf-info{flex:1;min-width:0}
@@ -169,7 +170,6 @@ ul{list-style:none}
 </style>
 </head>
 <body>
-
 <div class="topbar">
 <a href="/student/index.html" class="back-btn">
 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
@@ -179,11 +179,9 @@ ul{list-style:none}
 <div id="userAvatar" class="avatar">👤</div>
 </div>
 </div>
-
 <div class="wrap" id="app">
 <div class="loading"><div class="spinner"></div>جارٍ تحميل الدرس...</div>
 </div>
-
 <div class="player-modal" id="playerModal">
 <div class="player-box">
 <div class="player-header">
@@ -205,7 +203,6 @@ ul{list-style:none}
 </div>
 </div>
 </div>
-
 <div class="footer-dev">
 <button class="dev-btn" onclick="openWhatsApp()">
 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
@@ -216,52 +213,31 @@ ul{list-style:none}
 <span>بلاغ</span>
 </button>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="/db.js"></script>
 <script>
 (function(){
 "use strict";
-
 const DB = window.MissionDB;
 const params = new URLSearchParams(window.location.search);
 const lessonId = params.get("id");
-
 const app = document.getElementById("app");
 const userAvatar = document.getElementById("userAvatar");
-
 let state = {
-user: null,
-lesson: null,
-unit: null,
-subject: null,
-relatedExams: [],
-unitPct: 0,
-doneUnit: 0,
-totalUnit: 0,
-isDone: false,
-watermarkTimer: null,
-isFullscreen: false,
-note: '',
-noteId: null,
-noteTimer: null,
-noteSaving: false,
-noteDirty: false,
-hasVideoAccess: false,
-hasExamAccess: {},
-debugReason: ''
+user: null, lesson: null, unit: null, subject: null,
+relatedExams: [], unitPct: 0, doneUnit: 0, totalUnit: 0,
+isDone: false, watermarkTimer: null, isFullscreen: false,
+note: '', noteId: null, noteTimer: null, noteSaving: false, noteDirty: false,
+hasVideoAccess: false, hasExamAccess: {}, debugReason: ''
 };
-
 function esc(str){
 return String(str||"").replace(/[&<>"']/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[s]);
 }
-
 function getYouTubeId(url){
 if(!url) return "";
 const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
 return m ? m[1] : "";
 }
-
 function parseVideo(v){
 if(!v) return null;
 if(typeof v === 'string'){
@@ -269,7 +245,6 @@ try{ return JSON.parse(v); }catch(e){ return null; }
 }
 return v;
 }
-
 function isPaidContent(item){
 if(!item) return false;
 const checkFlag = (val)=>{
@@ -284,7 +259,6 @@ const video = parseVideo(item.video);
 if(video && checkFlag(video.is_free)) return true;
 return false;
 }
-
 function hasSubscriptionAccess(user){
 if(!user) return false;
 if(user.subscription === 'vip' || user.subscription === 'VIP') return true;
@@ -297,20 +271,16 @@ if(!isNaN(until) && until > Date.now()) return true;
 }
 return false;
 }
-
 function hasAccess(user, item){
 const paid = isPaidContent(item);
 if(!paid) return true;
-const sub = hasSubscriptionAccess(user);
-return sub;
+return hasSubscriptionAccess(user);
 }
-
 function getLockReason(user, item){
 if(!isPaidContent(item)) return '';
 if(!user) return 'no_user';
-if(user.all_subjects === true) return '';
-if(user.subscription === 'vip') return '';
-if(user.subscription === 'paid'){
+if(user.subscription === 'vip' || user.subscription === 'VIP') return '';
+if(user.subscription === 'paid' || user.subscription === 'PAID'){
 if(!user.subscription_until) return '';
 const until = typeof user.subscription_until === 'number' ? user.subscription_until : new Date(user.subscription_until).getTime();
 if(until > Date.now()) return '';
@@ -318,7 +288,6 @@ return 'expired';
 }
 return 'no_subscription';
 }
-
 function showLockedMessage(){
 Swal.fire({
 icon: 'warning',
@@ -346,10 +315,8 @@ window.open("https://wa.me/201128351702?text=" + encodeURIComponent("مرحبً�
 }
 });
 }
-
 function getSubscriptionBadge(user){
 if(!user) return '';
-if(user.all_subjects === true || user.all_subjects === 'true') return '<span class="pill pill-vip"><i class="fa-solid fa-crown"></i> وصول كامل</span>';
 if(user.subscription === 'vip' || user.subscription === 'VIP') return '<span class="pill pill-vip"><i class="fa-solid fa-crown"></i> VIP</span>';
 if(user.subscription === 'paid' || user.subscription === 'PAID'){
 if(user.subscription_until){
@@ -364,7 +331,6 @@ return '<span class="pill pill-paid"><i class="fa-solid fa-crown"></i> مشتر�
 }
 return '<span class="pill pill-free"><i class="fa-solid fa-user"></i> مجاني</span>';
 }
-
 async function downloadPdf(url, filename){
 try{
 const res = await fetch(url, { mode: 'cors' });
@@ -385,7 +351,6 @@ window.open(url, '_blank');
 return false;
 }
 }
-
 async function loadNote(userId, lessonId){
 try{
 const sb = await DB.getClient();
@@ -396,7 +361,6 @@ state.noteId = data.id;
 }
 }catch(e){ console.warn('loadNote:', e); }
 }
-
 function updateNoteStatus(status){
 const el = document.getElementById('noteStatus');
 if(!el) return;
@@ -415,19 +379,15 @@ el.textContent = 'فارغ';
 el.className = 'pill pill-y';
 }
 }
-
 async function saveNote(silent){
 if(!state.user || !state.lesson) return;
 if(!state.noteDirty && silent) return;
-
 state.noteSaving = true;
 updateNoteStatus('saving');
-
 try{
 const sb = await DB.getClient();
 const now = Date.now();
 const text = state.note;
-
 if(!text.trim()){
 if(state.noteId){
 await sb.from('notes').delete().eq('id', state.noteId);
@@ -438,7 +398,6 @@ state.noteSaving = false;
 updateNoteStatus('empty');
 return;
 }
-
 if(state.noteId){
 await sb.from('notes').update({text, updated_at: now}).eq('id', state.noteId);
 } else {
@@ -453,11 +412,9 @@ updated_at: now
 }]);
 state.noteId = id;
 }
-
 state.noteDirty = false;
 state.noteSaving = false;
 updateNoteStatus('saved');
-
 if(!silent){
 DB.trackActivity({
 userId: state.user.id,
@@ -484,24 +441,20 @@ customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
 }
 }
 }
-
 function scheduleAutoSave(){
 if(state.noteTimer) clearTimeout(state.noteTimer);
 state.noteTimer = setTimeout(()=>{
 saveNote(true);
 }, 1500);
 }
-
 function openPlayer(lesson, user){
 if(!state.hasVideoAccess){
 showLockedMessage();
 return;
 }
-
 const video = parseVideo(lesson.video) || {};
 const url = video.url || "";
 const type = video.type || "youtube";
-
 if(!url){
 Swal.fire({
 icon: 'warning',
@@ -514,16 +467,13 @@ customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
 });
 return;
 }
-
 const playerTitle = document.getElementById('playerTitle');
 if(playerTitle) playerTitle.textContent = lesson.title || 'الدرس';
-
 const watermark = document.getElementById('watermark');
 if(watermark){
 const phone = (user.country_code || '') + (user.phone || '') || user.name || 'طالب';
 watermark.textContent = phone;
 }
-
 const container = document.getElementById('playerContainer');
 if(container){
 if(type === 'youtube'){
@@ -568,19 +518,15 @@ title="فيديو الدرس"
 ></iframe>`;
 }
 }
-
 const modal = document.getElementById('playerModal');
 if(modal){
 modal.classList.add('open');
 document.body.style.overflow = 'hidden';
 }
-
 setTimeout(()=>{
 enterFullscreenLandscape();
 }, 100);
-
 startWatermarkMotion();
-
 try{
 DB.trackActivity({
 userId: user.id, userName: user.name,
@@ -589,7 +535,6 @@ details: { lesson: lesson.title }
 });
 }catch(e){}
 }
-
 function closePlayer(){
 const modal = document.getElementById('playerModal');
 if(modal){
@@ -597,20 +542,15 @@ modal.classList.remove('open');
 modal.classList.remove('fullscreen');
 }
 document.body.style.overflow = '';
-
 exitFullscreen();
 lockOrientation('portrait');
-
 const container = document.getElementById('playerContainer');
 if(container) container.innerHTML = '';
-
 stopWatermarkMotion();
 }
-
 async function enterFullscreenLandscape(){
 const modal = document.getElementById('playerModal');
 const box = modal?.querySelector('.player-box');
-
 try{
 if(box){
 if(box.requestFullscreen){
@@ -621,7 +561,6 @@ box.webkitRequestFullscreen();
 box.msRequestFullscreen();
 }
 }
-
 if(screen.orientation && screen.orientation.lock){
 try{
 await screen.orientation.lock('landscape');
@@ -629,17 +568,14 @@ await screen.orientation.lock('landscape');
 console.warn('Orientation lock failed:', e.message);
 }
 }
-
 modal.classList.add('fullscreen');
 state.isFullscreen = true;
-
 }catch(e){
 console.warn('Fullscreen failed:', e.message);
 modal.classList.add('fullscreen');
 state.isFullscreen = true;
 }
 }
-
 async function exitFullscreen(){
 try{
 if(document.fullscreenElement){
@@ -648,14 +584,11 @@ else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
 else if(document.msExitFullscreen) document.msExitFullscreen();
 }
 }catch(e){}
-
 state.isFullscreen = false;
-
 if(screen.orientation && screen.orientation.unlock){
 try{ screen.orientation.unlock(); }catch(e){}
 }
 }
-
 async function lockOrientation(mode){
 if(screen.orientation && screen.orientation.lock){
 try{
@@ -663,11 +596,9 @@ await screen.orientation.lock(mode);
 }catch(e){}
 }
 }
-
 function toggleFullscreen(){
 const modal = document.getElementById('playerModal');
 if(!modal) return;
-
 if(state.isFullscreen){
 exitFullscreen().then(()=>{
 modal.classList.remove('fullscreen');
@@ -677,42 +608,33 @@ lockOrientation('portrait');
 enterFullscreenLandscape();
 }
 }
-
 function moveWatermark(){
 const wm = document.getElementById('watermark');
 const stage = document.getElementById('playerStage');
 if(!wm || !stage) return;
-
 const w = stage.offsetWidth;
 const h = stage.offsetHeight;
-
 const maxX = Math.max(20, w - 180);
 const maxY = Math.max(20, h - 50);
-
 const x = Math.floor(Math.random() * maxX) + 10;
 const y = Math.floor(Math.random() * maxY) + 10;
-
 wm.style.left = x + 'px';
 wm.style.top = y + 'px';
 wm.style.right = 'auto';
 wm.style.bottom = 'auto';
 }
-
 function startWatermarkMotion(){
 moveWatermark();
 state.watermarkTimer = setInterval(moveWatermark, 5000);
 }
-
 function stopWatermarkMotion(){
 if(state.watermarkTimer){
 clearInterval(state.watermarkTimer);
 state.watermarkTimer = null;
 }
 }
-
 function attachProtection(){
 document.addEventListener('contextmenu', e => e.preventDefault());
-
 document.addEventListener('keydown', e => {
 if(e.key === 'F12'){ e.preventDefault(); return false; }
 if(e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())){ e.preventDefault(); return false; }
@@ -727,7 +649,6 @@ const modal = document.getElementById('playerModal');
 if(modal && modal.classList.contains('open')) closePlayer();
 }
 });
-
 document.addEventListener('copy', e => {
 const t = e.target?.tagName?.toLowerCase();
 if(t !== 'input' && t !== 'textarea') e.preventDefault();
@@ -743,13 +664,11 @@ if(t !== 'input' && t !== 'textarea') e.preventDefault();
 });
 document.addEventListener('dblclick', e => e.preventDefault());
 }
-
 function buildPlayerHTML(video, lessonTitle, hasAccess){
 const v = parseVideo(video);
 if(!v || !v.url){
 return `<div class="vid-shell"><div class="vp-error"><div style="font-size:48px;opacity:.35;margin-bottom:12px">🎬</div><div>لا يوجد فيديو لهذا الدرس</div></div></div>`;
 }
-
 if(!hasAccess){
 return `
 <div class="locked-shell">
@@ -769,7 +688,6 @@ return `
 </div>
 `;
 }
-
 return `
 <div class="vid-shell" id="vidShell">
 <div class="vp-error" style="background:linear-gradient(135deg,rgba(4,6,14,.92),rgba(11,18,38,.94));display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%">
@@ -783,12 +701,9 @@ return `
 </div>
 `;
 }
-
 function buildPdfHTML(pdfUrl, lessonTitle){
 if(!pdfUrl || !pdfUrl.trim()) return '';
-
 const fileName = (lessonTitle || 'lesson').replace(/[^\u0600-\u06FFa-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_') + '.pdf';
-
 return `
 <div class="glass mb20" style="padding:16px">
 <div class="h4 mb12" style="display:flex;align-items:center;gap:8px">
@@ -807,7 +722,6 @@ return `
 </div>
 `;
 }
-
 function buildRelatedExamsHTML(exams){
 if(!exams || exams.length === 0){
 return `
@@ -817,7 +731,6 @@ return `
 </div>
 `;
 }
-
 return `
 <div class="glass" style="padding:16px">
 <div class="h4 mb12">📝 اختبارات مرتبطة (${exams.length})</div>
@@ -847,11 +760,9 @@ ${locked ? '<div class="pill pill-paid" style="margin-top:8px;font-size:10px"><i
 </div>
 `;
 }
-
 function render(){
 const l = state.lesson;
 const u = state.user;
-
 app.innerHTML = `
 <div class="fade-in">
 <div class="flex between center wrap-fl g12 mb16">
@@ -873,23 +784,18 @@ ${getSubscriptionBadge(u)}
 ${state.isDone ? '<span class="pill pill-g"><i class="fa-solid fa-check"></i> مكتمل</span>' : '<span class="pill pill-b"><i class="fa-solid fa-play"></i> لم يُكمل</span>'}
 </div>
 </div>
-
 <div class="grid-main">
 <div>
 <div class="glass" style="padding:20px">
 ${l.desc ? `<div class="sm txt2 mb16">${esc(l.desc)}</div>` : ''}
-
 <div class="mb20" id="playerHost">
 ${buildPlayerHTML(l.video, l.title, state.hasVideoAccess)}
 </div>
-
 ${buildPdfHTML(l.pdf_url, l.title)}
-
 ${l.summary ? `
 <div class="h4 mb8">📝 ملخص الدرس</div>
 <div class="sm txt2 mb16">${esc(l.summary)}</div>
 ` : ''}
-
 ${(l.key_points || []).length > 0 ? `
 <div class="h4 mb8">💡 النقاط المهمة</div>
 <div class="mb16">
@@ -898,7 +804,6 @@ ${(l.key_points || []).map(k => `
 `).join('')}
 </div>
 ` : ''}
-
 ${(l.examples || []).length > 0 ? `
 <div class="h4 mb8">🧮 أمثلة محلولة</div>
 <div class="mb16">
@@ -910,12 +815,10 @@ ${(l.examples || []).map(ex => `
 `).join('')}
 </div>
 ` : ''}
-
 ${l.notes ? `
 <div class="h4 mb8">📌 ملاحظات المعلم</div>
 <div class="sm txt2 mb16">${esc(l.notes)}</div>
 ` : ''}
-
 <div class="flex wrap-fl g8 mt20">
 <button class="btn btn-ok" id="btnDone" ${state.isDone || !state.hasVideoAccess ? 'disabled' : ''}>
 ${state.isDone ? '<i class="fa-solid fa-check"></i> تم إكمال الدرس' : (state.hasVideoAccess ? '<i class="fa-solid fa-check"></i> فهمت الدرس' : '<i class="fa-solid fa-lock"></i> الدرس مدفوع')}
@@ -926,7 +829,6 @@ ${state.isDone ? '<i class="fa-solid fa-check"></i> تم إكمال الدرس' 
 </div>
 </div>
 </div>
-
 <div>
 <div class="glass mb16" style="padding:16px">
 <div class="flex between center mb12">
@@ -934,13 +836,12 @@ ${state.isDone ? '<i class="fa-solid fa-check"></i> تم إكمال الدرس' 
 <span class="pill pill-y" id="noteStatus">فارغ</span>
 </div>
 <textarea id="lessonNote" class="notes-area" placeholder="اكتب ملاحظاتك على الدرس هنا..."></textarea>
-<div className="flex g8 mt12">
-<button className="btn btn-p btn-sm" id="btnSaveNote" style="flex:1"><i class="fa-solid fa-floppy-disk"></i> حفظ</button>
-<button className="btn btn-s btn-sm" id="btnClearNote" title="مسح الملاحظة"><i className="fa-solid fa-trash"></i></button>
+<div class="flex g8 mt12">
+<button class="btn btn-p btn-sm" id="btnSaveNote" style="flex:1"><i class="fa-solid fa-floppy-disk"></i> حفظ</button>
+<button class="btn btn-s btn-sm" id="btnClearNote" title="مسح الملاحظة"><i class="fa-solid fa-trash"></i></button>
 </div>
 <div class="xs muted mt8" style="text-align:center"><i class="fa-solid fa-circle-info"></i> يتم الحفظ تلقائيًا أثناء الكتابة</div>
 </div>
-
 <div class="glass mb16" style="padding:16px">
 <div class="h4 mb12">📊 تقدمك في الوحدة</div>
 <div class="flex between center mb8">
@@ -950,16 +851,13 @@ ${state.isDone ? '<i class="fa-solid fa-check"></i> تم إكمال الدرس' 
 <div class="bar"><div class="bar-f" style="width:${state.unitPct}%"></div></div>
 <div class="xs muted mt8">${state.doneUnit} من ${state.totalUnit} دروس</div>
 </div>
-
 ${buildRelatedExamsHTML(state.relatedExams)}
 </div>
 </div>
 </div>
 `;
-
 const lockedSubscribeBtn = document.getElementById('btnLockedSubscribe');
 if(lockedSubscribeBtn) lockedSubscribeBtn.addEventListener('click', showLockedMessage);
-
 const openBtn = document.getElementById('btnOpenPlayer');
 if(openBtn){
 const openHandler = (e)=>{
@@ -970,7 +868,6 @@ openPlayer(l, u);
 openBtn.addEventListener('click', openHandler);
 openBtn.addEventListener('touchend', openHandler, { passive: false });
 }
-
 const lockedExamCards = app.querySelectorAll('.exam-card[data-locked="true"]');
 lockedExamCards.forEach(card=>{
 card.addEventListener('click', (e)=>{
@@ -979,7 +876,6 @@ e.stopPropagation();
 showLockedMessage();
 });
 });
-
 const pdfLink = document.getElementById('pdfLink');
 if(pdfLink){
 pdfLink.addEventListener('click', async ()=>{
@@ -995,7 +891,6 @@ const fname = pdfLink.dataset.filename || 'lesson.pdf';
 await downloadPdf(url, fname);
 });
 }
-
 const btnDoneEl = document.getElementById("btnDone");
 if(btnDoneEl){
 btnDoneEl.addEventListener("click", async ()=>{
@@ -1011,10 +906,8 @@ const completed = userData?.completed_lessons || [];
 const currentXp = userData?.xp || 0;
 const newCompleted = [...completed, l.id];
 const newXp = currentXp + (l.xp || 0);
-
 await DB.updateUser(u.id, { completed_lessons: newCompleted, xp: newXp });
 DB.trackActivity({userId:u.id,userName:u.name,type:"lesson_complete",target:l.title,details:{xp:l.xp}});
-
 await Swal.fire({
 icon: 'success',
 title: 'أحسنت!',
@@ -1026,14 +919,12 @@ customClass: {popup:'swal-custom-popup', title:'swal-custom-title'},
 timer: 1800,
 showConfirmButton: false
 });
-
 location.reload();
 }catch(e){
 Swal.fire({icon:'error', title:'خطأ', text:e.message, background:'linear-gradient(180deg, #151f38, #0b1122)', color:'#e8eefc', confirmButtonColor:'#2f7dff', customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
 }
 });
 }
-
 const btnReviewEl = document.getElementById("btnReview");
 if(btnReviewEl){
 btnReviewEl.addEventListener("click", ()=>{
@@ -1052,7 +943,6 @@ customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
 });
 });
 }
-
 const noteEl = document.getElementById('lessonNote');
 if(noteEl){
 noteEl.value = state.note || '';
@@ -1061,19 +951,16 @@ updateNoteStatus('saved');
 } else {
 updateNoteStatus('empty');
 }
-
 noteEl.addEventListener('input', ()=>{
 state.note = noteEl.value;
 state.noteDirty = true;
 updateNoteStatus('saving');
 scheduleAutoSave();
 });
-
 noteEl.addEventListener('blur', ()=>{
 if(state.noteDirty) saveNote(true);
 });
 }
-
 const btnSave = document.getElementById('btnSaveNote');
 if(btnSave){
 btnSave.addEventListener('click', ()=>{
@@ -1081,7 +968,6 @@ state.noteDirty = true;
 saveNote(false);
 });
 }
-
 const btnClear = document.getElementById('btnClearNote');
 if(btnClear){
 btnClear.addEventListener('click', async ()=>{
@@ -1108,7 +994,6 @@ await saveNote(false);
 });
 }
 }
-
 async function load(){
 if(!lessonId){
 app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
@@ -1118,18 +1003,13 @@ app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
 </div>`;
 return;
 }
-
 const sid = DB.getSessionId();
 if(!sid){ window.location.replace("/auth/login.html"); return; }
-
 const user = await DB.getUser(sid);
 if(!user || user.active === false){ DB.clearSession(); window.location.replace("/auth/login.html"); return; }
-
 state.user = user;
 userAvatar.textContent = user.avatar || "🧑‍🎓";
-
 const sb = await DB.getClient();
-
 const { data: lesson, error } = await sb.from("lessons").select("*").eq("id", lessonId).maybeSingle();
 if(error || !lesson){
 app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
@@ -1138,44 +1018,18 @@ app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
 </div>`;
 return;
 }
-
 state.lesson = lesson;
-
-console.log('=== DEBUG LESSON ACCESS ===');
-console.log('User data:', {
-id: user.id,
-name: user.name,
-subscription: user.subscription,
-subscription_until: user.subscription_until,
-all_subjects: user.all_subjects
-});
-console.log('Lesson data:', {
-id: lesson.id,
-title: lesson.title,
-is_free: lesson.is_free,
-video: lesson.video,
-video_type: typeof lesson.video
-});
-console.log('isPaidContent:', isPaidContent(lesson));
-console.log('hasSubscriptionAccess:', hasSubscriptionAccess(user));
-console.log('Final access:', hasAccess(user, lesson));
-console.log('Lock reason:', getLockReason(user, lesson));
-console.log('============================');
-
 DB.trackActivity({
 userId: user.id, userName: user.name,
 type: "lesson_view", target: lesson.title,
 details: { lesson: lesson.title }
 });
-
 const { data: unit } = await sb.from("units").select("*").eq("id", lesson.unit_id).maybeSingle();
 state.unit = unit;
-
 if(unit){
 const { data: subject } = await sb.from("subjects").select("*").eq("id", unit.subject_id).maybeSingle();
 state.subject = subject;
 }
-
 const { data: unitLessons } = await sb.from("lessons").select("id").eq("unit_id", lesson.unit_id).eq("published", true);
 const { data: userData } = await sb.from("users").select("completed_lessons").eq("id", user.id).maybeSingle();
 const completed = userData?.completed_lessons || [];
@@ -1183,53 +1037,41 @@ state.totalUnit = unitLessons?.length || 1;
 state.doneUnit = (unitLessons || []).filter(l => completed.includes(l.id)).length;
 state.unitPct = Math.round((state.doneUnit / state.totalUnit) * 100);
 state.isDone = completed.includes(lesson.id);
-
 const { data: allExams } = await sb.from("exams").select("*").eq("published", true);
 state.relatedExams = (allExams || []).filter(e => {
 const lessonIds = Array.isArray(e.lesson_ids) ? e.lesson_ids : [];
 return lessonIds.includes(lesson.id);
 });
-
 state.hasVideoAccess = hasAccess(user, lesson);
 state.hasExamAccess = {};
 state.relatedExams.forEach(e=>{
 state.hasExamAccess[e.id] = hasAccess(user, e);
 });
-
 await loadNote(user.id, lesson.id);
-
 render();
-
 const closeBtn = document.getElementById('playerClose');
 if(closeBtn) closeBtn.addEventListener('click', closePlayer);
-
 const fsBtn = document.getElementById('playerFullscreen');
 if(fsBtn) fsBtn.addEventListener('click', toggleFullscreen);
-
 const modal = document.getElementById('playerModal');
 if(modal){
 modal.addEventListener('click', (e)=>{
 if(e.target === modal) closePlayer();
 });
 }
-
 attachProtection();
-
 window.addEventListener('beforeunload', ()=>{
 if(state.noteDirty){
 saveNote(true);
 }
 });
-
 try{
 localStorage.setItem('student_last_lesson', lessonId);
 }catch(e){}
 }
-
 window.openWhatsApp = ()=>{
 window.open("https://wa.me/201128351702?text=" + encodeURIComponent("مرحبًا، أريد الاستفسار عن منصة MISSION EDU"), "_blank");
 };
-
 window.sendReport = async ()=>{
 const user = state.user || await DB.getUser(DB.getSessionId());
 const { value: msg } = await Swal.fire({
@@ -1253,7 +1095,6 @@ message: msg
 Swal.fire({icon: sent?'success':'error', title: sent?'✅ تم الإرسال':'❌ فشل', text: sent?'شكرًا لك':'حاول مرة أخرى', background:'linear-gradient(180deg, #151f38, #0b1122)', color:'#e8eefc', confirmButtonColor:'#2f7dff', customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
 }
 };
-
 load();
 })();
 </script>
