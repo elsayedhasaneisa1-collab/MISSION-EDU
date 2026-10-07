@@ -60,7 +60,7 @@ ul{list-style:none}
 .hv{transition:.28s cubic-bezier(.2,.8,.3,1)}
 .hv:hover{transform:translateY(-4px);border-color:var(--border2);box-shadow:var(--sh-gold)}
 .app{display:flex;min-height:100vh}
-.sidebar{width:264px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;padding:18px 12px;display:flex;flex-direction:column;gap:6px;background:linear-gradient(180deg,rgba(15,12,7,.96),rgba(10,8,5,.92));border-inline-start:1px solid var(--border);z-index:60}
+.sidebar{width:264px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow:hidden;padding:18px 12px;display:flex;flex-direction:column;gap:6px;background:linear-gradient(180deg,rgba(15,12,7,.96),rgba(10,8,5,.92));border-inline-start:1px solid var(--border);z-index:60}
 .main{flex:1;min-width:0;display:flex;flex-direction:column}
 .content{padding:22px 26px 100px;max-width:1440px;width:100%;margin:0 auto;animation:fu .5s}
 @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -606,7 +606,7 @@ function VideoEditor({value,onChange}){
   </div>;
 }
 
-function Sidebar({items,active,onNav,open,onClose}){
+function Sidebar({items,active,onNav,open,onClose,onLogout}){
   return <>
     {open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',zIndex:55}}/>}
     <aside className={`sidebar ${open?'open':''}`}>
@@ -614,14 +614,22 @@ function Sidebar({items,active,onNav,open,onClose}){
         <div className="brand-logo"><Icon name="trophy" size={22} color="#1a1206"/></div>
         <div><div className="brand-name">MISSION EDU</div><div className="brand-sub">لوحة الإدارة</div></div>
       </div>
-      {items.map((g,gi)=><div key={gi}>
-        {g.title&&<div className="nav-gt">{g.title}</div>}
-        {g.items.map(it=><button key={it.id} className={`nav-i ${active===it.id?'on':''}`} onClick={()=>{onNav(it.id);onClose?.();}}>
-          <span className="nav-ico"><Icon name={it.icon} size={16}/></span>
-          <span>{it.label}</span>
-          {it.badge!=null&&<span className="pill pill-b" style={{marginInlineStart:'auto'}}>{it.badge}</span>}
-        </button>)}
-      </div>)}
+      <div style={{flex:1, overflowY:'auto', overflowX:'hidden', display:'flex', flexDirection:'column', gap:'4px', marginInlineEnd:'-6px', paddingInlineEnd:'6px'}}>
+        {items.map((g,gi)=><div key={gi}>
+          {g.title&&<div className="nav-gt">{g.title}</div>}
+          {g.items.map(it=><button key={it.id} className={`nav-i ${active===it.id?'on':''}`} onClick={()=>{onNav(it.id);onClose?.();}}>
+            <span className="nav-ico"><Icon name={it.icon} size={16}/></span>
+            <span>{it.label}</span>
+            {it.badge!=null&&<span className="pill pill-b" style={{marginInlineStart:'auto'}}>{it.badge}</span>}
+          </button>)}
+        </div>)}
+      </div>
+      <div style={{marginTop:'10px', paddingTop:'10px', borderTop:'1px solid var(--border)', flexShrink:0}}>
+        <button className="nav-i" onClick={onLogout} style={{color:'#fca5a5', width:'100%'}}>
+          <span className="nav-ico"><Icon name="logout" size={16}/></span>
+          <span>تسجيل الخروج</span>
+        </button>
+      </div>
     </aside>
   </>;
 }
@@ -3338,12 +3346,13 @@ function AdminApp(){
 
   return <div className="app">
     <Sidebar
-      items={items}
-      active={tab}
-      onNav={(id)=>{setTab(id);try{localStorage.setItem('admin_tab',id);}catch(e){}}}
-      open={sidebarOpen}
-      onClose={()=>setSidebarOpen(false)}
-    />
+  items={items}
+  active={tab}
+  onNav={(id)=>{setTab(id);try{localStorage.setItem('admin_tab',id);}catch(e){}}}
+  open={sidebarOpen}
+  onClose={()=>setSidebarOpen(false)}
+  onLogout={app.logout}
+/>
     <div className="main">
       <Topbar
         user={user}
