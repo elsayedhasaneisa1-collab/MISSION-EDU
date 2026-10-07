@@ -1590,22 +1590,13 @@ function MissionsPage(){
   const openNew=()=>{setForm({title:'',desc:'',subject_id:'',required_lessons:[],required_exam_id:'',xp:100,sort_order:1});setEditing('new');};
   const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
   const save=async ()=>{
-  if(!form.title) return app.toast.warn('العنوان مطلوب');
-  if(!form.unit_id) return app.toast.warn('اختر الوحدة');
-  setBusy(true);
-  try{
-    const video = form.video || {};
-    const isFreeValue = video.is_free !== false && video.is_free !== 'paid';
-    const payload = {
-      ...form,
-      is_free: isFreeValue
-    };
-    await app.save('lessons', payload);
-    app.toast.ok(editing==='new'?'تمت الإضافة':'تم الحفظ');
-    setEditing(null);
-  }catch(e){app.toast.err(e.message);}
-  setBusy(false);
-};
+    if(!form.title) return app.toast.warn('العنوان مطلوب');
+    if(!form.unit_id) return app.toast.warn('اختر الوحدة');
+    setBusy(true);
+    try{await app.save('missions',form);app.toast.ok('تم الحفظ');setEditing(null);}
+    catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
   const del=async id=>{
     const r=await Swal.fire({title:'حذف المهمة؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
     if(!r.isConfirmed) return;
