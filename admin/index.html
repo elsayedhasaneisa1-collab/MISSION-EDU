@@ -1088,16 +1088,18 @@ function LessonsPage(){
   const openNew=()=>{setForm({title:'',desc:'',summary:'',video:{type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true},pdf_url:'',duration:15,xp:20,sort_order:1,unit_id:'',published:true,key_points:[],examples:[],notes:''});setEditing('new');};
   const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(!c.video)c.video={type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true};if(c.video.is_free===undefined)c.video.is_free=true;if(!c.key_points)c.key_points=[];if(!c.pdf_url)c.pdf_url='';setForm(c);setEditing(it.id);};
   const save=async ()=>{
-  if(!form.title||!form.subject_id) return app.toast.warn('العنوان والمادة مطلوبان');
-  if(!form.question_ids||form.question_ids.length===0) return app.toast.warn('اختر سؤالاً على الأقل');
+  if(!form.title) return app.toast.warn('العنوان مطلوب');
+  if(!form.unit_id) return app.toast.warn('اختر الوحدة');
   setBusy(true);
   try{
+    const video = form.video || {};
+    const isFreeValue = video.is_free !== false && video.is_free !== 'paid';
     const payload = {
       ...form,
-      is_free: form.is_free !== false && form.is_free !== 'paid'
+      is_free: isFreeValue
     };
-    await app.save('exams', payload);
-    app.toast.ok('تم الحفظ');
+    await app.save('lessons', payload);
+    app.toast.ok(editing==='new'?'تمت الإضافة':'تم الحفظ');
     setEditing(null);
   }catch(e){app.toast.err(e.message);}
   setBusy(false);
