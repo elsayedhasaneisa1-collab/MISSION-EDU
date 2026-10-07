@@ -220,7 +220,7 @@ const API = {
       grade_id: gradeId || "",
       xp: 0, streak: 1, last_active: today(),
       created_at: Date.now(), active: true,
-      all_subjects: true, access_subjects: [],
+      all_subjects: false, access_subjects: [], subscription: "free",
       completed_lessons: [], completed_missions: [], achievements: []
     };
 
