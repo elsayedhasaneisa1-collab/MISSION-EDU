@@ -1606,6 +1606,11 @@ function MissionsPage(){
   }catch(e){app.toast.err(e.message);}
   setBusy(false);
 };
+  const del=async id=>{
+    const r=await Swal.fire({title:'حذف المهمة؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+    if(!r.isConfirmed) return;
+    try{await app.remove('missions',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}
+  };
   return <>
     <div className="flex between center mb16"><div className="h2 grad">🎯 إدارة المهام</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> مهمة جديدة</button></div>
     <div className="glass" style={{padding:14}}>
