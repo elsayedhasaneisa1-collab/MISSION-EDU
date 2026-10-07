@@ -26,6 +26,7 @@ fbq('track', 'PageView');
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -51,7 +52,7 @@ html, body {
 img, video, iframe, svg { max-width: 100%; }
 .app, .main, .content, .topbar, .sidebar { max-width: 100%; overflow-x: hidden; }
 
-:root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#8b5cf6;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.45)}
+:root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#8b5cf6;--gold:#fbbf24;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.45)}
 *{margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(47,125,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(139,92,246,.14),transparent 60%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;line-height:1.7}
 ::-webkit-scrollbar{width:10px;height:10px}
@@ -75,6 +76,7 @@ a{color:inherit;text-decoration:none}
 @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
 @keyframes sp{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes lockFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 .brand{display:flex;align-items:center;gap:11px;padding:8px 10px 16px}
 .brand-logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 8px 26px rgba(47,125,255,.45)}
 .brand-name{font-weight:900;font-size:17px}
@@ -128,12 +130,16 @@ a{color:inherit;text-decoration:none}
 .pill-r{background:rgba(239,68,68,.14);color:#fca5a5;border-color:rgba(239,68,68,.28)}
 .pill-v{background:rgba(139,92,246,.15);color:#c4b5fd;border-color:rgba(139,92,246,.28)}
 .pill-y{background:rgba(255,255,255,.06);color:var(--muted);border-color:var(--border)}
+.pill-paid{background:linear-gradient(135deg,rgba(251,191,36,.25),rgba(251,191,36,.10));color:#fbbf24;border:1px solid rgba(251,191,36,.5);box-shadow:0 0 14px rgba(251,191,36,.22)}
+.pill-free{background:linear-gradient(135deg,rgba(34,197,94,.22),rgba(34,197,94,.10));color:#86efac;border:1px solid rgba(34,197,94,.42)}
+.pill-vip{background:linear-gradient(135deg,rgba(139,92,246,.28),rgba(139,92,246,.12));color:#c4b5fd;border:1px solid rgba(139,92,246,.5);box-shadow:0 0 14px rgba(139,92,246,.25)}
 .bar{height:9px;border-radius:20px;background:rgba(255,255,255,.07);overflow:hidden;position:relative}
 .bar-f{height:100%;border-radius:20px;transition:width .8s cubic-bezier(.2,.8,.3,1);position:relative;overflow:hidden}
 .bar-f::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);background-size:400px 100%;animation:shimmer 2.4s infinite linear}
 .bar-b{background:linear-gradient(90deg,#2f7dff,#5aa9ff)}
 .bar-g{background:linear-gradient(90deg,#16a34a,#4ade80)}
 .bar-v{background:linear-gradient(90deg,#7c3aed,#a78bfa)}
+.bar-gold{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
 .input,select.input,textarea.input{width:100%;padding:11px 14px;border-radius:12px;background:rgba(10,16,32,.72);border:1.5px solid var(--border);outline:none;font-size:14px;transition:.22s;color:var(--txt)}
 .input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.12)}
 select.input{cursor:pointer;appearance:none;padding-left:38px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237f93b8' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:left 14px center}
@@ -202,6 +208,17 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 .swal-custom-input{background:rgba(10,16,32,.75) !important;border:1.5px solid rgba(90,140,230,.3) !important;color:#e8eefc !important;border-radius:12px !important;font-family:'Tajawal','Cairo',sans-serif !important}
 .swal-custom-confirm{border-radius:12px !important;font-weight:700 !important;font-family:'Tajawal','Cairo',sans-serif !important;padding:10px 24px !important}
 .swal-custom-cancel{border-radius:12px !important;font-weight:700 !important;font-family:'Tajawal','Cairo',sans-serif !important;padding:10px 24px !important}
+
+.locked-lesson-card{border-color:rgba(251,191,36,.35) !important;background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(21,31,56,.62)) !important;position:relative !important}
+.locked-lesson-card:hover{border-color:rgba(251,191,36,.6) !important;box-shadow:0 12px 30px rgba(251,191,36,.20) !important}
+.lock-badge-mini{position:absolute;top:10px;left:10px;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#fbbf24,#f59e0b);display:grid;place-items:center;box-shadow:0 4px 14px rgba(251,191,36,.5);animation:lockFloat 3s ease-in-out infinite}
+.lock-badge-mini i{font-size:12px;color:#1a1206}
+.lock-overlay-tag{position:absolute;bottom:8px;left:8px;display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:800;background:linear-gradient(135deg,rgba(251,191,36,.9),rgba(245,158,11,.9));color:#1a1206;box-shadow:0 4px 12px rgba(251,191,36,.4)}
+.lock-overlay-tag i{font-size:9px}
+
+.sub-lock-ribbon{position:absolute;top:0;left:0;right:0;padding:6px 12px;background:linear-gradient(135deg,rgba(251,191,36,.95),rgba(245,158,11,.95));color:#1a1206;font-size:10.5px;font-weight:900;text-align:center;letter-spacing:.3px;box-shadow:0 4px 14px rgba(0,0,0,.35);z-index:2;display:flex;align-items:center;justify-content:center;gap:6px}
+.sub-lock-ribbon i{font-size:11px}
+
 @media(max-width:1080px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:860px){
   .sidebar{position:fixed;inset-inline-end:0;top:0;transform:translateX(-105%);transition:transform .34s;width:280px;max-width:85vw;box-shadow:-20px 0 60px rgba(0,0,0,.7);overflow-x:hidden}
@@ -524,6 +541,80 @@ function Ring({value,size=120,stroke=10,color='#2f7dff',children}){
   </div>;
 }
 
+function isPaidContent(item){
+  if(!item) return false;
+  if(item.is_free === false) return true;
+  if(item.is_free === 'paid') return true;
+  if(item.video && item.video.is_free === false) return true;
+  if(item.video && item.video.is_free === 'paid') return true;
+  return false;
+}
+
+function hasSubscriptionAccess(user){
+  if(!user) return false;
+  if(user.all_subjects === true) return true;
+  if(user.subscription === 'vip') return true;
+  if(user.subscription === 'paid'){
+    if(!user.subscription_until) return true;
+    const until = typeof user.subscription_until === 'number'
+      ? user.subscription_until
+      : new Date(user.subscription_until).getTime();
+    if(!isNaN(until) && until > Date.now()) return true;
+  }
+  return false;
+}
+
+function hasAccess(user, item){
+  if(!isPaidContent(item)) return true;
+  return hasSubscriptionAccess(user);
+}
+
+function showLockedMessage(){
+  Swal.fire({
+    icon: 'warning',
+    title: '🔒 محتوى مدفوع',
+    html: `
+      <div style="text-align:right;line-height:2;font-size:14px">
+        <p style="margin-bottom:10px">هذا المحتوى متاح <b style="color:#fbbf24">للمشتركين فقط</b>.</p>
+        <p style="color:#b7c6e4;font-size:13px;margin-bottom:10px">للاشتراك والاستفادة من كل المحتوى المدفوع، تواصل معنا:</p>
+        <div style="display:flex;align-items:center;gap:8px;background:rgba(37,211,102,.10);border:1px solid rgba(37,211,102,.3);border-radius:10px;padding:10px 14px;margin-top:8px">
+          <i class="fa-brands fa-whatsapp" style="color:#25d366;font-size:20px"></i>
+          <span style="color:#fff;font-weight:700">01128351702</span>
+        </div>
+      </div>`,
+    background: 'linear-gradient(180deg, #151f38, #0b1122)',
+    color: '#e8eefc',
+    showCancelButton: true,
+    confirmButtonText: '<i class="fa-brands fa-whatsapp"></i> تواصل واتساب',
+    cancelButtonText: 'إلغاء',
+    confirmButtonColor: '#25d366',
+    cancelButtonColor: '#64748b',
+    customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
+  }).then(r=>{
+    if(r.isConfirmed){
+      window.open("https://wa.me/201128351702?text=" + encodeURIComponent("مرحبًا، أريد الاشتراك في منصة MISSION EDU للوصول للمحتوى المدفوع"), "_blank");
+    }
+  });
+}
+
+function getSubscriptionBadge(user){
+  if(!user) return '';
+  if(user.all_subjects === true) return <span className="pill pill-vip"><i className="fa-solid fa-crown"></i> وصول كامل</span>;
+  if(user.subscription === 'vip') return <span className="pill pill-vip"><i className="fa-solid fa-crown"></i> VIP</span>;
+  if(user.subscription === 'paid'){
+    if(user.subscription_until){
+      const until = typeof user.subscription_until === 'number' ? user.subscription_until : new Date(user.subscription_until).getTime();
+      if(until > Date.now()){
+        const days = Math.ceil((until - Date.now()) / 86400000);
+        return <span className="pill pill-paid"><i className="fa-solid fa-crown"></i> مشترك ({days} يوم)</span>;
+      }
+      return <span className="pill pill-r"><i className="fa-solid fa-circle-xmark"></i> اشتراك منتهي</span>;
+    }
+    return <span className="pill pill-paid"><i className="fa-solid fa-crown"></i> مشترك</span>;
+  }
+  return <span className="pill pill-free"><i className="fa-solid fa-user"></i> مجاني</span>;
+}
+
 function PomodoroTimer({compact=false}){
   const app=useApp();
   const u=app.currentUser;
@@ -725,6 +816,7 @@ function Home({onNav,setSelected}){
 
   const lastLessonId=(()=>{try{return localStorage.getItem('student_last_lesson');}catch(e){return null;}})();
   const lastLesson = lastLessonId ? app.lesson(lastLessonId) : null;
+  const lastLessonAccess = lastLesson ? hasAccess(u, lastLesson) : false;
 
   return <>
     <div className="hero mb16" style={{padding:'clamp(16px,4vw,24px)'}}>
@@ -734,6 +826,9 @@ function Home({onNav,setSelected}){
             أهلًا بك {u.name.split(' ')[0]} 👋
           </div>
           <div className="sm txt2 mb12">مهمتك الحالية في انتظارك.</div>
+          <div style={{display:'flex',justifyContent:'center',gap:8,flexWrap:'wrap'}}>
+            {getSubscriptionBadge(u)}
+          </div>
         </div>
 
         <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'20px',flexWrap:'wrap'}}>
@@ -749,11 +844,19 @@ function Home({onNav,setSelected}){
 
         <div style={{display:'flex',gap:'8px',width:'100%',flexWrap:'wrap'}}>
           {lastLesson && (
-            <a href={`/student/lesson.html?id=${lastLesson.id}`}
-               className="btn btn-p"
-               style={{textDecoration:'none',flex:'1 1 auto',minWidth:'140px',fontSize:'13px',padding:'10px 16px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
-              ▶️ متابعة الدرس
-            </a>
+            lastLessonAccess ? (
+              <a href={`/student/lesson.html?id=${lastLesson.id}`}
+                 className="btn btn-p"
+                 style={{textDecoration:'none',flex:'1 1 auto',minWidth:'140px',fontSize:'13px',padding:'10px 16px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
+                ▶️ متابعة الدرس
+              </a>
+            ) : (
+              <button className="btn btn-p"
+                 onClick={showLockedMessage}
+                 style={{flex:'1 1 auto',minWidth:'140px',fontSize:'13px',padding:'10px 16px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',background:'linear-gradient(135deg,#fbbf24,#f59e0b)',color:'#1a1206'}}>
+                <i className="fa-solid fa-lock"></i> متابعة الدرس (مدفوع)
+              </button>
+            )
           )}
           <button className="btn btn-g"
                   onClick={()=>onNav('subjects')}
@@ -834,7 +937,10 @@ function Subjects({setSelected,setTab}){
   const access=u.all_subjects?app.db.subjects.map(s=>s.id):(u.access_subjects||[]);
   const subjects=app.db.subjects.filter(s=>access.includes(s.id)).sort((a,b)=>a.sort_order-b.sort_order);
   return <>
-    <div className="h2 mb16">المواد المتاحة</div>
+    <div className="flex between center mb16 wrap g8">
+      <div className="h2">المواد المتاحة</div>
+      {getSubscriptionBadge(u)}
+    </div>
     {subjects.length===0?<div className="glass" style={{padding:30}}><Empty icon="📚" title="لا توجد مواد متاحة لك"/></div>:
       <div className="grid g-auto">
         {subjects.map(s=>{
@@ -842,10 +948,13 @@ function Subjects({setSelected,setTab}){
           const lessons=app.db.lessons.filter(l=>units.some(un=>un.id===l.unit_id)&&l.published!==false);
           const done=lessons.filter(l=>(u.completed_lessons||[]).includes(l.id)).length;
           const p=DB.pct(done,lessons.length);
-          return <div key={s.id} className="glass hv" style={{padding:20,cursor:'pointer'}} onClick={()=>{
+          const paidLessons = lessons.filter(l=>isPaidContent(l));
+          const hasPaid = paidLessons.length > 0;
+          return <div key={s.id} className={`glass hv ${hasPaid?'locked-lesson-card':''}`} style={{padding:20,cursor:'pointer',position:'relative'}} onClick={()=>{
             if(typeof fbq!=='undefined') fbq('trackCustom','ViewSubject',{subject:s.name});
             setSelected({type:'subject',id:s.id});setTab('subject');
           }}>
+            {hasPaid && <div className="lock-overlay-tag"><i className="fa-solid fa-lock"></i> يحتوي على محتوى مدفوع</div>}
             <div className="flex between center mb12">
               <div style={{fontSize:38}}>{s.icon}</div>
               <span className="pill pill-b">{lessons.length} درس</span>
@@ -882,7 +991,11 @@ function SubjectDetail({subjectId,setSelected,setTab}){
       </div>
     </div>
 
-    <div className="h3 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="book" size={18}/> الوحدات والدروس</div>
+    <div className="flex between center mb12 wrap g8">
+      <div className="h3" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="book" size={18}/> الوحدات والدروس</div>
+      {getSubscriptionBadge(u)}
+    </div>
+
     {units.map(un=>{
       const lessons=app.db.lessons.filter(l=>l.unit_id===un.id&&l.published!==false).sort((a,b)=>{
         const sa=Number(a.sort_order)||999999,sb=Number(b.sort_order)||999999;
@@ -912,10 +1025,16 @@ function SubjectDetail({subjectId,setSelected,setTab}){
               const done=(u.completed_lessons||[]).includes(l.id);
               const hasVideo=l.video&&l.video.url;
               const note=app.getNote(l.id);
-              return <a key={l.id} href={`/student/lesson.html?id=${l.id}`} className="glass-s hv" style={{padding:14,textDecoration:'none',color:'inherit'}}
-                onClick={()=>{if(typeof fbq!=='undefined') fbq('trackCustom','ViewLesson',{lesson:l.title});}}>
+              const paid = isPaidContent(l);
+              const allowed = hasAccess(u, l);
+              const locked = paid && !allowed;
+              const cardContent = <>
+                {locked && <div className="lock-badge-mini"><i className="fa-solid fa-lock"></i></div>}
                 <div className="flex between center mb6">
-                  <span className={`pill ${done?'pill-g':'pill-b'}`}>{done?<Icon name="check" size={12}/>:<Icon name="play" size={12}/>}</span>
+                  <span className={`pill ${done?'pill-g':(paid?'pill-paid':'pill-b')}`}>
+                    {done? <Icon name="check" size={12}/> : (paid ? <i className="fa-solid fa-lock" style={{fontSize:11}}/> : <Icon name="play" size={12}/>)}
+                    {paid && !done ? ' مدفوع' : ''}
+                  </span>
                   <div className="flex g6">
                     {note && <span className="pill pill-y" style={{fontSize:10}}>📝</span>}
                     {hasVideo&&<span className="pill pill-v" style={{fontSize:10}}>🎬</span>}
@@ -923,6 +1042,17 @@ function SubjectDetail({subjectId,setSelected,setTab}){
                 </div>
                 <div className="h4" style={{fontSize:14}}>{l.title}</div>
                 <div className="xs muted mt6">⏱ {l.duration}د • +{l.xp} XP</div>
+              </>;
+
+              if(locked){
+                return <div key={l.id} className="glass-s hv locked-lesson-card" style={{padding:14,textDecoration:'none',color:'inherit',cursor:'pointer'}} onClick={showLockedMessage}>
+                  {cardContent}
+                </div>;
+              }
+
+              return <a key={l.id} href={`/student/lesson.html?id=${l.id}`} className="glass-s hv" style={{padding:14,textDecoration:'none',color:'inherit'}}
+                onClick={()=>{if(typeof fbq!=='undefined') fbq('trackCustom','ViewLesson',{lesson:l.title});}}>
+                {cardContent}
               </a>;
             })}
           </div>
@@ -934,14 +1064,31 @@ function SubjectDetail({subjectId,setSelected,setTab}){
             {exams.map(e=>{
               const attempts=(app.attempts||[]).filter(a=>a.exam_id===e.id);
               const best=attempts.length?Math.max(...attempts.map(a=>a.pct)):0;
-              return <a key={e.id} href={`/student/exam.html?id=${e.id}`} className="glass-s hv" style={{padding:14,textDecoration:'none',color:'inherit'}}
-                onClick={()=>{if(typeof fbq!=='undefined') fbq('track','InitiateCheckout',{content_name:e.title});}}>
+              const paid = isPaidContent(e);
+              const allowed = hasAccess(u, e);
+              const locked = paid && !allowed;
+
+              const content = <>
+                {locked && <div className="lock-badge-mini"><i className="fa-solid fa-lock"></i></div>}
                 <div className="flex between center mb6">
-                  <span className={`pill ${best>=e.pass_score?'pill-g':'pill-a'}`}>{attempts.length?`أفضل: ${best}%`:'جديد'}</span>
+                  <span className={`pill ${locked?'pill-paid':(best>=e.pass_score?'pill-g':'pill-a')}`}>
+                    {locked ? <><i className="fa-solid fa-lock" style={{fontSize:11}}/> مدفوع</> : (attempts.length?`أفضل: ${best}%`:'جديد')}
+                  </span>
                   <span className="xs muted">⏱ {e.duration}د</span>
                 </div>
                 <div className="h4" style={{fontSize:14}}>{e.title}</div>
                 <div className="xs muted mt6">+{e.xp} XP • {(e.question_ids||[]).length} أسئلة</div>
+              </>;
+
+              if(locked){
+                return <div key={e.id} className="glass-s hv locked-lesson-card" style={{padding:14,textDecoration:'none',color:'inherit',cursor:'pointer'}} onClick={showLockedMessage}>
+                  {content}
+                </div>;
+              }
+
+              return <a key={e.id} href={`/student/exam.html?id=${e.id}`} className="glass-s hv" style={{padding:14,textDecoration:'none',color:'inherit'}}
+                onClick={()=>{if(typeof fbq!=='undefined') fbq('track','InitiateCheckout',{content_name:e.title});}}>
+                {content}
               </a>;
             })}
           </div>
@@ -1202,7 +1349,7 @@ function NotesPage({setTab}){
               <div className="sm txt2" style={{background:'rgba(0,0,0,.20)',padding:10,borderRadius:10,borderInlineStart:'2px solid var(--blue)',whiteSpace:'pre-wrap',minHeight:60}}>{n.text||'—'}</div>
               <div className="flex g8 mt12">
                 <button className="btn btn-s btn-sm" style={{flex:1}} onClick={()=>startEdit(n)}><Icon name="edit" size={12}/> تعديل</button>
-                <button className="btn btn-dn btn-sm" onClick={()=>delNote(n)} style={{background:'rgba(239,68,68,.14)',color:'#fca5a5',border:'1px solid rgba(239,68,68,.32)',padding:'7px 13px',borderRadius:10}}><Icon name="trash" size={12}/></button>
+                <button className="btn btn-sm" onClick={()=>delNote(n)} style={{background:'rgba(239,68,68,.14)',color:'#fca5a5',border:'1px solid rgba(239,68,68,.32)',padding:'7px 13px',borderRadius:10}}><Icon name="trash" size={12}/></button>
               </div>
             </>}
           </div>;

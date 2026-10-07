@@ -7,6 +7,7 @@
 <title>الاختبار | MISSION EDU</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 <link rel="icon" type="image/png" href="/logo.png">
@@ -17,7 +18,7 @@
 <meta name="apple-mobile-web-app-title" content="MISSION EDU">
 <meta name="mobile-web-app-capable" content="yes">
 <style>
-:root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#8b5cf6;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.45)}
+:root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#8b5cf6;--gold:#fbbf24;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.45)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(47,125,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(139,92,246,.14),transparent 60%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;line-height:1.7}
 ::-webkit-scrollbar{width:10px;height:10px}
@@ -52,6 +53,9 @@ a{color:inherit;text-decoration:none}
 .pill-a{background:rgba(245,158,11,.14);color:#fcd34d;border-color:rgba(245,158,11,.28)}
 .pill-r{background:rgba(239,68,68,.14);color:#fca5a5;border-color:rgba(239,68,68,.28)}
 .pill-y{background:rgba(255,255,255,.06);color:var(--muted);border-color:var(--border)}
+.pill-paid{background:linear-gradient(135deg,rgba(251,191,36,.25),rgba(251,191,36,.10));color:#fbbf24;border:1px solid rgba(251,191,36,.5);box-shadow:0 0 14px rgba(251,191,36,.22)}
+.pill-free{background:linear-gradient(135deg,rgba(34,197,94,.22),rgba(34,197,94,.10));color:#86efac;border:1px solid rgba(34,197,94,.42)}
+.pill-vip{background:linear-gradient(135deg,rgba(139,92,246,.28),rgba(139,92,246,.12));color:#c4b5fd;border:1px solid rgba(139,92,246,.5);box-shadow:0 0 14px rgba(139,92,246,.25)}
 .bar{height:9px;border-radius:20px;background:rgba(255,255,255,.07);overflow:hidden}
 .bar-f{height:100%;border-radius:20px;transition:width .8s;background:linear-gradient(90deg,#2f7dff,#5aa9ff)}
 .opt{display:flex;align-items:center;gap:13px;padding:14px 17px;border-radius:14px;background:rgba(255,255,255,.035);border:1.5px solid var(--border);transition:.2s;cursor:pointer;text-align:right;width:100%;font-size:14.5px;color:var(--txt)}
@@ -67,6 +71,8 @@ a{color:inherit;text-decoration:none}
 .spinner{width:40px;height:40px;border:3px solid rgba(90,140,230,.2);border-top-color:var(--blue);border-radius:50%;animation:sp 1s linear infinite;margin-bottom:14px}
 @keyframes sp{to{transform:rotate(360deg)}}
 @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes lockPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 20px rgba(251,191,36,.5))}50%{transform:scale(1.08);filter:drop-shadow(0 0 35px rgba(251,191,36,.9))}}
+@keyframes crownFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-6px) rotate(3deg)}}
 .fade-in{animation:fu .3s ease-out}
 .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(6,9,20,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
 .back-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--txt2);font-size:13.5px;font-weight:700;transition:.2s;text-decoration:none}
@@ -86,6 +92,18 @@ a{color:inherit;text-decoration:none}
 .stat-l{font-size:12.5px;color:var(--muted);font-weight:600}
 .stat-v{font-size:16px;font-weight:900;letter-spacing:-.5px}
 .xp-box{margin-top:20px;padding:12px 20px;border-radius:14px;font-weight:700;text-align:center}
+.locked-shell{width:100%;border-radius:18px;overflow:hidden;background:linear-gradient(135deg,rgba(4,6,14,.96),rgba(11,18,38,.98));border:1px solid rgba(251,191,36,.35);box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 40px rgba(251,191,36,.12) inset;display:flex;align-items:center;justify-content:center;padding:32px 20px}
+.lock-content{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:100%;max-width:440px}
+.lock-icon-wrap{position:relative;width:clamp(80px,20vw,120px);height:clamp(80px,20vw,120px);border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 30% 30%,rgba(251,191,36,.35),rgba(251,191,36,.08) 70%,transparent);border:2px solid rgba(251,191,36,.4);box-shadow:0 0 40px rgba(251,191,36,.3);margin-bottom:clamp(14px,3.5vw,22px);animation:lockPulse 3s ease-in-out infinite}
+.lock-icon-wrap i{font-size:clamp(32px,8vw,50px);color:#fbbf24;filter:drop-shadow(0 4px 10px rgba(0,0,0,.5))}
+.crown-badge{position:absolute;top:-8px;right:-8px;width:clamp(30px,7.5vw,44px);height:clamp(30px,7.5vw,44px);border-radius:50%;background:linear-gradient(135deg,#fbbf24,#f59e0b);display:grid;place-items:center;box-shadow:0 6px 20px rgba(251,191,36,.55),0 0 0 2px rgba(10,8,5,.9) inset;animation:crownFloat 2.5s ease-in-out infinite}
+.crown-badge i{font-size:clamp(14px,3.8vw,20px);color:#1a1206}
+.lock-title{font-size:clamp(17px,4.5vw,22px);font-weight:900;color:#fbbf24;margin-bottom:8px;text-shadow:0 2px 12px rgba(251,191,36,.4)}
+.lock-desc{font-size:clamp(12px,3vw,14px);color:#b7c6e4;margin-bottom:clamp(14px,3.5vw,20px);line-height:1.6;padding:0 10px}
+.lock-btn{display:inline-flex;align-items:center;gap:8px;padding:clamp(10px,2.8vw,13px) clamp(20px,5vw,30px);border-radius:12px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a1206;font-weight:900;font-size:clamp(13px,3.2vw,15px);box-shadow:0 10px 30px rgba(251,191,36,.45);transition:.24s;border:none;cursor:pointer;font-family:inherit}
+.lock-btn:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(251,191,36,.6)}
+.lock-btn i{font-size:clamp(13px,3.2vw,16px)}
+.lock-note{margin-top:clamp(10px,2.8vw,16px);font-size:clamp(10px,2.5vw,12px);color:#7f93b8;opacity:.85}
 </style>
 </head>
 <body>
@@ -139,7 +157,8 @@ a{color:inherit;text-decoration:none}
     answers: {},
     timeLeft: 0,
     timer: null,
-    result: null
+    result: null,
+    hasAccess: false
   };
 
   function esc(str){
@@ -167,6 +186,114 @@ a{color:inherit;text-decoration:none}
     `;
   }
 
+  function isPaidContent(item){
+    if(!item) return false;
+    if(item.is_free === false) return true;
+    if(item.is_free === 'paid') return true;
+    return false;
+  }
+
+  function hasSubscriptionAccess(user){
+    if(!user) return false;
+    if(user.all_subjects === true) return true;
+    if(user.subscription === 'vip') return true;
+    if(user.subscription === 'paid'){
+      if(!user.subscription_until) return true;
+      const until = typeof user.subscription_until === 'number'
+        ? user.subscription_until
+        : new Date(user.subscription_until).getTime();
+      if(!isNaN(until) && until > Date.now()) return true;
+    }
+    return false;
+  }
+
+  function hasAccess(user, item){
+    if(!isPaidContent(item)) return true;
+    return hasSubscriptionAccess(user);
+  }
+
+  function getSubscriptionBadge(user){
+    if(!user) return '';
+    if(user.subscription === 'vip') return '<span class="pill pill-vip"><i class="fa-solid fa-crown"></i> VIP</span>';
+    if(user.subscription === 'paid'){
+      if(user.subscription_until){
+        const until = typeof user.subscription_until === 'number' ? user.subscription_until : new Date(user.subscription_until).getTime();
+        if(until > Date.now()){
+          const days = Math.ceil((until - Date.now()) / 86400000);
+          return `<span class="pill pill-paid"><i class="fa-solid fa-crown"></i> مشترك (${days} يوم)</span>`;
+        }
+        return '<span class="pill pill-r"><i class="fa-solid fa-circle-xmark"></i> اشتراك منتهي</span>';
+      }
+      return '<span class="pill pill-paid"><i class="fa-solid fa-crown"></i> مشترك</span>';
+    }
+    return '<span class="pill pill-free"><i class="fa-solid fa-user"></i> مجاني</span>';
+  }
+
+  function showLockedMessage(){
+    Swal.fire({
+      icon: 'warning',
+      title: '🔒 اختبار مدفوع',
+      html: `
+        <div style="text-align:right;line-height:2;font-size:14px">
+          <p style="margin-bottom:10px">هذا الاختبار متاح <b style="color:#fbbf24">للمشتركين فقط</b>.</p>
+          <p style="color:#b7c6e4;font-size:13px;margin-bottom:10px">للاشتراك والاستفادة من كل المحتوى المدفوع، تواصل معنا:</p>
+          <div style="display:flex;align-items:center;gap:8px;background:rgba(37,211,102,.10);border:1px solid rgba(37,211,102,.3);border-radius:10px;padding:10px 14px;margin-top:8px">
+            <i class="fa-brands fa-whatsapp" style="color:#25d366;font-size:20px"></i>
+            <span style="color:#fff;font-weight:700">01128351702</span>
+          </div>
+        </div>`,
+      background: 'linear-gradient(180deg, #151f38, #0b1122)',
+      color: '#e8eefc',
+      showCancelButton: true,
+      confirmButtonText: '<i class="fa-brands fa-whatsapp"></i> تواصل واتساب',
+      cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#25d366',
+      cancelButtonColor: '#64748b',
+      customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
+    }).then(r=>{
+      if(r.isConfirmed){
+        window.open("https://wa.me/201128351702?text=" + encodeURIComponent("مرحبًا، أريد الاشتراك في منصة MISSION EDU للوصول للمحتوى المدفوع"), "_blank");
+      }
+    });
+  }
+
+  function renderLocked(){
+    const e = state.exam;
+    app.innerHTML = `
+      <div class="fade-in">
+        <div class="glass mb16" style="padding:22px">
+          <div class="flex between center wrap-fl g12 mb12">
+            <div class="h1">${esc(e.title)}</div>
+            <div class="flex g8 center wrap-fl">
+              ${getSubscriptionBadge(state.user)}
+              <span class="pill pill-paid"><i class="fa-solid fa-lock"></i> مدفوع</span>
+            </div>
+          </div>
+          <div class="sm muted">هذا الاختبار متاح للمشتركين فقط</div>
+        </div>
+
+        <div class="locked-shell">
+          <div class="lock-content">
+            <div class="lock-icon-wrap">
+              <i class="fa-solid fa-lock"></i>
+              <div class="crown-badge"><i class="fa-solid fa-crown"></i></div>
+            </div>
+            <div class="lock-title">هذا الاختبار مدفوع</div>
+            <div class="lock-desc">اشترك للوصول إلى الاختبار والحصول على نقاط XP وشهادة إتمام</div>
+            <button class="lock-btn" id="btnSubscribeNow">
+              <i class="fa-solid fa-crown"></i>
+              اشترك الآن
+            </button>
+            <div class="lock-note">🔒 المحتوى متاح للمشتركين فقط</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const btn = document.getElementById('btnSubscribeNow');
+    if(btn) btn.addEventListener('click', showLockedMessage);
+  }
+
   function renderStart(){
     const e = state.exam;
     const attempts = state.attempts;
@@ -174,6 +301,7 @@ a{color:inherit;text-decoration:none}
     const qCount = (e.question_ids || []).length;
     const hasWon = attempts.some(a => a.passed);
     const bestPct = attempts.length ? Math.max(...attempts.map(a=>a.pct)) : 0;
+    const paid = isPaidContent(e);
 
     let actionArea = '';
     if(hasWon){
@@ -200,7 +328,13 @@ a{color:inherit;text-decoration:none}
     app.innerHTML = `
       <div class="fade-in">
         <div class="glass" style="padding:28px">
-          <div class="h1 mb8">${esc(e.title)}</div>
+          <div class="flex between center wrap-fl g12 mb8">
+            <div class="h1">${esc(e.title)}</div>
+            <div class="flex g8 center wrap-fl">
+              ${getSubscriptionBadge(state.user)}
+              ${paid ? '<span class="pill pill-paid"><i class="fa-solid fa-lock"></i> مدفوع</span>' : '<span class="pill pill-free"><i class="fa-solid fa-unlock"></i> مجاني</span>'}
+            </div>
+          </div>
           <div class="sm muted mb20">اقرأ التفاصيل جيدًا قبل بدء الاختبار</div>
 
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px">
@@ -356,11 +490,7 @@ a{color:inherit;text-decoration:none}
     const total = state.questions.length;
     const pct = Math.round((score/total)*100);
     const passed = pct >= state.exam.pass_score;
-
-    // ✅ التحقق من المحاولات السابقة
     const hasWonBefore = state.attempts.some(a => a.passed);
-
-    // ✅ XP يُمنح فقط عند أول نجاح
     const gained = (passed && !hasWonBefore) ? (state.exam.xp || 0) : 0;
 
     try{
@@ -372,7 +502,6 @@ a{color:inherit;text-decoration:none}
       });
     }catch(e){}
 
-    // ✅ تحديث XP فقط لو كسب XP جديد
     if(gained > 0){
       try{
         await DB.updateUser(state.user.id, { xp: (state.user.xp || 0) + gained });
@@ -394,7 +523,6 @@ a{color:inherit;text-decoration:none}
     const r = state.result;
     const color = r.passed ? "#22c55e" : "#f59e0b";
 
-    // Confetti فقط عند أول نجاح
     if (r.passed && !r.hasWonBefore && window.confetti) {
       window.confetti({
         particleCount: 150,
@@ -500,6 +628,13 @@ a{color:inherit;text-decoration:none}
     }
 
     state.exam = exam;
+    state.hasAccess = hasAccess(user, exam);
+
+    if(!state.hasAccess){
+      renderLocked();
+      document.addEventListener("contextmenu", e=>e.preventDefault());
+      return;
+    }
 
     const qIds = exam.question_ids || [];
     if(qIds.length === 0){
