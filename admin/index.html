@@ -1089,19 +1089,10 @@ function LessonsPage(){
   const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(!c.video)c.video={type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true};if(c.video.is_free===undefined)c.video.is_free=true;if(!c.key_points)c.key_points=[];if(!c.pdf_url)c.pdf_url='';setForm(c);setEditing(it.id);};
   const save=async ()=>{
   if(!form.title) return app.toast.warn('العنوان مطلوب');
-  if(!form.unit_id) return app.toast.warn('اختر الوحدة');
+  if(!form.subject_id) return app.toast.warn('اختر المادة');
   setBusy(true);
-  try{
-    const video = form.video || {};
-    const isFreeValue = video.is_free !== false && video.is_free !== 'paid';
-    const payload = {
-      ...form,
-      is_free: isFreeValue
-    };
-    await app.save('lessons', payload);
-    app.toast.ok(editing==='new'?'تمت الإضافة':'تم الحفظ');
-    setEditing(null);
-  }catch(e){app.toast.err(e.message);}
+  try{await app.save('missions',form);app.toast.ok('تم الحفظ');setEditing(null);}
+  catch(e){app.toast.err(e.message);}
   setBusy(false);
 };
   const del=async id=>{
@@ -1196,9 +1187,9 @@ function LessonsPage(){
       <div className="grid g2">
         <Field label="عنوان الدرس"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
         <Field label="الوحدة"><select className="input" value={form.unit_id||''} onChange={e=>setForm({...form,unit_id:e.target.value})}><option value="">— اختر —</option>{app.db.units.map(u=><option key={u.id} value={u.id}>{app.subject(u.subject_id)?.name} — {u.name}</option>)}</select></Field>
-        <Field label="المدة (دقيقة)"><input type="number" className="input" value={form.duration||15} onChange={e=>setForm({...form,duration:+e.target.value})}/></Field>
+        <Field label="المدة (دقيقة)"><input type="number" className="input" value={form.duration ?? ''} onChange={e=>setForm({...form,duration: e.target.value === '' ? '' : +e.target.value})}/></Field>
         <Field label="XP"><input type="number" className="input" value={form.xp ?? ''} onChange={e=>setForm({...form,xp: e.target.value === '' ? '' : +e.target.value})}/></Field>
-        <Field label="الترتيب"><input type="number" className="input" value={form.sort_order||1} onChange={e=>setForm({...form,sort_order:+e.target.value})}/></Field>
+        <Field label="الترتيب"><input type="number" className="input" value={form.sort_order ?? ''} onChange={e=>setForm({...form,sort_order: e.target.value === '' ? '' : +e.target.value})}/></Field>
         <Field label="الحالة"><select className="input" value={form.published!==false?'1':'0'} onChange={e=>setForm({...form,published:e.target.value==='1'})}><option value="1">منشور</option><option value="0">مخفي</option></select></Field>
         <Field label="وصف الدرس" full><textarea className="input" value={form.desc||''} onChange={e=>setForm({...form,desc:e.target.value})}/></Field>
       </div>
@@ -1551,8 +1542,8 @@ function ExamsPage(){
         <Field label="المدة (دقيقة)"><input type="number" className="input" value={form.duration ?? ''} onChange={e=>setForm({...form,duration: e.target.value === '' ? '' : +e.target.value})}/></Field>
         <Field label="درجة النجاح %"><input type="number" className="input" value={form.pass_score ?? ''} onChange={e=>setForm({...form,pass_score: e.target.value === '' ? '' : +e.target.value})}/></Field>
         <Field label="عدد المحاولات"><input type="number" className="input" value={form.max_attempts ?? ''} onChange={e=>setForm({...form,max_attempts: e.target.value === '' ? '' : +e.target.value})}/></Field>
-        <Field label="XP"><input type="number" className="input" value={form.xp||50} onChange={e=>setForm({...form,xp:+e.target.value})}/></Field>
-        <Field label="الترتيب"><input type="number" className="input" value={form.sort_order||1} onChange={e=>setForm({...form,sort_order:+e.target.value})}/></Field>
+        <Field label="XP"><input type="number" className="input" value={form.xp ?? ''} onChange={e=>setForm({...form,xp: e.target.value === '' ? '' : +e.target.value})}/></Field>
+        <Field label="الترتيب"><input type="number" className="input" value={form.sort_order ?? ''} onChange={e=>setForm({...form,sort_order: e.target.value === '' ? '' : +e.target.value})}/></Field>
         <Field label="الحالة"><select className="input" value={form.published!==false?'1':'0'} onChange={e=>setForm({...form,published:e.target.value==='1'})}><option value="1">منشور</option><option value="0">مخفي</option></select></Field>
       </div>
 
@@ -1622,7 +1613,7 @@ function MissionsPage(){
       <Field label="الوصف"><textarea className="input" value={form.desc||''} onChange={e=>setForm({...form,desc:e.target.value})}/></Field>
       <div className="grid g2">
         <Field label="المادة"><select className="input" value={form.subject_id||''} onChange={e=>setForm({...form,subject_id:e.target.value})}><option value="">— اختر —</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field>
-        <Field label="XP"><input type="number" className="input" value={form.xp||100} onChange={e=>setForm({...form,xp:+e.target.value})}/></Field>
+        <Field label="XP"><input type="number" className="input" value={form.xp ?? ''} onChange={e=>setForm({...form,xp: e.target.value === '' ? '' : +e.target.value})}/></Field>
         <Field label="الترتيب"><input type="number" className="input" value={form.sort_order ?? ''} onChange={e=>setForm({...form,sort_order: e.target.value === '' ? '' : +e.target.value})}/></Field>
         <Field label="الاختبار المطلوب"><select className="input" value={form.required_exam_id||''} onChange={e=>setForm({...form,required_exam_id:e.target.value||null})}><option value="">— بدون —</option>{app.db.exams.filter(e=>!form.subject_id||e.subject_id===form.subject_id).map(e=><option key={e.id} value={e.id}>{e.title}</option>)}</select></Field>
       </div>
@@ -1848,7 +1839,7 @@ function StudentsPage(){
             <input className="input" value={form.phone||''} onChange={e=>setForm({...form,phone:e.target.value})}/>
           </Field>
           <Field label="XP">
-            <input type="number" className="input" value={form.xp||0} onChange={e=>setForm({...form,xp:+e.target.value})}/>
+            <input type="number" className="input" value={form.xp ?? ''} onChange={e=>setForm({...form,xp: e.target.value === '' ? '' : +e.target.value})}/>
           </Field>
           <Field label="الصف">
             <select className="input" value={form.grade_id||''} onChange={e=>setForm({...form,grade_id:e.target.value})}>
