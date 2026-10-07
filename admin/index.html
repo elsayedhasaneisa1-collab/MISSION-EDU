@@ -1088,13 +1088,20 @@ function LessonsPage(){
   const openNew=()=>{setForm({title:'',desc:'',summary:'',video:{type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true},pdf_url:'',duration:15,xp:20,sort_order:1,unit_id:'',published:true,key_points:[],examples:[],notes:''});setEditing('new');};
   const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(!c.video)c.video={type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true};if(c.video.is_free===undefined)c.video.is_free=true;if(!c.key_points)c.key_points=[];if(!c.pdf_url)c.pdf_url='';setForm(c);setEditing(it.id);};
   const save=async ()=>{
-    if(!form.title) return app.toast.warn('العنوان مطلوب');
-    if(!form.unit_id) return app.toast.warn('اختر الوحدة');
-    setBusy(true);
-    try{await app.save('lessons',form);app.toast.ok(editing==='new'?'تمت الإضافة':'تم الحفظ');setEditing(null);}
-    catch(e){app.toast.err(e.message);}
-    setBusy(false);
-  };
+  if(!form.title||!form.subject_id) return app.toast.warn('العنوان والمادة مطلوبان');
+  if(!form.question_ids||form.question_ids.length===0) return app.toast.warn('اختر سؤالاً على الأقل');
+  setBusy(true);
+  try{
+    const payload = {
+      ...form,
+      is_free: form.is_free !== false && form.is_free !== 'paid'
+    };
+    await app.save('exams', payload);
+    app.toast.ok('تم الحفظ');
+    setEditing(null);
+  }catch(e){app.toast.err(e.message);}
+  setBusy(false);
+};
   const del=async id=>{
     const r=await Swal.fire({title:'حذف الدرس؟',text:'لا يمكن التراجع',icon:'warning',showCancelButton:true,confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
     if(!r.isConfirmed) return;
