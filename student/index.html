@@ -566,7 +566,6 @@ function isPaidContent(item){
 
 function hasSubscriptionAccess(user){
   if(!user) return false;
-  if(user.all_subjects === true || user.all_subjects === 'true') return true;
   if(user.subscription === 'vip' || user.subscription === 'VIP') return true;
   if(user.subscription === 'paid' || user.subscription === 'PAID'){
     if(!user.subscription_until) return true;
