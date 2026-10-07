@@ -89,6 +89,13 @@ ul{list-style:none}
 .notes-area:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.12);background:rgba(10,16,32,.78)}
 .notes-area::placeholder{color:var(--muted)}
 .note-status-saving{animation:noteBlink 1s infinite}
+.pdf-box{display:flex;align-items:center;gap:14px;padding:16px;border-radius:14px;background:linear-gradient(135deg,rgba(239,68,68,.10),rgba(239,68,68,.03));border:1px solid rgba(239,68,68,.28);transition:.28s;text-decoration:none;color:inherit}
+.pdf-box:hover{transform:translateY(-3px);border-color:rgba(239,68,68,.5);box-shadow:0 12px 30px rgba(239,68,68,.20)}
+.pdf-icon{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;font-size:11px;font-weight:900;flex-shrink:0;box-shadow:0 8px 20px rgba(239,68,68,.35);letter-spacing:.5px}
+.pdf-info{flex:1;min-width:0}
+.pdf-title{font-size:14.5px;font-weight:800;color:#e8eefc;margin-bottom:4px}
+.pdf-desc{font-size:11.5px;color:#7f93b8}
+.pdf-arrow{color:#fca5a5;flex-shrink:0;font-size:18px}
 .footer-dev{display:flex;justify-content:center;gap:10px;padding:24px 20px 16px;margin-top:40px;border-top:1px solid rgba(90,140,230,.12);flex-wrap:wrap}
 .dev-btn{display:inline-flex;align-items:center;gap:9px;padding:10px 20px;border-radius:50px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .3s;border:1px solid rgba(90,140,230,.3);background:linear-gradient(135deg,rgba(47,125,255,.15),rgba(139,92,246,.15));color:var(--txt);position:relative;overflow:hidden}
 .dev-btn:hover{background:linear-gradient(135deg,rgba(47,125,255,.28),rgba(139,92,246,.28));border-color:#2f7dff;transform:translateY(-2px);box-shadow:0 12px 32px rgba(47,125,255,.35)}
@@ -604,6 +611,28 @@ return `
 `;
 }
 
+function buildPdfHTML(pdfUrl, lessonTitle){
+if(!pdfUrl || !pdfUrl.trim()) return '';
+
+return `
+<div class="glass mb20" style="padding:16px">
+<div class="h4 mb12" style="display:flex;align-items:center;gap:8px">
+<span style="font-size:18px">📄</span>
+ملف الشرح (PDF)
+</div>
+<a href="${esc(pdfUrl)}" target="_blank" rel="noopener noreferrer" class="pdf-box" id="pdfLink">
+<div class="pdf-icon">PDF</div>
+<div class="pdf-info">
+<div class="pdf-title">اضغط لعرض ملف الشرح</div>
+<div class="pdf-desc">ملف PDF يحتوي على شرح تفصيلي للدرس</div>
+</div>
+<div class="pdf-arrow">↗</div>
+</a>
+<div class="xs muted mt12" style="text-align:center">💡 يفتح الملف في نافذة جديدة</div>
+</div>
+`;
+}
+
 function render(){
 const l = state.lesson;
 const u = state.user;
@@ -632,6 +661,8 @@ ${l.desc ? `<div class="sm txt2 mb16">${esc(l.desc)}</div>` : ''}
 <div class="mb20" id="playerHost">
 ${buildPlayerHTML(l.video, l.title)}
 </div>
+
+${buildPdfHTML(l.pdf_url, l.title)}
 
 ${l.summary ? `
 <div class="h4 mb8">📝 ملخص الدرس</div>
@@ -731,6 +762,19 @@ openPlayer(l, u);
 };
 openBtn.addEventListener('click', openHandler);
 openBtn.addEventListener('touchend', openHandler, { passive: false });
+}
+
+const pdfLink = document.getElementById('pdfLink');
+if(pdfLink){
+pdfLink.addEventListener('click', ()=>{
+try{
+DB.trackActivity({
+userId: u.id, userName: u.name,
+type: "pdf_open", target: l.title,
+details: { lesson: l.title, pdf: l.pdf_url }
+});
+}catch(e){}
+});
 }
 
 document.getElementById("btnDone").addEventListener("click", async ()=>{
