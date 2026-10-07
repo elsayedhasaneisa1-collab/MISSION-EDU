@@ -7,6 +7,7 @@
 <title>الدرس | MISSION EDU</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <link rel="icon" type="image/png" href="/logo.png">
 <link rel="apple-touch-icon" href="/logo.png">
@@ -16,7 +17,7 @@
 <meta name="apple-mobile-web-app-title" content="MISSION EDU">
 <meta name="mobile-web-app-capable" content="yes">
 <style>
-:root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#8b5cf6;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.45)}
+:root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#8b5cf6;--gold:#fbbf24;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.45)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(47,125,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(139,92,246,.14),transparent 60%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;line-height:1.7}
 ::-webkit-scrollbar{width:10px;height:10px}
@@ -47,17 +48,18 @@ ul{list-style:none}
 .btn-wr:hover{transform:translateY(-2px)}
 .btn-s{background:rgba(255,255,255,.05);color:var(--txt2);border:1px solid var(--border)}
 .btn-s:hover{background:rgba(255,255,255,.09);color:var(--txt)}
-.btn-dn{background:rgba(239,68,68,.14);color:#fca5a5;border:1px solid rgba(239,68,68,.32)}
-.btn-sm{padding:7px 13px;font-size:12.5px;border-radius:10px}
 .btn-block{width:100%}
+.btn-lg{padding:15px 32px;font-size:16px;border-radius:16px}
 .btn:disabled{opacity:.42;cursor:not-allowed;transform:none!important}
 .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:40px;font-size:11.5px;font-weight:700;border:1px solid transparent}
 .pill-b{background:rgba(47,125,255,.15);color:#7db6ff;border-color:rgba(47,125,255,.28)}
 .pill-g{background:rgba(34,197,94,.14);color:#6ee7a0;border-color:rgba(34,197,94,.28)}
 .pill-a{background:rgba(245,158,11,.14);color:#fcd34d;border-color:rgba(245,158,11,.28)}
 .pill-v{background:rgba(139,92,246,.15);color:#c4b5fd;border-color:rgba(139,92,246,.28)}
-.pill-r{background:rgba(239,68,68,.14);color:#fca5a5;border-color:rgba(239,68,68,.28)}
 .pill-y{background:rgba(255,255,255,.06);color:var(--muted);border-color:var(--border)}
+.pill-paid{background:linear-gradient(135deg,rgba(251,191,36,.25),rgba(251,191,36,.10));color:#fbbf24;border:1px solid rgba(251,191,36,.5);box-shadow:0 0 14px rgba(251,191,36,.22)}
+.pill-free{background:linear-gradient(135deg,rgba(34,197,94,.22),rgba(34,197,94,.10));color:#86efac;border:1px solid rgba(34,197,94,.42)}
+.pill-vip{background:linear-gradient(135deg,rgba(139,92,246,.28),rgba(139,92,246,.12));color:#c4b5fd;border:1px solid rgba(139,92,246,.5);box-shadow:0 0 14px rgba(139,92,246,.25)}
 .bar{height:9px;border-radius:20px;background:rgba(255,255,255,.07);overflow:hidden}
 .bar-f{height:100%;border-radius:20px;transition:width .8s;background:linear-gradient(90deg,#2f7dff,#5aa9ff)}
 .div{height:1px;background:var(--border);margin:14px 0}
@@ -69,6 +71,8 @@ ul{list-style:none}
 @keyframes pu{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 @keyframes noteBlink{0%,100%{opacity:1}50%{opacity:.55}}
+@keyframes lockPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 20px rgba(251,191,36,.5))}50%{transform:scale(1.08);filter:drop-shadow(0 0 35px rgba(251,191,36,.9))}}
+@keyframes crownFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-6px) rotate(3deg)}}
 .fade-in{animation:fu .5s}
 .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(6,9,20,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
 .back-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--txt2);font-size:13.5px;font-weight:700;transition:.2s;text-decoration:none}
@@ -78,13 +82,29 @@ ul{list-style:none}
 @media(max-width:900px){.grid-main{grid-template-columns:1fr}}
 .vid-shell{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#000;border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.6);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;isolation:isolate;cursor:pointer}
 .vp-error{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:'Tajawal','Cairo',sans-serif;text-align:center;padding:20px}
+.locked-shell{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,rgba(4,6,14,.96),rgba(11,18,38,.98));border:1px solid rgba(251,191,36,.35);box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 40px rgba(251,191,36,.12) inset;display:flex;align-items:center;justify-content:center;padding:16px}
+.lock-content{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:100%;max-width:420px}
+.lock-icon-wrap{position:relative;width:clamp(70px,18vw,110px);height:clamp(70px,18vw,110px);border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 30% 30%,rgba(251,191,36,.35),rgba(251,191,36,.08) 70%,transparent);border:2px solid rgba(251,191,36,.4);box-shadow:0 0 40px rgba(251,191,36,.3);margin-bottom:clamp(12px,3vw,20px);animation:lockPulse 3s ease-in-out infinite}
+.lock-icon-wrap i{font-size:clamp(28px,7vw,46px);color:#fbbf24;filter:drop-shadow(0 4px 10px rgba(0,0,0,.5))}
+.crown-badge{position:absolute;top:-8px;right:-8px;width:clamp(28px,7vw,40px);height:clamp(28px,7vw,40px);border-radius:50%;background:linear-gradient(135deg,#fbbf24,#f59e0b);display:grid;place-items:center;box-shadow:0 6px 20px rgba(251,191,36,.55),0 0 0 2px rgba(10,8,5,.9) inset;animation:crownFloat 2.5s ease-in-out infinite}
+.crown-badge i{font-size:clamp(13px,3.5vw,18px);color:#1a1206}
+.lock-title{font-size:clamp(15px,4vw,20px);font-weight:900;color:#fbbf24;margin-bottom:6px;text-shadow:0 2px 12px rgba(251,191,36,.4)}
+.lock-desc{font-size:clamp(11px,2.8vw,13.5px);color:#b7c6e4;margin-bottom:clamp(12px,3vw,18px);line-height:1.6;padding:0 10px}
+.lock-btn{display:inline-flex;align-items:center;gap:8px;padding:clamp(9px,2.5vw,12px) clamp(18px,4.5vw,26px);border-radius:12px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a1206;font-weight:900;font-size:clamp(12px,3vw,14px);box-shadow:0 10px 30px rgba(251,191,36,.45);transition:.24s;border:none;cursor:pointer;font-family:inherit}
+.lock-btn:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(251,191,36,.6)}
+.lock-btn i{font-size:clamp(12px,3vw,15px)}
+.lock-note{margin-top:clamp(10px,2.5vw,14px);font-size:clamp(9.5px,2.4vw,11px);color:#7f93b8;opacity:.8}
 .example{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px}
 .example-q{font-size:13px;font-weight:700;margin-bottom:6px;color:var(--txt2)}
 .example-a{font-size:13px;color:var(--muted)}
 .kp{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start}
 .kp-dot{color:var(--blue2);font-weight:800;flex-shrink:0}
-.exam-card{display:block;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-radius:14px;background:rgba(21,31,56,.62);border:1px solid var(--border);transition:.28s cubic-bezier(.2,.8,.3,1)}
+.exam-card{display:block;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-radius:14px;background:rgba(21,31,56,.62);border:1px solid var(--border);transition:.28s cubic-bezier(.2,.8,.3,1);position:relative}
 .exam-card:hover{transform:translateY(-3px);border-color:var(--border2);box-shadow:0 12px 30px rgba(47,125,255,.15)}
+.exam-card.locked-card{border-color:rgba(251,191,36,.35);background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(21,31,56,.62));cursor:pointer}
+.exam-card.locked-card:hover{border-color:rgba(251,191,36,.6);box-shadow:0 12px 30px rgba(251,191,36,.20)}
+.exam-lock-badge{position:absolute;top:10px;left:10px;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#fbbf24,#f59e0b);display:grid;place-items:center;box-shadow:0 4px 14px rgba(251,191,36,.5)}
+.exam-lock-badge i{font-size:12px;color:#1a1206}
 .notes-area{width:100%;min-height:130px;padding:12px 14px;border-radius:12px;background:rgba(10,16,32,.55);border:1.5px solid var(--border);color:var(--txt);font-size:13px;line-height:1.8;resize:vertical;outline:none;font-family:inherit;transition:.22s}
 .notes-area:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.12);background:rgba(10,16,32,.78)}
 .notes-area::placeholder{color:var(--muted)}
@@ -226,7 +246,9 @@ note: '',
 noteId: null,
 noteTimer: null,
 noteSaving: false,
-noteDirty: false
+noteDirty: false,
+hasVideoAccess: false,
+hasExamAccess: {}
 };
 
 function esc(str){
@@ -239,6 +261,64 @@ const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|short
 return m ? m[1] : "";
 }
 
+/* ================== منطق الوصول (Access Logic) ================== */
+function isPaidContent(item){
+if(!item) return false;
+if(item.is_free === false) return true;
+if(item.is_free === 'paid') return true;
+if(item.video && item.video.is_free === false) return true;
+if(item.video && item.video.is_free === 'paid') return true;
+return false;
+}
+
+function hasSubscriptionAccess(user){
+if(!user) return false;
+if(user.all_subjects === true) return true;
+if(user.subscription === 'vip') return true;
+if(user.subscription === 'paid'){
+if(!user.subscription_until) return true;
+const until = typeof user.subscription_until === 'number'
+? user.subscription_until
+: new Date(user.subscription_until).getTime();
+if(!isNaN(until) && until > Date.now()) return true;
+}
+return false;
+}
+
+function hasAccess(user, item){
+if(!isPaidContent(item)) return true;
+return hasSubscriptionAccess(user);
+}
+
+function showLockedMessage(){
+Swal.fire({
+icon: 'warning',
+title: '🔒 محتوى مدفوع',
+html: `
+<div style="text-align:right;line-height:2;font-size:14px">
+<p style="margin-bottom:10px">هذا المحتوى متاح <b style="color:#fbbf24">للمشتركين فقط</b>.</p>
+<p style="color:#b7c6e4;font-size:13px;margin-bottom:10px">للاشتراك والاستفادة من كل المحتوى المدفوع، تواصل معنا:</p>
+<div style="display:flex;align-items:center;gap:8px;background:rgba(37,211,102,.10);border:1px solid rgba(37,211,102,.3);border-radius:10px;padding:10px 14px;margin-top:8px">
+<i class="fa-brands fa-whatsapp" style="color:#25d366;font-size:20px"></i>
+<span style="color:#fff;font-weight:700">01128351702</span>
+</div>
+</div>`,
+background: 'linear-gradient(180deg, #151f38, #0b1122)',
+color: '#e8eefc',
+showCancelButton: true,
+confirmButtonText: '<i class="fa-brands fa-whatsapp"></i> تواصل واتساب',
+cancelButtonText: 'إلغاء',
+confirmButtonColor: '#25d366',
+cancelButtonColor: '#64748b',
+customClass: {popup:'swal-custom-popup', title:'swal-custom-title', confirmButton:'swal-custom-confirm'}
+}).then(r=>{
+if(r.isConfirmed){
+window.open("https://wa.me/201128351702?text=" + encodeURIComponent("مرحبًا، أريد الاشتراك في منصة MISSION EDU للوصول للمحتوى المدفوع"), "_blank");
+}
+});
+}
+
+/* ================== الملاحظات ================== */
 async function loadNote(userId, lessonId){
 try{
 const sb = await DB.getClient();
@@ -345,7 +425,13 @@ saveNote(true);
 }, 1500);
 }
 
+/* ================== مشغل الفيديو ================== */
 function openPlayer(lesson, user){
+if(!state.hasVideoAccess){
+showLockedMessage();
+return;
+}
+
 const video = lesson.video || {};
 const url = video.url || "";
 const type = video.type || "youtube";
@@ -592,26 +678,47 @@ if(t !== 'input' && t !== 'textarea') e.preventDefault();
 document.addEventListener('dblclick', e => e.preventDefault());
 }
 
-function buildPlayerHTML(video, lessonTitle){
+/* ================== بناء HTML ================== */
+function buildPlayerHTML(video, lessonTitle, hasAccess){
 if(!video || !video.url){
 return `<div class="vid-shell"><div class="vp-error"><div style="font-size:48px;opacity:.35;margin-bottom:12px">🎬</div><div>لا يوجد فيديو لهذا الدرس</div></div></div>`;
 }
 
+if(!hasAccess){
 return `
-<div class="vid-shell" id="vidShell">
-<div class="vp-error" style="background:linear-gradient(135deg,rgba(4,6,14,.92),rgba(11,18,38,.94));display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:10px 14px">
-<button id="btnOpenPlayer" style="width:clamp(50px,13vw,80px);height:clamp(50px,13vw,80px);border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 10px 30px rgba(47,125,255,.55);padding-right:4px;margin-bottom:clamp(8px,2vw,16px);cursor:pointer;animation:pulsePlay 2.5s ease-in-out infinite;border:none;outline:none;flex-shrink:0">
-<svg width="clamp(20,5vw,32)" height="clamp(20,5vw,32)" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+<div class="locked-shell">
+<div class="lock-content">
+<div class="lock-icon-wrap">
+<i class="fa-solid fa-lock"></i>
+<div class="crown-badge"><i class="fa-solid fa-crown"></i></div>
+</div>
+<div class="lock-title">هذا الفيديو مدفوع</div>
+<div class="lock-desc">اشترك للوصول إلى محتوى الدرس كامل</div>
+<button class="lock-btn" onclick="showLockedMessage()">
+<i class="fa-solid fa-crown"></i>
+اشترك الآن
 </button>
-<div style="font-size:clamp(12px,3.5vw,18px);font-weight:900;color:#e8eefc;margin-bottom:clamp(4px,1vw,8px);text-align:center;padding:0 8px;line-height:1.3">${esc(lessonTitle)}</div>
-<div style="font-size:clamp(10px,2.6vw,13px);color:#7f93b8;margin-bottom:clamp(8px,2vw,16px);text-align:center;line-height:1.4">اضغط لتشغيل الفيديو في وضع ملء الشاشة</div>
-<div style="font-size:clamp(9px,2.3vw,11px);color:#7f93b8;opacity:.7;text-align:center;line-height:1.4">🛡 المشاهدة محمية — لا يمكن التحميل أو النسخ</div>
+<div class="lock-note">🔒 المحتوى متاح للمشتركين فقط</div>
 </div>
 </div>
 `;
 }
 
-function buildPdfHTML(pdfUrl, lessonTitle){
+return `
+<div class="vid-shell" id="vidShell">
+<div class="vp-error" style="background:linear-gradient(135deg,rgba(4,6,14,.92),rgba(11,18,38,.94));display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%">
+<div id="btnOpenPlayer" style="width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 16px 50px rgba(47,125,255,.55);padding-right:6px;margin-bottom:20px;cursor:pointer;animation:pulsePlay 2.5s ease-in-out infinite">
+<svg width="36" height="36" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+</div>
+<div style="font-size:20px;font-weight:900;color:#e8eefc;margin-bottom:8px;text-align:center;padding:0 16px">${esc(lessonTitle)}</div>
+<div style="font-size:13px;color:#7f93b8;margin-bottom:20px">اضغط لتشغيل الفيديو في وضع ملء الشاشة</div>
+<div style="font-size:11.5px;color:#7f93b8;opacity:.7">🛡 المشاهدة محمية — لا يمكن التحميل أو النسخ</div>
+</div>
+</div>
+`;
+}
+
+function buildPdfHTML(pdfUrl){
 if(!pdfUrl || !pdfUrl.trim()) return '';
 
 return `
@@ -633,6 +740,63 @@ return `
 `;
 }
 
+function buildRelatedExamsHTML(exams){
+if(!exams || exams.length === 0){
+return `
+<div class="glass" style="padding:16px">
+<div class="h4 mb12">📝 اختبارات مرتبطة</div>
+<div class="sm muted" style="text-align:center;padding:16px">لا توجد اختبارات مرتبطة بهذا الدرس</div>
+</div>
+`;
+}
+
+return `
+<div class="glass" style="padding:16px">
+<div class="h4 mb12">📝 اختبارات مرتبطة (${exams.length})</div>
+${exams.map(e=>{
+const paid = isPaidContent(e);
+const access = state.hasExamAccess[e.id] !== false;
+const locked = paid && !access;
+return `
+<a href="${locked ? 'javascript:void(0)' : '/student/exam.html?id='+e.id}"
+class="exam-card ${locked?'locked-card':''}"
+data-exam-id="${e.id}"
+data-locked="${locked}">
+${locked ? `<div class="exam-lock-badge"><i class="fa-solid fa-lock"></i></div>` : ''}
+<div class="flex between center mb6">
+<span class="pill ${paid?'pill-paid':'pill-free'}">
+<i class="fa-solid ${paid?'fa-lock':'fa-unlock'}"></i>
+${paid?'مدفوع':'مجاني'}
+</span>
+<span class="pill pill-v">+${e.xp} XP</span>
+</div>
+<div style="font-size:14px;font-weight:700;color:#e8eefc">${esc(e.title)}</div>
+<div style="font-size:11.5px;color:#7f93b8;margin-top:6px">⏱ ${e.duration}د • درجة النجاح: ${e.pass_score}%</div>
+${locked ? '<div class="pill pill-paid" style="margin-top:8px;font-size:10px"><i class="fa-solid fa-crown"></i> يتطلب اشتراك</div>' : ''}
+</a>
+`;
+}).join('')}
+</div>
+`;
+}
+
+function getSubscriptionBadge(user){
+if(!user) return '';
+if(user.subscription === 'vip') return '<span class="pill pill-vip"><i class="fa-solid fa-crown"></i> VIP</span>';
+if(user.subscription === 'paid'){
+if(user.subscription_until){
+const until = typeof user.subscription_until === 'number' ? user.subscription_until : new Date(user.subscription_until).getTime();
+if(until > Date.now()){
+const days = Math.ceil((until - Date.now()) / 86400000);
+return `<span class="pill pill-paid"><i class="fa-solid fa-crown"></i> مشترك (${days} يوم)</span>`;
+}
+return '<span class="pill pill-r"><i class="fa-solid fa-circle-xmark"></i> اشتراك منتهي</span>';
+}
+return '<span class="pill pill-paid"><i class="fa-solid fa-crown"></i> مشترك</span>';
+}
+return '<span class="pill pill-free"><i class="fa-solid fa-user"></i> مجاني</span>';
+}
+
 function render(){
 const l = state.lesson;
 const u = state.user;
@@ -641,16 +805,22 @@ app.innerHTML = `
 <div class="fade-in">
 <div class="flex between center wrap-fl g12 mb16">
 <div>
-<div class="h1 mb6">${esc(l.title)}</div>
+<div class="flex wrap-fl g8 center mb6">
+<div class="h1">${esc(l.title)}</div>
+${isPaidContent(l) ? `<span class="pill pill-paid"><i class="fa-solid fa-lock"></i> مدفوع</span>` : `<span class="pill pill-free"><i class="fa-solid fa-unlock"></i> مجاني</span>`}
+</div>
 <div class="flex wrap-fl g8 xs muted">
-<span>⏱ ${l.duration || 15} دقيقة</span>
+<span><i class="fa-solid fa-clock"></i> ${l.duration || 15} دقيقة</span>
 <span>•</span>
 <span>+${l.xp || 20} XP</span>
 ${state.subject ? `<span>•</span><span>${esc(state.subject.name)}</span>` : ''}
 ${state.unit ? `<span>•</span><span>${esc(state.unit.name)}</span>` : ''}
 </div>
 </div>
-${state.isDone ? '<span class="pill pill-g">✅ مكتمل</span>' : '<span class="pill pill-b">▶️ لم يُكمل</span>'}
+<div class="flex g8 center wrap-fl">
+${getSubscriptionBadge(u)}
+${state.isDone ? '<span class="pill pill-g"><i class="fa-solid fa-check"></i> مكتمل</span>' : '<span class="pill pill-b"><i class="fa-solid fa-play"></i> لم يُكمل</span>'}
+</div>
 </div>
 
 <div class="grid-main">
@@ -659,10 +829,10 @@ ${state.isDone ? '<span class="pill pill-g">✅ مكتمل</span>' : '<span clas
 ${l.desc ? `<div class="sm txt2 mb16">${esc(l.desc)}</div>` : ''}
 
 <div class="mb20" id="playerHost">
-${buildPlayerHTML(l.video, l.title)}
+${buildPlayerHTML(l.video, l.title, state.hasVideoAccess)}
 </div>
 
-${buildPdfHTML(l.pdf_url, l.title)}
+${buildPdfHTML(l.pdf_url)}
 
 ${l.summary ? `
 <div class="h4 mb8">📝 ملخص الدرس</div>
@@ -696,10 +866,12 @@ ${l.notes ? `
 ` : ''}
 
 <div class="flex wrap-fl g8 mt20">
-<button class="btn btn-ok" id="btnDone" ${state.isDone ? 'disabled' : ''}>
-${state.isDone ? '✅ تم إكمال الدرس' : '✓ فهمت الدرس'}
+<button class="btn btn-ok" id="btnDone" ${state.isDone || !state.hasVideoAccess ? 'disabled' : ''}>
+${state.isDone ? '<i class="fa-solid fa-check"></i> تم إكمال الدرس' : (state.hasVideoAccess ? '<i class="fa-solid fa-check"></i> فهمت الدرس' : '<i class="fa-solid fa-lock"></i> الدرس مدفوع')}
 </button>
-<button class="btn btn-wr" id="btnReview">🔄 أحتاج مراجعة</button>
+<button class="btn btn-wr" id="btnReview" ${!state.hasVideoAccess ? 'disabled' : ''}>
+<i class="fa-solid fa-rotate-left"></i> أحتاج مراجعة
+</button>
 </div>
 </div>
 </div>
@@ -710,12 +882,12 @@ ${state.isDone ? '✅ تم إكمال الدرس' : '✓ فهمت الدرس'}
 <div class="h4">📝 ملاحظاتي</div>
 <span class="pill pill-y" id="noteStatus">فارغ</span>
 </div>
-<textarea id="lessonNote" class="notes-area" placeholder="اكتب ملاحظاتك على الدرس هنا... هتظهر في تبويب ملاحظاتي بالرئيسية"></textarea>
+<textarea id="lessonNote" class="notes-area" placeholder="اكتب ملاحظاتك على الدرس هنا..."></textarea>
 <div class="flex g8 mt12">
-<button class="btn btn-p btn-sm" id="btnSaveNote" style="flex:1">💾 حفظ</button>
-<button class="btn btn-dn btn-sm" id="btnClearNote" title="مسح الملاحظة">🗑</button>
+<button class="btn btn-p btn-sm" id="btnSaveNote" style="flex:1"><i class="fa-solid fa-floppy-disk"></i> حفظ</button>
+<button class="btn btn-s btn-sm" id="btnClearNote" title="مسح الملاحظة"><i class="fa-solid fa-trash"></i></button>
 </div>
-<div class="xs muted mt8" style="text-align:center">💡 يتم الحفظ تلقائيًا أثناء الكتابة</div>
+<div class="xs muted mt8" style="text-align:center"><i class="fa-solid fa-circle-info"></i> يتم الحفظ تلقائيًا أثناء الكتابة</div>
 </div>
 
 <div class="glass mb16" style="padding:16px">
@@ -728,26 +900,7 @@ ${state.isDone ? '✅ تم إكمال الدرس' : '✓ فهمت الدرس'}
 <div class="xs muted mt8">${state.doneUnit} من ${state.totalUnit} دروس</div>
 </div>
 
-${state.relatedExams.length > 0 ? `
-<div class="glass" style="padding:16px">
-<div class="h4 mb12">📝 اختبارات مرتبطة (${state.relatedExams.length})</div>
-${state.relatedExams.map(e => `
-<a href="/student/exam.html?id=${e.id}" class="exam-card">
-<div class="flex between center mb6">
-<span class="pill pill-b">${(e.question_ids||[]).length} أسئلة</span>
-<span class="pill pill-v">+${e.xp} XP</span>
-</div>
-<div style="font-size:14px;font-weight:700;color:#e8eefc">${esc(e.title)}</div>
-<div style="font-size:11.5px;color:#7f93b8;margin-top:6px">⏱ ${e.duration}د • درجة النجاح: ${e.pass_score}%</div>
-</a>
-`).join('')}
-</div>
-` : `
-<div class="glass" style="padding:16px">
-<div class="h4 mb12">📝 اختبارات مرتبطة</div>
-<div class="sm muted" style="text-align:center;padding:16px">لا توجد اختبارات مرتبطة بهذا الدرس</div>
-</div>
-`}
+${buildRelatedExamsHTML(state.relatedExams)}
 </div>
 </div>
 </div>
@@ -764,6 +917,15 @@ openBtn.addEventListener('click', openHandler);
 openBtn.addEventListener('touchend', openHandler, { passive: false });
 }
 
+const lockedExamCards = app.querySelectorAll('.exam-card[data-locked="true"]');
+lockedExamCards.forEach(card=>{
+card.addEventListener('click', (e)=>{
+e.preventDefault();
+e.stopPropagation();
+showLockedMessage();
+});
+});
+
 const pdfLink = document.getElementById('pdfLink');
 if(pdfLink){
 pdfLink.addEventListener('click', ()=>{
@@ -777,8 +939,14 @@ details: { lesson: l.title, pdf: l.pdf_url }
 });
 }
 
-document.getElementById("btnDone").addEventListener("click", async ()=>{
+const btnDoneEl = document.getElementById("btnDone");
+if(btnDoneEl){
+btnDoneEl.addEventListener("click", async ()=>{
 if(state.isDone) return;
+if(!state.hasVideoAccess){
+showLockedMessage();
+return;
+}
 try{
 const sb = await DB.getClient();
 const { data: userData } = await sb.from("users").select("completed_lessons, xp").eq("id", u.id).maybeSingle();
@@ -807,8 +975,15 @@ location.reload();
 Swal.fire({icon:'error', title:'خطأ', text:e.message, background:'linear-gradient(180deg, #151f38, #0b1122)', color:'#e8eefc', confirmButtonColor:'#2f7dff', customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
 }
 });
+}
 
-document.getElementById("btnReview").addEventListener("click", ()=>{
+const btnReviewEl = document.getElementById("btnReview");
+if(btnReviewEl){
+btnReviewEl.addEventListener("click", ()=>{
+if(!state.hasVideoAccess){
+showLockedMessage();
+return;
+}
 Swal.fire({
 icon: 'info',
 title: 'تمت الإضافة',
@@ -819,6 +994,7 @@ confirmButtonColor: '#2f7dff',
 customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
 });
 });
+}
 
 const noteEl = document.getElementById('lessonNote');
 if(noteEl){
@@ -876,6 +1052,7 @@ await saveNote(false);
 }
 }
 
+/* ================== تحميل البيانات ================== */
 async function load(){
 if(!lessonId){
 app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
@@ -934,6 +1111,13 @@ const { data: allExams } = await sb.from("exams").select("*").eq("published", tr
 state.relatedExams = (allExams || []).filter(e => {
 const lessonIds = Array.isArray(e.lesson_ids) ? e.lesson_ids : [];
 return lessonIds.includes(lesson.id);
+});
+
+/* تحديد الوصول للمحتوى المدفوع */
+state.hasVideoAccess = hasAccess(user, lesson);
+state.hasExamAccess = {};
+state.relatedExams.forEach(e=>{
+state.hasExamAccess[e.id] = hasAccess(user, e);
 });
 
 await loadNote(user.id, lesson.id);
