@@ -225,6 +225,8 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 .pomodoro-time{font-size:48px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-2px}
 .pomodoro-label{font-size:12px;color:var(--muted);margin-top:6px}
 @media(max-width:640px){.pomodoro-time{font-size:36px}}
+.cert-full{grid-template-columns:1fr!important;width:100%}
+.cert-full > *{width:100%}
 </style>
 </head>
 <body>
@@ -1558,11 +1560,11 @@ return <>
 </div>
 </div>
 ):(
-<div className="grid g2">
+<div className="grid cert-full">
 {certs.map(cert => {
 const subject = app.subject(cert.subject_id);
 return (
-<div key={cert.id} className="glass hv" style={{padding:0,textAlign:'center',position:'relative',overflow:'hidden'}}>
+<div key={cert.id} className="glass hv" style={{padding:0,textAlign:'center',position:'relative',overflow:'hidden',width:'100%'}}>
 <div style={{position:'absolute',top:0,left:0,right:0,height:5,background:'linear-gradient(90deg,#8B6914,#FFD700,#D4AF37,#FFD700,#8B6914)'}}/>
 <div style={{position:'absolute',bottom:0,left:0,right:0,height:5,background:'linear-gradient(90deg,#8B6914,#FFD700,#D4AF37,#FFD700,#8B6914)'}}/>
 <div style={{padding:'28px 22px',position:'relative'}}>
@@ -1832,6 +1834,13 @@ function StudentApp(){
     app.db.exams.filter(e=>access.includes(e.subject_id)&&e.title.toLowerCase().includes(lc)).forEach(e=>res.push({type:'اختبار',icon:<Icon name="clipboard" size={16}/>,title:e.title,href:`/student/exam.html?id=${e.id}`}));
     setSearchResults(res);
   };
+  const btmTabs=[
+    {id:'home',icon:'home',label:'الرئيسية',color:'#5aa9ff'},
+    {id:'subjects',icon:'book',label:'المواد',color:'#22c55e'},
+    {id:'missions',icon:'target',label:'المهام',color:'#f59e0b'},
+    {id:'polls',icon:'activity',label:'استطلاعات',color:'#c4b5fd'},
+    {id:'notes',icon:'note',label:'ملاحظاتي',color:'#fbbf24'}
+  ];
   return <div className="app">
     <Sidebar items={items} active={tab} onNav={handleNav} open={sidebarOpen} onClose={()=>setSidebarOpen(false)}/>
     <div className="main">
@@ -1861,16 +1870,20 @@ function StudentApp(){
       </div>
     </div>
     <div className="btmnav">
-      {[
-        {id:'home',icon:'home',label:'الرئيسية'},
-        {id:'subjects',icon:'book',label:'المواد'},
-        {id:'missions',icon:'target',label:'المهام'},
-        {id:'polls',icon:'activity',label:'استطلاعات'},
-        {id:'notes',icon:'note',label:'ملاحظاتي'}
-      ].map(it=><button key={it.id} className={tab===it.id?'on':''} onClick={()=>handleNav(it.id)}>
-        <span className="i"><Icon name={it.icon} size={19}/></span>
-        <span className="lbl-txt">{it.label}</span>
-      </button>)}
+      {btmTabs.map(it=>{
+        const active=tab===it.id;
+        return <button
+          key={it.id}
+          className={active?'on':''}
+          onClick={()=>handleNav(it.id)}
+          style={active?{color:it.color,background:`linear-gradient(180deg,${it.color}22,${it.color}08)`}:{}}
+        >
+          <span className="i" style={active?{color:it.color,filter:`drop-shadow(0 0 8px ${it.color}88)`}:{color:it.color+'99'}}>
+            <Icon name={it.icon} size={19}/>
+          </span>
+          <span className="lbl-txt" style={active?{color:it.color,fontWeight:800}:{}}>{it.label}</span>
+        </button>;
+      })}
     </div>
   </div>;
 }
