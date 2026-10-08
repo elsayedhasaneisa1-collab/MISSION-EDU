@@ -1581,7 +1581,7 @@ return (
 className="btn btn-block"
 onClick={()=>downloadCertificate(u, subject, cert)}
 style={{background:'linear-gradient(135deg,#FFD700,#D4AF37)',color:'#1a1206',fontWeight:900,boxShadow:'0 10px 28px rgba(251,191,36,.35)'}}>
-<i className="fa-solid fa-download"></i> تحميل الشهادة PDF
+<i className="fa-solid fa-download"></i> تحميل الشهادة صورة
 </button>
 </div>
 </div>
@@ -1594,7 +1594,6 @@ style={{background:'linear-gradient(135deg,#FFD700,#D4AF37)',color:'#1a1206',fon
 
 async function downloadCertificate(student, subject, cert){
 if(!window.jspdf){ window.location.reload(); return; }
-const { jsPDF } = window.jspdf;
 
 let logoBase64 = '';
 try{
@@ -1714,13 +1713,14 @@ x: 0,
 y: 0
 });
 
-const imgData = canvas.toDataURL('image/jpeg', 0.95);
-const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-const pdfW = pdf.internal.pageSize.getWidth();
-const pdfH = pdf.internal.pageSize.getHeight();
-pdf.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
-pdf.save(`شهادة_${subjectName}_${studentName}.pdf`);
-app.toast.ok('تم تحميل الشهادة');
+const imgData = canvas.toDataURL('image/png');
+const link = document.createElement('a');
+link.href = imgData;
+link.download = `شهادة_${subjectName}_${studentName}.png`;
+document.body.appendChild(link);
+link.click();
+link.remove();
+app.toast.ok('تم تحميل الشهادة كصورة');
 }catch(e){
 console.error(e);
 app.toast.err('فشل توليد الشهادة');
