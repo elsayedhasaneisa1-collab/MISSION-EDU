@@ -391,12 +391,7 @@ function Sidebar({items,active,onNav,open,onClose,onLogout}){return <>{open&&<di
 function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick,theme,onToggleTheme,unreadNotifs=0,onOpenNotifications}){
   const [q,setQ]=useState('');
   const [open,setOpen]=useState(false);
-  useEffect(()=>{
-    if(!q.trim()){setOpen(false);return;}
-    setOpen(true);
-    const t=setTimeout(()=>onSearch?.(q),150);
-    return ()=>clearTimeout(t);
-  },[q]);
+  useEffect(()=>{if(!q.trim()){setOpen(false);return;}setOpen(true);const t=setTimeout(()=>onSearch?.(q),150);return ()=>clearTimeout(t);},[q]);
   return <div className="topbar">
     <button className="icon-btn mbar" onClick={onMenu}><Icon name="menu" size={16}/></button>
     <div style={{position:'relative',flex:1,maxWidth:520}}>
@@ -419,12 +414,7 @@ function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick,theme
       <button className="icon-btn" onClick={onOpenNotifications} title="الإشعارات">
         <Icon name="bell" size={16}/>
         {unreadNotifs > 0 && (
-          <span style={{
-            position:'absolute',top:-4,insetInlineEnd:-4,minWidth:18,height:18,borderRadius:9,
-            background:'var(--grad-gold)',color:'#1a1206',fontSize:10,fontWeight:900,
-            display:'grid',placeItems:'center',padding:'0 5px',
-            boxShadow:'0 0 10px rgba(255,215,0,.7)',animation:'pulse 2s infinite'
-          }}>{unreadNotifs > 9 ? '9+' : unreadNotifs}</span>
+          <span style={{position:'absolute',top:-4,insetInlineEnd:-4,minWidth:18,height:18,borderRadius:9,background:'var(--grad-gold)',color:'#1a1206',fontSize:10,fontWeight:900,display:'grid',placeItems:'center',padding:'0 5px',boxShadow:'0 0 10px rgba(255,215,0,.7)',animation:'pulse 2s infinite'}}>{unreadNotifs > 9 ? '9+' : unreadNotifs}</span>
         )}
       </button>
       <button className="icon-btn" onClick={onToggleTheme} title={theme==='dark'?'الوضع النهاري':'الوضع الليلي'}>
@@ -437,7 +427,6 @@ function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick,theme
     </div>
   </div>;
 }
-
 function Dashboard(){
   const app=useApp();
   const students=app.db.users.filter(u=>u.role==='student');
@@ -449,14 +438,12 @@ function Dashboard(){
   const top10=useMemo(()=>[...students].sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,10),[students]);
   const recentAct=(app.db.activity||[]).slice(0,8);
   const actLabel={login:'تسجيل دخول',register:'تسجيل جديد',lesson_view:'فتح درس',lesson_complete:'أكمل درس',exam_start:'بدأ اختبار',exam_submit:'أنهى اختبار',video_play:'شاهد فيديو',video_25:'25%',video_50:'50%',video_75:'75%',video_complete:'أكمل الفيديو',mission_complete:'أكمل مهمة',achievement_unlock:'فتح إنجاز',poll_vote:'صوّت في استطلاع'};
-
   const chart1Ref=useRef(null);
   const chart2Ref=useRef(null);
   const chart3Ref=useRef(null);
   const chart1Instance=useRef(null);
   const chart2Instance=useRef(null);
   const chart3Instance=useRef(null);
-
   useEffect(()=>{
     if(!chart1Ref.current || !window.Chart) return;
     const ctx=chart1Ref.current.getContext("2d");
@@ -467,7 +454,6 @@ function Dashboard(){
     chart1Instance.current=new window.Chart(ctx,{type:"bar",data:{labels:top10.map(s=>s.name.split(" ")[0]),datasets:[{label:"XP",data:top10.map(s=>s.xp||0),backgroundColor:g1,borderColor:"#FFD700",borderWidth:2,borderRadius:10}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#d4c79a",font:{family:"Tajawal",size:12}},grid:{display:false}},y:{ticks:{color:"#d4c79a",font:{family:"Tajawal",size:12}},grid:{color:"rgba(212,175,55,0.08)"}}}}});
     return ()=>{if(chart1Instance.current)chart1Instance.current.destroy();};
   },[top10]);
-
   useEffect(()=>{
     if(!chart2Ref.current || !window.Chart) return;
     const ctx=chart2Ref.current.getContext("2d");
@@ -477,7 +463,6 @@ function Dashboard(){
     chart2Instance.current=new window.Chart(ctx,{type:"doughnut",data:{labels:distribution.map(d=>d.name),datasets:[{data:distribution.map(d=>d.count),backgroundColor:["rgba(255,215,0,0.8)","rgba(212,175,55,0.8)","rgba(184,134,11,0.8)","rgba(139,105,20,0.8)","rgba(92,69,9,0.8)"],borderColor:"rgba(10,8,5,0.7)",borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{color:"#d4c79a",font:{family:"Tajawal",size:11},padding:12,boxWidth:14}}}}});
     return ()=>{if(chart2Instance.current)chart2Instance.current.destroy();};
   },[students,app.db.levels]);
-
   useEffect(()=>{
     if(!chart3Ref.current || !window.Chart) return;
     const ctx=chart3Ref.current.getContext("2d");
@@ -490,7 +475,6 @@ function Dashboard(){
     chart3Instance.current=new window.Chart(ctx,{type:"doughnut",data:{labels:sorted.map(s=>s[0]),datasets:[{data:sorted.map(s=>s[1]),backgroundColor:colors.slice(0,sorted.length),borderColor:"rgba(10,8,5,0.7)",borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{color:"#d4c79a",font:{family:"Tajawal",size:11},padding:12,boxWidth:14}}}}});
     return ()=>{if(chart3Instance.current)chart3Instance.current.destroy();};
   },[students]);
-
   const exportToCSV=()=>{
     const headers=["الاسم","الهاتف","المحافظة","البريد","XP","المستوى","سلسلة الأيام","الحالة","دروس مكتملة"];
     const rows=students.map(s=>{const {current}=app.getLevel(s.xp||0);return [s.name,(s.country_code||"+20")+(s.phone||""),s.governorate||"—",s.email||"—",s.xp||0,`Lv ${current.level} - ${current.name}`,s.streak||0,s.active===false?"موقوف":"نشط",(s.completed_lessons||[]).length];});
@@ -504,7 +488,6 @@ function Dashboard(){
     URL.revokeObjectURL(url);
     app.toast.ok("تم تصدير البيانات");
   };
-
   return <>
     <div className="hero mb16">
       <div className="flex between center wrap g12">
@@ -517,7 +500,6 @@ function Dashboard(){
         </button>
       </div>
     </div>
-
     <div className="grid g4 mb16">
       <Stat label="إجمالي الطلاب" value={DB.fmt(students.length)} icon="users" color="#FFD700"/>
       <Stat label="الطلاب النشطون" value={DB.fmt(active)} icon="check" color="#22c55e"/>
@@ -528,7 +510,6 @@ function Dashboard(){
       <Stat label="الأسئلة" value={DB.fmt(app.db.questions.length)} icon="help" color="#FFD700"/>
       <Stat label="متوسط التقدم" value={`${avgProgress}%`} icon="trend" color="#FFD700"/>
     </div>
-
     <div className="grid g2 mb16">
       <div className="glass" style={{padding:18}}>
         <div className="h4 mb12" style={{color:'var(--gold)'}}>📊 XP — أفضل 10 طلاب</div>
@@ -539,7 +520,6 @@ function Dashboard(){
         <div style={{height:240,position:'relative'}}><canvas ref={chart2Ref}></canvas></div>
       </div>
     </div>
-
     <div className="glass mb16" style={{padding:18}}>
       <div className="flex between center mb12 wrap g8">
         <div className="h4" style={{color:'var(--gold)'}}>📍 توزيع الطلاب على المحافظات</div>
@@ -548,103 +528,35 @@ function Dashboard(){
       <div style={{display:'grid',gridTemplateColumns:'minmax(0,1fr) minmax(0,1.2fr)',gap:16,alignItems:'center'}}>
         <div style={{height:260,position:'relative'}}><canvas ref={chart3Ref}></canvas></div>
         <div>
-          {(()=>{
-            const govStats={};
-            students.forEach(s=>{const gov=s.governorate||'بدون محافظة';govStats[gov]=(govStats[gov]||0)+1;});
-            const sorted=Object.entries(govStats).sort((a,b)=>b[1]-a[1]);
-            return sorted.map(([gov,count],idx)=>(
-              <div key={gov} className="flex between center" style={{padding:'8px 12px',borderBottom:'1px solid rgba(212,175,55,.08)'}}>
-                <div className="flex center g8">
-                  <span className="pill pill-b" style={{fontSize:10,padding:'2px 8px'}}>{idx + 1}</span>
-                  <span className="sm">📍 {gov}</span>
-                </div>
-                <div className="flex center g8">
-                  <div style={{width:'60px',height:'6px',background:'rgba(212,175,55,.12)',borderRadius:20,overflow:'hidden'}}>
-                    <div style={{width:`${(count/students.length)*100}%`,height:'100%',background:'var(--grad-gold)'}}/>
-                  </div>
-                  <span className="pill pill-g" style={{fontSize:11}}>{count}</span>
-                </div>
-              </div>
-            ));
-          })()}
+          {(()=>{const govStats={};students.forEach(s=>{const gov=s.governorate||'بدون محافظة';govStats[gov]=(govStats[gov]||0)+1;});const sorted=Object.entries(govStats).sort((a,b)=>b[1]-a[1]);return sorted.map(([gov,count],idx)=>(<div key={gov} className="flex between center" style={{padding:'8px 12px',borderBottom:'1px solid rgba(212,175,55,.08)'}}><div className="flex center g8"><span className="pill pill-b" style={{fontSize:10,padding:'2px 8px'}}>{idx+1}</span><span className="sm">📍 {gov}</span></div><div className="flex center g8"><div style={{width:'60px',height:'6px',background:'rgba(212,175,55,.12)',borderRadius:20,overflow:'hidden'}}><div style={{width:`${(count/students.length)*100}%`,height:'100%',background:'var(--grad-gold)'}}/></div><span className="pill pill-g" style={{fontSize:11}}>{count}</span></div></div>));})()}
         </div>
       </div>
     </div>
-
     <div className="grid g2 mb16">
       <div className="glass" style={{padding:18}}>
         <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8,color:'var(--gold)'}}><Icon name="award" size={16}/> المتصدرون العشرة</div>
-        {top10.length===0?<Empty icon="🏅" title="لا يوجد طلاب بعد"/>:
-          top10.map((s,i)=>{
-            const {current}=app.getLevel(s.xp||0);
-            return <div key={s.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid rgba(212,175,55,.08)'}}>
-              <div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div>
-              <div className="avatar" style={{width:34,height:34,fontSize:14}}>{s.avatar||'👤'}</div>
-              <div style={{flex:1}}>
-                <div className="sm">{s.name} {s.governorate && <span className="xs muted">— 📍 {s.governorate}</span>}</div>
-                <div className="xs muted">Lv {current.level} — {current.name}</div>
-              </div>
-              <span className="pill pill-b">{DB.fmt(s.xp||0)} XP</span>
-            </div>;
-          })
-        }
+        {top10.length===0?<Empty icon="🏅" title="لا يوجد طلاب بعد"/>:top10.map((s,i)=>{const {current}=app.getLevel(s.xp||0);return <div key={s.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid rgba(212,175,55,.08)'}}><div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div><div className="avatar" style={{width:34,height:34,fontSize:14}}>{s.avatar||'👤'}</div><div style={{flex:1}}><div className="sm">{s.name} {s.governorate && <span className="xs muted">— 📍 {s.governorate}</span>}</div><div className="xs muted">Lv {current.level} — {current.name}</div></div><span className="pill pill-b">{DB.fmt(s.xp||0)} XP</span></div>;})}
       </div>
       <div className="glass" style={{padding:18}}>
         <div className="flex between center mb12">
-          <div className="h4" style={{display:'flex',alignItems:'center',gap:8,color:'var(--gold)'}}>
-            <Icon name="activity" size={16}/> آخر الأنشطة
-          </div>
+          <div className="h4" style={{display:'flex',alignItems:'center',gap:8,color:'var(--gold)'}}><Icon name="activity" size={16}/> آخر الأنشطة</div>
           <span className="pill pill-b">{app.db.activity?.length || 0}</span>
         </div>
-        {recentAct.length===0 ? (
-          <div style={{padding:'24px',textAlign:'center'}}>
-            <div style={{fontSize:40,opacity:.3,marginBottom:8}}>📡</div>
-            <div className="sm muted">لا يوجد نشاط بعد</div>
-            <div className="xs muted mt6">سيظهر نشاط الطلاب هنا</div>
-          </div>
-        ) : (
-          recentAct.map(a => (
-            <div key={a.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid rgba(212,175,55,.08)'}}>
-              <div className="act-ico"><Icon name="activity" size={16}/></div>
-              <div style={{flex:1}}>
-                <div className="sm">{a.user_name || 'غير معروف'}</div>
-                <div className="xs muted">{actLabel[a.type] || a.type}{a.target ? ` — ${a.target}` : ''}</div>
-              </div>
-              <div className="xs muted">{DB.formatTime(a.at)}</div>
-            </div>
-          ))
-        )}
+        {recentAct.length===0 ? (<div style={{padding:'24px',textAlign:'center'}}><div style={{fontSize:40,opacity:.3,marginBottom:8}}>📡</div><div className="sm muted">لا يوجد نشاط بعد</div><div className="xs muted mt6">سيظهر نشاط الطلاب هنا</div></div>) : (recentAct.map(a => (<div key={a.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid rgba(212,175,55,.08)'}}><div className="act-ico"><Icon name="activity" size={16}/></div><div style={{flex:1}}><div className="sm">{a.user_name || 'غير معروف'}</div><div className="xs muted">{actLabel[a.type] || a.type}{a.target ? ` — ${a.target}` : ''}</div></div><div className="xs muted">{DB.formatTime(a.at)}</div></div>)))}
       </div>
     </div>
   </>;
 }
-
 function ActivityLog(){
   const app=useApp();
   const [filter,setFilter]=useState('all');
   const [studentFilter,setStudentFilter]=useState('all');
   const students=app.db.users.filter(u=>u.role==='student');
-  const typeFilters=[
-    {id:'all',label:'الكل'},
-    {id:'lesson_view',label:'دروس'},
-    {id:'video_play',label:'فيديو'},
-    {id:'video_complete',label:'إكمال فيديو'},
-    {id:'exam_start',label:'بدء اختبار'},
-    {id:'exam_submit',label:'إنهاء اختبار'},
-    {id:'mission_complete',label:'مهام'},
-    {id:'poll_vote',label:'استطلاعات'},
-    {id:'login',label:'دخول'}
-  ];
+  const typeFilters=[{id:'all',label:'الكل'},{id:'lesson_view',label:'دروس'},{id:'video_play',label:'فيديو'},{id:'video_complete',label:'إكمال فيديو'},{id:'exam_start',label:'بدء اختبار'},{id:'exam_submit',label:'إنهاء اختبار'},{id:'mission_complete',label:'مهام'},{id:'poll_vote',label:'استطلاعات'},{id:'login',label:'دخول'}];
   let list=[...(app.db.activity||[])];
   if(filter!=='all') list=list.filter(a=>a.type===filter);
   if(studentFilter!=='all') list=list.filter(a=>a.user_id===studentFilter);
-  const actLabel={
-    login:'تسجيل دخول',register:'تسجيل جديد',lesson_view:'فتح درس',
-    lesson_complete:'أكمل درس',exam_start:'بدأ اختبار',exam_submit:'أنهى اختبار',
-    video_play:'شاهد فيديو',video_25:'25%',video_50:'50%',video_75:'75%',
-    video_complete:'أكمل الفيديو',mission_complete:'أكمل مهمة',
-    achievement_unlock:'فتح إنجاز',poll_vote:'صوّت في استطلاع'
-  };
+  const actLabel={login:'تسجيل دخول',register:'تسجيل جديد',lesson_view:'فتح درس',lesson_complete:'أكمل درس',exam_start:'بدأ اختبار',exam_submit:'أنهى اختبار',video_play:'شاهد فيديو',video_25:'25%',video_50:'50%',video_75:'75%',video_complete:'أكمل الفيديو',mission_complete:'أكمل مهمة',achievement_unlock:'فتح إنجاز',poll_vote:'صوّت في استطلاع'};
   return <>
     <div className="flex between center mb16 wrap g8">
       <div className="h2 grad">سجل النشاط</div>
@@ -657,42 +569,10 @@ function ActivityLog(){
       </div>
     </div>
     <div className="flex wrap g6 mb16">
-      {typeFilters.map(f=><button key={f.id} onClick={()=>setFilter(f.id)} style={{
-        padding:'8px 14px',borderRadius:30,
-        background:filter===f.id?'rgba(212,175,55,.20)':'rgba(212,175,55,.05)',
-        border:`1px solid ${filter===f.id?'var(--gold)':'var(--border)'}`,
-        fontSize:12.5,fontWeight:700,
-        color:filter===f.id?'#FFD700':'var(--txt)',cursor:'pointer'
-      }}>{f.label}</button>)}
+      {typeFilters.map(f=><button key={f.id} onClick={()=>setFilter(f.id)} style={{padding:'8px 14px',borderRadius:30,background:filter===f.id?'rgba(212,175,55,.20)':'rgba(212,175,55,.05)',border:`1px solid ${filter===f.id?'var(--gold)':'var(--border)'}`,fontSize:12.5,fontWeight:700,color:filter===f.id?'#FFD700':'var(--txt)',cursor:'pointer'}}>{f.label}</button>)}
     </div>
     <div className="glass" style={{padding:16}}>
-      {list.length===0?(
-        <div style={{padding:'40px 20px',textAlign:'center'}}>
-          <div style={{fontSize:48,opacity:.3,marginBottom:12}}>📡</div>
-          <div className="h4 txt2 mb8">لا يوجد نشاط</div>
-          <div className="sm muted">لم يقم الطلاب بأي نشاط بعد</div>
-        </div>
-      ):(
-        <div className="flex col g8">
-          {list.slice(0,200).map(a=>(
-            <div key={a.id} className="act-row">
-              <div className="act-ico"><Icon name="activity" size={16}/></div>
-              <div style={{flex:1,minWidth:0}}>
-                <div className="flex between center wrap g8">
-                  <div>
-                    <div className="sm" style={{fontWeight:700}}>{a.user_name || 'غير معروف'}</div>
-                    <div className="xs muted">
-                      {actLabel[a.type] || a.type}
-                      {a.target ? ` — ${a.target}` : ''}
-                    </div>
-                  </div>
-                  <div className="xs muted">{DB.formatDateTime(a.at)}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      {list.length===0?(<div style={{padding:'40px 20px',textAlign:'center'}}><div style={{fontSize:48,opacity:.3,marginBottom:12}}>📡</div><div className="h4 txt2 mb8">لا يوجد نشاط</div><div className="sm muted">لم يقم الطلاب بأي نشاط بعد</div></div>):(<div className="flex col g8">{list.slice(0,200).map(a=>(<div key={a.id} className="act-row"><div className="act-ico"><Icon name="activity" size={16}/></div><div style={{flex:1,minWidth:0}}><div className="flex between center wrap g8"><div><div className="sm" style={{fontWeight:700}}>{a.user_name || 'غير معروف'}</div><div className="xs muted">{actLabel[a.type] || a.type}{a.target ? ` — ${a.target}` : ''}</div></div><div className="xs muted">{DB.formatDateTime(a.at)}</div></div></div></div>))}</div>)}
     </div>
   </>;
 }
@@ -704,45 +584,12 @@ function Crud({title,collection,defaultItem,fields,columns}){
   const items=[...(app.db[collection]||[])].sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
   const openNew=()=>{setForm(defaultItem());setEditing('new');};
   const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
-  const save=async ()=>{
-    setBusy(true);
-    try{
-      await app.save(collection,form);
-      app.toast.ok(editing==='new'?'تمت الإضافة':'تم الحفظ');
-      setEditing(null);
-    }catch(e){app.toast.err(e.message);}
-    setBusy(false);
-  };
-  const del=async id=>{
-    const r=await Swal.fire({
-      title:'تأكيد الحذف',text:'سيتم حذف هذا العنصر نهائيًا',icon:'warning',
-      showCancelButton:true,confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',
-      confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
-      background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',
-      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
-    });
-    if(!r.isConfirmed) return;
-    try{await app.remove(collection,id);app.toast.warn('تم الحذف');}
-    catch(e){app.toast.err(e.message);}
-  };
+  const save=async ()=>{setBusy(true);try{await app.save(collection,form);app.toast.ok(editing==='new'?'تمت الإضافة':'تم الحفظ');setEditing(null);}catch(e){app.toast.err(e.message);}setBusy(false);};
+  const del=async id=>{const r=await Swal.fire({title:'تأكيد الحذف',text:'سيتم حذف هذا العنصر نهائيًا',icon:'warning',showCancelButton:true,confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed) return;try{await app.remove(collection,id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
   return <>
-    <div className="flex between center mb16">
-      <div className="h2 grad">{title}</div>
-      <button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> إضافة</button>
-    </div>
+    <div className="flex between center mb16"><div className="h2 grad">{title}</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> إضافة</button></div>
     <div className="glass" style={{padding:14}}>
-      {items.length===0?<Empty title="لا توجد بيانات"/>:
-        <div className="sx"><table className="tbl">
-          <thead><tr>{columns.map((c,i)=><th key={i}>{c.label}</th>)}<th>إجراءات</th></tr></thead>
-          <tbody>{items.map(it=><tr key={it.id}>
-            {columns.map((c,i)=><td key={i}>{c.render?c.render(it,app):it[c.key]}</td>)}
-            <td><div className="flex g6">
-              <button className="btn btn-s btn-sm" onClick={()=>openEdit(it)}><Icon name="edit" size={13}/></button>
-              <button className="btn btn-dn btn-sm" onClick={()=>del(it.id)}><Icon name="trash" size={13}/></button>
-            </div></td>
-          </tr>)}</tbody>
-        </table></div>
-      }
+      {items.length===0?<Empty title="لا توجد بيانات"/>:<div className="sx"><table className="tbl"><thead><tr>{columns.map((c,i)=><th key={i}>{c.label}</th>)}<th>إجراءات</th></tr></thead><tbody>{items.map(it=><tr key={it.id}>{columns.map((c,i)=><td key={i}>{c.render?c.render(it,app):it[c.key]}</td>)}<td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(it)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(it.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody></table></div>}
     </div>
     {editing!==null&&<Modal title={editing==='new'?'إضافة':'تعديل'} onClose={()=>setEditing(null)} wide>
       <div className="grid g2">
@@ -750,47 +597,20 @@ function Crud({title,collection,defaultItem,fields,columns}){
           <Field label={f.label} hint={f.hint}>
             {f.type==='textarea'?<textarea className="input" value={form[f.key]||''} onChange={e=>setForm({...form,[f.key]:e.target.value})}/>:
              f.type==='number'?<input type="number" className="input" value={form[f.key]??''} onChange={e=>setForm({...form,[f.key]: e.target.value === '' ? '' : +e.target.value})}/>:
-             f.type==='select'?<select className="input" value={form[f.key]||''} onChange={e=>setForm({...form,[f.key]:e.target.value})}>
-               <option value="">— اختر —</option>
-               {(typeof f.options==='function'?f.options(app):f.options).map(o=><option key={o.value} value={o.value}>{o.label}</option>)}
-             </select>:
+             f.type==='select'?<select className="input" value={form[f.key]||''} onChange={e=>setForm({...form,[f.key]:e.target.value})}><option value="">— اختر —</option>{(typeof f.options==='function'?f.options(app):f.options).map(o=><option key={o.value} value={o.value}>{o.label}</option>)}</select>:
              f.type==='list'?<textarea className="input" placeholder="سطر لكل عنصر" value={(form[f.key]||[]).join('\n')} onChange={e=>setForm({...form,[f.key]:e.target.value.split('\n').filter(Boolean)})}/>:
              f.type==='bool'?<label className="flex center g8" style={{cursor:'pointer'}}><input type="checkbox" checked={!!form[f.key]} onChange={e=>setForm({...form,[f.key]:e.target.checked})}/><span className="sm">{form[f.key]?'مفعّل':'معطّل'}</span></label>:
              <input className="input" value={form[f.key]||''} onChange={e=>setForm({...form,[f.key]:e.target.value})}/>}
           </Field>
         </div>)}
       </div>
-      <div className="flex g8 mt16">
-        <button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button>
-        <button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button>
-      </div>
+      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
     </Modal>}
   </>;
 }
-
-function GradesPage(){
-  return <Crud title="🏫 إدارة الصفوف" collection="grades" defaultItem={()=>({name:'',desc:''})} fields={[{key:'name',label:'اسم الصف'},{key:'desc',label:'الوصف',type:'textarea',full:true}]} columns={[{key:'name',label:'الاسم'},{key:'desc',label:'الوصف'}]}/>;
-}
-
-function SubjectsPage(){
-  const app=useApp();
-  return <Crud title="📚 إدارة المواد" collection="subjects" defaultItem={()=>({name:'',desc:'',icon:'📚',color:'#D4AF37',sort_order:'',grade_id:''})} fields={[
-    {key:'name',label:'اسم المادة'},{key:'icon',label:'الأيقونة'},{key:'color',label:'اللون'},{key:'sort_order',label:'الترتيب',type:'number'},
-    {key:'grade_id',label:'الصف',type:'select',options:a=>a.db.grades.map(g=>({value:g.id,label:g.name}))},{key:'desc',label:'الوصف',type:'textarea',full:true}
-  ]} columns={[
-    {label:'',render:s=><span style={{fontSize:20}}>{s.icon}</span>},{key:'name',label:'الاسم'},{key:'sort_order',label:'الترتيب'},{label:'الصف',render:(s,a)=>a.grade(s.grade_id)?.name||'—'}
-  ]}/>;
-}
-
-function UnitsPage(){
-  const app=useApp();
-  return <Crud title="🗂 إدارة الوحدات" collection="units" defaultItem={()=>({name:'',desc:'',sort_order:'',subject_id:''})} fields={[
-    {key:'name',label:'اسم الوحدة'},{key:'sort_order',label:'الترتيب',type:'number'},{key:'subject_id',label:'المادة',type:'select',options:a=>a.db.subjects.map(s=>({value:s.id,label:s.name}))},{key:'desc',label:'الوصف',type:'textarea',full:true}
-  ]} columns={[
-    {key:'name',label:'الاسم'},{label:'المادة',render:u=>app.subject(u.subject_id)?.name||'—'},{key:'sort_order',label:'الترتيب'}
-  ]}/>;
-}
-
+function GradesPage(){return <Crud title="🏫 إدارة الصفوف" collection="grades" defaultItem={()=>({name:'',desc:''})} fields={[{key:'name',label:'اسم الصف'},{key:'desc',label:'الوصف',type:'textarea',full:true}]} columns={[{key:'name',label:'الاسم'},{key:'desc',label:'الوصف'}]}/>;}
+function SubjectsPage(){const app=useApp();return <Crud title="📚 إدارة المواد" collection="subjects" defaultItem={()=>({name:'',desc:'',icon:'📚',color:'#D4AF37',sort_order:'',grade_id:''})} fields={[{key:'name',label:'اسم المادة'},{key:'icon',label:'الأيقونة'},{key:'color',label:'اللون'},{key:'sort_order',label:'الترتيب',type:'number'},{key:'grade_id',label:'الصف',type:'select',options:a=>a.db.grades.map(g=>({value:g.id,label:g.name}))},{key:'desc',label:'الوصف',type:'textarea',full:true}]} columns={[{label:'',render:s=><span style={{fontSize:20}}>{s.icon}</span>},{key:'name',label:'الاسم'},{key:'sort_order',label:'الترتيب'},{label:'الصف',render:(s,a)=>a.grade(s.grade_id)?.name||'—'}]}/>;}
+function UnitsPage(){const app=useApp();return <Crud title="🗂 إدارة الوحدات" collection="units" defaultItem={()=>({name:'',desc:'',sort_order:'',subject_id:''})} fields={[{key:'name',label:'اسم الوحدة'},{key:'sort_order',label:'الترتيب',type:'number'},{key:'subject_id',label:'المادة',type:'select',options:a=>a.db.subjects.map(s=>({value:s.id,label:s.name}))},{key:'desc',label:'الوصف',type:'textarea',full:true}]} columns={[{key:'name',label:'الاسم'},{label:'المادة',render:u=>app.subject(u.subject_id)?.name||'—'},{key:'sort_order',label:'الترتيب'}]}/>;}
 function LessonsPage(){
   const app=useApp();
   const [editing,setEditing]=useState(null);
@@ -798,7 +618,6 @@ function LessonsPage(){
   const [busy,setBusy]=useState(false);
   const [filterUnit,setFilterUnit]=useState('all');
   const [filterAccess,setFilterAccess]=useState('all');
-
   const openNew=()=>{setForm({title:'',desc:'',summary:'',video:{type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true},pdf_url:'',duration:'',xp:'',sort_order:'',unit_id:'',published:true,key_points:[],examples:[],notes:''});setEditing('new');};
   const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(!c.video)c.video={type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true};if(c.video.is_free===undefined)c.video.is_free=true;if(!c.key_points)c.key_points=[];if(!c.pdf_url)c.pdf_url='';setForm(c);setEditing(it.id);};
   const save=async ()=>{
@@ -815,33 +634,10 @@ function LessonsPage(){
     try{await app.remove('lessons',id);app.toast.warn('تم الحذف');}
     catch(e){app.toast.err(e.message);}
   };
-
-  const sortedLessons = useMemo(()=>{
-    return [...app.db.lessons].sort((a,b)=>{
-      const ta = new Date(a.created_at || a.createdAt || 0).getTime() || 0;
-      const tb = new Date(b.created_at || b.createdAt || 0).getTime() || 0;
-      if(ta !== tb) return ta - tb;
-      const sa = Number(a.sort_order) || 0;
-      const sb = Number(b.sort_order) || 0;
-      return sa - sb;
-    });
-  },[app.db.lessons]);
-
-  const filteredLessons = useMemo(()=>{
-    let list = sortedLessons;
-    if(filterUnit !== 'all') list = list.filter(l=>l.unit_id === filterUnit);
-    if(filterAccess !== 'all'){
-      list = list.filter(l=>{
-        const isFree = !l.video || !l.video.url || l.video.is_free !== false;
-        return filterAccess === 'free' ? isFree : !isFree;
-      });
-    }
-    return list;
-  },[sortedLessons, filterUnit, filterAccess]);
-
+  const sortedLessons = useMemo(()=>{return [...app.db.lessons].sort((a,b)=>{const ta = new Date(a.created_at || a.createdAt || 0).getTime() || 0;const tb = new Date(b.created_at || b.createdAt || 0).getTime() || 0;if(ta !== tb) return ta - tb;const sa = Number(a.sort_order) || 0;const sb = Number(b.sort_order) || 0;return sa - sb;});},[app.db.lessons]);
+  const filteredLessons = useMemo(()=>{let list = sortedLessons;if(filterUnit !== 'all') list = list.filter(l=>l.unit_id === filterUnit);if(filterAccess !== 'all'){list = list.filter(l=>{const isFree = !l.video || !l.video.url || l.video.is_free !== false;return filterAccess === 'free' ? isFree : !isFree;});}return list;},[sortedLessons, filterUnit, filterAccess]);
   const freeCount = sortedLessons.filter(l=>!l.video || !l.video.url || l.video.is_free !== false).length;
   const paidCount = sortedLessons.length - freeCount;
-
   return <>
     <div className="flex between center mb16 wrap g8">
       <div className="h2 grad">📖 إدارة الدروس</div>
@@ -851,7 +647,6 @@ function LessonsPage(){
         <button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> درس جديد</button>
       </div>
     </div>
-
     <div className="glass mb16" style={{padding:14}}>
       <div className="flex wrap g12">
         <div style={{flex:'1 1 240px'}}>
@@ -871,33 +666,14 @@ function LessonsPage(){
         </div>
       </div>
     </div>
-
     <div className="glass" style={{padding:14}}>
-      {filteredLessons.length===0?<Empty title="لا توجد دروس"/>:
-        <div className="sx"><table className="tbl">
-          <thead><tr><th>الدرس</th><th>الوحدة</th><th>الفيديو</th><th>الوصول</th><th>PDF</th><th>XP</th><th>الحالة</th><th>إجراءات</th></tr></thead>
-          <tbody>{filteredLessons.map(l=>{
-            const isFree = !l.video || !l.video.url || l.video.is_free !== false;
-            const badge = !l.video || !l.video.url ? <span className="pill pill-y">لا فيديو</span> : (()=>{const map={youtube:'📺 YouTube',vimeo:'🎬 Vimeo',mp4:'🎥 MP4',external:'🔗 خارجي'};return <span className="pill pill-b">{map[l.video.type]||l.video.type}</span>;})();
-            return <tr key={l.id}>
-              <td><b>{l.title}</b></td>
-              <td className="sm">{app.unit(l.unit_id)?.name||'—'}</td>
-              <td>{badge}</td>
-              <td><AccessBadge value={isFree}/></td>
-              <td>{l.pdf_url ? <span className="pill pill-r">📄 PDF</span> : <span className="xs muted">—</span>}</td>
-              <td>{l.xp}</td>
-              <td>{l.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td>
-              <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(l)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(l.id)}><Icon name="trash" size={13}/></button></div></td>
-            </tr>;
-          })}</tbody>
-        </table></div>
-      }
+      {filteredLessons.length===0?<Empty title="لا توجد دروس"/>:<div className="sx"><table className="tbl">
+        <thead><tr><th>الدرس</th><th>الوحدة</th><th>الفيديو</th><th>الوصول</th><th>PDF</th><th>XP</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+        <tbody>{filteredLessons.map(l=>{const isFree = !l.video || !l.video.url || l.video.is_free !== false;const badge = !l.video || !l.video.url ? <span className="pill pill-y">لا فيديو</span> : (()=>{const map={youtube:'📺 YouTube',vimeo:'🎬 Vimeo',mp4:'🎥 MP4',external:'🔗 خارجي'};return <span className="pill pill-b">{map[l.video.type]||l.video.type}</span>;})();return <tr key={l.id}><td><b>{l.title}</b></td><td className="sm">{app.unit(l.unit_id)?.name||'—'}</td><td>{badge}</td><td><AccessBadge value={isFree}/></td><td>{l.pdf_url ? <span className="pill pill-r">📄 PDF</span> : <span className="xs muted">—</span>}</td><td>{l.xp}</td><td>{l.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(l)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(l.id)}><Icon name="trash" size={13}/></button></div></td></tr>;})}</tbody>
+      </table></div>}
     </div>
-
     {editing!==null&&<Modal title={editing==='new'?'درس جديد':'تعديل الدرس'} onClose={()=>setEditing(null)} wide>
-      <div className="section-title" style={{marginTop:0}}>
-        <span className="ico">📝</span> المعلومات الأساسية
-      </div>
+      <div className="section-title" style={{marginTop:0}}><span className="ico">📝</span> المعلومات الأساسية</div>
       <div className="grid g2">
         <Field label="عنوان الدرس"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
         <Field label="الوحدة"><select className="input" value={form.unit_id||''} onChange={e=>setForm({...form,unit_id:e.target.value})}><option value="">— اختر —</option>{app.db.units.map(u=><option key={u.id} value={u.id}>{app.subject(u.subject_id)?.name} — {u.name}</option>)}</select></Field>
@@ -907,89 +683,51 @@ function LessonsPage(){
         <Field label="الحالة"><select className="input" value={form.published!==false?'1':'0'} onChange={e=>setForm({...form,published:e.target.value==='1'})}><option value="1">منشور</option><option value="0">مخفي</option></select></Field>
         <Field label="وصف الدرس" full><textarea className="input" value={form.desc||''} onChange={e=>setForm({...form,desc:e.target.value})}/></Field>
       </div>
-
-      <div className="section-title">
-        <span className="ico">🎬</span> الفيديو
-      </div>
+      <div className="section-title"><span className="ico">🎬</span> الفيديو</div>
       <div className="mb12"><VideoEditor value={form.video} onChange={v=>setForm({...form,video:v})}/></div>
-
-      <div className="section-title">
-        <span className="ico">📄</span> ملف الشرح (اختياري)
-      </div>
+      <div className="section-title"><span className="ico">📄</span> ملف الشرح (اختياري)</div>
       <Field label="رابط PDF" hint="اتركه فارغًا لو مفيش ملف PDF">
         <input className="input" value={form.pdf_url||''} onChange={e=>setForm({...form,pdf_url:e.target.value})} placeholder="https://example.com/lesson1.pdf"/>
       </Field>
-
-      <div className="section-title">
-        <span className="ico">📚</span> محتوى الدرس
-      </div>
+      <div className="section-title"><span className="ico">📚</span> محتوى الدرس</div>
       <Field label="ملخص الدرس" full><textarea className="input" value={form.summary||''} onChange={e=>setForm({...form,summary:e.target.value})}/></Field>
       <Field label="النقاط المهمة" full hint="سطر لكل نقطة"><textarea className="input" value={(form.key_points||[]).join('\n')} onChange={e=>setForm({...form,key_points:e.target.value.split('\n').filter(Boolean)})}/></Field>
       <Field label="ملاحظات" full><textarea className="input" value={form.notes||''} onChange={e=>setForm({...form,notes:e.target.value})}/></Field>
-
-      <div className="flex g8 mt16">
-        <button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button>
-        <button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button>
-      </div>
+      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
     </Modal>}
   </>;
 }
-
 function QuestionsPage(){
   const app=useApp();
   const [editing,setEditing]=useState(null);
   const [form,setForm]=useState({});
   const [bulkMode,setBulkMode]=useState(false);
-  const [bulkForm,setBulkForm]=useState({
-    lesson_id:'', difficulty:'medium', xp:10,
-    questions:[{text:'',options:['','','',''],correct:0,explanation:''}]
-  });
+  const [bulkForm,setBulkForm]=useState({lesson_id:'',difficulty:'medium',xp:10,questions:[{text:'',options:['','','',''],correct:0,explanation:''}]});
   const [busy,setBusy]=useState(false);
   const [filterLesson,setFilterLesson]=useState('all');
-
-  const openNew=()=>{
-    setForm({text:'',options:['','','',''],correct:[0],explanation:'',lesson_id:'',difficulty:'medium',xp:'',type:'mcq'});
-    setEditing('new');
-  };
+  const openNew=()=>{setForm({text:'',options:['','','',''],correct:[0],explanation:'',lesson_id:'',difficulty:'medium',xp:'',type:'mcq'});setEditing('new');};
   const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
-
   const save=async ()=>{
     if(!form.text||!form.lesson_id) return app.toast.warn('النص والدرس مطلوبان');
     const lesson=app.lesson(form.lesson_id);
     const unit_id=lesson?.unit_id||'';
     const subject_id=app.unit(unit_id)?.subject_id||'';
     setBusy(true);
-    try{
-      await app.save('questions',{...form,unit_id,subject_id});
-      app.toast.ok('تم الحفظ');
-      setEditing(null);
-    }catch(e){app.toast.err(e.message);}
+    try{await app.save('questions',{...form,unit_id,subject_id});app.toast.ok('تم الحفظ');setEditing(null);}
+    catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
-
   const saveBulk=async ()=>{
     if(!bulkForm.lesson_id) return app.toast.warn('اختر الدرس');
     const validQs = bulkForm.questions.filter(q=>q.text.trim() && q.options.some(o=>o.trim()));
     if(validQs.length===0) return app.toast.warn('أضف سؤالاً واحداً على الأقل');
-
     const lesson = app.lesson(bulkForm.lesson_id);
     const unit_id = lesson?.unit_id || '';
     const subject_id = app.unit(unit_id)?.subject_id || '';
-
     setBusy(true);
     try{
       for(const q of validQs){
-        const record = {
-          text: q.text.trim(),
-          options: q.options.map(o=>o.trim()),
-          correct: [q.correct],
-          explanation: q.explanation.trim(),
-          lesson_id: bulkForm.lesson_id,
-          unit_id, subject_id,
-          difficulty: bulkForm.difficulty,
-          xp: bulkForm.xp,
-          type: 'mcq'
-        };
+        const record = {text: q.text.trim(),options: q.options.map(o=>o.trim()),correct: [q.correct],explanation: q.explanation.trim(),lesson_id: bulkForm.lesson_id,unit_id, subject_id,difficulty: bulkForm.difficulty,xp: bulkForm.xp,type: 'mcq'};
         await app.save('questions', record);
       }
       app.toast.ok(`✅ تمت إضافة ${validQs.length} سؤال`);
@@ -998,84 +736,41 @@ function QuestionsPage(){
     }catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
-
   const del=async id=>{
-    const r=await Swal.fire({
-      title:'حذف السؤال؟',icon:'warning',showCancelButton:true,
-      confirmButtonText:'نعم',cancelButtonText:'إلغاء',
-      confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
-      background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',
-      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
-    });
+    const r=await Swal.fire({title:'حذف السؤال؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
     if(!r.isConfirmed) return;
     try{await app.remove('questions',id);app.toast.warn('تم الحذف');}
     catch(e){app.toast.err(e.message);}
   };
-
-  const addBulkQuestion=()=>{
-    setBulkForm(f=>({...f,questions:[...f.questions,{text:'',options:['','','',''],correct:0,explanation:''}]}));
-  };
-  const removeBulkQuestion=(idx)=>{
-    setBulkForm(f=>({...f,questions:f.questions.filter((_,i)=>i!==idx)}));
-  };
-  const updateBulkQuestion=(idx,patch)=>{
-    setBulkForm(f=>({...f,questions:f.questions.map((q,i)=>i===idx?{...q,...patch}:q)}));
-  };
-
+  const addBulkQuestion=()=>{setBulkForm(f=>({...f,questions:[...f.questions,{text:'',options:['','','',''],correct:0,explanation:''}]}));};
+  const removeBulkQuestion=(idx)=>{setBulkForm(f=>({...f,questions:f.questions.filter((_,i)=>i!==idx)}));};
+  const updateBulkQuestion=(idx,patch)=>{setBulkForm(f=>({...f,questions:f.questions.map((q,i)=>i===idx?{...q,...patch}:q)}));};
   const filteredQuestions = filterLesson === 'all' ? app.db.questions : app.db.questions.filter(q=>q.lesson_id === filterLesson);
-  const sortedQuestions = useMemo(()=>{
-    return [...filteredQuestions].sort((a,b)=>{
-      const ta = new Date(a.created_at || a.createdAt || 0).getTime() || 0;
-      const tb = new Date(b.created_at || b.createdAt || 0).getTime() || 0;
-      return ta - tb;
-    });
-  },[filteredQuestions]);
-
+  const sortedQuestions = useMemo(()=>{return [...filteredQuestions].sort((a,b)=>{const ta = new Date(a.created_at || a.createdAt || 0).getTime() || 0;const tb = new Date(b.created_at || b.createdAt || 0).getTime() || 0;return ta - tb;});},[filteredQuestions]);
   return <>
     <div className="flex between center mb16 wrap g8">
       <div className="h2 grad">❓ بنك الأسئلة</div>
       <div className="flex g8">
-        <button className="btn btn-s" onClick={()=>setBulkMode(true)}>
-          <Icon name="plus" size={14}/> إضافة مجموعة أسئلة
-        </button>
-        <button className="btn btn-p" onClick={openNew}>
-          <Icon name="plus" size={15}/> سؤال واحد
-        </button>
+        <button className="btn btn-s" onClick={()=>setBulkMode(true)}><Icon name="plus" size={14}/> إضافة مجموعة أسئلة</button>
+        <button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> سؤال واحد</button>
       </div>
     </div>
-
     <div className="flex between center mb12 wrap g8">
       <div className="flex center g8">
         <span className="sm muted">تصفية حسب الدرس:</span>
         <select className="input" style={{maxWidth:280}} value={filterLesson} onChange={e=>setFilterLesson(e.target.value)}>
           <option value="all">جميع الدروس ({app.db.questions.length})</option>
-          {app.db.lessons.map(l=>{
-            const count = app.db.questions.filter(q=>q.lesson_id===l.id).length;
-            return <option key={l.id} value={l.id}>{l.title} ({count})</option>;
-          })}
+          {app.db.lessons.map(l=>{const count = app.db.questions.filter(q=>q.lesson_id===l.id).length;return <option key={l.id} value={l.id}>{l.title} ({count})</option>;})}
         </select>
       </div>
       <span className="pill pill-b">{sortedQuestions.length} سؤال</span>
     </div>
-
     <div className="glass" style={{padding:14}}>
-      {sortedQuestions.length===0?<Empty title="لا توجد أسئلة"/>:
-        <div className="sx"><table className="tbl">
-          <thead><tr><th>السؤال</th><th>الدرس</th><th>الصعوبة</th><th>XP</th><th>إجراءات</th></tr></thead>
-          <tbody>{sortedQuestions.map(q=><tr key={q.id}>
-            <td style={{maxWidth:340}}>{q.text.slice(0,80)}{q.text.length>80?'...':''}</td>
-            <td className="sm">{app.lesson(q.lesson_id)?.title||'—'}</td>
-            <td><span className={`pill ${q.difficulty==='easy'?'pill-g':q.difficulty==='hard'?'pill-r':'pill-a'}`}>{q.difficulty}</span></td>
-            <td>{q.xp}</td>
-            <td><div className="flex g6">
-              <button className="btn btn-s btn-sm" onClick={()=>openEdit(q)}><Icon name="edit" size={13}/></button>
-              <button className="btn btn-dn btn-sm" onClick={()=>del(q.id)}><Icon name="trash" size={13}/></button>
-            </div></td>
-          </tr>)}</tbody>
-        </table></div>
-      }
+      {sortedQuestions.length===0?<Empty title="لا توجد أسئلة"/>:<div className="sx"><table className="tbl">
+        <thead><tr><th>السؤال</th><th>الدرس</th><th>الصعوبة</th><th>XP</th><th>إجراءات</th></tr></thead>
+        <tbody>{sortedQuestions.map(q=><tr key={q.id}><td style={{maxWidth:340}}>{q.text.slice(0,80)}{q.text.length>80?'...':''}</td><td className="sm">{app.lesson(q.lesson_id)?.title||'—'}</td><td><span className={`pill ${q.difficulty==='easy'?'pill-g':q.difficulty==='hard'?'pill-r':'pill-a'}`}>{q.difficulty}</span></td><td>{q.xp}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(q)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(q.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody>
+      </table></div>}
     </div>
-
     {editing!==null&&<Modal title={editing==='new'?'سؤال جديد':'تعديل السؤال'} onClose={()=>setEditing(null)} wide>
       <Field label="نص السؤال"><textarea className="input" value={form.text||''} onChange={e=>setForm({...form,text:e.target.value})}/></Field>
       <Field label="الخيارات">
@@ -1090,12 +785,8 @@ function QuestionsPage(){
         <Field label="الصعوبة"><select className="input" value={form.difficulty||'medium'} onChange={e=>setForm({...form,difficulty:e.target.value})}><option value="easy">سهل</option><option value="medium">متوسط</option><option value="hard">صعب</option></select></Field>
         <Field label="XP"><input type="number" className="input" value={form.xp ?? ''} onChange={e=>setForm({...form,xp: e.target.value === '' ? '' : +e.target.value})}/></Field>
       </div>
-      <div className="flex g8 mt16">
-        <button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button>
-        <button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button>
-      </div>
+      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
     </Modal>}
-
     {bulkMode&&<Modal title="📚 إضافة مجموعة أسئلة" onClose={()=>setBulkMode(false)} wide>
       <div className="grid g2 mb12">
         <Field label="الدرس المستهدف">
@@ -1106,17 +797,11 @@ function QuestionsPage(){
         </Field>
         <Field label="الصعوبة">
           <select className="input" value={bulkForm.difficulty} onChange={e=>setBulkForm({...bulkForm,difficulty:e.target.value})}>
-            <option value="easy">سهل</option>
-            <option value="medium">متوسط</option>
-            <option value="hard">صعب</option>
+            <option value="easy">سهل</option><option value="medium">متوسط</option><option value="hard">صعب</option>
           </select>
         </Field>
-        <Field label="XP لكل سؤال">
-          <input type="number" className="input" value={bulkForm.xp ?? ''} onChange={e=>setBulkForm({...bulkForm,xp: e.target.value === '' ? '' : +e.target.value})}/>
-        </Field>
-        <Field label="عدد الأسئلة">
-          <div className="pill pill-b" style={{padding:'12px 20px',fontSize:14}}>{bulkForm.questions.length} سؤال</div>
-        </Field>
+        <Field label="XP لكل سؤال"><input type="number" className="input" value={bulkForm.xp ?? ''} onChange={e=>setBulkForm({...bulkForm,xp: e.target.value === '' ? '' : +e.target.value})}/></Field>
+        <Field label="عدد الأسئلة"><div className="pill pill-b" style={{padding:'12px 20px',fontSize:14}}>{bulkForm.questions.length} سؤال</div></Field>
       </div>
       <div className="div"/>
       <div style={{maxHeight:'60vh',overflowY:'auto',paddingInlineEnd:6}}>
@@ -1124,54 +809,29 @@ function QuestionsPage(){
           <div key={idx} className="glass-s mb12" style={{padding:16,borderColor:'var(--border2)'}}>
             <div className="flex between center mb12">
               <span className="pill pill-b">سؤال {idx+1}</span>
-              {bulkForm.questions.length > 1 && (
-                <button className="btn btn-dn btn-sm" onClick={()=>removeBulkQuestion(idx)}>
-                  <Icon name="trash" size={12}/> حذف
-                </button>
-              )}
+              {bulkForm.questions.length > 1 && (<button className="btn btn-dn btn-sm" onClick={()=>removeBulkQuestion(idx)}><Icon name="trash" size={12}/> حذف</button>)}
             </div>
-            <Field label="نص السؤال">
-              <textarea className="input" rows="2" value={q.text} onChange={e=>updateBulkQuestion(idx,{text:e.target.value})} placeholder="اكتب السؤال هنا..."/>
-            </Field>
+            <Field label="نص السؤال"><textarea className="input" rows="2" value={q.text} onChange={e=>updateBulkQuestion(idx,{text:e.target.value})} placeholder="اكتب السؤال هنا..."/></Field>
             <Field label="الخيارات (اضغط على الحرف لتحديد الإجابة الصحيحة)">
-              {q.options.map((op,oi)=>(
-                <div key={oi} className="flex g8 mb6 center">
-                  <button type="button" className={`btn btn-sm ${q.correct===oi?'btn-ok':'btn-s'}`}
-                    onClick={()=>updateBulkQuestion(idx,{correct:oi})} style={{minWidth:44}}>
-                    {['أ','ب','ج','د'][oi]}
-                  </button>
-                  <input className="input" value={op} onChange={e=>{
-                    const opts=[...q.options]; opts[oi]=e.target.value;
-                    updateBulkQuestion(idx,{options:opts});
-                  }} placeholder={`الخيار ${['أ','ب','ج','د'][oi]}`}/>
-                </div>
-              ))}
+              {q.options.map((op,oi)=>(<div key={oi} className="flex g8 mb6 center"><button type="button" className={`btn btn-sm ${q.correct===oi?'btn-ok':'btn-s'}`} onClick={()=>updateBulkQuestion(idx,{correct:oi})} style={{minWidth:44}}>{['أ','ب','ج','د'][oi]}</button><input className="input" value={op} onChange={e=>{const opts=[...q.options]; opts[oi]=e.target.value;updateBulkQuestion(idx,{options:opts});}} placeholder={`الخيار ${['أ','ب','ج','د'][oi]}`}/></div>))}
             </Field>
-            <Field label="شرح الإجابة (اختياري)">
-              <textarea className="input" rows="2" value={q.explanation} onChange={e=>updateBulkQuestion(idx,{explanation:e.target.value})} placeholder="اشرح سبب الإجابة الصحيحة..."/>
-            </Field>
+            <Field label="شرح الإجابة (اختياري)"><textarea className="input" rows="2" value={q.explanation} onChange={e=>updateBulkQuestion(idx,{explanation:e.target.value})} placeholder="اشرح سبب الإجابة الصحيحة..."/></Field>
           </div>
         ))}
       </div>
       <div className="flex g8 mt12">
-        <button className="btn btn-s" onClick={addBulkQuestion} style={{flex:1}}>
-          <Icon name="plus" size={14}/> إضافة سؤال آخر
-        </button>
-        <button className="btn btn-p" onClick={saveBulk} disabled={busy} style={{flex:1}}>
-          {busy?'جارٍ الحفظ...':`💾 حفظ ${bulkForm.questions.length} سؤال`}
-        </button>
+        <button className="btn btn-s" onClick={addBulkQuestion} style={{flex:1}}><Icon name="plus" size={14}/> إضافة سؤال آخر</button>
+        <button className="btn btn-p" onClick={saveBulk} disabled={busy} style={{flex:1}}>{busy?'جارٍ الحفظ...':`💾 حفظ ${bulkForm.questions.length} سؤال`}</button>
       </div>
     </Modal>}
   </>;
 }
-
 function ExamsPage(){
   const app=useApp();
   const [editing,setEditing]=useState(null);
   const [form,setForm]=useState({});
   const [busy,setBusy]=useState(false);
   const [filterAccess,setFilterAccess]=useState('all');
-
   const openNew=()=>{setForm({title:'',subject_id:'',unit_id:'',lesson_ids:[],question_ids:[],duration:'',pass_score:'',max_attempts:'',xp:'',published:true,sort_order:'',is_free:true});setEditing('new');};
   const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(c.is_free===undefined)c.is_free=true;setForm(c);setEditing(it.id);};
   const save=async ()=>{
@@ -1182,32 +842,12 @@ function ExamsPage(){
     catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
-  const del=async id=>{
-    const r=await Swal.fire({title:'حذف الاختبار؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
-    if(!r.isConfirmed) return;
-    try{await app.remove('exams',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}
-  };
+  const del=async id=>{const r=await Swal.fire({title:'حذف الاختبار؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed) return;try{await app.remove('exams',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
   const availQ=form.unit_id?app.db.questions.filter(q=>q.unit_id===form.unit_id):app.db.questions;
-
-  const sortedExams = useMemo(()=>{
-    return [...app.db.exams].sort((a,b)=>{
-      const ta = new Date(a.created_at || a.createdAt || 0).getTime() || 0;
-      const tb = new Date(b.created_at || b.createdAt || 0).getTime() || 0;
-      return ta - tb;
-    });
-  },[app.db.exams]);
-
-  const filteredExams = useMemo(()=>{
-    if(filterAccess === 'all') return sortedExams;
-    return sortedExams.filter(e=>{
-      const isFree = e.is_free !== false;
-      return filterAccess === 'free' ? isFree : !isFree;
-    });
-  },[sortedExams, filterAccess]);
-
+  const sortedExams = useMemo(()=>{return [...app.db.exams].sort((a,b)=>{const ta = new Date(a.created_at || a.createdAt || 0).getTime() || 0;const tb = new Date(b.created_at || b.createdAt || 0).getTime() || 0;return ta - tb;});},[app.db.exams]);
+  const filteredExams = useMemo(()=>{if(filterAccess === 'all') return sortedExams;return sortedExams.filter(e=>{const isFree = e.is_free !== false;return filterAccess === 'free' ? isFree : !isFree;});},[sortedExams, filterAccess]);
   const freeCount = sortedExams.filter(e=>e.is_free !== false).length;
   const paidCount = sortedExams.length - freeCount;
-
   return <>
     <div className="flex between center mb16 wrap g8">
       <div className="h2 grad">📝 إدارة الاختبارات</div>
@@ -1217,7 +857,6 @@ function ExamsPage(){
         <button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> اختبار جديد</button>
       </div>
     </div>
-
     <div className="glass mb16" style={{padding:14}}>
       <div style={{flex:'1 1 240px',maxWidth:280}}>
         <label className="lbl">تصفية حسب الوصول</label>
@@ -1228,28 +867,14 @@ function ExamsPage(){
         </select>
       </div>
     </div>
-
     <div className="glass" style={{padding:14}}>
-      {filteredExams.length===0?<Empty title="لا توجد اختبارات"/>:
-        <div className="sx"><table className="tbl">
-          <thead><tr><th>العنوان</th><th>المادة</th><th>الأسئلة</th><th>الوصول</th><th>النجاح</th><th>الحالة</th><th>إجراءات</th></tr></thead>
-          <tbody>{filteredExams.map(e=><tr key={e.id}>
-            <td><b>{e.title}</b></td>
-            <td className="sm">{app.subject(e.subject_id)?.name||'—'}</td>
-            <td>{(e.question_ids||[]).length}</td>
-            <td><AccessBadge value={e.is_free}/></td>
-            <td>{e.pass_score}%</td>
-            <td>{e.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td>
-            <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(e)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(e.id)}><Icon name="trash" size={13}/></button></div></td>
-          </tr>)}</tbody>
-        </table></div>
-      }
+      {filteredExams.length===0?<Empty title="لا توجد اختبارات"/>:<div className="sx"><table className="tbl">
+        <thead><tr><th>العنوان</th><th>المادة</th><th>الأسئلة</th><th>الوصول</th><th>النجاح</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+        <tbody>{filteredExams.map(e=><tr key={e.id}><td><b>{e.title}</b></td><td className="sm">{app.subject(e.subject_id)?.name||'—'}</td><td>{(e.question_ids||[]).length}</td><td><AccessBadge value={e.is_free}/></td><td>{e.pass_score}%</td><td>{e.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(e)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(e.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody>
+      </table></div>}
     </div>
-
     {editing!==null&&<Modal title={editing==='new'?'اختبار جديد':'تعديل الاختبار'} onClose={()=>setEditing(null)} wide>
-      <div className="section-title" style={{marginTop:0}}>
-        <span className="ico">📋</span> المعلومات الأساسية
-      </div>
+      <div className="section-title" style={{marginTop:0}}><span className="ico">📋</span> المعلومات الأساسية</div>
       <Field label="اسم الاختبار"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
       <div className="grid g2">
         <Field label="المادة"><select className="input" value={form.subject_id||''} onChange={e=>setForm({...form,subject_id:e.target.value,unit_id:''})}><option value="">— اختر —</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field>
@@ -1261,35 +886,20 @@ function ExamsPage(){
         <Field label="الترتيب"><input type="number" className="input" value={form.sort_order ?? ''} onChange={e=>setForm({...form,sort_order: e.target.value === '' ? '' : +e.target.value})}/></Field>
         <Field label="الحالة"><select className="input" value={form.published!==false?'1':'0'} onChange={e=>setForm({...form,published:e.target.value==='1'})}><option value="1">منشور</option><option value="0">مخفي</option></select></Field>
       </div>
-
-      <div className="section-title">
-        <span className="ico">🔐</span> نوع الوصول
-      </div>
+      <div className="section-title"><span className="ico">🔐</span> نوع الوصول</div>
       <Field label="الاختبار المجاني متاح لجميع الطلاب • الاختبار المدفوع يتطلب اشتراك">
         <AccessToggle value={form.is_free} onChange={(isFree)=>setForm({...form,is_free:isFree})}/>
       </Field>
-
-      <div className="section-title">
-        <span className="ico">❓</span> الأسئلة
-      </div>
+      <div className="section-title"><span className="ico">❓</span> الأسئلة</div>
       <Field label={`الأسئلة المختارة (${(form.question_ids||[]).length})`}>
         <div className="glass-s" style={{padding:10,maxHeight:260,overflowY:'auto'}}>
-          {availQ.length===0?<div className="sm muted">لا توجد أسئلة</div>:
-            availQ.map(q=>{const on=(form.question_ids||[]).includes(q.id);return <label key={q.id} className="flex center g8 mb6" style={{padding:6,cursor:'pointer'}}>
-              <input type="checkbox" checked={on} onChange={()=>setForm({...form,question_ids:on?(form.question_ids||[]).filter(x=>x!==q.id):[...(form.question_ids||[]),q.id]})}/>
-              <span className="sm" style={{flex:1}}>{q.text.slice(0,80)}</span>
-            </label>;})
-          }
+          {availQ.length===0?<div className="sm muted">لا توجد أسئلة</div>:availQ.map(q=>{const on=(form.question_ids||[]).includes(q.id);return <label key={q.id} className="flex center g8 mb6" style={{padding:6,cursor:'pointer'}}><input type="checkbox" checked={on} onChange={()=>setForm({...form,question_ids:on?(form.question_ids||[]).filter(x=>x!==q.id):[...(form.question_ids||[]),q.id]})}/><span className="sm" style={{flex:1}}>{q.text.slice(0,80)}</span></label>;})}
         </div>
       </Field>
-      <div className="flex g8 mt16">
-        <button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button>
-        <button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button>
-      </div>
+      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
     </Modal>}
   </>;
 }
-
 function MissionsPage(){
   const app=useApp();
   const [editing,setEditing]=useState(null);
@@ -1305,23 +915,14 @@ function MissionsPage(){
     catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
-  const del=async id=>{
-    const r=await Swal.fire({title:'حذف المهمة؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
-    if(!r.isConfirmed) return;
-    try{await app.remove('missions',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}
-  };
+  const del=async id=>{const r=await Swal.fire({title:'حذف المهمة؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed) return;try{await app.remove('missions',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
   return <>
     <div className="flex between center mb16"><div className="h2 grad">🎯 إدارة المهام</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> مهمة جديدة</button></div>
     <div className="glass" style={{padding:14}}>
-      {app.db.missions.length===0?<Empty title="لا توجد مهام"/>:
-        <div className="sx"><table className="tbl">
-          <thead><tr><th>العنوان</th><th>المادة</th><th>XP</th><th>إجراءات</th></tr></thead>
-          <tbody>{app.db.missions.map(m=><tr key={m.id}>
-            <td>{m.title}</td><td className="sm">{app.subject(m.subject_id)?.name||'—'}</td><td>{m.xp}</td>
-            <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(m)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(m.id)}><Icon name="trash" size={13}/></button></div></td>
-          </tr>)}</tbody>
-        </table></div>
-      }
+      {app.db.missions.length===0?<Empty title="لا توجد مهام"/>:<div className="sx"><table className="tbl">
+        <thead><tr><th>العنوان</th><th>المادة</th><th>XP</th><th>إجراءات</th></tr></thead>
+        <tbody>{app.db.missions.map(m=><tr key={m.id}><td>{m.title}</td><td className="sm">{app.subject(m.subject_id)?.name||'—'}</td><td>{m.xp}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(m)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(m.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody>
+      </table></div>}
     </div>
     {editing!==null&&<Modal title={editing==='new'?'مهمة جديدة':'تعديل المهمة'} onClose={()=>setEditing(null)} wide>
       <Field label="عنوان المهمة"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
@@ -1334,13 +935,7 @@ function MissionsPage(){
       </div>
       <Field label="الدروس المطلوبة">
         <div className="glass-s" style={{padding:10,maxHeight:220,overflowY:'auto'}}>
-          {app.db.lessons.filter(l=>{const un=app.unit(l.unit_id);return !form.subject_id||un?.subject_id===form.subject_id;}).map(l=>{
-            const on=(form.required_lessons||[]).includes(l.id);
-            return <label key={l.id} className="flex center g8 mb6" style={{cursor:'pointer'}}>
-              <input type="checkbox" checked={on} onChange={()=>setForm({...form,required_lessons:on?(form.required_lessons||[]).filter(x=>x!==l.id):[...(form.required_lessons||[]),l.id]})}/>
-              <span className="sm">{l.title}</span>
-            </label>;
-          })}
+          {app.db.lessons.filter(l=>{const un=app.unit(l.unit_id);return !form.subject_id||un?.subject_id===form.subject_id;}).map(l=>{const on=(form.required_lessons||[]).includes(l.id);return <label key={l.id} className="flex center g8 mb6" style={{cursor:'pointer'}}><input type="checkbox" checked={on} onChange={()=>setForm({...form,required_lessons:on?(form.required_lessons||[]).filter(x=>x!==l.id):[...(form.required_lessons||[]),l.id]})}/><span className="sm">{l.title}</span></label>;})}
         </div>
       </Field>
       <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
@@ -1356,7 +951,6 @@ function AchievementsPage(){
     {label:'',render:a=><span style={{fontSize:20}}>{a.icon}</span>},{key:'title',label:'الاسم'},{key:'type',label:'النوع'},{key:'threshold',label:'القيمة'}
   ]}/>;
 }
-
 function LevelsPage(){
   return <Crud title="📈 إدارة المستويات" collection="levels" defaultItem={()=>({level:'',name:'',xp:'',reward:''})} fields={[
     {key:'level',label:'رقم المستوى',type:'number'},{key:'name',label:'الاسم'},{key:'xp',label:'XP المطلوب',type:'number'},{key:'reward',label:'المكافأة'}
@@ -1364,7 +958,6 @@ function LevelsPage(){
     {key:'level',label:'المستوى'},{key:'name',label:'الاسم'},{key:'xp',label:'XP'},{key:'reward',label:'المكافأة'}
   ]}/>;
 }
-
 function StudentsPage(){
   const app=useApp();
   const [editing,setEditing]=useState(null);
@@ -1372,17 +965,8 @@ function StudentsPage(){
   const [q,setQ]=useState('');
   const [govFilter,setGovFilter]=useState('all');
   const [busy,setBusy]=useState(false);
-
-  const GOVERNORATES = [
-    "القاهرة", "الجيزة", "الإسكندرية", "الدقهلية", "الشرقية", "المنوفية",
-    "القليوبية", "البحيرة", "الغربية", "بورسعيد", "دمياط", "الإسماعيلية",
-    "السويس", "كفر الشيخ", "الفيوم", "بني سويف", "المنيا", "أسيوط",
-    "سوهاج", "قنا", "الأقصر", "أسوان", "البحر الأحمر", "الوادي الجديد",
-    "مطروح", "شمال سيناء", "جنوب سيناء"
-  ];
-
+  const GOVERNORATES = ["القاهرة", "الجيزة", "الإسكندرية", "الدقهلية", "الشرقية", "المنوفية","القليوبية", "البحيرة", "الغربية", "بورسعيد", "دمياط", "الإسماعيلية","السويس", "كفر الشيخ", "الفيوم", "بني سويف", "المنيا", "أسيوط","سوهاج", "قنا", "الأقصر", "أسوان", "البحر الأحمر", "الوادي الجديد","مطروح", "شمال سيناء", "جنوب سيناء"];
   const allStudents = app.db.users.filter(u => u.role === 'student');
-
   const list = allStudents.filter(u => {
     const matchesSearch = u.name.toLowerCase().includes(q.toLowerCase()) || (u.phone||'').includes(q);
     let matchesGov = true;
@@ -1391,256 +975,89 @@ function StudentsPage(){
     else matchesGov = u.governorate === govFilter;
     return matchesSearch && matchesGov;
   });
-
   const open = s => { setForm(JSON.parse(JSON.stringify(s))); setEditing(s.id); };
   const save = async () => {
     setBusy(true);
     try {
-      await DB.updateUser(editing, {
-        name: form.name,
-        phone: form.phone,
-        xp: form.xp,
-        grade_id: form.grade_id,
-        governorate: form.governorate || null,
-        all_subjects: form.all_subjects,
-        access_subjects: form.access_subjects || [],
-        subscription: form.subscription || 'free',
-        subscription_until: form.subscription_until || null
-      });
+      await DB.updateUser(editing, {name: form.name,phone: form.phone,xp: form.xp,grade_id: form.grade_id,governorate: form.governorate || null,all_subjects: form.all_subjects,access_subjects: form.access_subjects || [],subscription: form.subscription || 'free',subscription_until: form.subscription_until || null});
       await app.reload();
       app.toast.ok('تم الحفظ');
       setEditing(null);
-    } catch(e) {
-      app.toast.err(e.message);
-    }
+    } catch(e) { app.toast.err(e.message); }
     setBusy(false);
   };
   const toggle = async s => {
     const action = s.active !== false ? 'إيقاف' : 'تفعيل';
-    const r = await Swal.fire({
-      title: `${action} الحساب؟`,
-      text: `هل تريد ${action} حساب ${s.name}؟`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: `نعم، ${action}`,
-      cancelButtonText: 'إلغاء',
-      confirmButtonColor: s.active !== false ? '#ef4444' : '#D4AF37',
-      cancelButtonColor: '#64748b',
-      background: 'linear-gradient(180deg, #1c160c, #0f0c07)',
-      color: '#f7f0dd',
-      customClass: { popup: 'swal-custom-popup', title: 'swal-custom-title' }
-    });
+    const r = await Swal.fire({title: `${action} الحساب؟`,text: `هل تريد ${action} حساب ${s.name}؟`,icon: 'question',showCancelButton: true,confirmButtonText: `نعم، ${action}`,cancelButtonText: 'إلغاء',confirmButtonColor: s.active !== false ? '#ef4444' : '#D4AF37',cancelButtonColor: '#64748b',background: 'linear-gradient(180deg, #1c160c, #0f0c07)',color: '#f7f0dd',customClass: { popup: 'swal-custom-popup', title: 'swal-custom-title' }});
     if (!r.isConfirmed) return;
-    try {
-      await DB.updateUser(s.id, { active: !s.active });
-      await app.reload();
-      app.toast.warn(s.active !== false ? 'تم الإيقاف' : 'تم التفعيل');
-    } catch(e) { app.toast.err(e.message); }
+    try { await DB.updateUser(s.id, { active: !s.active }); await app.reload(); app.toast.warn(s.active !== false ? 'تم الإيقاف' : 'تم التفعيل'); } catch(e) { app.toast.err(e.message); }
   };
   const govCounts = {};
-  allStudents.forEach(u => {
-    if (u.governorate) {
-      govCounts[u.governorate] = (govCounts[u.governorate] || 0) + 1;
-    }
-  });
-
+  allStudents.forEach(u => { if (u.governorate) { govCounts[u.governorate] = (govCounts[u.governorate] || 0) + 1; } });
   return <>
     <div className="flex between center mb16 wrap g8">
       <div className="h2 grad">إدارة الطلاب</div>
       <div className="flex g8 wrap">
-        <input
-          className="input"
-          style={{maxWidth:200}}
-          placeholder="🔍 بحث..."
-          value={q}
-          onChange={e=>setQ(e.target.value)}
-        />
-        <select
-          className="input"
-          style={{maxWidth:220}}
-          value={govFilter}
-          onChange={e=>setGovFilter(e.target.value)}
-        >
+        <input className="input" style={{maxWidth:200}} placeholder="🔍 بحث..." value={q} onChange={e=>setQ(e.target.value)}/>
+        <select className="input" style={{maxWidth:220}} value={govFilter} onChange={e=>setGovFilter(e.target.value)}>
           <option value="all">كل المحافظات ({allStudents.length})</option>
-          {GOVERNORATES.map(gov => {
-            const count = govCounts[gov] || 0;
-            if (count === 0) return null;
-            return <option key={gov} value={gov}>{gov} ({count})</option>;
-          })}
+          {GOVERNORATES.map(gov => {const count = govCounts[gov] || 0;if (count === 0) return null;return <option key={gov} value={gov}>{gov} ({count})</option>;})}
           <option value="none">— بدون محافظة ({allStudents.filter(u=>!u.governorate).length}) —</option>
         </select>
       </div>
     </div>
-
     <div className="glass" style={{padding:14}}>
       <div className="sx">
         <table className="tbl">
-          <thead>
-            <tr>
-              <th>الطالب</th>
-              <th>الهاتف</th>
-              <th>📍 المحافظة</th>
-              <th>XP</th>
-              <th>💳 الاشتراك</th>
-              <th>الحالة</th>
-              <th>إجراءات</th>
-            </tr>
-          </thead>
+          <thead><tr><th>الطالب</th><th>الهاتف</th><th>📍 المحافظة</th><th>XP</th><th>💳 الاشتراك</th><th>الحالة</th><th>إجراءات</th></tr></thead>
           <tbody>
-            {list.map(s => (
-              <tr key={s.id}>
-                <td>
-                  <div className="flex center g8">
-                    <div className="avatar" style={{width:30,height:30,fontSize:14}}>{s.avatar||'👤'}</div>
-                    <span>{s.name}</span>
-                  </div>
-                </td>
-                <td className="sm muted" dir="ltr">{(s.country_code||'+20')}{s.phone||''}</td>
-                <td>
-                  {s.governorate
-                    ? <span className="pill pill-b" style={{fontSize:11}}>📍 {s.governorate}</span>
-                    : <span className="xs muted">—</span>
-                  }
-                </td>
-                <td><b style={{color:'var(--gold)'}}>{DB.fmt(s.xp||0)}</b></td>
-                <td>
-                  {s.subscription === 'vip' ? <span className="pill pill-v">💎 VIP</span>
-                   : s.subscription === 'paid' ? <span className="pill pill-g">💳 مدفوع</span>
-                   : <span className="pill pill-y">🆓 مجاني</span>}
-                </td>
-                <td>
-                  {s.active!==false
-                    ? <span className="pill pill-g">نشط</span>
-                    : <span className="pill pill-r">موقوف</span>
-                  }
-                </td>
-                <td>
-                  <div className="flex g6">
-                    <button className="btn btn-s btn-sm" onClick={()=>open(s)}>
-                      <Icon name="edit" size={13}/>
-                    </button>
-                    <button
-                      className={`btn btn-sm ${s.active!==false?'btn-dn':'btn-ok'}`}
-                      onClick={()=>toggle(s)}
-                    >
-                      {s.active!==false?'إيقاف':'تفعيل'}
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {list.map(s => (<tr key={s.id}>
+              <td><div className="flex center g8"><div className="avatar" style={{width:30,height:30,fontSize:14}}>{s.avatar||'👤'}</div><span>{s.name}</span></div></td>
+              <td className="sm muted" dir="ltr">{(s.country_code||'+20')}{s.phone||''}</td>
+              <td>{s.governorate ? <span className="pill pill-b" style={{fontSize:11}}>📍 {s.governorate}</span> : <span className="xs muted">—</span>}</td>
+              <td><b style={{color:'var(--gold)'}}>{DB.fmt(s.xp||0)}</b></td>
+              <td>{s.subscription === 'vip' ? <span className="pill pill-v">💎 VIP</span> : s.subscription === 'paid' ? <span className="pill pill-g">💳 مدفوع</span> : <span className="pill pill-y">🆓 مجاني</span>}</td>
+              <td>{s.active!==false ? <span className="pill pill-g">نشط</span> : <span className="pill pill-r">موقوف</span>}</td>
+              <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>open(s)}><Icon name="edit" size={13}/></button><button className={`btn btn-sm ${s.active!==false?'btn-dn':'btn-ok'}`} onClick={()=>toggle(s)}>{s.active!==false?'إيقاف':'تفعيل'}</button></div></td>
+            </tr>))}
           </tbody>
         </table>
-        {list.length === 0 && (
-          <div className="empty" style={{padding:'40px 20px',textAlign:'center'}}>
-            <div className="empty-ico">🔍</div>
-            <div className="h4 txt2 mb8">لا يوجد طلاب مطابقين للبحث</div>
-          </div>
-        )}
+        {list.length === 0 && (<div className="empty" style={{padding:'40px 20px',textAlign:'center'}}><div className="empty-ico">🔍</div><div className="h4 txt2 mb8">لا يوجد طلاب مطابقين للبحث</div></div>)}
       </div>
     </div>
-
     {editing && (
       <Modal title={`تعديل: ${form.name}`} onClose={()=>setEditing(null)} wide>
-        <div className="section-title" style={{marginTop:0}}>
-          <span className="ico">👤</span> المعلومات الأساسية
-        </div>
+        <div className="section-title" style={{marginTop:0}}><span className="ico">👤</span> المعلومات الأساسية</div>
         <div className="grid g2">
-          <Field label="الاسم">
-            <input className="input" value={form.name||''} onChange={e=>setForm({...form,name:e.target.value})}/>
-          </Field>
-          <Field label="الهاتف">
-            <input className="input" value={form.phone||''} onChange={e=>setForm({...form,phone:e.target.value})}/>
-          </Field>
-          <Field label="XP">
-            <input type="number" className="input" value={form.xp ?? ''} onChange={e=>setForm({...form,xp: e.target.value === '' ? '' : +e.target.value})}/>
-          </Field>
-          <Field label="الصف">
-            <select className="input" value={form.grade_id||''} onChange={e=>setForm({...form,grade_id:e.target.value})}>
-              <option value="">— اختر —</option>
-              {app.db.grades.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}
-            </select>
-          </Field>
-          <Field label="📍 المحافظة">
-            <select className="input" value={form.governorate||''} onChange={e=>setForm({...form,governorate:e.target.value})}>
-              <option value="">— بدون —</option>
-              {GOVERNORATES.map(gov=><option key={gov} value={gov}>{gov}</option>)}
-            </select>
-          </Field>
+          <Field label="الاسم"><input className="input" value={form.name||''} onChange={e=>setForm({...form,name:e.target.value})}/></Field>
+          <Field label="الهاتف"><input className="input" value={form.phone||''} onChange={e=>setForm({...form,phone:e.target.value})}/></Field>
+          <Field label="XP"><input type="number" className="input" value={form.xp ?? ''} onChange={e=>setForm({...form,xp: e.target.value === '' ? '' : +e.target.value})}/></Field>
+          <Field label="الصف"><select className="input" value={form.grade_id||''} onChange={e=>setForm({...form,grade_id:e.target.value})}><option value="">— اختر —</option>{app.db.grades.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></Field>
+          <Field label="📍 المحافظة"><select className="input" value={form.governorate||''} onChange={e=>setForm({...form,governorate:e.target.value})}><option value="">— بدون —</option>{GOVERNORATES.map(gov=><option key={gov} value={gov}>{gov}</option>)}</select></Field>
         </div>
-
-        <div className="section-title">
-          <span className="ico">💳</span> الاشتراك
-        </div>
+        <div className="section-title"><span className="ico">💳</span> الاشتراك</div>
         <div className="grid g2">
           <Field label="نوع الاشتراك">
-            <select
-              className="input"
-              value={form.subscription || 'free'}
-              onChange={e=>setForm({...form, subscription:e.target.value})}
-            >
+            <select className="input" value={form.subscription || 'free'} onChange={e=>setForm({...form, subscription:e.target.value})}>
               <option value="free">🆓 مجاني</option>
               <option value="paid">💳 مدفوع</option>
               <option value="vip">💎 VIP</option>
             </select>
           </Field>
-          <Field label="تاريخ انتهاء الاشتراك">
-            <input
-              type="date"
-              className="input"
-              value={form.subscription_until || ''}
-              onChange={e=>setForm({...form, subscription_until:e.target.value})}
-            />
-          </Field>
+          <Field label="تاريخ انتهاء الاشتراك"><input type="date" className="input" value={form.subscription_until || ''} onChange={e=>setForm({...form, subscription_until:e.target.value})}/></Field>
         </div>
-
-        <div className="section-title">
-          <span className="ico">🔐</span> صلاحيات الوصول
-        </div>
+        <div className="section-title"><span className="ico">🔐</span> صلاحيات الوصول</div>
         <Field label="المواد المسموح بها">
-          <label className="flex center g8 mb12" style={{cursor:'pointer'}}>
-            <input type="checkbox" checked={!!form.all_subjects} onChange={e=>setForm({...form,all_subjects:e.target.checked})}/>
-            <span className="sm">جميع المواد</span>
-          </label>
-          {!form.all_subjects && (
-            <div className="flex wrap g6">
-              {app.db.subjects.map(s => {
-                const on = (form.access_subjects||[]).includes(s.id);
-                return (
-                  <button
-                    key={s.id}
-                    type="button"
-                    onClick={()=>{
-                      const cur = form.access_subjects || [];
-                      setForm({...form,access_subjects: on ? cur.filter(x=>x!==s.id) : [...cur,s.id]});
-                    }}
-                    style={{
-                      padding:'8px 14px',borderRadius:30,
-                      background: on ? 'rgba(212,175,55,.20)' : 'rgba(212,175,55,.05)',
-                      border: `1px solid ${on?'var(--gold)':'var(--border)'}`,
-                      fontSize:12.5,fontWeight:700,
-                      color: on ? '#FFD700' : 'var(--txt)',cursor:'pointer'
-                    }}
-                  >
-                    {s.icon} {s.name}
-                  </button>
-                );
-              })}
-            </div>
-          )}
+          <label className="flex center g8 mb12" style={{cursor:'pointer'}}><input type="checkbox" checked={!!form.all_subjects} onChange={e=>setForm({...form,all_subjects:e.target.checked})}/><span className="sm">جميع المواد</span></label>
+          {!form.all_subjects && (<div className="flex wrap g6">
+            {app.db.subjects.map(s => {const on = (form.access_subjects||[]).includes(s.id);return (<button key={s.id} type="button" onClick={()=>{const cur = form.access_subjects || [];setForm({...form,access_subjects: on ? cur.filter(x=>x!==s.id) : [...cur,s.id]});}} style={{padding:'8px 14px',borderRadius:30,background: on ? 'rgba(212,175,55,.20)' : 'rgba(212,175,55,.05)',border: `1px solid ${on?'var(--gold)':'var(--border)'}`,fontSize:12.5,fontWeight:700,color: on ? '#FFD700' : 'var(--txt)',cursor:'pointer'}}>{s.icon} {s.name}</button>);})}
+          </div>)}
         </Field>
-
-        <div className="flex g8 mt16">
-          <button className="btn btn-p" onClick={save} disabled={busy}>
-            {busy?'جارٍ...':'💾 حفظ'}
-          </button>
-          <button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button>
-        </div>
+        <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
       </Modal>
     )}
   </>;
 }
-
 function NotificationsPage(){
   const app=useApp();
   const [form,setForm]=useState({title:'',body:'',target:'all'});
@@ -1648,20 +1065,11 @@ function NotificationsPage(){
   const send=async ()=>{
     if(!form.title||!form.body) return app.toast.warn('أدخل العنوان والنص');
     setBusy(true);
-    try{
-      await app.save('notifications',{...form,read_by:[]});
-      app.toast.ok('تم الإرسال');
-      app.playSound && app.playSound('success');
-      setForm({title:'',body:'',target:'all'});
-    }
+    try{await app.save('notifications',{...form,read_by:[]});app.toast.ok('تم الإرسال');app.playSound && app.playSound('success');setForm({title:'',body:'',target:'all'});}
     catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
-  const del=async id=>{
-    const r=await Swal.fire({title:'حذف الإشعار؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
-    if(!r.isConfirmed) return;
-    try{await app.remove('notifications',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}
-  };
+  const del=async id=>{const r=await Swal.fire({title:'حذف الإشعار؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed) return;try{await app.remove('notifications',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
   return <>
     <div className="h2 mb16 grad">الإشعارات</div>
     <div className="grid g2">
@@ -1669,10 +1077,7 @@ function NotificationsPage(){
         <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8,color:'var(--gold)'}}><Icon name="bell" size={16}/> إرسال إشعار</div>
         <Field label="العنوان"><input className="input" value={form.title} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
         <Field label="النص"><textarea className="input" value={form.body} onChange={e=>setForm({...form,body:e.target.value})}/></Field>
-        <Field label="المستهدفون"><select className="input" value={form.target} onChange={e=>setForm({...form,target:e.target.value})}>
-          <option value="all">كل الطلاب</option>
-          {app.db.users.filter(u=>u.role==='student').map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
-        </select></Field>
+        <Field label="المستهدفون"><select className="input" value={form.target} onChange={e=>setForm({...form,target:e.target.value})}><option value="all">كل الطلاب</option>{app.db.users.filter(u=>u.role==='student').map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field>
         <button className="btn btn-p btn-block" onClick={send} disabled={busy}>{busy?'جارٍ...':'📤 إرسال'}</button>
       </div>
       <div className="glass" style={{padding:20}}>
@@ -1681,10 +1086,7 @@ function NotificationsPage(){
           <div style={{flex:1}}>
             <div className="h4" style={{fontSize:14}}>{n.title}</div>
             <div className="xs muted">{n.body}</div>
-            <div className="flex between center mt6">
-              <div className="xs" style={{color:'var(--gold)'}}>← {n.target==='all'?'كل الطلاب':app.db.users.find(u=>u.id===n.target)?.name||'—'}</div>
-              <div className="xs muted">{DB.formatDate(n.created_at)}</div>
-            </div>
+            <div className="flex between center mt6"><div className="xs" style={{color:'var(--gold)'}}>← {n.target==='all'?'كل الطلاب':app.db.users.find(u=>u.id===n.target)?.name||'—'}</div><div className="xs muted">{DB.formatDate(n.created_at)}</div></div>
           </div>
           <button className="btn btn-dn btn-sm" onClick={()=>del(n.id)}><Icon name="trash" size={13}/></button>
         </div>)}
@@ -1692,20 +1094,10 @@ function NotificationsPage(){
     </div>
   </>;
 }
-
 function ReportsPage(){
   const [reports,setReports]=useState([]);
   const [loading,setLoading]=useState(true);
-  useEffect(()=>{
-    (async ()=>{
-      try{
-        const sb=await DB.getClient();
-        const {data}=await sb.from('reports').select('*').order('created_at',{ascending:false}).limit(50);
-        setReports(data||[]);
-      }catch(e){}
-      setLoading(false);
-    })();
-  },[]);
+  useEffect(()=>{(async ()=>{try{const sb=await DB.getClient();const {data}=await sb.from('reports').select('*').order('created_at',{ascending:false}).limit(50);setReports(data||[]);}catch(e){}setLoading(false);})();},[]);
   return <>
     <div className="h2 mb16 grad">📨 البلاغات المستلمة</div>
     <div className="glass" style={{padding:20}}>
@@ -1713,10 +1105,7 @@ function ReportsPage(){
         reports.length===0?<Empty icon="📨" title="لا توجد بلاغات"/>:
         <div className="flex col g8">
           {reports.map(r=><div key={r.id} className="glass-s" style={{padding:14}}>
-            <div className="flex between center mb8">
-              <div className="h4">{r.user_name}</div>
-              <span className="xs muted">{DB.formatDateTime(r.created_at)}</span>
-            </div>
+            <div className="flex between center mb8"><div className="h4">{r.user_name}</div><span className="xs muted">{DB.formatDateTime(r.created_at)}</span></div>
             <div className="xs muted mb8" dir="ltr">📱 {r.user_phone}</div>
             <div className="sm txt2" style={{background:'rgba(0,0,0,.25)',padding:10,borderRadius:10,borderInlineStart:'2px solid var(--gold)'}}>{r.message}</div>
           </div>)}
@@ -1725,26 +1114,57 @@ function ReportsPage(){
     </div>
   </>;
 }
-
 function SettingsPage(){
   const app=useApp();
+  const [loading,setLoading]=useState(true);
+  const [busy,setBusy]=useState(false);
+  const [form,setForm]=useState({about_title:'عن المنصة',about_text:'',social_links:[]});
+  useEffect(()=>{(async ()=>{try{const sb=await DB.getClient();const {data}=await sb.from('settings').select('*').eq('id','site').maybeSingle();if(data){setForm({about_title: data.about_title || 'عن المنصة',about_text: data.about_text || '',social_links: Array.isArray(data.social_links) ? data.social_links : []});}}catch(e){console.warn(e);}setLoading(false);})();},[]);
+  const save=async ()=>{setBusy(true);try{const sb=await DB.getClient();const {error}=await sb.from('settings').upsert({id:'site',about_title: form.about_title,about_text: form.about_text,social_links: form.social_links,updated_at: Date.now()});if(error) throw new Error(error.message);app.toast.ok('تم الحفظ');}catch(e){app.toast.err(e.message);}setBusy(false);};
+  const addLink=()=>{setForm(f=>({...f,social_links:[...f.social_links,{id:DB.uid('lnk_'),platform:'facebook',label:'',url:''}]}));};
+  const updLink=(id,patch)=>setForm(f=>({...f,social_links:f.social_links.map(l=>l.id===id?{...l,...patch}:l)}));
+  const delLink=(id)=>setForm(f=>({...f,social_links:f.social_links.filter(l=>l.id!==id)}));
+  const platforms=[{id:'facebook',label:'فيسبوك'},{id:'tiktok',label:'تيك توك'},{id:'instagram',label:'إنستجرام'},{id:'whatsapp_channel',label:'قناة واتساب'},{id:'whatsapp_group',label:'جروب واتساب'},{id:'custom',label:'رابط مخصص'}];
+  if(loading) return <div className="glass" style={{padding:40,textAlign:'center'}}><div className="spinner" style={{margin:'0 auto 14px'}}></div>جارٍ التحميل...</div>;
   return <>
-    <div className="h2 mb16 grad">الإعدادات</div>
-    <div className="glass" style={{padding:20,maxWidth:640}}>
-      <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8,color:'var(--gold)'}}><Icon name="settings" size={16}/> معلومات النظام</div>
-      <div className="glass-s mb12" style={{padding:12}}>
-        <div className="xs muted">Supabase URL</div>
-        <div className="xs" style={{wordBreak:'break-all'}}>https://szuvpbdwixezecxnykjn.supabase.co</div>
-      </div>
-      <div className="grid g3 mb16">
-        <Stat label="المستخدمون" value={app.db.users.length} icon="users"/>
-        <Stat label="سجل النشاط" value={app.db.activity.length} icon="activity"/>
-        <Stat label="الإشعارات" value={app.db.notifications.length} icon="bell"/>
-      </div>
+    <div className="h2 mb16 grad">⚙️ الإعدادات</div>
+    <div className="glass mb16" style={{padding:20}}>
+      <div className="section-title" style={{marginTop:0}}><span className="ico">📖</span> عن المنصة</div>
+      <Field label="عنوان القسم"><input className="input" value={form.about_title} onChange={e=>setForm({...form,about_title:e.target.value})}/></Field>
+      <Field label="نص عن المنصة"><textarea className="input" rows="6" value={form.about_text} onChange={e=>setForm({...form,about_text:e.target.value})} placeholder="اكتب نبذة عن المنصة..."/></Field>
     </div>
+    <div className="glass mb16" style={{padding:20}}>
+      <div className="flex between center mb16">
+        <div className="section-title" style={{margin:0,border:0,paddingBottom:0}}><span className="ico">🔗</span> لينكات السوشيال</div>
+        <button className="btn btn-p btn-sm" onClick={addLink}><Icon name="plus" size={13}/> إضافة لينك</button>
+      </div>
+      {form.social_links.length===0?(<div className="sm muted" style={{textAlign:'center',padding:20}}>لا توجد لينكات بعد — اضغط "إضافة لينك"</div>):(
+        <div className="flex col g12">
+          {form.social_links.map((link)=>(
+            <div key={link.id} className="glass-s" style={{padding:14,display:'flex',gap:12,alignItems:'center',flexWrap:'wrap'}}>
+              <div style={{flex:'1 1 160px',minWidth:140}}>
+                <label className="lbl">المنصة</label>
+                <select className="input" value={link.platform} onChange={e=>updLink(link.id,{platform:e.target.value})}>
+                  {platforms.map(p=><option key={p.id} value={p.id}>{p.label}</option>)}
+                </select>
+              </div>
+              <div style={{flex:'1 1 160px',minWidth:140}}>
+                <label className="lbl">الاسم (اختياري)</label>
+                <input className="input" value={link.label||''} onChange={e=>updLink(link.id,{label:e.target.value})} placeholder="مثال: صفحتنا الرسمية"/>
+              </div>
+              <div style={{flex:'2 1 260px',minWidth:200}}>
+                <label className="lbl">الرابط</label>
+                <input className="input" value={link.url||''} onChange={e=>updLink(link.id,{url:e.target.value})} placeholder="https://..." dir="ltr"/>
+              </div>
+              <button className="btn btn-dn btn-sm" onClick={()=>delLink(link.id)} style={{flexShrink:0}}><Icon name="trash" size={13}/></button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+    <button className="btn btn-p btn-block" onClick={save} disabled={busy}>{busy?'جارٍ الحفظ...':'💾 حفظ الإعدادات'}</button>
   </>;
 }
-
 function ErrorsAnalyticsPage(){
   const app=useApp();
   const [filterSubject,setFilterSubject]=useState('all');
@@ -1752,68 +1172,15 @@ function ErrorsAnalyticsPage(){
   const [sortBy,setSortBy]=useState('count');
   const [loading,setLoading]=useState(true);
   const [allErrors,setAllErrors]=useState([]);
-
-  useEffect(()=>{
-    (async ()=>{
-      try{
-        const sb=await DB.getClient();
-        const {data}=await sb.from('user_errors').select('*').limit(2000);
-        setAllErrors(data||[]);
-      }catch(e){
-        console.warn('فشل تحميل الأخطاء:',e);
-      }
-      setLoading(false);
-    })();
-  },[]);
-
+  useEffect(()=>{(async ()=>{try{const sb=await DB.getClient();const {data}=await sb.from('user_errors').select('*').limit(2000);setAllErrors(data||[]);}catch(e){console.warn('فشل تحميل الأخطاء:',e);}setLoading(false);})();},[]);
   const groupedByQuestion = useMemo(()=>{
     const map={};
-    allErrors.forEach(err=>{
-      const qid = err.question_id;
-      if(!qid) return;
-      if(!map[qid]){
-        map[qid] = {question_id: qid, total_errors: 0, unique_students: new Set(), last_error_at: 0};
-      }
-      map[qid].total_errors += (err.count || 1);
-      map[qid].unique_students.add(err.user_id);
-      if(err.at && err.at > map[qid].last_error_at){
-        map[qid].last_error_at = err.at;
-      }
-    });
-    return Object.values(map).map(item=>{
-      const q = app.question(item.question_id);
-      const lesson = q ? app.lesson(q.lesson_id) : null;
-      const unit = lesson ? app.unit(lesson.unit_id) : null;
-      const subject = unit ? app.subject(unit.subject_id) : null;
-      return {...item, question: q, lesson, unit, subject, studentsCount: item.unique_students.size};
-    }).filter(x=>x.question);
+    allErrors.forEach(err=>{const qid = err.question_id;if(!qid) return;if(!map[qid]){map[qid] = {question_id: qid, total_errors: 0, unique_students: new Set(), last_error_at: 0};}map[qid].total_errors += (err.count || 1);map[qid].unique_students.add(err.user_id);if(err.at && err.at > map[qid].last_error_at){map[qid].last_error_at = err.at;}});
+    return Object.values(map).map(item=>{const q = app.question(item.question_id);const lesson = q ? app.lesson(q.lesson_id) : null;const unit = lesson ? app.unit(lesson.unit_id) : null;const subject = unit ? app.subject(unit.subject_id) : null;return {...item, question: q, lesson, unit, subject, studentsCount: item.unique_students.size};}).filter(x=>x.question);
   },[allErrors, app.db.questions, app.db.lessons, app.db.units, app.db.subjects]);
-
-  const filtered = useMemo(()=>{
-    let list = [...groupedByQuestion];
-    if(filterSubject !== 'all') list = list.filter(x=>x.subject?.id === filterSubject);
-    if(filterLesson !== 'all') list = list.filter(x=>x.lesson?.id === filterLesson);
-    if(sortBy === 'count') list.sort((a,b)=>b.total_errors - a.total_errors);
-    else if(sortBy === 'students') list.sort((a,b)=>b.studentsCount - a.studentsCount);
-    else if(sortBy === 'recent') list.sort((a,b)=>b.last_error_at - a.last_error_at);
-    return list;
-  },[groupedByQuestion, filterSubject, filterLesson, sortBy]);
-
-  const stats = useMemo(()=>{
-    const totalErrors = groupedByQuestion.reduce((s,x)=>s+x.total_errors,0);
-    const totalQuestions = groupedByQuestion.length;
-    const worstQuestion = groupedByQuestion[0];
-    return {totalErrors, totalQuestions, worstQuestion};
-  },[groupedByQuestion]);
-
-  const availableLessons = useMemo(()=>{
-    if(filterSubject === 'all') return app.db.lessons;
-    return app.db.lessons.filter(l=>{
-      const u = app.unit(l.unit_id);
-      return u?.subject_id === filterSubject;
-    });
-  },[filterSubject, app.db.lessons]);
-
+  const filtered = useMemo(()=>{let list = [...groupedByQuestion];if(filterSubject !== 'all') list = list.filter(x=>x.subject?.id === filterSubject);if(filterLesson !== 'all') list = list.filter(x=>x.lesson?.id === filterLesson);if(sortBy === 'count') list.sort((a,b)=>b.total_errors - a.total_errors);else if(sortBy === 'students') list.sort((a,b)=>b.studentsCount - a.studentsCount);else if(sortBy === 'recent') list.sort((a,b)=>b.last_error_at - a.last_error_at);return list;},[groupedByQuestion, filterSubject, filterLesson, sortBy]);
+  const stats = useMemo(()=>{const totalErrors = groupedByQuestion.reduce((s,x)=>s+x.total_errors,0);const totalQuestions = groupedByQuestion.length;const worstQuestion = groupedByQuestion[0];return {totalErrors, totalQuestions, worstQuestion};},[groupedByQuestion]);
+  const availableLessons = useMemo(()=>{if(filterSubject === 'all') return app.db.lessons;return app.db.lessons.filter(l=>{const u = app.unit(l.unit_id);return u?.subject_id === filterSubject;});},[filterSubject, app.db.lessons]);
   const exportErrorsCSV=()=>{
     const headers=["السؤال","المادة","الدرس","عدد الأخطاء","عدد الطلاب"];
     const rows=filtered.map(x=>[x.question.text,x.subject?.name||'—',x.lesson?.title||'—',x.total_errors,x.studentsCount]);
@@ -1827,81 +1194,33 @@ function ErrorsAnalyticsPage(){
     URL.revokeObjectURL(url);
     app.toast.ok("تم تصدير الأخطاء");
   };
-
   return <>
     <div className="flex between center mb16 wrap g8">
-      <div>
-        <div className="h2 grad">📊 تحليل أخطاء الطلاب</div>
-        <div className="sm muted mt6">اكتشف الأسئلة الصعبة وحسّن المحتوى</div>
-      </div>
-      <div className="flex g8">
-        <button className="btn btn-s" onClick={exportErrorsCSV} disabled={filtered.length===0}>
-          <Icon name="file" size={14}/> تصدير CSV
-        </button>
-        <button className="btn btn-s" onClick={()=>window.location.reload()}>🔄 تحديث</button>
-      </div>
+      <div><div className="h2 grad">📊 تحليل أخطاء الطلاب</div><div className="sm muted mt6">اكتشف الأسئلة الصعبة وحسّن المحتوى</div></div>
+      <div className="flex g8"><button className="btn btn-s" onClick={exportErrorsCSV} disabled={filtered.length===0}><Icon name="file" size={14}/> تصدير CSV</button><button className="btn btn-s" onClick={()=>window.location.reload()}>🔄 تحديث</button></div>
     </div>
-
     <div className="grid g3 mb16">
       <Stat label="إجمالي الأخطاء" value={DB.fmt(stats.totalErrors)} icon="alert" color="#ef4444"/>
       <Stat label="أسئلة فيها أخطاء" value={DB.fmt(stats.totalQuestions)} icon="help" color="#f59e0b"/>
       <Stat label="أصعب سؤال" value={stats.worstQuestion ? `${stats.worstQuestion.total_errors} خطأ` : '—'} icon="trophy" color="#ef4444" sub={stats.worstQuestion?.question?.text?.slice(0,40)+'...'}/>
     </div>
-
     <div className="glass mb16" style={{padding:14}}>
       <div className="flex wrap g8 center">
-        <div style={{flex:'1 1 200px'}}>
-          <label className="lbl">المادة</label>
-          <select className="input" value={filterSubject} onChange={e=>{setFilterSubject(e.target.value);setFilterLesson('all');}}>
-            <option value="all">كل المواد</option>
-            {app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.icon} {s.name}</option>)}
-          </select>
-        </div>
-        <div style={{flex:'1 1 200px'}}>
-          <label className="lbl">الدرس</label>
-          <select className="input" value={filterLesson} onChange={e=>setFilterLesson(e.target.value)}>
-            <option value="all">كل الدروس</option>
-            {availableLessons.map(l=><option key={l.id} value={l.id}>{l.title}</option>)}
-          </select>
-        </div>
-        <div style={{flex:'1 1 200px'}}>
-          <label className="lbl">الترتيب حسب</label>
-          <select className="input" value={sortBy} onChange={e=>setSortBy(e.target.value)}>
-            <option value="count">عدد الأخطاء</option>
-            <option value="students">عدد الطلاب</option>
-            <option value="recent">الأحدث</option>
-          </select>
-        </div>
+        <div style={{flex:'1 1 200px'}}><label className="lbl">المادة</label><select className="input" value={filterSubject} onChange={e=>{setFilterSubject(e.target.value);setFilterLesson('all');}}><option value="all">كل المواد</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.icon} {s.name}</option>)}</select></div>
+        <div style={{flex:'1 1 200px'}}><label className="lbl">الدرس</label><select className="input" value={filterLesson} onChange={e=>setFilterLesson(e.target.value)}><option value="all">كل الدروس</option>{availableLessons.map(l=><option key={l.id} value={l.id}>{l.title}</option>)}</select></div>
+        <div style={{flex:'1 1 200px'}}><label className="lbl">الترتيب حسب</label><select className="input" value={sortBy} onChange={e=>setSortBy(e.target.value)}><option value="count">عدد الأخطاء</option><option value="students">عدد الطلاب</option><option value="recent">الأحدث</option></select></div>
       </div>
     </div>
-
     <div className="glass" style={{padding:14}}>
-      {loading ? (
-        <div style={{textAlign:'center',padding:40}}>
-          <div className="spinner" style={{margin:'0 auto 14px'}}></div>
-          جارٍ تحميل بيانات الأخطاء...
-        </div>
-      ) : filtered.length === 0 ? (
-        <Empty icon="✨" title="لا توجد أخطاء" desc="لم يسجل الطلاب أي أخطاء بعد"/>
-      ) : (
+      {loading ? (<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div>جارٍ تحميل بيانات الأخطاء...</div>) : filtered.length === 0 ? (<Empty icon="✨" title="لا توجد أخطاء" desc="لم يسجل الطلاب أي أخطاء بعد"/>) : (
         <div className="sx">
           <table className="tbl">
-            <thead>
-              <tr>
-                <th>#</th><th>السؤال</th><th>المادة</th><th>الدرس</th>
-                <th>عدد الأخطاء</th><th>عدد الطلاب</th><th>آخر خطأ</th>
-              </tr>
-            </thead>
+            <thead><tr><th>#</th><th>السؤال</th><th>المادة</th><th>الدرس</th><th>عدد الأخطاء</th><th>عدد الطلاب</th><th>آخر خطأ</th></tr></thead>
             <tbody>
               {filtered.map((x, idx) => (
                 <tr key={x.question_id}>
-                  <td>
-                    <span className={`rank ${idx===0?'rank-1':idx===1?'rank-2':idx===2?'rank-3':'rank-x'}`} style={{width:28,height:28,fontSize:12}}>{idx+1}</span>
-                  </td>
-                  <td style={{maxWidth:380}}>
-                    <div className="sm" style={{fontWeight:700}}>{x.question.text.slice(0,100)}{x.question.text.length>100?'...':''}</div>
-                    <div className="xs muted mt6">💡 {x.question.explanation?.slice(0,60)}...</div>
-                  </td>
+                  <td><span className={`rank ${idx===0?'rank-1':idx===1?'rank-2':idx===2?'rank-3':'rank-x'}`} style={{width:28,height:28,fontSize:12}}>{idx+1}</span></td>
+                  <td style={{maxWidth:380}}><div className="sm" style={{fontWeight:700}}>{x.question.text.slice(0,100)}{x.question.text.length>100?'...':''}</div><div className="xs muted mt6">💡 {x.question.explanation?.slice(0,60)}...</div></td>
                   <td>{x.subject ? <span className="pill pill-b" style={{fontSize:11}}>{x.subject.icon} {x.subject.name}</span> : <span className="xs muted">—</span>}</td>
                   <td className="sm">{x.lesson?.title || '—'}</td>
                   <td><span className="pill pill-r" style={{fontWeight:800}}>{x.total_errors}</span></td>
@@ -1916,83 +1235,38 @@ function ErrorsAnalyticsPage(){
     </div>
   </>;
 }
-
 function NotesPage(){
   const app=useApp();
   const [loading,setLoading]=useState(true);
   const [notes,setNotes]=useState([]);
   const [q,setQ]=useState('');
-
-  useEffect(()=>{
-    (async ()=>{
-      try{
-        const sb=await DB.getClient();
-        const {data}=await sb.from('notes').select('*').order('updated_at',{ascending:false}).limit(500);
-        setNotes(data||[]);
-      }catch(e){console.warn(e);}
-      setLoading(false);
-    })();
-  },[]);
-
-  const filtered = useMemo(()=>{
-    if(!q.trim()) return notes;
-    const lc = q.toLowerCase();
-    return notes.filter(n=>(n.text||'').toLowerCase().includes(lc));
-  },[notes,q]);
-
+  useEffect(()=>{(async ()=>{try{const sb=await DB.getClient();const {data}=await sb.from('notes').select('*').order('updated_at',{ascending:false}).limit(500);setNotes(data||[]);}catch(e){console.warn(e);}setLoading(false);})();},[]);
+  const filtered = useMemo(()=>{if(!q.trim()) return notes;const lc = q.toLowerCase();return notes.filter(n=>(n.text||'').toLowerCase().includes(lc));},[notes,q]);
   const del = async id => {
-    const r = await Swal.fire({
-      title:'حذف الملاحظة؟',icon:'warning',showCancelButton:true,
-      confirmButtonText:'نعم',cancelButtonText:'إلغاء',
-      confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
-      background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',
-      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
-    });
+    const r = await Swal.fire({title:'حذف الملاحظة؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
     if(!r.isConfirmed) return;
-    try{
-      const sb = await DB.getClient();
-      await sb.from('notes').delete().eq('id',id);
-      setNotes(x=>x.filter(n=>n.id!==id));
-      app.toast.warn('تم الحذف');
-    }catch(e){app.toast.err(e.message);}
+    try{const sb = await DB.getClient();await sb.from('notes').delete().eq('id',id);setNotes(x=>x.filter(n=>n.id!==id));app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}
   };
-
   return <>
     <div className="flex between center mb16 wrap g8">
-      <div>
-        <div className="h2 grad">📝 ملاحظات الطلاب</div>
-        <div className="sm muted mt6">آخر 500 ملاحظة مكتوبة بواسطة الطلاب</div>
-      </div>
+      <div><div className="h2 grad">📝 ملاحظات الطلاب</div><div className="sm muted mt6">آخر 500 ملاحظة مكتوبة بواسطة الطلاب</div></div>
       <input className="input" style={{maxWidth:280}} placeholder="🔍 ابحث في الملاحظات..." value={q} onChange={e=>setQ(e.target.value)}/>
     </div>
-
     <div className="glass" style={{padding:14}}>
-      {loading ? (
-        <div style={{textAlign:'center',padding:40}}>
-          <div className="spinner" style={{margin:'0 auto 14px'}}></div>
-          جارٍ التحميل...
-        </div>
-      ) : filtered.length === 0 ? (
-        <Empty icon="📝" title="لا توجد ملاحظات" desc="لم يكتب الطلاب أي ملاحظات بعد"/>
-      ) : (
+      {loading ? (<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div>جارٍ التحميل...</div>) : filtered.length === 0 ? (<Empty icon="📝" title="لا توجد ملاحظات" desc="لم يكتب الطلاب أي ملاحظات بعد"/>) : (
         <div className="flex col g8">
           {filtered.map(n => {
             const u = app.db.users.find(x=>x.id===n.user_id);
             const l = app.lesson(n.lesson_id);
             return <div key={n.id} className="glass-s" style={{padding:14}}>
               <div className="flex between center wrap g8 mb8">
-                <div className="flex center g8">
-                  <div className="avatar" style={{width:28,height:28,fontSize:12}}>{u?.avatar||'👤'}</div>
-                  <span className="sm" style={{fontWeight:700}}>{u?.name||'طالب محذوف'}</span>
-                </div>
+                <div className="flex center g8"><div className="avatar" style={{width:28,height:28,fontSize:12}}>{u?.avatar||'👤'}</div><span className="sm" style={{fontWeight:700}}>{u?.name||'طالب محذوف'}</span></div>
                 <span className="xs muted">{DB.formatDateTime(n.updated_at || n.created_at)}</span>
               </div>
               <div className="sm txt2 mb8" style={{background:'rgba(0,0,0,.20)',padding:10,borderRadius:10,borderInlineStart:'2px solid var(--gold)',whiteSpace:'pre-wrap'}}>{n.text || '—'}</div>
               <div className="flex between center wrap g6">
                 <span className="xs muted">📖 {l?.title || 'درس محذوف'}</span>
-                <button className="btn btn-dn btn-sm" onClick={()=>del(n.id)}>
-                  <Icon name="trash" size={12}/> حذف
-                </button>
+                <button className="btn btn-dn btn-sm" onClick={()=>del(n.id)}><Icon name="trash" size={12}/> حذف</button>
               </div>
             </div>;
           })}
@@ -2001,7 +1275,6 @@ function NotesPage(){
     </div>
   </>;
 }
-
 function CertificatesPage(){
   const app=useApp();
   const [loading,setLoading]=useState(true);
@@ -2009,20 +1282,8 @@ function CertificatesPage(){
   const [studentId,setStudentId]=useState('');
   const [subjectId,setSubjectId]=useState('');
   const [busy,setBusy]=useState(false);
-
-  useEffect(()=>{
-    (async ()=>{
-      try{
-        const sb=await DB.getClient();
-        const {data}=await sb.from('certificates').select('*').order('issued_at',{ascending:false}).limit(200);
-        setCerts(data||[]);
-      }catch(e){console.warn(e);}
-      setLoading(false);
-    })();
-  },[]);
-
+  useEffect(()=>{(async ()=>{try{const sb=await DB.getClient();const {data}=await sb.from('certificates').select('*').order('issued_at',{ascending:false}).limit(200);setCerts(data||[]);}catch(e){console.warn(e);}setLoading(false);})();},[]);
   const students = app.db.users.filter(u=>u.role==='student');
-
   const issueCertificate = async () => {
     if(!studentId || !subjectId) return app.toast.warn('اختر الطالب والمادة');
     setBusy(true);
@@ -2030,13 +1291,7 @@ function CertificatesPage(){
       const sb = await DB.getClient();
       const student = app.db.users.find(u=>u.id===studentId);
       const subject = app.db.subjects.find(s=>s.id===subjectId);
-      const cert = {
-        id: DB.uid('cert_'),
-        user_id: studentId,
-        subject_id: subjectId,
-        issued_at: Date.now(),
-        created_at: Date.now()
-      };
+      const cert = {id: DB.uid('cert_'),user_id: studentId,subject_id: subjectId,issued_at: Date.now(),created_at: Date.now()};
       const { error } = await sb.from('certificates').insert([cert]);
       if(error) throw new Error(error.message);
       const { data: fresh } = await sb.from('certificates').select('*').order('issued_at',{ascending:false}).limit(200);
@@ -2048,33 +1303,24 @@ function CertificatesPage(){
     }catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
-
   const generatePDF = async (student, subject, cert) => {
     const { jsPDF } = window.jspdf;
     let logoBase64 = '';
     try{
       const res = await fetch('/logo.png');
       const blob = await res.blob();
-      logoBase64 = await new Promise((resolve)=>{
-        const reader = new FileReader();
-        reader.onloadend = ()=>resolve(reader.result);
-        reader.readAsDataURL(blob);
-      });
+      logoBase64 = await new Promise((resolve)=>{const reader = new FileReader();reader.onloadend = ()=>resolve(reader.result);reader.readAsDataURL(blob);});
     }catch(e){ console.warn('Logo failed:', e); }
-
     const certNumber = cert.id.slice(-12).toUpperCase();
     const issueDate = new Date(cert.issued_at).toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
     const studentName = student?.name || 'الطالب';
     const subjectName = subject?.name || 'المادة';
     const subjectIcon = subject?.icon || '📚';
-
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#0a1428;display:flex;align-items:center;justify-content:center;overflow:hidden;';
-
     const container = document.createElement('div');
     container.setAttribute('dir', 'rtl');
     container.style.cssText = 'position:relative;width:1400px;height:990px;font-family:"Tajawal","Cairo",sans-serif;direction:rtl;background:radial-gradient(1400px 900px at 50% -10%,#1e2f5c 0%,#0d1a3a 45%,#050a18 100%);box-sizing:border-box;overflow:hidden;color:#f7f0dd;flex-shrink:0;';
-
     container.innerHTML = `
       <div style="position:absolute;top:0;left:0;width:500px;height:500px;background:radial-gradient(circle at 0% 0%,rgba(212,175,55,.14),transparent 55%);pointer-events:none;"></div>
       <div style="position:absolute;top:0;right:0;width:500px;height:500px;background:radial-gradient(circle at 100% 0%,rgba(212,175,55,.14),transparent 55%);pointer-events:none;"></div>
@@ -2137,18 +1383,12 @@ function CertificatesPage(){
         <div style="font-size:11px;color:#8a7d55;font-weight:700;font-family:'Tajawal',sans-serif;">التوقيع الرسمي</div>
       </div>
     `;
-
     overlay.appendChild(container);
     document.body.appendChild(overlay);
-
     try{
       await document.fonts.ready;
       await new Promise(r => setTimeout(r, 1200));
-      const canvas = await window.html2canvas(container, {
-        scale: 2, backgroundColor: '#050a18', useCORS: true, logging: false,
-        width: 1400, height: 990, windowWidth: 1400, windowHeight: 990,
-        scrollX: 0, scrollY: 0, x: 0, y: 0
-      });
+      const canvas = await window.html2canvas(container, {scale: 2,backgroundColor: '#050a18',useCORS: true,logging: false,width: 1400,height: 990,windowWidth: 1400,windowHeight: 990,scrollX: 0,scrollY: 0,x: 0,y: 0});
       const imgData = canvas.toDataURL('image/jpeg', 0.95);
       const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
       const pdfW = pdf.internal.pageSize.getWidth();
@@ -2163,101 +1403,42 @@ function CertificatesPage(){
       document.body.removeChild(overlay);
     }
   };
-
   const del = async id => {
-    const r = await Swal.fire({
-      title:'حذف الشهادة؟',icon:'warning',showCancelButton:true,
-      confirmButtonText:'نعم',cancelButtonText:'إلغاء',
-      confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
-      background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',
-      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
-    });
+    const r = await Swal.fire({title:'حذف الشهادة؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
     if(!r.isConfirmed) return;
-    try{
-      const sb = await DB.getClient();
-      await sb.from('certificates').delete().eq('id',id);
-      setCerts(x=>x.filter(c=>c.id!==id));
-      app.toast.warn('تم الحذف');
-    }catch(e){app.toast.err(e.message);}
+    try{const sb = await DB.getClient();await sb.from('certificates').delete().eq('id',id);setCerts(x=>x.filter(c=>c.id!==id));app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}
   };
-
   const downloadAgain = (cert) => {
     const student = app.db.users.find(u=>u.id===cert.user_id);
     const subject = app.db.subjects.find(s=>s.id===cert.subject_id);
     generatePDF(student, subject, cert);
   };
-
   return <>
     <div className="h2 mb16 grad">🏆 إدارة الشهادات</div>
-
     <div className="glass mb16" style={{padding:20}}>
-      <div className="section-title" style={{marginTop:0}}>
-        <span className="ico">➕</span> إصدار شهادة جديدة
-      </div>
+      <div className="section-title" style={{marginTop:0}}><span className="ico">➕</span> إصدار شهادة جديدة</div>
       <div className="grid g2">
-        <Field label="الطالب">
-          <select className="input" value={studentId} onChange={e=>setStudentId(e.target.value)}>
-            <option value="">— اختر الطالب —</option>
-            {students.map(s=><option key={s.id} value={s.id}>{s.name} — {(s.country_code||'+20')}{s.phone}</option>)}
-          </select>
-        </Field>
-        <Field label="المادة">
-          <select className="input" value={subjectId} onChange={e=>setSubjectId(e.target.value)}>
-            <option value="">— اختر المادة —</option>
-            {app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.icon} {s.name}</option>)}
-          </select>
-        </Field>
+        <Field label="الطالب"><select className="input" value={studentId} onChange={e=>setStudentId(e.target.value)}><option value="">— اختر الطالب —</option>{students.map(s=><option key={s.id} value={s.id}>{s.name} — {(s.country_code||'+20')}{s.phone}</option>)}</select></Field>
+        <Field label="المادة"><select className="input" value={subjectId} onChange={e=>setSubjectId(e.target.value)}><option value="">— اختر المادة —</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.icon} {s.name}</option>)}</select></Field>
       </div>
-      <button className="btn btn-p btn-block" onClick={issueCertificate} disabled={busy}>
-        {busy?'جارٍ الإصدار...':'🏆 إصدار الشهادة + تحميل PDF'}
-      </button>
+      <button className="btn btn-p btn-block" onClick={issueCertificate} disabled={busy}>{busy?'جارٍ الإصدار...':'🏆 إصدار الشهادة + تحميل PDF'}</button>
     </div>
-
     <div className="glass" style={{padding:14}}>
       <div className="h4 mb12" style={{color:'var(--gold)'}}>📜 الشهادات الصادرة ({certs.length})</div>
-      {loading ? (
-        <div style={{textAlign:'center',padding:40}}>
-          <div className="spinner" style={{margin:'0 auto 14px'}}></div>
-          جارٍ التحميل...
-        </div>
-      ) : certs.length === 0 ? (
-        <Empty icon="🏆" title="لا توجد شهادات" desc="ابدأ بإصدار شهادة من الأعلى"/>
-      ) : (
+      {loading ? (<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div>جارٍ التحميل...</div>) : certs.length === 0 ? (<Empty icon="🏆" title="لا توجد شهادات" desc="ابدأ بإصدار شهادة من الأعلى"/>) : (
         <div className="sx">
           <table className="tbl">
-            <thead>
-              <tr>
-                <th>الطالب</th>
-                <th>المادة</th>
-                <th>تاريخ الإصدار</th>
-                <th>رقم الشهادة</th>
-                <th>إجراءات</th>
-              </tr>
-            </thead>
+            <thead><tr><th>الطالب</th><th>المادة</th><th>تاريخ الإصدار</th><th>رقم الشهادة</th><th>إجراءات</th></tr></thead>
             <tbody>
               {certs.map(c => {
                 const u = app.db.users.find(x=>x.id===c.user_id);
                 const s = app.db.subjects.find(x=>x.id===c.subject_id);
                 return <tr key={c.id}>
-                  <td>
-                    <div className="flex center g8">
-                      <div className="avatar" style={{width:28,height:28,fontSize:12}}>{u?.avatar||'👤'}</div>
-                      <span>{u?.name || 'طالب محذوف'}</span>
-                    </div>
-                  </td>
+                  <td><div className="flex center g8"><div className="avatar" style={{width:28,height:28,fontSize:12}}>{u?.avatar||'👤'}</div><span>{u?.name || 'طالب محذوف'}</span></div></td>
                   <td><span className="pill pill-b">{s?.icon} {s?.name||'—'}</span></td>
                   <td className="xs muted">{DB.formatDateTime(c.issued_at)}</td>
                   <td className="xs" dir="ltr" style={{fontFamily:'monospace'}}>{c.id.slice(-12).toUpperCase()}</td>
-                  <td>
-                    <div className="flex g6">
-                      <button className="btn btn-s btn-sm" onClick={()=>downloadAgain(c)} title="تحميل PDF">
-                        <Icon name="download" size={13}/>
-                      </button>
-                      <button className="btn btn-dn btn-sm" onClick={()=>del(c.id)}>
-                        <Icon name="trash" size={13}/>
-                      </button>
-                    </div>
-                  </td>
+                  <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>downloadAgain(c)} title="تحميل PDF"><Icon name="download" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(c.id)}><Icon name="trash" size={13}/></button></div></td>
                 </tr>;
               })}
             </tbody>
@@ -2267,7 +1448,6 @@ function CertificatesPage(){
     </div>
   </>;
 }
-
 function CouponsPage(){
   const app=useApp();
   const [loading,setLoading]=useState(true);
@@ -2275,42 +1455,16 @@ function CouponsPage(){
   const [editing,setEditing]=useState(null);
   const [form,setForm]=useState({code:'',discount:'',max_uses:'',expires_at:'',active:true});
   const [busy,setBusy]=useState(false);
-
-  const loadCoupons = useCallback(async ()=>{
-    try{
-      const sb = await DB.getClient();
-      const { data } = await sb.from('coupons').select('*').order('created_at',{ascending:false});
-      setCoupons(data||[]);
-    }catch(e){console.warn(e);}
-    setLoading(false);
-  },[]);
-
+  const loadCoupons = useCallback(async ()=>{try{const sb = await DB.getClient();const { data } = await sb.from('coupons').select('*').order('created_at',{ascending:false});setCoupons(data||[]);}catch(e){console.warn(e);}setLoading(false);},[]);
   useEffect(()=>{ loadCoupons(); },[loadCoupons]);
-
-  const openNew = () => {
-    setForm({code:'',discount:'',max_uses:'',expires_at:'',active:true});
-    setEditing('new');
-  };
-  const openEdit = (c) => {
-    setForm({...c, expires_at: c.expires_at ? new Date(c.expires_at).toISOString().slice(0,10) : ''});
-    setEditing(c.id);
-  };
-
+  const openNew = () => { setForm({code:'',discount:'',max_uses:'',expires_at:'',active:true}); setEditing('new'); };
+  const openEdit = (c) => { setForm({...c, expires_at: c.expires_at ? new Date(c.expires_at).toISOString().slice(0,10) : ''}); setEditing(c.id); };
   const save = async () => {
     if(!form.code || form.code.length < 3) return app.toast.warn('الكود قصير');
     setBusy(true);
     try{
       const sb = await DB.getClient();
-      const record = {
-        id: editing==='new' ? DB.uid('cpn_') : editing,
-        code: form.code.toUpperCase().trim(),
-        discount: +form.discount || 10,
-        max_uses: +form.max_uses || 100,
-        used_count: form.used_count || 0,
-        expires_at: form.expires_at ? new Date(form.expires_at).getTime() : null,
-        active: form.active !== false,
-        created_at: form.created_at || Date.now()
-      };
+      const record = {id: editing==='new' ? DB.uid('cpn_') : editing,code: form.code.toUpperCase().trim(),discount: +form.discount || 10,max_uses: +form.max_uses || 100,used_count: form.used_count || 0,expires_at: form.expires_at ? new Date(form.expires_at).getTime() : null,active: form.active !== false,created_at: form.created_at || Date.now()};
       const { error } = await sb.from('coupons').upsert(record);
       if(error) throw new Error(error.message);
       await loadCoupons();
@@ -2319,103 +1473,36 @@ function CouponsPage(){
     }catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
-
   const del = async id => {
-    const r = await Swal.fire({
-      title:'حذف الكوبون؟',icon:'warning',showCancelButton:true,
-      confirmButtonText:'نعم',cancelButtonText:'إلغاء',
-      confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
-      background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',
-      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
-    });
+    const r = await Swal.fire({title:'حذف الكوبون؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
     if(!r.isConfirmed) return;
-    try{
-      const sb = await DB.getClient();
-      await sb.from('coupons').delete().eq('id',id);
-      setCoupons(x=>x.filter(c=>c.id!==id));
-      app.toast.warn('تم الحذف');
-    }catch(e){app.toast.err(e.message);}
+    try{const sb = await DB.getClient();await sb.from('coupons').delete().eq('id',id);setCoupons(x=>x.filter(c=>c.id!==id));app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}
   };
-
   const toggleActive = async (c) => {
-    try{
-      const sb = await DB.getClient();
-      await sb.from('coupons').update({active:!c.active}).eq('id',c.id);
-      setCoupons(x=>x.map(x=>x.id===c.id?{...x,active:!c.active}:x));
-      app.toast.ok(c.active?'تم التعطيل':'تم التفعيل');
-    }catch(e){app.toast.err(e.message);}
+    try{const sb = await DB.getClient();await sb.from('coupons').update({active:!c.active}).eq('id',c.id);setCoupons(x=>x.map(x=>x.id===c.id?{...x,active:!c.active}:x));app.toast.ok(c.active?'تم التعطيل':'تم التفعيل');}catch(e){app.toast.err(e.message);}
   };
-
-  const copyCode = (code) => {
-    try{
-      navigator.clipboard.writeText(code);
-      app.toast.ok('تم نسخ الكود');
-    }catch(e){app.toast.err('فشل النسخ');}
-  };
-
+  const copyCode = (code) => { try{navigator.clipboard.writeText(code);app.toast.ok('تم نسخ الكود');}catch(e){app.toast.err('فشل النسخ');} };
   return <>
     <div className="flex between center mb16 wrap g8">
-      <div>
-        <div className="h2 grad">🎟️ كوبونات الخصم</div>
-        <div className="sm muted mt6">أكواد خصم للطلاب عند التسجيل</div>
-      </div>
-      <button className="btn btn-p" onClick={openNew}>
-        <Icon name="plus" size={15}/> كوبون جديد
-      </button>
+      <div><div className="h2 grad">🎟️ كوبونات الخصم</div><div className="sm muted mt6">أكواد خصم للطلاب عند التسجيل</div></div>
+      <button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> كوبون جديد</button>
     </div>
-
     <div className="glass" style={{padding:14}}>
-      {loading ? (
-        <div style={{textAlign:'center',padding:40}}>
-          <div className="spinner" style={{margin:'0 auto 14px'}}></div>
-          جارٍ التحميل...
-        </div>
-      ) : coupons.length === 0 ? (
-        <Empty icon="🎟️" title="لا توجد كوبونات" desc="ابدأ بإضافة كوبون جديد"/>
-      ) : (
+      {loading ? (<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div>جارٍ التحميل...</div>) : coupons.length === 0 ? (<Empty icon="🎟️" title="لا توجد كوبونات" desc="ابدأ بإضافة كوبون جديد"/>) : (
         <div className="sx">
           <table className="tbl">
-            <thead>
-              <tr>
-                <th>الكود</th><th>الخصم</th><th>الاستخدامات</th>
-                <th>الانتهاء</th><th>الحالة</th><th>إجراءات</th>
-              </tr>
-            </thead>
+            <thead><tr><th>الكود</th><th>الخصم</th><th>الاستخدامات</th><th>الانتهاء</th><th>الحالة</th><th>إجراءات</th></tr></thead>
             <tbody>
               {coupons.map(c => {
                 const expired = c.expires_at && c.expires_at < Date.now();
                 const usedUp = (c.used_count||0) >= (c.max_uses||100);
                 return <tr key={c.id}>
-                  <td>
-                    <div className="flex center g6">
-                      <code style={{background:'rgba(212,175,55,.15)',padding:'4px 10px',borderRadius:8,fontWeight:900,letterSpacing:1,color:'#FFD700',fontSize:13}}>{c.code}</code>
-                      <button className="icon-btn" style={{width:28,height:28}} onClick={()=>copyCode(c.code)}>📋</button>
-                    </div>
-                  </td>
+                  <td><div className="flex center g6"><code style={{background:'rgba(212,175,55,.15)',padding:'4px 10px',borderRadius:8,fontWeight:900,letterSpacing:1,color:'#FFD700',fontSize:13}}>{c.code}</code><button className="icon-btn" style={{width:28,height:28}} onClick={()=>copyCode(c.code)}>📋</button></div></td>
                   <td><span className="pill pill-g">{c.discount}%</span></td>
-                  <td>
-                    <span className="sm">{c.used_count||0} / {c.max_uses||100}</span>
-                    <div className="bar mt6" style={{height:5}}>
-                      <div className="bar-f" style={{width:`${Math.min(100,((c.used_count||0)/(c.max_uses||100))*100)}%`}}/>
-                    </div>
-                  </td>
-                  <td className="xs muted">
-                    {c.expires_at ? DB.formatDate(c.expires_at) : 'بلا نهاية'}
-                    {expired && <div className="pill pill-r mt6" style={{fontSize:10}}>منتهي</div>}
-                  </td>
-                  <td>
-                    {!c.active ? <span className="pill pill-y">معطّل</span>
-                     : usedUp ? <span className="pill pill-a">استُنفد</span>
-                     : expired ? <span className="pill pill-r">منتهي</span>
-                     : <span className="pill pill-g">نشط</span>}
-                  </td>
-                  <td>
-                    <div className="flex g6">
-                      <button className="btn btn-s btn-sm" onClick={()=>toggleActive(c)}>{c.active?'🚫':'✓'}</button>
-                      <button className="btn btn-s btn-sm" onClick={()=>openEdit(c)}><Icon name="edit" size={13}/></button>
-                      <button className="btn btn-dn btn-sm" onClick={()=>del(c.id)}><Icon name="trash" size={13}/></button>
-                    </div>
-                  </td>
+                  <td><span className="sm">{c.used_count||0} / {c.max_uses||100}</span><div className="bar mt6" style={{height:5}}><div className="bar-f" style={{width:`${Math.min(100,((c.used_count||0)/(c.max_uses||100))*100)}%`}}/></div></td>
+                  <td className="xs muted">{c.expires_at ? DB.formatDate(c.expires_at) : 'بلا نهاية'}{expired && <div className="pill pill-r mt6" style={{fontSize:10}}>منتهي</div>}</td>
+                  <td>{!c.active ? <span className="pill pill-y">معطّل</span> : usedUp ? <span className="pill pill-a">استُنفد</span> : expired ? <span className="pill pill-r">منتهي</span> : <span className="pill pill-g">نشط</span>}</td>
+                  <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>toggleActive(c)}>{c.active?'🚫':'✓'}</button><button className="btn btn-s btn-sm" onClick={()=>openEdit(c)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(c.id)}><Icon name="trash" size={13}/></button></div></td>
                 </tr>;
               })}
             </tbody>
@@ -2423,194 +1510,72 @@ function CouponsPage(){
         </div>
       )}
     </div>
-
     {editing!==null && <Modal title={editing==='new'?'كوبون جديد':'تعديل الكوبون'} onClose={()=>setEditing(null)}>
-      <Field label="الكود">
-        <input className="input" value={form.code} onChange={e=>setForm({...form,code:e.target.value.toUpperCase()})} placeholder="SUMMER2025" style={{letterSpacing:2,fontWeight:900,textAlign:'center'}}/>
-      </Field>
+      <Field label="الكود"><input className="input" value={form.code} onChange={e=>setForm({...form,code:e.target.value.toUpperCase()})} placeholder="SUMMER2025" style={{letterSpacing:2,fontWeight:900,textAlign:'center'}}/></Field>
       <div className="grid g2">
-        <Field label="نسبة الخصم %">
-          <input type="number" className="input" value={form.discount ?? ''} onChange={e=>setForm({...form,discount: e.target.value === '' ? '' : +e.target.value})} min="1" max="100"/>
-        </Field>
-        <Field label="الحد الأقصى للاستخدام">
-          <input type="number" className="input" value={form.max_uses ?? ''} onChange={e=>setForm({...form,max_uses: e.target.value === '' ? '' : +e.target.value})}/>
-        </Field>
+        <Field label="نسبة الخصم %"><input type="number" className="input" value={form.discount ?? ''} onChange={e=>setForm({...form,discount: e.target.value === '' ? '' : +e.target.value})} min="1" max="100"/></Field>
+        <Field label="الحد الأقصى للاستخدام"><input type="number" className="input" value={form.max_uses ?? ''} onChange={e=>setForm({...form,max_uses: e.target.value === '' ? '' : +e.target.value})}/></Field>
       </div>
-      <label className="flex center g8 mt12" style={{cursor:'pointer'}}>
-        <input type="checkbox" checked={form.active!==false} onChange={e=>setForm({...form,active:e.target.checked})}/>
-        <span className="sm">مفعّل</span>
-      </label>
-      <Field label="تاريخ الانتهاء (اختياري)">
-        <input type="date" className="input" value={form.expires_at||''} onChange={e=>setForm({...form,expires_at:e.target.value})}/>
-      </Field>
-      <div className="flex g8 mt16">
-        <button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button>
-        <button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button>
-      </div>
+      <label className="flex center g8 mt12" style={{cursor:'pointer'}}><input type="checkbox" checked={form.active!==false} onChange={e=>setForm({...form,active:e.target.checked})}/><span className="sm">مفعّل</span></label>
+      <Field label="تاريخ الانتهاء (اختياري)"><input type="date" className="input" value={form.expires_at||''} onChange={e=>setForm({...form,expires_at:e.target.value})}/></Field>
+      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
     </Modal>}
   </>;
 }
-
 function ReferralsPage(){
   const app=useApp();
   const [loading,setLoading]=useState(true);
   const [referrals,setReferrals]=useState([]);
-
-  const loadReferrals = useCallback(async ()=>{
-    try{
-      const sb = await DB.getClient();
-      const { data } = await sb.from('referrals').select('*').order('created_at',{ascending:false}).limit(500);
-      setReferrals(data||[]);
-    }catch(e){console.warn(e);}
-    setLoading(false);
-  },[]);
-
+  const loadReferrals = useCallback(async ()=>{try{const sb = await DB.getClient();const { data } = await sb.from('referrals').select('*').order('created_at',{ascending:false}).limit(500);setReferrals(data||[]);}catch(e){console.warn(e);}setLoading(false);},[]);
   useEffect(()=>{ loadReferrals(); },[loadReferrals]);
-
-  const stats = useMemo(()=>{
-    const total = referrals.length;
-    const rewarded = referrals.filter(r=>r.rewarded).length;
-    const totalXp = referrals.reduce((s,r)=>s+(r.reward_xp||50),0);
-    return { total, rewarded, totalXp };
-  },[referrals]);
-
-  const topReferrers = useMemo(()=>{
-    const map = {};
-    referrals.forEach(r=>{
-      const id = r.referrer_id;
-      if(!id) return;
-      if(!map[id]) map[id] = { user_id:id, count:0, rewarded:0, total_xp:0 };
-      map[id].count++;
-      if(r.rewarded) map[id].rewarded++;
-      map[id].total_xp += (r.reward_xp||50);
-    });
-    return Object.values(map).sort((a,b)=>b.count - a.count).slice(0,10);
-  },[referrals]);
-
+  const stats = useMemo(()=>{const total = referrals.length;const rewarded = referrals.filter(r=>r.rewarded).length;const totalXp = referrals.reduce((s,r)=>s+(r.reward_xp||50),0);return { total, rewarded, totalXp };},[referrals]);
+  const topReferrers = useMemo(()=>{const map = {};referrals.forEach(r=>{const id = r.referrer_id;if(!id) return;if(!map[id]) map[id] = { user_id:id, count:0, rewarded:0, total_xp:0 };map[id].count++;if(r.rewarded) map[id].rewarded++;map[id].total_xp += (r.reward_xp||50);});return Object.values(map).sort((a,b)=>b.count - a.count).slice(0,10);},[referrals]);
   const del = async id => {
-    const r = await Swal.fire({
-      title:'حذف الإحالة؟',icon:'warning',showCancelButton:true,
-      confirmButtonText:'نعم',cancelButtonText:'إلغاء',
-      confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
-      background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',
-      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
-    });
+    const r = await Swal.fire({title:'حذف الإحالة؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
     if(!r.isConfirmed) return;
-    try{
-      const sb = await DB.getClient();
-      await sb.from('referrals').delete().eq('id',id);
-      setReferrals(x=>x.filter(x=>x.id!==id));
-      app.toast.warn('تم الحذف');
-    }catch(e){app.toast.err(e.message);}
+    try{const sb = await DB.getClient();await sb.from('referrals').delete().eq('id',id);setReferrals(x=>x.filter(x=>x.id!==id));app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}
   };
-
   const markRewarded = async (r) => {
-    try{
-      const sb = await DB.getClient();
-      await sb.from('referrals').update({rewarded:true}).eq('id',r.id);
-      setReferrals(x=>x.map(x=>x.id===r.id?{...x,rewarded:true}:x));
-      const referrer = app.db.users.find(u=>u.id===r.referrer_id);
-      const referred = app.db.users.find(u=>u.id===r.referred_id);
-      const xp = r.reward_xp || 50;
-      if(referrer) await DB.updateUser(referrer.id, { xp: (referrer.xp||0) + xp });
-      if(referred) await DB.updateUser(referred.id, { xp: (referred.xp||0) + xp });
-      await app.reload();
-      app.toast.ok(`✅ تم توزيع ${xp} XP على الطالبين`);
-    }catch(e){app.toast.err(e.message);}
+    try{const sb = await DB.getClient();await sb.from('referrals').update({rewarded:true}).eq('id',r.id);setReferrals(x=>x.map(x=>x.id===r.id?{...x,rewarded:true}:x));const referrer = app.db.users.find(u=>u.id===r.referrer_id);const referred = app.db.users.find(u=>u.id===r.referred_id);const xp = r.reward_xp || 50;if(referrer) await DB.updateUser(referrer.id, { xp: (referrer.xp||0) + xp });if(referred) await DB.updateUser(referred.id, { xp: (referred.xp||0) + xp });await app.reload();app.toast.ok(`✅ تم توزيع ${xp} XP على الطالبين`);}catch(e){app.toast.err(e.message);}
   };
-
   return <>
     <div className="flex between center mb16 wrap g8">
-      <div>
-        <div className="h2 grad">🎁 نظام الإحالة</div>
-        <div className="sm muted mt6">إحصائيات دعوة الأصدقاء</div>
-      </div>
+      <div><div className="h2 grad">🎁 نظام الإحالة</div><div className="sm muted mt6">إحصائيات دعوة الأصدقاء</div></div>
       <button className="btn btn-s" onClick={loadReferrals}>🔄 تحديث</button>
     </div>
-
     <div className="grid g3 mb16">
       <Stat label="إجمالي الإحالات" value={DB.fmt(stats.total)} icon="share" color="#FFD700"/>
       <Stat label="إحالات مكافأة" value={DB.fmt(stats.rewarded)} icon="check" color="#22c55e"/>
       <Stat label="إجمالي XP الموزع" value={DB.fmt(stats.totalXp)} icon="trend" color="#B8860B"/>
     </div>
-
     <div className="glass mb16" style={{padding:18}}>
-      <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8,color:'var(--gold)'}}>
-        <Icon name="trophy" size={16}/> أفضل 10 مُحيلين
-      </div>
-      {topReferrers.length === 0 ? (
-        <div className="sm muted" style={{textAlign:'center',padding:20}}>لا يوجد مُحيلين بعد</div>
-      ) : (
-        topReferrers.map((r,i)=>{
-          const u = app.db.users.find(x=>x.id===r.user_id);
-          return <div key={r.user_id} className="flex center g12" style={{padding:'9px 0',borderBottom:'1px solid rgba(212,175,55,.08)'}}>
-            <div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div>
-            <div className="avatar" style={{width:34,height:34,fontSize:14}}>{u?.avatar||'👤'}</div>
-            <div style={{flex:1}}>
-              <div className="sm" style={{fontWeight:700}}>{u?.name || 'مستخدم محذوف'}</div>
-              <div className="xs muted">📍 {u?.governorate || '—'}</div>
-            </div>
-            <div className="flex g6">
-              <span className="pill pill-b">{r.count} إحالة</span>
-              <span className="pill pill-g">{r.rewarded} مكافأة</span>
-            </div>
-          </div>;
-        })
+      <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8,color:'var(--gold)'}}><Icon name="trophy" size={16}/> أفضل 10 مُحيلين</div>
+      {topReferrers.length === 0 ? (<div className="sm muted" style={{textAlign:'center',padding:20}}>لا يوجد مُحيلين بعد</div>) : (
+        topReferrers.map((r,i)=>{const u = app.db.users.find(x=>x.id===r.user_id);return <div key={r.user_id} className="flex center g12" style={{padding:'9px 0',borderBottom:'1px solid rgba(212,175,55,.08)'}}>
+          <div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div>
+          <div className="avatar" style={{width:34,height:34,fontSize:14}}>{u?.avatar||'👤'}</div>
+          <div style={{flex:1}}><div className="sm" style={{fontWeight:700}}>{u?.name || 'مستخدم محذوف'}</div><div className="xs muted">📍 {u?.governorate || '—'}</div></div>
+          <div className="flex g6"><span className="pill pill-b">{r.count} إحالة</span><span className="pill pill-g">{r.rewarded} مكافأة</span></div>
+        </div>;})
       )}
     </div>
-
     <div className="glass" style={{padding:14}}>
       <div className="h4 mb12" style={{color:'var(--gold)'}}>📋 سجل الإحالات</div>
-      {loading ? (
-        <div style={{textAlign:'center',padding:40}}>
-          <div className="spinner" style={{margin:'0 auto 14px'}}></div>
-          جارٍ التحميل...
-        </div>
-      ) : referrals.length === 0 ? (
-        <Empty icon="🎁" title="لا توجد إحالات" desc="لم يقم أي طالب بدعوة أصدقاء بعد"/>
-      ) : (
+      {loading ? (<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div>جارٍ التحميل...</div>) : referrals.length === 0 ? (<Empty icon="🎁" title="لا توجد إحالات" desc="لم يقم أي طالب بدعوة أصدقاء بعد"/>) : (
         <div className="sx">
           <table className="tbl">
-            <thead>
-              <tr>
-                <th>المُحيل</th><th>→</th><th>المدعو</th>
-                <th>التاريخ</th><th>المكافأة</th><th>إجراءات</th>
-              </tr>
-            </thead>
+            <thead><tr><th>المُحيل</th><th>→</th><th>المدعو</th><th>التاريخ</th><th>المكافأة</th><th>إجراءات</th></tr></thead>
             <tbody>
               {referrals.map(r => {
                 const referrer = app.db.users.find(x=>x.id===r.referrer_id);
                 const referred = app.db.users.find(x=>x.id===r.referred_id);
                 return <tr key={r.id}>
-                  <td>
-                    <div className="flex center g8">
-                      <div className="avatar" style={{width:28,height:28,fontSize:12}}>{referrer?.avatar||'👤'}</div>
-                      <span className="sm">{referrer?.name || 'محذوف'}</span>
-                    </div>
-                  </td>
+                  <td><div className="flex center g8"><div className="avatar" style={{width:28,height:28,fontSize:12}}>{referrer?.avatar||'👤'}</div><span className="sm">{referrer?.name || 'محذوف'}</span></div></td>
                   <td className="muted">→</td>
-                  <td>
-                    <div className="flex center g8">
-                      <div className="avatar" style={{width:28,height:28,fontSize:12}}>{referred?.avatar||'👤'}</div>
-                      <span className="sm">{referred?.name || 'محذوف'}</span>
-                    </div>
-                  </td>
+                  <td><div className="flex center g8"><div className="avatar" style={{width:28,height:28,fontSize:12}}>{referred?.avatar||'👤'}</div><span className="sm">{referred?.name || 'محذوف'}</span></div></td>
                   <td className="xs muted">{DB.formatDateTime(r.created_at)}</td>
-                  <td>
-                    {r.rewarded
-                      ? <span className="pill pill-g">✓ +{r.reward_xp||50} XP</span>
-                      : <span className="pill pill-a">⏳ بانتظار</span>}
-                  </td>
-                  <td>
-                    <div className="flex g6">
-                      {!r.rewarded && (
-                        <button className="btn btn-ok btn-sm" onClick={()=>markRewarded(r)}>✓ منح</button>
-                      )}
-                      <button className="btn btn-dn btn-sm" onClick={()=>del(r.id)}>
-                        <Icon name="trash" size={13}/>
-                      </button>
-                    </div>
-                  </td>
+                  <td>{r.rewarded ? <span className="pill pill-g">✓ +{r.reward_xp||50} XP</span> : <span className="pill pill-a">⏳ بانتظار</span>}</td>
+                  <td><div className="flex g6">{!r.rewarded && (<button className="btn btn-ok btn-sm" onClick={()=>markRewarded(r)}>✓ منح</button>)}<button className="btn btn-dn btn-sm" onClick={()=>del(r.id)}><Icon name="trash" size={13}/></button></div></td>
                 </tr>;
               })}
             </tbody>
@@ -2620,7 +1585,6 @@ function ReferralsPage(){
     </div>
   </>;
 }
-
 function PollsPage(){
   const app=useApp();
   const [loading,setLoading]=useState(true);
@@ -2630,62 +1594,24 @@ function PollsPage(){
   const [form,setForm]=useState({question:'',options:['',''],active:true,allow_multiple:false,ends_at:''});
   const [busy,setBusy]=useState(false);
   const [expandedPoll,setExpandedPoll]=useState(null);
-
   const loadData = useCallback(async ()=>{
-    try{
-      await DB.cleanupExpiredPolls();
-      const sb = await DB.getClient();
-      const [pRes, vRes] = await Promise.all([
-        sb.from('polls').select('*').order('created_at',{ascending:false}),
-        sb.from('poll_votes').select('*')
-      ]);
-      setPolls(pRes.data || []);
-      setVotes(vRes.data || []);
-    }catch(e){console.warn(e);}
-    setLoading(false);
+    try{await DB.cleanupExpiredPolls();const sb = await DB.getClient();const [pRes, vRes] = await Promise.all([sb.from('polls').select('*').order('created_at',{ascending:false}),sb.from('poll_votes').select('*')]);setPolls(pRes.data || []);setVotes(vRes.data || []);}catch(e){console.warn(e);}setLoading(false);
   },[]);
-
   useEffect(()=>{ loadData(); },[loadData]);
-
-  const openNew = () => {
-    setForm({question:'',options:['',''],active:true,allow_multiple:false,ends_at:''});
-    setEditing('new');
-  };
-
-  const openEdit = (p) => {
-    setForm({
-      ...p,
-      options: Array.isArray(p.options) ? [...p.options] : ['',''],
-      ends_at: p.ends_at ? new Date(p.ends_at).toISOString().slice(0,10) : ''
-    });
-    setEditing(p.id);
-  };
-
+  const openNew = () => { setForm({question:'',options:['',''],active:true,allow_multiple:false,ends_at:''}); setEditing('new'); };
+  const openEdit = (p) => { setForm({...p,options: Array.isArray(p.options) ? [...p.options] : ['',''],ends_at: p.ends_at ? new Date(p.ends_at).toISOString().slice(0,10) : ''}); setEditing(p.id); };
   const addOption = () => setForm(f => ({...f, options:[...f.options, '']}));
-  const removeOption = (idx) => {
-    if(form.options.length <= 2) return app.toast.warn('لازم خيارين على الأقل');
-    setForm(f => ({...f, options:f.options.filter((_,i)=>i!==idx)}));
-  };
+  const removeOption = (idx) => { if(form.options.length <= 2) return app.toast.warn('لازم خيارين على الأقل');setForm(f => ({...f, options:f.options.filter((_,i)=>i!==idx)})); };
   const updateOption = (idx, val) => setForm(f => ({...f, options:f.options.map((o,i)=>i===idx?val:o)}));
-
   const save = async () => {
     const q = (form.question||'').trim();
     const opts = (form.options||[]).map(o=>o.trim()).filter(Boolean);
     if(!q || q.length < 3) return app.toast.warn('السؤال قصير');
     if(opts.length < 2) return app.toast.warn('لازم خيارين على الأقل');
-
     setBusy(true);
     try{
       const sb = await DB.getClient();
-      const record = {
-        id: editing === 'new' ? DB.uid('poll_') : editing,
-        question: q,
-        options: opts,
-        active: form.active !== false,
-        allow_multiple: !!form.allow_multiple,
-        ends_at: form.ends_at ? new Date(form.ends_at).getTime() : null,
-        created_at: form.created_at || Date.now()
-      };
+      const record = {id: editing === 'new' ? DB.uid('poll_') : editing,question: q,options: opts,active: form.active !== false,allow_multiple: !!form.allow_multiple,ends_at: form.ends_at ? new Date(form.ends_at).getTime() : null,created_at: form.created_at || Date.now()};
       const { error } = await sb.from('polls').upsert(record);
       if(error) throw new Error(error.message);
       await loadData();
@@ -2694,83 +1620,25 @@ function PollsPage(){
     }catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
-
   const del = async (id) => {
-    const r = await Swal.fire({
-      title:'حذف الاستطلاع؟',text:'سيتم حذف كل الأصوات المرتبطة به',
-      icon:'warning',showCancelButton:true,
-      confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',
-      confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
-      background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',
-      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
-    });
+    const r = await Swal.fire({title:'حذف الاستطلاع؟',text:'سيتم حذف كل الأصوات المرتبطة به',icon:'warning',showCancelButton:true,confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
     if(!r.isConfirmed) return;
-    try{
-      const sb = await DB.getClient();
-      await sb.from('poll_votes').delete().eq('poll_id', id);
-      await sb.from('polls').delete().eq('id', id);
-      await loadData();
-      app.toast.warn('تم الحذف');
-    }catch(e){app.toast.err(e.message);}
+    try{const sb = await DB.getClient();await sb.from('poll_votes').delete().eq('poll_id', id);await sb.from('polls').delete().eq('id', id);await loadData();app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}
   };
-
   const toggleActive = async (p) => {
-    try{
-      const sb = await DB.getClient();
-      await sb.from('polls').update({active: !p.active}).eq('id', p.id);
-      await loadData();
-      app.toast.ok(p.active?'تم الإيقاف':'تم التفعيل');
-    }catch(e){app.toast.err(e.message);}
+    try{const sb = await DB.getClient();await sb.from('polls').update({active: !p.active}).eq('id', p.id);await loadData();app.toast.ok(p.active?'تم الإيقاف':'تم التفعيل');}catch(e){app.toast.err(e.message);}
   };
-
-  const getStats = (poll) => {
-    const pollVotes = votes.filter(v => v.poll_id === poll.id);
-    const total = pollVotes.length;
-    const counts = (poll.options||[]).map((_, i) => pollVotes.filter(v => v.option_index === i).length);
-    return { total, counts };
-  };
-
+  const getStats = (poll) => {const pollVotes = votes.filter(v => v.poll_id === poll.id);const total = pollVotes.length;const counts = (poll.options||[]).map((_, i) => pollVotes.filter(v => v.option_index === i).length);return { total, counts };};
   const getVoterDetails = (poll) => {
     const pollVotes = votes.filter(v => v.poll_id === poll.id);
-    return pollVotes.map(v => {
-      const voter = app.db.users.find(u => u.id === v.user_id);
-      return {
-        id: v.user_id,
-        name: voter?.name || 'طالب محذوف',
-        avatar: voter?.avatar || '👤',
-        phone: voter?.phone || '—',
-        country_code: voter?.country_code || '+20',
-        governorate: voter?.governorate || '—',
-        grade: voter?.grade_id ? (app.grade(voter.grade_id)?.name || '—') : '—',
-        xp: voter?.xp || 0,
-        option: (poll.options || [])[v.option_index] || '—',
-        optionIndex: v.option_index,
-        voted_at: v.created_at
-      };
-    }).sort((a,b) => b.voted_at - a.voted_at);
+    return pollVotes.map(v => {const voter = app.db.users.find(u => u.id === v.user_id);return {id: v.user_id,name: voter?.name || 'طالب محذوف',avatar: voter?.avatar || '👤',phone: voter?.phone || '—',country_code: voter?.country_code || '+20',governorate: voter?.governorate || '—',grade: voter?.grade_id ? (app.grade(voter.grade_id)?.name || '—') : '—',xp: voter?.xp || 0,option: (poll.options || [])[v.option_index] || '—',optionIndex: v.option_index,voted_at: v.created_at};}).sort((a,b) => b.voted_at - a.voted_at);
   };
-
   return <>
     <div className="flex between center mb16 wrap g8">
-      <div>
-        <div className="h2 grad">📊 استطلاعات الرأي</div>
-        <div className="sm muted mt6">اسأل طلابك واستقبل آرائهم</div>
-      </div>
-      <button className="btn btn-p" onClick={openNew}>
-        <Icon name="plus" size={15}/> استطلاع جديد
-      </button>
+      <div><div className="h2 grad">📊 استطلاعات الرأي</div><div className="sm muted mt6">اسأل طلابك واستقبل آرائهم</div></div>
+      <button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> استطلاع جديد</button>
     </div>
-
-    {loading ? (
-      <div className="glass" style={{padding:40,textAlign:'center'}}>
-        <div className="spinner" style={{margin:'0 auto 14px'}}></div>
-        جارٍ التحميل...
-      </div>
-    ) : polls.length === 0 ? (
-      <div className="glass" style={{padding:30}}>
-        <Empty icon="📊" title="لا توجد استطلاعات" desc="ابدأ بإنشاء استطلاع جديد"/>
-      </div>
-    ) : (
+    {loading ? (<div className="glass" style={{padding:40,textAlign:'center'}}><div className="spinner" style={{margin:'0 auto 14px'}}></div>جارٍ التحميل...</div>) : polls.length === 0 ? (<div className="glass" style={{padding:30}}><Empty icon="📊" title="لا توجد استطلاعات" desc="ابدأ بإنشاء استطلاع جديد"/></div>) : (
       <div className="grid g2">
         {polls.map(p => {
           const { total, counts } = getStats(p);
@@ -2779,267 +1647,102 @@ function PollsPage(){
           const isExpanded = expandedPoll === p.id;
           return <div key={p.id} className="glass" style={{padding:20}}>
             <div className="flex between center mb12 wrap g8">
-              <div className="flex g6 center">
-                {p.active && !expired
-                  ? <span className="pill pill-g">● نشط</span>
-                  : expired
-                  ? <span className="pill pill-r">منتهي</span>
-                  : <span className="pill pill-y">موقوف</span>}
-                <span className="pill pill-b">{total} صوت</span>
-              </div>
-              <div className="flex g6">
-                <button className="btn btn-s btn-sm" onClick={()=>toggleActive(p)} title={p.active?'إيقاف':'تفعيل'}>
-                  {p.active?'⏸':'▶️'}
-                </button>
-                <button className="btn btn-s btn-sm" onClick={()=>openEdit(p)}><Icon name="edit" size={13}/></button>
-                <button className="btn btn-dn btn-sm" onClick={()=>del(p.id)}><Icon name="trash" size={13}/></button>
-              </div>
+              <div className="flex g6 center">{p.active && !expired ? <span className="pill pill-g">● نشط</span> : expired ? <span className="pill pill-r">منتهي</span> : <span className="pill pill-y">موقوف</span>}<span className="pill pill-b">{total} صوت</span></div>
+              <div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>toggleActive(p)} title={p.active?'إيقاف':'تفعيل'}>{p.active?'⏸':'▶️'}</button><button className="btn btn-s btn-sm" onClick={()=>openEdit(p)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(p.id)}><Icon name="trash" size={13}/></button></div>
             </div>
-
             <div className="h4 mb12" style={{lineHeight:1.5}}>{p.question}</div>
-
             <div className="flex col g8">
-              {(p.options||[]).map((opt, i) => {
-                const cnt = counts[i] || 0;
-                const perc = total ? Math.round((cnt/total)*100) : 0;
-                return <div key={i}>
-                  <div className="flex between center mb6">
-                    <span className="sm">{opt}</span>
-                    <span className="xs muted">{cnt} ({perc}%)</span>
-                  </div>
-                  <div className="bar" style={{height:8}}>
-                    <div className="bar-f bar-b" style={{width:`${perc}%`}}/>
-                  </div>
-                </div>;
-              })}
+              {(p.options||[]).map((opt, i) => {const cnt = counts[i] || 0;const perc = total ? Math.round((cnt/total)*100) : 0;return <div key={i}><div className="flex between center mb6"><span className="sm">{opt}</span><span className="xs muted">{cnt} ({perc}%)</span></div><div className="bar" style={{height:8}}><div className="bar-f bar-b" style={{width:`${perc}%`}}/></div></div>;})}
             </div>
-
             {voters.length > 0 && (
               <>
-                <button
-                  className="btn btn-s btn-sm mt16"
-                  onClick={()=>setExpandedPoll(isExpanded ? null : p.id)}
-                  style={{width:'100%'}}
-                >
-                  <Icon name="users" size={13}/>
-                  {isExpanded ? 'إخفاء تفاصيل المصوتين' : `عرض تفاصيل المصوتين (${voters.length})`}
+                <button className="btn btn-s btn-sm mt16" onClick={()=>setExpandedPoll(isExpanded ? null : p.id)} style={{width:'100%'}}>
+                  <Icon name="users" size={13}/>{isExpanded ? 'إخفاء تفاصيل المصوتين' : `عرض تفاصيل المصوتين (${voters.length})`}
                 </button>
-
                 {isExpanded && (
                   <div style={{marginTop:12, maxHeight:400, overflowY:'auto'}}>
                     {voters.map((v, i) => (
                       <div key={i} className="glass-s mb8" style={{padding:'12px',display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}}>
                         <div className="avatar" style={{width:40,height:40,fontSize:16,flexShrink:0}}>{v.avatar}</div>
-                        <div style={{flex:1,minWidth:180}}>
-                          <div className="sm" style={{fontWeight:700,marginBottom:2}}>{v.name}</div>
-                          <div className="flex wrap g8 xs muted">
-                            <span dir="ltr">📱 {v.country_code}{v.phone}</span>
-                            {v.governorate !== '—' && <span>📍 {v.governorate}</span>}
-                            {v.grade !== '—' && <span>🎓 {v.grade}</span>}
-                            <span>⚡ {DB.fmt(v.xp)} XP</span>
-                          </div>
-                        </div>
-                        <div className="flex col" style={{alignItems:'flex-end',gap:4}}>
-                          <span className="pill pill-b" style={{fontSize:11}}>
-                            {['أ','ب','ج','د','هـ','و'][v.optionIndex]}: {v.option}
-                          </span>
-                          <span className="xs muted">{DB.formatDateTime(v.voted_at)}</span>
-                        </div>
+                        <div style={{flex:1,minWidth:180}}><div className="sm" style={{fontWeight:700,marginBottom:2}}>{v.name}</div><div className="flex wrap g8 xs muted"><span dir="ltr">📱 {v.country_code}{v.phone}</span>{v.governorate !== '—' && <span>📍 {v.governorate}</span>}{v.grade !== '—' && <span>🎓 {v.grade}</span>}<span>⚡ {DB.fmt(v.xp)} XP</span></div></div>
+                        <div className="flex col" style={{alignItems:'flex-end',gap:4}}><span className="pill pill-b" style={{fontSize:11}}>{['أ','ب','ج','د','هـ','و'][v.optionIndex]}: {v.option}</span><span className="xs muted">{DB.formatDateTime(v.voted_at)}</span></div>
                       </div>
                     ))}
                   </div>
                 )}
               </>
             )}
-
-            {p.ends_at && (
-              <div className="xs muted mt12">⏰ ينتهي: {DB.formatDate(p.ends_at)}</div>
-            )}
+            {p.ends_at && (<div className="xs muted mt12">⏰ ينتهي: {DB.formatDate(p.ends_at)}</div>)}
           </div>;
         })}
       </div>
     )}
-
     {editing !== null && (
       <Modal title={editing==='new'?'استطلاع جديد':'تعديل الاستطلاع'} onClose={()=>setEditing(null)} wide>
-        <Field label="السؤال">
-          <textarea className="input" rows="2" value={form.question||''} onChange={e=>setForm({...form,question:e.target.value})} placeholder="اكتب السؤال هنا..."/>
-        </Field>
-
+        <Field label="السؤال"><textarea className="input" rows="2" value={form.question||''} onChange={e=>setForm({...form,question:e.target.value})} placeholder="اكتب السؤال هنا..."/></Field>
         <Field label={`الخيارات (${form.options.length})`}>
           <div className="flex col g8">
             {form.options.map((opt, i) => (
               <div key={i} className="flex g8 center">
                 <span className="pill pill-b" style={{minWidth:32,justifyContent:'center'}}>{i+1}</span>
                 <input className="input" value={opt} onChange={e=>updateOption(i, e.target.value)} placeholder={`الخيار ${i+1}`}/>
-                {form.options.length > 2 && (
-                  <button className="btn btn-dn btn-sm" onClick={()=>removeOption(i)}><Icon name="trash" size={12}/></button>
-                )}
+                {form.options.length > 2 && (<button className="btn btn-dn btn-sm" onClick={()=>removeOption(i)}><Icon name="trash" size={12}/></button>)}
               </div>
             ))}
-            <button className="btn btn-s btn-sm" onClick={addOption} style={{alignSelf:'flex-start'}}>
-              <Icon name="plus" size={13}/> إضافة خيار
-            </button>
+            <button className="btn btn-s btn-sm" onClick={addOption} style={{alignSelf:'flex-start'}}><Icon name="plus" size={13}/> إضافة خيار</button>
           </div>
         </Field>
-
         <div className="grid g2">
-          <Field label="تاريخ الانتهاء (اختياري)">
-            <input type="date" className="input" value={form.ends_at||''} onChange={e=>setForm({...form,ends_at:e.target.value})}/>
-          </Field>
-          <Field label="الحالة">
-            <label className="flex center g8" style={{cursor:'pointer',marginTop:6}}>
-              <input type="checkbox" checked={form.active!==false} onChange={e=>setForm({...form,active:e.target.checked})}/>
-              <span className="sm">مفعّل</span>
-            </label>
-          </Field>
+          <Field label="تاريخ الانتهاء (اختياري)"><input type="date" className="input" value={form.ends_at||''} onChange={e=>setForm({...form,ends_at:e.target.value})}/></Field>
+          <Field label="الحالة"><label className="flex center g8" style={{cursor:'pointer',marginTop:6}}><input type="checkbox" checked={form.active!==false} onChange={e=>setForm({...form,active:e.target.checked})}/><span className="sm">مفعّل</span></label></Field>
         </div>
-
-        <div className="flex g8 mt16">
-          <button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button>
-          <button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button>
-        </div>
+        <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
       </Modal>
     )}
   </>;
 }
-
 function Footer(){
   const app=useApp();
   const user=app.currentUser;
-
   const sendReport=async ()=>{
-    const { value: msg } = await Swal.fire({
-      title: '🚨 بلاغ عن مشكلة',input: 'textarea',
-      inputLabel: 'اكتب مشكلتك بالتفصيل',
-      inputPlaceholder: 'اكتب رسالتك هنا...',
-      inputAttributes: { 'aria-label': 'اكتب رسالتك', 'dir': 'rtl' },
-      showCancelButton: true,confirmButtonText: '📤 إرسال',cancelButtonText: 'إلغاء',
-      confirmButtonColor: '#D4AF37',cancelButtonColor: '#64748b',
-      inputValidator: (value) => { if (!value || value.trim().length < 5) return 'يرجى كتابة رسالة واضحة (5 أحرف على الأقل)'; },
-      customClass: {popup: 'swal-custom-popup',title: 'swal-custom-title',input: 'swal-custom-input',confirmButton: 'swal-custom-confirm',cancelButton: 'swal-custom-cancel'}
-    });
-
+    const { value: msg } = await Swal.fire({title: '🚨 بلاغ عن مشكلة',input: 'textarea',inputLabel: 'اكتب مشكلتك بالتفصيل',inputPlaceholder: 'اكتب رسالتك هنا...',inputAttributes: { 'aria-label': 'اكتب رسالتك', 'dir': 'rtl' },showCancelButton: true,confirmButtonText: '📤 إرسال',cancelButtonText: 'إلغاء',confirmButtonColor: '#D4AF37',cancelButtonColor: '#64748b',inputValidator: (value) => { if (!value || value.trim().length < 5) return 'يرجى كتابة رسالة واضحة (5 أحرف على الأقل)'; },customClass: {popup: 'swal-custom-popup',title: 'swal-custom-title',input: 'swal-custom-input',confirmButton: 'swal-custom-confirm',cancelButton: 'swal-custom-cancel'}});
     if (msg){
-      Swal.fire({
-        title: 'جارٍ الإرسال...',allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
-        background: 'linear-gradient(180deg, #1c160c, #0f0c07)',color: '#f7f0dd',
-        customClass: {popup: 'swal-custom-popup'}
-      });
-
-      const sent = await DB.reportIssue({
-        userName: user?.name || 'أدمن',
-        userPhone: (user?.country_code || '+20') + (user?.phone || '—'),
-        message: msg
-      });
-
-      Swal.fire({
-        icon: sent ? 'success' : 'error',
-        title: sent ? '✅ تم الإرسال' : '❌ فشل الإرسال',
-        text: sent ? 'تم استلام بلاغك، شكرًا لك' : 'حدث خطأ، حاول مرة أخرى',
-        confirmButtonText: 'حسنًا',confirmButtonColor: '#D4AF37',
-        background: 'linear-gradient(180deg, #1c160c, #0f0c07)',color: '#f7f0dd',
-        customClass: {popup: 'swal-custom-popup', title: 'swal-custom-title', confirmButton: 'swal-custom-confirm'}
-      });
+      Swal.fire({title: 'جارٍ الإرسال...',allowOutsideClick: false,didOpen: () => Swal.showLoading(),background: 'linear-gradient(180deg, #1c160c, #0f0c07)',color: '#f7f0dd',customClass: {popup: 'swal-custom-popup'}});
+      const sent = await DB.reportIssue({userName: user?.name || 'أدمن',userPhone: (user?.country_code || '+20') + (user?.phone || '—'),message: msg});
+      Swal.fire({icon: sent ? 'success' : 'error',title: sent ? '✅ تم الإرسال' : '❌ فشل الإرسال',text: sent ? 'تم استلام بلاغك، شكرًا لك' : 'حدث خطأ، حاول مرة أخرى',confirmButtonText: 'حسنًا',confirmButtonColor: '#D4AF37',background: 'linear-gradient(180deg, #1c160c, #0f0c07)',color: '#f7f0dd',customClass: {popup: 'swal-custom-popup', title: 'swal-custom-title', confirmButton: 'swal-custom-confirm'}});
     }
   };
-
   return <div className="footer-dev">
     <button className="dev-btn" onClick={()=>window.open("https://wa.me/201128351702?text="+encodeURIComponent("مرحبًا، أريد الاستفسار عن منصة MISSION EDU"),"_blank")}>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-      </svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
       <span className="dev-name">Developed by <b>EL-sayed Hasan</b></span>
     </button>
     <button className="tg-btn" onClick={sendReport}>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-      </svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
       <span>بلاغ</span>
     </button>
   </div>;
 }
-
 function AdminApp(){
   const app=useApp();
-  const [tab,setTab]=useState(()=>{
-    try{ return localStorage.getItem('admin_tab') || 'dashboard'; }
-    catch(e){ return 'dashboard'; }
-  });
+  const [tab,setTab]=useState(()=>{try{ return localStorage.getItem('admin_tab') || 'dashboard'; }catch(e){ return 'dashboard'; }});
   const [sidebarOpen,setSidebarOpen]=useState(false);
   const [searchResults,setSearchResults]=useState([]);
-  const [theme,setTheme]=useState(()=>{
-    try{ return localStorage.getItem('admin_theme') || 'dark'; }
-    catch(e){ return 'dark'; }
-  });
+  const [theme,setTheme]=useState(()=>{try{ return localStorage.getItem('admin_theme') || 'dark'; }catch(e){ return 'dark'; }});
   const user=app.currentUser;
-
-  useEffect(()=>{
-    try{ localStorage.setItem('admin_tab', tab); }catch(e){}
-  },[tab]);
-
-  useEffect(()=>{
-    try{ localStorage.setItem('admin_theme', theme); }catch(e){}
-    document.documentElement.setAttribute('data-theme', theme);
-  },[theme]);
-
-  const unreadNotifs = useMemo(()=>{
-    return (app.db.notifications||[]).filter(n => {
-      if(!n.created_at) return false;
-      const created = new Date(n.created_at).getTime();
-      const lastSeen = Number(localStorage.getItem('admin_last_notif_seen') || 0);
-      return created > lastSeen;
-    }).length;
-  },[app.db.notifications]);
-
-  useEffect(()=>{
-    const baseTitle = 'MISSION EDU — لوحة الإدارة';
-    document.title = unreadNotifs > 0 ? `(${unreadNotifs}) ${baseTitle}` : baseTitle;
-  },[unreadNotifs]);
-
-  useEffect(()=>{
-    if(tab === 'notifications'){
-      try{ localStorage.setItem('admin_last_notif_seen', Date.now().toString()); }catch(e){}
-    }
-  },[tab]);
-
+  useEffect(()=>{try{ localStorage.setItem('admin_tab', tab); }catch(e){}},[tab]);
+  useEffect(()=>{try{ localStorage.setItem('admin_theme', theme); }catch(e){}document.documentElement.setAttribute('data-theme', theme);},[theme]);
+  const unreadNotifs = useMemo(()=>{return (app.db.notifications||[]).filter(n => {if(!n.created_at) return false;const created = new Date(n.created_at).getTime();const lastSeen = Number(localStorage.getItem('admin_last_notif_seen') || 0);return created > lastSeen;}).length;},[app.db.notifications]);
+  useEffect(()=>{const baseTitle = 'MISSION EDU — لوحة الإدارة';document.title = unreadNotifs > 0 ? `(${unreadNotifs}) ${baseTitle}` : baseTitle;},[unreadNotifs]);
+  useEffect(()=>{if(tab === 'notifications'){try{ localStorage.setItem('admin_last_notif_seen', Date.now().toString()); }catch(e){}}},[tab]);
   const items=[
-    {title:'الرئيسية',items:[
-      {id:'dashboard',icon:'dashboard',label:'لوحة التحكم'},
-      {id:'activity',icon:'activity',label:'سجل النشاط'},
-      {id:'errors',icon:'alert',label:'تحليل الأخطاء'}
-    ]},
-    {title:'المحتوى',items:[
-      {id:'grades',icon:'school',label:'الصفوف'},
-      {id:'subjects',icon:'book',label:'المواد'},
-      {id:'units',icon:'folder',label:'الوحدات'},
-      {id:'lessons',icon:'file',label:'الدروس'},
-      {id:'questions',icon:'help',label:'بنك الأسئلة'},
-      {id:'exams',icon:'clipboard',label:'الاختبارات'},
-      {id:'missions',icon:'target',label:'المهام'}
-    ]},
-    {title:'التحفيز',items:[
-      {id:'achievements',icon:'trophy',label:'الإنجازات'},
-      {id:'levels',icon:'trend',label:'المستويات'},
-      {id:'certificates',icon:'award',label:'الشهادات'}
-    ]},
-    {title:'المستخدمون',items:[
-      {id:'students',icon:'users',label:'الطلاب'},
-      {id:'notes',icon:'note',label:'ملاحظات الطلاب'},
-      {id:'notifications',icon:'bell',label:'الإشعارات',badge:unreadNotifs||null},
-      {id:'reports',icon:'link',label:'البلاغات'}
-    ]},
-    {title:'النمو',items:[
-      {id:'coupons',icon:'coupon',label:'الكوبونات'},
-      {id:'referrals',icon:'share',label:'الإحالات'},
-      {id:'polls',icon:'activity',label:'الاستطلاعات'}
-    ]},
-    {title:'النظام',items:[
-      {id:'settings',icon:'settings',label:'الإعدادات'}
-    ]}
+    {title:'الرئيسية',items:[{id:'dashboard',icon:'dashboard',label:'لوحة التحكم'},{id:'activity',icon:'activity',label:'سجل النشاط'},{id:'errors',icon:'alert',label:'تحليل الأخطاء'}]},
+    {title:'المحتوى',items:[{id:'grades',icon:'school',label:'الصفوف'},{id:'subjects',icon:'book',label:'المواد'},{id:'units',icon:'folder',label:'الوحدات'},{id:'lessons',icon:'file',label:'الدروس'},{id:'questions',icon:'help',label:'بنك الأسئلة'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'missions',icon:'target',label:'المهام'}]},
+    {title:'التحفيز',items:[{id:'achievements',icon:'trophy',label:'الإنجازات'},{id:'levels',icon:'trend',label:'المستويات'},{id:'certificates',icon:'award',label:'الشهادات'}]},
+    {title:'المستخدمون',items:[{id:'students',icon:'users',label:'الطلاب'},{id:'notes',icon:'note',label:'ملاحظات الطلاب'},{id:'notifications',icon:'bell',label:'الإشعارات',badge:unreadNotifs||null},{id:'reports',icon:'link',label:'البلاغات'}]},
+    {title:'النمو',items:[{id:'coupons',icon:'coupon',label:'الكوبونات'},{id:'referrals',icon:'share',label:'الإحالات'},{id:'polls',icon:'activity',label:'الاستطلاعات'}]},
+    {title:'النظام',items:[{id:'settings',icon:'settings',label:'الإعدادات'}]}
   ];
-
   const onSearch=q=>{
     const lc=q.toLowerCase(),res=[];
     app.db.users.filter(x=>x.name.toLowerCase().includes(lc)||(x.phone||'').includes(lc)).slice(0,5).forEach(s=>res.push({type:'مستخدم',icon:<Icon name="user" size={16}/>,title:s.name,nav:'students'}));
@@ -3049,29 +1752,10 @@ function AdminApp(){
     app.db.questions.filter(x=>x.text.toLowerCase().includes(lc)).slice(0,5).forEach(x=>res.push({type:'سؤال',icon:<Icon name="help" size={16}/>,title:x.text.slice(0,50),nav:'questions'}));
     setSearchResults(res);
   };
-
   return <div className="app">
-    <Sidebar
-      items={items}
-      active={tab}
-      onNav={(id)=>{setTab(id);try{localStorage.setItem('admin_tab',id);}catch(e){}}}
-      open={sidebarOpen}
-      onClose={()=>setSidebarOpen(false)}
-      onLogout={app.logout}
-    />
+    <Sidebar items={items} active={tab} onNav={(id)=>{setTab(id);try{localStorage.setItem('admin_tab',id);}catch(e){}}} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} onLogout={app.logout}/>
     <div className="main">
-      <Topbar
-        user={user}
-        onMenu={()=>setSidebarOpen(true)}
-        onLogout={app.logout}
-        onSearch={onSearch}
-        searchResults={searchResults}
-        onResultClick={r=>setTab(r.nav)}
-        theme={theme}
-        onToggleTheme={()=>setTheme(t=>t==='dark'?'light':'dark')}
-        unreadNotifs={unreadNotifs}
-        onOpenNotifications={()=>setTab('notifications')}
-      />
+      <Topbar user={user} onMenu={()=>setSidebarOpen(true)} onLogout={app.logout} onSearch={onSearch} searchResults={searchResults} onResultClick={r=>setTab(r.nav)} theme={theme} onToggleTheme={()=>setTheme(t=>t==='dark'?'light':'dark')} unreadNotifs={unreadNotifs} onOpenNotifications={()=>setTab('notifications')}/>
       <div className="content">
         {tab==='dashboard'&&<Dashboard/>}
         {tab==='activity'&&<ActivityLog/>}
@@ -3099,7 +1783,6 @@ function AdminApp(){
     </div>
   </div>;
 }
-
 function Root(){
   const app=useApp();
   if(app.loading) return <div className="loading"><div className="spinner"></div>جارٍ التحميل...</div>;
@@ -3107,7 +1790,6 @@ function Root(){
   if(app.currentUser.role!=='admin') return null;
   return <AdminApp/>;
 }
-
 function App(){return <ToastProvider><AppProvider><Root/></AppProvider></ToastProvider>;}
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
