@@ -2357,7 +2357,7 @@ function CertificatesPage(){
 
   const wrapper = document.createElement('div');
   wrapper.setAttribute('dir', 'rtl');
-  wrapper.style.cssText = 'position:absolute;left:-99999px;top:0;width:1400px;height:990px;overflow:hidden;';
+  wrapper.style.cssText = 'position:fixed;left:0;top:0;width:1400px;height:990px;overflow:hidden;z-index:-9999;background:#050a18;';
 
   const container = document.createElement('div');
   container.setAttribute('dir', 'rtl');
@@ -2454,6 +2454,9 @@ function CertificatesPage(){
       <div style="font-size:11px;color:#8a7d55;letter-spacing:3px;font-weight:700;">التوقيع الرسمي</div>
     </div>
   `;
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+  window.scrollTo(0, 0); 
 
   wrapper.appendChild(container);
   document.body.appendChild(wrapper);
@@ -2463,15 +2466,19 @@ function CertificatesPage(){
     await new Promise(r => setTimeout(r, 800));
 
     const canvas = await window.html2canvas(container, {
-      scale: 2,
-      backgroundColor: '#050a18',
-      useCORS: true,
-      logging: false,
-      width: 1400,
-      height: 990,
-      windowWidth: 1400,
-      windowHeight: 990
-    });
+  scale: 2,
+  backgroundColor: '#050a18',
+  useCORS: true,
+  logging: false,
+  width: 1400,
+  height: 990,
+  windowWidth: 1400,
+  windowHeight: 990,
+  scrollX: 0,
+  scrollY: 0,
+  x: 0,
+  y: 0
+});
 
     const imgData = canvas.toDataURL('image/jpeg', 0.95);
     const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
