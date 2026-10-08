@@ -2357,128 +2357,147 @@ function CertificatesPage(){
 
   const wrapper = document.createElement('div');
   wrapper.setAttribute('dir', 'rtl');
-  wrapper.style.cssText = 'position:fixed;left:0;top:0;width:1400px;height:990px;overflow:hidden;z-index:-9999;background:#050a18;';
+  wrapper.style.cssText = 'position:fixed;top:0;left:0;width:1400px;height:990px;overflow:hidden;z-index:-1;background:#050a18;';
 
   const container = document.createElement('div');
   container.setAttribute('dir', 'rtl');
-  container.style.cssText = `
-    position:relative;
-    width:1400px;
-    height:990px;
-    font-family:'Tajawal','Cairo',sans-serif;
-    direction:rtl;
-    background:radial-gradient(1200px 800px at 50% -20%,#1a2a52,#0a1428 60%,#050a18);
-    box-sizing:border-box;
-    overflow:hidden;
-    color:#f7f0dd;
-  `;
+  container.style.cssText = 'position:relative;width:1400px;height:990px;font-family:"Tajawal","Cairo",sans-serif;direction:rtl;background:radial-gradient(1400px 900px at 50% -10%,#1e2f5c 0%,#0d1a3a 45%,#050a18 100%);box-sizing:border-box;overflow:hidden;color:#f7f0dd;';
 
   container.innerHTML = `
-    <div style="position:absolute;inset:0;background-image:radial-gradient(circle at 20% 30%,rgba(212,175,55,.08),transparent 40%),radial-gradient(circle at 80% 70%,rgba(139,92,246,.08),transparent 40%);pointer-events:none;"></div>
+    <!-- نقشات زخرفية في الزوايا -->
+    <div style="position:absolute;top:0;left:0;width:400px;height:400px;background:radial-gradient(circle at 0% 0%,rgba(212,175,55,.15),transparent 60%);pointer-events:none;"></div>
+    <div style="position:absolute;top:0;right:0;width:400px;height:400px;background:radial-gradient(circle at 100% 0%,rgba(212,175,55,.15),transparent 60%);pointer-events:none;"></div>
+    <div style="position:absolute;bottom:0;left:0;width:400px;height:400px;background:radial-gradient(circle at 0% 100%,rgba(212,175,55,.12),transparent 60%);pointer-events:none;"></div>
+    <div style="position:absolute;bottom:0;right:0;width:400px;height:400px;background:radial-gradient(circle at 100% 100%,rgba(212,175,55,.12),transparent 60%);pointer-events:none;"></div>
 
-    <div style="position:absolute;top:0;left:0;right:0;height:10px;background:linear-gradient(90deg,#FFD700,#D4AF37,#8B6914,#D4AF37,#FFD700);"></div>
-    <div style="position:absolute;bottom:0;left:0;right:0;height:10px;background:linear-gradient(90deg,#FFD700,#D4AF37,#8B6914,#D4AF37,#FFD700);"></div>
+    <!-- الإطار الخارجي -->
+    <div style="position:absolute;top:0;left:0;right:0;height:12px;background:linear-gradient(90deg,#8B6914,#FFD700,#D4AF37,#FFD700,#8B6914);"></div>
+    <div style="position:absolute;bottom:0;left:0;right:0;height:12px;background:linear-gradient(90deg,#8B6914,#FFD700,#D4AF37,#FFD700,#8B6914);"></div>
+    <div style="position:absolute;top:0;left:0;bottom:0;width:12px;background:linear-gradient(180deg,#8B6914,#FFD700,#D4AF37,#FFD700,#8B6914);"></div>
+    <div style="position:absolute;top:0;right:0;bottom:0;width:12px;background:linear-gradient(180deg,#8B6914,#FFD700,#D4AF37,#FFD700,#8B6914);"></div>
 
-    <div style="position:absolute;inset:32px;border:2px solid rgba(212,175,55,.65);border-radius:12px;"></div>
-    <div style="position:absolute;inset:48px;border:1px solid rgba(212,175,55,.30);border-radius:8px;"></div>
+    <!-- الإطار الذهبي المزدوج -->
+    <div style="position:absolute;inset:40px;border:2.5px solid rgba(212,175,55,.75);border-radius:8px;"></div>
+    <div style="position:absolute;inset:54px;border:1px solid rgba(212,175,55,.35);border-radius:6px;"></div>
 
-    <div style="position:absolute;top:22px;left:22px;width:90px;height:90px;border-top:4px solid #FFD700;border-left:4px solid #FFD700;border-top-left-radius:12px;"></div>
-    <div style="position:absolute;top:22px;right:22px;width:90px;height:90px;border-top:4px solid #FFD700;border-right:4px solid #FFD700;border-top-right-radius:12px;"></div>
-    <div style="position:absolute;bottom:22px;left:22px;width:90px;height:90px;border-bottom:4px solid #FFD700;border-left:4px solid #FFD700;border-bottom-left-radius:12px;"></div>
-    <div style="position:absolute;bottom:22px;right:22px;width:90px;height:90px;border-bottom:4px solid #FFD700;border-right:4px solid #FFD700;border-bottom-right-radius:12px;"></div>
+    <!-- زخارف الزوايا الأربعة -->
+    <div style="position:absolute;top:28px;right:28px;width:100px;height:100px;border-top:5px solid #FFD700;border-right:5px solid #FFD700;border-top-right-radius:8px;"></div>
+    <div style="position:absolute;top:28px;left:28px;width:100px;height:100px;border-top:5px solid #FFD700;border-left:5px solid #FFD700;border-top-left-radius:8px;"></div>
+    <div style="position:absolute;bottom:28px;right:28px;width:100px;height:100px;border-bottom:5px solid #FFD700;border-right:5px solid #FFD700;border-bottom-right-radius:8px;"></div>
+    <div style="position:absolute;bottom:28px;left:28px;width:100px;height:100px;border-bottom:5px solid #FFD700;border-left:5px solid #FFD700;border-bottom-left-radius:8px;"></div>
 
-    <div style="position:absolute;top:120px;left:0;right:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 140px;">
+    <!-- دائرة الزخرفة العلوية -->
+    <div style="position:absolute;top:32px;left:50%;transform:translateX(-50%);width:180px;height:14px;background:linear-gradient(90deg,transparent,#D4AF37,transparent);"></div>
+    <div style="position:absolute;top:22px;left:50%;transform:translateX(-50%);color:#FFD700;font-size:24px;">❖</div>
 
-      <div style="display:flex;align-items:center;justify-content:center;gap:22px;margin-bottom:14px;">
+    <!-- محتوى الشهادة -->
+    <div style="position:absolute;top:130px;left:0;right:0;display:flex;flex-direction:column;align-items:center;padding:0 140px;">
+
+      <!-- الشعار والاسم -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:20px;">
         ${logoBase64
-          ? `<img src="${logoBase64}" style="width:88px;height:88px;object-fit:contain;filter:drop-shadow(0 0 24px rgba(255,215,0,.55));"/>`
-          : `<div style="width:88px;height:88px;border-radius:22px;background:linear-gradient(135deg,#FFD700,#D4AF37,#8B6914);display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:900;color:#1a1206;box-shadow:0 12px 36px rgba(212,175,55,.5);">M</div>`
+          ? `<img src="${logoBase64}" style="width:100px;height:100px;object-fit:contain;filter:drop-shadow(0 0 30px rgba(255,215,0,.6));"/>`
+          : `<div style="width:100px;height:100px;border-radius:24px;background:linear-gradient(135deg,#FFD700,#D4AF37,#8B6914);display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:900;color:#1a1206;box-shadow:0 14px 40px rgba(212,175,55,.55);">M</div>`
         }
         <div style="text-align:right;">
-          <div style="font-size:42px;font-weight:900;letter-spacing:2px;background:linear-gradient(100deg,#FFD700,#FFF3B0 55%,#D4AF37);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1;">MISSION EDU</div>
-          <div style="font-size:13px;letter-spacing:9px;color:#d4c79a;margin-top:10px;font-weight:600;">منصة تعليمية متكاملة</div>
+          <div style="font-size:46px;font-weight:900;letter-spacing:3px;background:linear-gradient(100deg,#FFD700,#FFF3B0 50%,#D4AF37);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1;text-shadow:0 4px 20px rgba(255,215,0,.4);">MISSION EDU</div>
+          <div style="font-size:14px;letter-spacing:10px;color:#d4c79a;margin-top:12px;font-weight:600;">منصة تعليمية متكاملة</div>
         </div>
       </div>
 
-      <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin:20px 0 26px;width:100%;max-width:800px;">
-        <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,#D4AF37);"></div>
-        <div style="color:#FFD700;font-size:16px;">◆</div>
-        <div style="flex:1;height:1px;background:linear-gradient(90deg,#D4AF37,transparent);"></div>
+      <!-- فاصل ذهبي -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin:22px 0 30px;width:100%;max-width:850px;">
+        <div style="flex:1;height:1.5px;background:linear-gradient(90deg,transparent,#D4AF37);"></div>
+        <div style="color:#FFD700;font-size:18px;">✦</div>
+        <div style="flex:1;height:1.5px;background:linear-gradient(90deg,#D4AF37,transparent);"></div>
       </div>
 
-      <div style="font-size:62px;font-weight:900;color:#FFD700;margin-bottom:6px;text-shadow:0 6px 28px rgba(255,215,0,.55);letter-spacing:1px;">شهادة إتمام</div>
-      <div style="font-size:15px;letter-spacing:10px;color:#d4c79a;margin-bottom:36px;font-weight:600;">CERTIFICATE OF COMPLETION</div>
+      <!-- عنوان الشهادة -->
+      <div style="font-size:68px;font-weight:900;color:#FFD700;margin-bottom:10px;text-shadow:0 8px 32px rgba(255,215,0,.6);letter-spacing:2px;">شهادة إتمام</div>
+      <div style="font-size:16px;letter-spacing:12px;color:#d4c79a;margin-bottom:44px;font-weight:600;">CERTIFICATE OF COMPLETION</div>
 
-      <div style="font-size:20px;color:#d4c79a;margin-bottom:14px;">تشهد المنصة بأن الطالب</div>
+      <!-- نص التقديم -->
+      <div style="font-size:22px;color:#d4c79a;margin-bottom:20px;font-weight:500;">تشهد المنصة بأن الطالب</div>
 
-      <div style="position:relative;padding:0 40px;margin-bottom:8px;width:100%;text-align:center;">
-        <div style="display:inline-block;font-size:52px;font-weight:900;color:#FFF3B0;padding:8px 60px 14px;border-bottom:3px solid #FFD700;text-shadow:0 4px 24px rgba(255,215,0,.6);line-height:1.2;max-width:900px;">${student?.name || 'الطالب'}</div>
+      <!-- اسم الطالب -->
+      <div style="position:relative;padding:0 60px;margin-bottom:14px;width:100%;text-align:center;">
+        <div style="display:inline-block;font-size:58px;font-weight:900;color:#FFF3B0;padding:10px 80px 18px;border-bottom:3px solid #FFD700;text-shadow:0 6px 28px rgba(255,215,0,.65);line-height:1.2;max-width:1000px;">${student?.name || 'الطالب'}</div>
       </div>
 
-      <div style="font-size:20px;color:#d4c79a;margin:20px 0 16px;">قد أتم بنجاح دراسة مادة</div>
+      <!-- نص المادة -->
+      <div style="font-size:22px;color:#d4c79a;margin:26px 0 20px;font-weight:500;">قد أتم بنجاح دراسة مادة</div>
 
-      <div style="display:inline-flex;align-items:center;gap:16px;padding:14px 40px;background:rgba(212,175,55,.14);border:2px solid rgba(212,175,55,.55);border-radius:18px;margin-bottom:36px;">
-        <span style="font-size:36px;">${subject?.icon || '📚'}</span>
-        <span style="font-size:32px;font-weight:900;color:#FFD700;">${subject?.name || 'المادة'}</span>
+      <!-- بطاقة المادة -->
+      <div style="display:inline-flex;align-items:center;gap:18px;padding:16px 48px;background:linear-gradient(135deg,rgba(212,175,55,.20),rgba(212,175,55,.08));border:2.5px solid rgba(212,175,55,.65);border-radius:20px;margin-bottom:40px;box-shadow:0 10px 36px rgba(212,175,55,.25),0 0 0 8px rgba(212,175,55,.06);">
+        <span style="font-size:40px;">${subject?.icon || '📚'}</span>
+        <span style="font-size:34px;font-weight:900;color:#FFD700;text-shadow:0 2px 12px rgba(255,215,0,.4);">${subject?.name || 'المادة'}</span>
       </div>
     </div>
 
-    <div style="position:absolute;bottom:150px;left:80px;right:80px;display:flex;justify-content:space-between;align-items:flex-end;">
+    <!-- القسم السفلي -->
+    <div style="position:absolute;bottom:180px;left:120px;right:120px;display:flex;justify-content:space-between;align-items:flex-end;">
 
-      <div style="text-align:center;min-width:200px;">
-        <div style="font-size:11px;color:#8a7d55;letter-spacing:2.5px;margin-bottom:12px;font-weight:700;">تاريخ الإصدار</div>
-        <div style="font-size:17px;color:#d4c79a;font-weight:800;">${issueDate}</div>
-        <div style="width:160px;height:1px;background:#D4AF37;margin:12px auto 0;opacity:.55;"></div>
+      <!-- التاريخ -->
+      <div style="text-align:center;min-width:220px;">
+        <div style="font-size:12px;color:#8a7d55;letter-spacing:3px;margin-bottom:14px;font-weight:700;">تاريخ الإصدار</div>
+        <div style="font-size:18px;color:#d4c79a;font-weight:800;">${issueDate}</div>
+        <div style="width:180px;height:1.5px;background:linear-gradient(90deg,transparent,#D4AF37,transparent);margin:14px auto 0;opacity:.7;"></div>
       </div>
 
-      <div style="position:relative;width:130px;height:130px;display:flex;align-items:center;justify-content:center;">
-        <div style="position:absolute;inset:0;border-radius:50%;border:2.5px solid #D4AF37;box-shadow:0 0 30px rgba(212,175,55,.55),0 0 0 6px rgba(212,175,55,.10) inset;"></div>
-        <div style="position:absolute;inset:12px;border-radius:50%;border:1px dashed rgba(212,175,55,.85);"></div>
+      <!-- الميدالية الوسطى -->
+      <div style="position:relative;width:150px;height:150px;display:flex;align-items:center;justify-content:center;">
+        <div style="position:absolute;inset:0;border-radius:50%;border:3px solid #D4AF37;box-shadow:0 0 40px rgba(212,175,55,.6),0 0 0 8px rgba(212,175,55,.12) inset;"></div>
+        <div style="position:absolute;inset:14px;border-radius:50%;border:1.5px dashed rgba(212,175,55,.9);"></div>
         <div style="position:relative;text-align:center;color:#FFD700;">
-          <div style="font-size:10px;letter-spacing:2.5px;font-weight:800;color:#d4c79a;">OFFICIAL</div>
-          <div style="font-size:32px;font-weight:900;line-height:1;margin:6px 0;color:#FFF3B0;">✦</div>
-          <div style="font-size:9px;letter-spacing:1.8px;font-weight:800;color:#d4c79a;">MISSION EDU</div>
+          <div style="font-size:11px;letter-spacing:3px;font-weight:800;color:#d4c79a;">OFFICIAL</div>
+          <div style="font-size:38px;font-weight:900;line-height:1;margin:8px 0;color:#FFF3B0;text-shadow:0 0 20px rgba(255,215,0,.8);">✦</div>
+          <div style="font-size:10px;letter-spacing:2px;font-weight:800;color:#d4c79a;">MISSION EDU</div>
         </div>
       </div>
 
-      <div style="text-align:center;min-width:200px;">
-        <div style="font-size:11px;color:#8a7d55;letter-spacing:2.5px;margin-bottom:12px;font-weight:700;">رقم الشهادة</div>
-        <div style="font-size:14px;color:#d4c79a;font-weight:800;font-family:monospace;direction:ltr;letter-spacing:1px;">${certNumber}</div>
-        <div style="width:160px;height:1px;background:#D4AF37;margin:12px auto 0;opacity:.55;"></div>
+      <!-- رقم الشهادة -->
+      <div style="text-align:center;min-width:220px;">
+        <div style="font-size:12px;color:#8a7d55;letter-spacing:3px;margin-bottom:14px;font-weight:700;">رقم الشهادة</div>
+        <div style="font-size:15px;color:#d4c79a;font-weight:800;font-family:monospace;direction:ltr;letter-spacing:1.5px;">${certNumber}</div>
+        <div style="width:180px;height:1.5px;background:linear-gradient(90deg,transparent,#D4AF37,transparent);margin:14px auto 0;opacity:.7;"></div>
       </div>
     </div>
 
-    <div style="position:absolute;bottom:70px;left:0;right:0;text-align:center;">
-      <div style="font-size:22px;font-weight:900;color:#FFD700;font-style:italic;letter-spacing:1px;">MISSION EDU</div>
-      <div style="width:180px;height:1px;background:#D4AF37;margin:10px auto;opacity:.55;"></div>
-      <div style="font-size:11px;color:#8a7d55;letter-spacing:3px;font-weight:700;">التوقيع الرسمي</div>
+    <!-- التوقيع -->
+    <div style="position:absolute;bottom:60px;left:0;right:0;text-align:center;">
+      <div style="display:inline-block;padding:0 60px;">
+        <div style="font-size:26px;font-weight:900;color:#FFD700;font-style:italic;letter-spacing:2px;text-shadow:0 2px 12px rgba(255,215,0,.4);">MISSION EDU</div>
+        <div style="width:220px;height:1.5px;background:linear-gradient(90deg,transparent,#D4AF37,transparent);margin:12px auto;opacity:.7;"></div>
+        <div style="font-size:11px;color:#8a7d55;letter-spacing:4px;font-weight:700;">التوقيع الرسمي</div>
+      </div>
     </div>
+
+    <!-- زخرفة سفلية -->
+    <div style="position:absolute;bottom:32px;left:50%;transform:translateX(-50%);width:180px;height:14px;background:linear-gradient(90deg,transparent,#D4AF37,transparent);"></div>
+    <div style="position:absolute;bottom:22px;left:50%;transform:translateX(-50%);color:#FFD700;font-size:24px;">❖</div>
   `;
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
-  window.scrollTo(0, 0); 
 
   wrapper.appendChild(container);
   document.body.appendChild(wrapper);
 
   try{
     await document.fonts.ready;
-    await new Promise(r => setTimeout(r, 800));
+    await new Promise(r => setTimeout(r, 1000));
 
     const canvas = await window.html2canvas(container, {
-  scale: 2,
-  backgroundColor: '#050a18',
-  useCORS: true,
-  logging: false,
-  width: 1400,
-  height: 990,
-  windowWidth: 1400,
-  windowHeight: 990,
-  scrollX: 0,
-  scrollY: 0,
-  x: 0,
-  y: 0
-});
+      scale: 2,
+      backgroundColor: '#050a18',
+      useCORS: true,
+      logging: false,
+      width: 1400,
+      height: 990,
+      windowWidth: 1400,
+      windowHeight: 990,
+      scrollX: 0,
+      scrollY: 0,
+      x: 0,
+      y: 0
+    });
 
     const imgData = canvas.toDataURL('image/jpeg', 0.95);
     const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
