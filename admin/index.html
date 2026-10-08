@@ -1089,9 +1089,9 @@ function LessonsPage(){
   const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(!c.video)c.video={type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true};if(c.video.is_free===undefined)c.video.is_free=true;if(!c.key_points)c.key_points=[];if(!c.pdf_url)c.pdf_url='';setForm(c);setEditing(it.id);};
   const save=async ()=>{
   if(!form.title) return app.toast.warn('العنوان مطلوب');
-  if(!form.subject_id) return app.toast.warn('اختر المادة');
+  if(!form.unit_id) return app.toast.warn('اختر الوحدة');
   setBusy(true);
-  try{await app.save('missions',form);app.toast.ok('تم الحفظ');setEditing(null);}
+  try{await app.save('lessons',form);app.toast.ok('تم الحفظ');setEditing(null);}
   catch(e){app.toast.err(e.message);}
   setBusy(false);
 };
