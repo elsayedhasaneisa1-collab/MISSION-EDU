@@ -1697,6 +1697,11 @@ ${logoBase64 ? `<img src="${logoBase64}" style="width:90px;height:90px;object-fi
 </div>
 `;
 
+const oldDir = document.documentElement.getAttribute('dir');
+document.documentElement.setAttribute('dir', 'ltr');
+document.body.style.direction = 'ltr';
+window.scrollTo(0, 0);
+
 wrapper.appendChild(container);
 document.body.appendChild(wrapper);
 
@@ -1730,8 +1735,10 @@ app.toast.ok('تم تحميل الشهادة');
 console.error(e);
 app.toast.err('فشل توليد الشهادة');
 } finally {
-document.body.removeChild(wrapper);
-}
+  document.body.removeChild(wrapper);
+  document.documentElement.setAttribute('dir', oldDir || 'rtl');
+  document.body.style.direction = '';
+} 
 }
 
 function ProfileRedirect(){
