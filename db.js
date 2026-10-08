@@ -34,14 +34,8 @@ const formatTime = (timestamp) => {
     if (ms < 10000000000) ms = ms * 1000;
     const d = new Date(ms);
     if (isNaN(d.getTime())) return "—";
-    return d.toLocaleTimeString("ar-EG", { 
-      hour: "2-digit", 
-      minute: "2-digit",
-      hour12: true 
-    });
-  } catch (e) {
-    return "—";
-  }
+    return d.toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit", hour12: true });
+  } catch (e) { return "—"; }
 };
 
 const formatDate = (timestamp) => {
@@ -51,14 +45,8 @@ const formatDate = (timestamp) => {
     if (ms < 10000000000) ms = ms * 1000;
     const d = new Date(ms);
     if (isNaN(d.getTime())) return "—";
-    return d.toLocaleDateString("ar-EG", { 
-      day: "numeric", 
-      month: "short", 
-      year: "numeric" 
-    });
-  } catch (e) {
-    return "—";
-  }
+    return d.toLocaleDateString("ar-EG", { day: "numeric", month: "short", year: "numeric" });
+  } catch (e) { return "—"; }
 };
 
 const formatDateTime = (timestamp) => {
@@ -68,16 +56,8 @@ const formatDateTime = (timestamp) => {
     if (ms < 10000000000) ms = ms * 1000;
     const d = new Date(ms);
     if (isNaN(d.getTime())) return "—";
-    return d.toLocaleString("ar-EG", { 
-      day: "numeric",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true
-    });
-  } catch (e) {
-    return "—";
-  }
+    return d.toLocaleString("ar-EG", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: true });
+  } catch (e) { return "—"; }
 };
 
 const hashPassword = async (password) => {
@@ -85,12 +65,8 @@ const hashPassword = async (password) => {
     const enc = new TextEncoder();
     const data = enc.encode(password + "::me::salt::" + SUPABASE_URL);
     const buf = await crypto.subtle.digest("SHA-256", data);
-    return Array.from(new Uint8Array(buf))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
-  } catch (e) {
-    return password;
-  }
+    return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+  } catch (e) { return password; }
 };
 
 const setSession = (userId) => {
@@ -105,9 +81,7 @@ const setSession = (userId) => {
 const getSessionId = () => {
   try {
     return localStorage.getItem("me_session") || sessionStorage.getItem("me_session");
-  } catch (e) {
-    return null;
-  }
+  } catch (e) { return null; }
 };
 
 const clearSession = () => {
@@ -129,11 +103,7 @@ const sendToTelegram = async (message) => {
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
-        text: message,
-        parse_mode: "HTML"
-      })
+      body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: "HTML" })
     });
     return res.ok;
   } catch (e) { return false; }
@@ -150,11 +120,7 @@ const API = {
     const cleanPhone = String(phone).replace(/\D/g, "");
     if (!cleanPhone) throw new Error("رقم الهاتف مطلوب");
 
-    const { data, error } = await sb
-      .from("users").select("*")
-      .eq("phone", cleanPhone)
-      .eq("country_code", countryCode)
-      .maybeSingle();
+    const { data, error } = await sb.from("users").select("*").eq("phone", cleanPhone).eq("country_code", countryCode).maybeSingle();
     if (error) throw new Error(error.message);
     if (!data) throw new Error("رقم الهاتف غير مسجل");
 
@@ -171,10 +137,7 @@ const API = {
       streak = d === 1 ? streak + 1 : 1;
     } else if (!data.last_active) streak = 1;
 
-    const { data: updated } = await sb
-      .from("users")
-      .update({ last_active: t, streak })
-      .eq("id", data.id).select().single();
+    const { data: updated } = await sb.from("users").update({ last_active: t, streak }).eq("id", data.id).select().single();
 
     setSession(data.id);
     API.trackActivity({
@@ -193,34 +156,20 @@ const API = {
     if (cleanPhone.length < 8) throw new Error("رقم الهاتف غير صالح");
 
     const sb = await getClient();
-    const { data: exist } = await sb
-      .from("users").select("id")
-      .eq("phone", cleanPhone)
-      .eq("country_code", countryCode)
-      .maybeSingle();
+    const { data: exist } = await sb.from("users").select("id").eq("phone", cleanPhone).eq("country_code", countryCode).maybeSingle();
     if (exist) throw new Error("رقم الهاتف مستخدم بالفعل");
 
-    const { data: roleRow } = await sb
-      .from("roles").select("id").eq("name", "student").maybeSingle();
+    const { data: roleRow } = await sb.from("roles").select("id").eq("name", "student").maybeSingle();
 
     const hashed = await hashPassword(password);
 
     const u = {
-      id: uid("u_"),
-      phone: cleanPhone,
-      country_code: countryCode,
-      governorate: governorate || null,
-      email: null,
-      password: hashed,
-      password_hash: hashed,
-      name: name.trim(),
-      role: "student",
-      role_id: roleRow ? roleRow.id : "role_student",
-      avatar: "🧑‍🎓",
-      grade_id: gradeId || "",
+      id: uid("u_"), phone: cleanPhone, country_code: countryCode, governorate: governorate || null,
+      email: null, password: hashed, password_hash: hashed, name: name.trim(),
+      role: "student", role_id: roleRow ? roleRow.id : "role_student",
+      avatar: "🧑‍🎓", grade_id: gradeId || "",
       xp: 0, streak: 1, last_active: today(),
       created_at: Date.now(), active: true,
-      
       all_subjects: true, access_subjects: [], subscription: "free",
       completed_lessons: [], completed_missions: [], achievements: []
     };
@@ -258,8 +207,8 @@ const API = {
   async loadAll() {
     const sb = await getClient();
     const tables = ["users","grades","subjects","units","lessons","questions",
-                    "exams","missions","achievements","levels","notifications","activity","roles","polls","poll_votes"];
-    
+                    "exams","missions","achievements","levels","notifications","activity","roles","polls","poll_votes","settings","coupons","referrals"];
+
     const results = await Promise.all(
       tables.map(async (t) => {
         let res = await sb.from(t).select("*").order("created_at", { ascending: false }).limit(3000);
@@ -269,7 +218,7 @@ const API = {
         return res;
       })
     );
-    
+
     const db = {};
     tables.forEach((t, i) => {
       if (results[i].error) {
@@ -279,38 +228,25 @@ const API = {
         db[t] = results[i].data || [];
       }
     });
-    
+
     if (db.activity && db.activity.length > 0) {
-      db.activity.sort((a, b) => {
-        const aTime = Number(a.at) || 0;
-        const bTime = Number(b.at) || 0;
-        return bTime - aTime;
-      });
+      db.activity.sort((a, b) => (Number(b.at) || 0) - (Number(a.at) || 0));
     }
-    
     if (db.notifications && db.notifications.length > 0) {
-      db.notifications.sort((a, b) => {
-        const aTime = Number(a.created_at) || 0;
-        const bTime = Number(b.created_at) || 0;
-        return bTime - aTime;
-      });
+      db.notifications.sort((a, b) => (Number(b.created_at) || 0) - (Number(a.created_at) || 0));
+    }
+    if (db.polls && db.polls.length > 0) {
+      db.polls.sort((a, b) => (Number(b.created_at) || 0) - (Number(a.created_at) || 0));
     }
 
-    if (db.polls && db.polls.length > 0) {
-      db.polls.sort((a, b) => {
-        const aTime = Number(a.created_at) || 0;
-        const bTime = Number(b.created_at) || 0;
-        return bTime - aTime;
-      });
-    }
-    
     console.log("✅ Loaded:", {
       activity: db.activity?.length || 0,
       users: db.users?.length || 0,
       notifications: db.notifications?.length || 0,
-      polls: db.polls?.length || 0
+      polls: db.polls?.length || 0,
+      settings: db.settings?.length || 0
     });
-    
+
     return db;
   },
 
@@ -339,9 +275,7 @@ const API = {
   async getTop10() {
     try {
       const sb = await getClient();
-      const { data } = await sb.from("users").select("*")
-        .eq("role", "student").eq("active", true)
-        .order("xp", { ascending: false }).limit(10);
+      const { data } = await sb.from("users").select("*").eq("role", "student").eq("active", true).order("xp", { ascending: false }).limit(10);
       return data || [];
     } catch (e) { return []; }
   },
@@ -351,17 +285,10 @@ const API = {
       const sb = await getClient();
       const now = Date.now();
       const { error } = await sb.from("activity").insert([{
-        id: uid("act_"),
-        user_id: userId,
-        user_name: userName,
-        user_role: userRole || "student",
-        type,
-        target: target || "",
-        details: details || {},
-        at: now,
-        created_at: now
+        id: uid("act_"), user_id: userId, user_name: userName,
+        user_role: userRole || "student", type, target: target || "",
+        details: details || {}, at: now, created_at: now
       }]);
-      
       if (error) {
         console.warn("⚠️ Track activity failed:", error.message);
       } else {
@@ -377,8 +304,7 @@ const API = {
     const now = Date.now();
     const row = {
       id: uid("att_"), user_id: userId, exam_id: examId,
-      score, total, pct, passed, answers,
-      at: now, created_at: now
+      score, total, pct, passed, answers, at: now, created_at: now
     };
     const { data, error } = await sb.from("exam_attempts").insert([row]).select().single();
     if (error) throw new Error(error.message);
@@ -389,22 +315,17 @@ const API = {
     if (!userId) return [];
     try {
       const sb = await getClient();
-      const { data } = await sb.from("exam_attempts").select("*")
-        .eq("user_id", userId).order("at", { ascending: false });
+      const { data } = await sb.from("exam_attempts").select("*").eq("user_id", userId).order("at", { ascending: false });
       return data || [];
     } catch (e) { return []; }
   },
 
   async saveError({ userId, questionId, given, correct, lessonId }) {
     const sb = await getClient();
-    const { data: exist } = await sb.from("user_errors").select("*")
-      .eq("user_id", userId).eq("question_id", questionId).maybeSingle();
+    const { data: exist } = await sb.from("user_errors").select("*").eq("user_id", userId).eq("question_id", questionId).maybeSingle();
 
     if (exist) {
-      return API.save("user_errors", {
-        ...exist, given, correct,
-        count: (exist.count || 1) + 1, at: Date.now()
-      });
+      return API.save("user_errors", { ...exist, given, correct, count: (exist.count || 1) + 1, at: Date.now() });
     }
     return API.save("user_errors", {
       id: uid("err_"), user_id: userId, question_id: questionId,
@@ -417,8 +338,7 @@ const API = {
     if (!userId) return [];
     try {
       const sb = await getClient();
-      const { data } = await sb.from("user_errors").select("*")
-        .eq("user_id", userId).order("at", { ascending: false });
+      const { data } = await sb.from("user_errors").select("*").eq("user_id", userId).order("at", { ascending: false });
       return data || [];
     } catch (e) { return []; }
   },
@@ -427,20 +347,11 @@ const API = {
     try {
       const sb = await getClient();
       const now = Date.now();
-
-      const { data: expired, error } = await sb
-        .from("polls")
-        .select("id")
-        .not("ends_at", "is", null)
-        .lt("ends_at", now);
-
+      const { data: expired, error } = await sb.from("polls").select("id").not("ends_at", "is", null).lt("ends_at", now);
       if (error || !expired || expired.length === 0) return 0;
-
       const ids = expired.map(p => p.id);
-
       await sb.from("poll_votes").delete().in("poll_id", ids);
       await sb.from("polls").delete().in("id", ids);
-
       console.log(`🗑️ حذف ${ids.length} استطلاع منتهي`);
       return ids.length;
     } catch (e) {
@@ -460,14 +371,53 @@ const API = {
     try {
       const sb = await getClient();
       await sb.from("reports").insert([{
-        id: uid("rep_"),
-        user_name: userName || "غير معروف",
-        user_phone: userPhone || "—",
-        message, sent_to_telegram: true, created_at: Date.now()
+        id: uid("rep_"), user_name: userName || "غير معروف",
+        user_phone: userPhone || "—", message,
+        sent_to_telegram: true, created_at: Date.now()
       }]);
     } catch (e) {}
 
     return await sendToTelegram(text);
+  },
+
+  async getSettings() {
+    try {
+      const sb = await getClient();
+      const { data } = await sb.from("settings").select("*").eq("id", "site").maybeSingle();
+      if (data) return {
+        about_title: data.about_title || "عن المنصة",
+        about_text: data.about_text || "",
+        social_links: Array.isArray(data.social_links) ? data.social_links : []
+      };
+      return { about_title: "عن المنصة", about_text: "", social_links: [] };
+    } catch (e) {
+      return { about_title: "عن المنصة", about_text: "", social_links: [] };
+    }
+  },
+
+  async saveSettings(patch) {
+    const sb = await getClient();
+    const { data, error } = await sb.from("settings").upsert({
+      id: "site",
+      about_title: patch.about_title || "عن المنصة",
+      about_text: patch.about_text || "",
+      social_links: patch.social_links || [],
+      updated_at: Date.now()
+    }).select().single();
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
+  async getUnreadNotifications(userId) {
+    if (!userId) return [];
+    try {
+      const sb = await getClient();
+      const { data } = await sb.from("notifications").select("*")
+        .or(`target.eq.all,target.eq.${userId}`)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      return (data || []).filter(n => !(n.read_by || []).includes(userId));
+    } catch (e) { return []; }
   },
 
   ytId(url) {
