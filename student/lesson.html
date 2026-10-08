@@ -749,7 +749,7 @@ ${locked ? `<div class="exam-lock-badge"><i class="fa-solid fa-lock"></i></div>`
 <i class="fa-solid ${paid?'fa-lock':'fa-unlock'}"></i>
 ${paid?'مدفوع':'مجاني'}
 </span>
-<span class="pill pill-v">+${e.xp} XP</span>
+<span className="pill pill-v">+${e.xp} XP</span>
 </div>
 <div style="font-size:14px;font-weight:700;color:#e8eefc">${esc(e.title)}</div>
 <div style="font-size:11.5px;color:#7f93b8;margin-top:6px">⏱ ${e.duration}د • درجة النجاح: ${e.pass_score}%</div>
@@ -908,18 +908,69 @@ const newCompleted = [...completed, l.id];
 const newXp = currentXp + (l.xp || 0);
 await DB.updateUser(u.id, { completed_lessons: newCompleted, xp: newXp });
 DB.trackActivity({userId:u.id,userName:u.name,type:"lesson_complete",target:l.title,details:{xp:l.xp}});
+let certificateEarned = null;
+try{
+const subjectId = state.subject?.id || state.unit?.subject_id;
+if(subjectId && hasSubscriptionAccess(u)){
+const { data: unitsInSubject } = await sb.from("units").select("id").eq("subject_id", subjectId);
+const unitIds = (unitsInSubject || []).map(x => x.id);
+if(unitIds.length > 0){
+const { data: allLessons } = await sb.from("lessons").select("id").in("unit_id", unitIds).eq("published", true);
+const allLessonIds = (allLessons || []).map(x => x.id);
+const allComplete = allLessonIds.length > 0 && allLessonIds.every(id => newCompleted.includes(id));
+if(allComplete){
+const { data: existingCert } = await sb.from("certificates").select("*").eq("user_id", u.id).eq("subject_id", subjectId).maybeSingle();
+if(!existingCert){
+const newCert = {
+id: DB.uid('cert_'),
+user_id: u.id,
+subject_id: subjectId,
+issued_at: Date.now(),
+created_at: Date.now(),
+auto_generated: true
+};
+const { data: insertedCert } = await sb.from("certificates").insert([newCert]).select().single();
+certificateEarned = insertedCert || newCert;
+DB.trackActivity({
+userId: u.id, userName: u.name,
+type: "certificate_earned",
+target: state.subject?.name || 'مادة',
+details: { subject: state.subject?.name, cert_id: newCert.id }
+});
+}
+}
+}
+}
+}catch(certErr){ console.warn("Auto cert error:", certErr); }
 await Swal.fire({
 icon: 'success',
-title: 'أحسنت!',
-text: `+${l.xp} XP`,
+title: certificateEarned ? '🏆 مبروووك!' : 'أحسنت!',
+html: certificateEarned 
+? `
+<div style="text-align:center;">
+<div style="font-size:64px;margin-bottom:12px;">🎓</div>
+<p style="font-size:17px;margin-bottom:10px;font-weight:700;">خلصت مادة <b style="color:#fbbf24">${state.subject?.name || ''}</b> كاملة!</p>
+<p style="color:#b7c6e4;font-size:14px;margin-bottom:8px;">اتولدت لك <b style="color:#FFD700">شهادة إتمام</b> تلقائيًا 🎉</p>
+<div style="display:inline-block;padding:8px 20px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);border-radius:12px;margin-top:8px;">
+<span style="color:#fbbf24;font-weight:900;font-size:14px;">+${l.xp} XP</span>
+</div>
+</div>
+`
+: `<div style="text-align:center;"><div style="font-size:48px;margin-bottom:8px;">✨</div><div style="font-size:20px;font-weight:900;color:#6ee7a0;">+${l.xp} XP</div></div>`,
 background: 'linear-gradient(180deg, #151f38, #0b1122)',
 color: '#e8eefc',
-confirmButtonColor: '#2f7dff',
+confirmButtonColor: certificateEarned ? '#fbbf24' : '#2f7dff',
+confirmButtonText: certificateEarned ? '🎓 روح لشهاداتي' : 'تمام',
 customClass: {popup:'swal-custom-popup', title:'swal-custom-title'},
-timer: 1800,
-showConfirmButton: false
-});
+timer: certificateEarned ? undefined : 2000,
+showConfirmButton: certificateEarned ? true : false
+}).then(r=>{
+if(certificateEarned && r.isConfirmed){
+window.location.href = '/student/index.html';
+} else {
 location.reload();
+}
+});
 }catch(e){
 Swal.fire({icon:'error', title:'خطأ', text:e.message, background:'linear-gradient(180deg, #151f38, #0b1122)', color:'#e8eefc', confirmButtonColor:'#2f7dff', customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
 }

@@ -1509,6 +1509,232 @@ function Notifications(){
     }
   </>;
 }
+function CertificatesPage(){
+const app=useApp();
+const u=app.currentUser;
+const isPaid = hasSubscriptionAccess(u);
+const certs = app.certificates || [];
+
+if(!isPaid){
+return <>
+<div className="flex between center mb16 wrap g8">
+<div>
+<div className="h2 grad">🎓 شهاداتي</div>
+<div className="sm muted mt6">شهادات إتمام المواد</div>
+</div>
+</div>
+<div className="glass" style={{padding:50,textAlign:'center',position:'relative',overflow:'hidden'}}>
+<div style={{position:'absolute',inset:0,background:'radial-gradient(circle at 50% 30%,rgba(251,191,36,.08),transparent 60%)',pointerEvents:'none'}}/>
+<div style={{fontSize:90,marginBottom:18,position:'relative',filter:'drop-shadow(0 0 30px rgba(251,191,36,.4))'}}>🔒</div>
+<div className="h2 mb10" style={{color:'#fbbf24',position:'relative'}}>الشهادات للمشتركين فقط</div>
+<div className="sm muted mb20" style={{maxWidth:520,margin:'0 auto 24px',lineHeight:1.8,position:'relative'}}>
+اشترك في المنصة، خلّص أي مادة كاملة، وهتاخد <b style={{color:'#FFD700'}}>شهادة إتمام احترافية</b> تلقائيًا 🎉
+</div>
+<button className="btn btn-lg" onClick={showLockedMessage} style={{background:'linear-gradient(135deg,#FFD700,#D4AF37)',color:'#1a1206',fontWeight:900,position:'relative',boxShadow:'0 14px 40px rgba(251,191,36,.5)'}}>
+<i className="fa-solid fa-crown"></i> اشترك الآن
+</button>
+</div>
+</>;
+}
+
+return <>
+<div className="flex between center mb16 wrap g8">
+<div>
+<div className="h2 grad">🎓 شهاداتي</div>
+<div className="sm muted mt6">شهادات إتمام المواد</div>
+</div>
+<div className="flex g8 center">
+{getSubscriptionBadge(u)}
+<span className="pill pill-b">{certs.length} شهادة</span>
+</div>
+</div>
+
+{certs.length===0?(
+<div className="glass" style={{padding:50,textAlign:'center'}}>
+<div style={{fontSize:90,marginBottom:18}}>📜</div>
+<div className="h2 mb10" style={{color:'#FFD700'}}>لسه معندكش شهادات</div>
+<div className="sm muted" style={{maxWidth:520,margin:'0 auto',lineHeight:1.8}}>
+خلّص أي مادة كاملة، وهتاخد شهادة إتمام احترافية تلقائيًا 🎉
+</div>
+</div>
+):(
+<div className="grid g2">
+{certs.map(cert => {
+const subject = app.subject(cert.subject_id);
+return (
+<div key={cert.id} className="glass hv" style={{padding:0,textAlign:'center',position:'relative',overflow:'hidden'}}>
+<div style={{position:'absolute',top:0,left:0,right:0,height:5,background:'linear-gradient(90deg,#8B6914,#FFD700,#D4AF37,#FFD700,#8B6914)'}}/>
+<div style={{position:'absolute',bottom:0,left:0,right:0,height:5,background:'linear-gradient(90deg,#8B6914,#FFD700,#D4AF37,#FFD700,#8B6914)'}}/>
+<div style={{padding:'28px 22px',position:'relative'}}>
+<div style={{position:'absolute',top:20,right:20,fontSize:24,opacity:.15}}>🏆</div>
+<div style={{fontSize:64,marginBottom:14,filter:'drop-shadow(0 8px 20px rgba(251,191,36,.4))'}}>{subject?.icon || '🎓'}</div>
+<div className="h3 mb8" style={{color:'#FFD700',fontWeight:900}}>{subject?.name || 'مادة'}</div>
+<div className="xs muted mb12">
+صادرة: {new Date(cert.issued_at).toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'})}
+</div>
+<div className="pill pill-b mb16" style={{display:'inline-flex',fontFamily:'monospace',letterSpacing:1,fontSize:10.5}}>
+رقم: {cert.id.slice(-10).toUpperCase()}
+</div>
+<button 
+className="btn btn-block"
+onClick={()=>downloadCertificate(u, subject, cert)}
+style={{background:'linear-gradient(135deg,#FFD700,#D4AF37)',color:'#1a1206',fontWeight:900,boxShadow:'0 10px 28px rgba(251,191,36,.35)'}}>
+<i className="fa-solid fa-download"></i> تحميل الشهادة PDF
+</button>
+</div>
+</div>
+);
+})}
+</div>
+)}
+</>;
+}
+
+async function downloadCertificate(student, subject, cert){
+if(!window.jspdf){ window.location.reload(); return; }
+const { jsPDF } = window.jspdf;
+
+let logoBase64 = '';
+try{
+const res = await fetch('/logo.png');
+const blob = await res.blob();
+logoBase64 = await new Promise((resolve)=>{
+const reader = new FileReader();
+reader.onloadend = ()=>resolve(reader.result);
+reader.readAsDataURL(blob);
+});
+}catch(e){}
+
+const certNumber = cert.id.slice(-12).toUpperCase();
+const issueDate = new Date(cert.issued_at).toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
+const studentName = student?.name || 'الطالب';
+const subjectName = subject?.name || 'المادة';
+const subjectIcon = subject?.icon || '📚';
+
+const wrapper = document.createElement('div');
+wrapper.setAttribute('dir', 'rtl');
+wrapper.style.cssText = 'position:fixed;top:0;left:0;width:1400px;height:990px;overflow:hidden;z-index:-1;background:#0a1428;';
+
+const container = document.createElement('div');
+container.setAttribute('dir', 'rtl');
+container.style.cssText = 'position:relative;width:1400px;height:990px;font-family:"Tajawal","Cairo",sans-serif;direction:rtl;background:radial-gradient(1400px 900px at 50% -10%,#1e3a6b 0%,#0d1a3a 45%,#050a18 100%);box-sizing:border-box;overflow:hidden;color:#f7f0dd;';
+
+container.innerHTML = `
+<div style="position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(212,175,55,.02) 0,rgba(212,175,55,.02) 2px,transparent 2px,transparent 22px),repeating-linear-gradient(-45deg,rgba(212,175,55,.02) 0,rgba(212,175,55,.02) 2px,transparent 2px,transparent 22px);pointer-events:none;"></div>
+<div style="position:absolute;top:0;left:0;width:600px;height:600px;background:radial-gradient(circle at 0% 0%,rgba(212,175,55,.18),transparent 55%);pointer-events:none;"></div>
+<div style="position:absolute;top:0;right:0;width:600px;height:600px;background:radial-gradient(circle at 100% 0%,rgba(212,175,55,.18),transparent 55%);pointer-events:none;"></div>
+<div style="position:absolute;bottom:0;left:0;width:600px;height:600px;background:radial-gradient(circle at 0% 100%,rgba(212,175,55,.14),transparent 55%);pointer-events:none;"></div>
+<div style="position:absolute;bottom:0;right:0;width:600px;height:600px;background:radial-gradient(circle at 100% 100%,rgba(212,175,55,.14),transparent 55%);pointer-events:none;"></div>
+<div style="position:absolute;top:0;left:0;right:0;height:14px;background:linear-gradient(90deg,#5c4509,#8B6914,#FFD700,#FFED4E,#FFD700,#8B6914,#5c4509);"></div>
+<div style="position:absolute;bottom:0;left:0;right:0;height:14px;background:linear-gradient(90deg,#5c4509,#8B6914,#FFD700,#FFED4E,#FFD700,#8B6914,#5c4509);"></div>
+<div style="position:absolute;top:0;left:0;bottom:0;width:14px;background:linear-gradient(180deg,#5c4509,#8B6914,#FFD700,#FFED4E,#FFD700,#8B6914,#5c4509);"></div>
+<div style="position:absolute;top:0;right:0;bottom:0;width:14px;background:linear-gradient(180deg,#5c4509,#8B6914,#FFD700,#FFED4E,#FFD700,#8B6914,#5c4509);"></div>
+<div style="position:absolute;top:42px;left:42px;right:42px;bottom:42px;border:2.5px solid rgba(212,175,55,.85);border-radius:10px;box-shadow:0 0 40px rgba(212,175,55,.25) inset;"></div>
+<div style="position:absolute;top:58px;left:58px;right:58px;bottom:58px;border:1px solid rgba(212,175,55,.4);border-radius:6px;"></div>
+<div style="position:absolute;top:72px;left:72px;right:72px;bottom:72px;border:1px dashed rgba(212,175,55,.28);border-radius:4px;"></div>
+<div style="position:absolute;top:26px;right:26px;width:110px;height:110px;border-top:6px solid #FFD700;border-right:6px solid #FFD700;border-top-right-radius:12px;filter:drop-shadow(0 0 12px rgba(255,215,0,.6));"></div>
+<div style="position:absolute;top:26px;left:26px;width:110px;height:110px;border-top:6px solid #FFD700;border-left:6px solid #FFD700;border-top-left-radius:12px;filter:drop-shadow(0 0 12px rgba(255,215,0,.6));"></div>
+<div style="position:absolute;bottom:26px;right:26px;width:110px;height:110px;border-bottom:6px solid #FFD700;border-right:6px solid #FFD700;border-bottom-right-radius:12px;filter:drop-shadow(0 0 12px rgba(255,215,0,.6));"></div>
+<div style="position:absolute;bottom:26px;left:26px;width:110px;height:110px;border-bottom:6px solid #FFD700;border-left:6px solid #FFD700;border-bottom-left-radius:12px;filter:drop-shadow(0 0 12px rgba(255,215,0,.6));"></div>
+<div style="position:absolute;top:90px;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:24px;">
+${logoBase64 ? `<img src="${logoBase64}" style="width:90px;height:90px;object-fit:contain;filter:drop-shadow(0 0 26px rgba(255,215,0,.7));flex-shrink:0;"/>` : `<div style="width:90px;height:90px;border-radius:22px;background:linear-gradient(135deg,#FFED4E,#FFD700,#D4AF37,#8B6914);display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:900;color:#1a1206;box-shadow:0 14px 40px rgba(212,175,55,.6);flex-shrink:0;">M</div>`}
+<div style="text-align:right;">
+<div style="font-size:44px;font-weight:900;background:linear-gradient(100deg,#FFED4E,#FFF3B0 45%,#FFD700 70%,#D4AF37);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1;font-family:'Cairo',sans-serif;">MISSION EDU</div>
+<div style="font-size:15px;color:#d4c79a;margin-top:8px;font-weight:600;font-family:'Tajawal',sans-serif;">منصة تعليمية متكاملة</div>
+</div>
+</div>
+<div style="position:absolute;top:220px;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:18px;width:900px;">
+<div style="flex:1;height:2px;background:linear-gradient(90deg,transparent,#D4AF37,#FFD700,#D4AF37,transparent);"></div>
+<div style="color:#FFD700;font-size:22px;">❖</div>
+<div style="flex:1;height:2px;background:linear-gradient(90deg,transparent,#D4AF37,#FFD700,#D4AF37,transparent);"></div>
+</div>
+<div style="position:absolute;top:255px;left:0;right:0;text-align:center;">
+<div style="font-size:78px;font-weight:900;background:linear-gradient(180deg,#FFED4E,#FFD700 40%,#D4AF37 75%,#8B6914);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-family:'Cairo','Tajawal',sans-serif;line-height:1.2;filter:drop-shadow(0 6px 24px rgba(255,215,0,.5));letter-spacing:0;">شهادة إتمام</div>
+<div style="font-size:14px;color:#d4c79a;margin-top:14px;font-weight:600;font-family:'Cairo',sans-serif;letter-spacing:6px;">CERTIFICATE OF COMPLETION</div>
+<div style="width:280px;height:1px;background:linear-gradient(90deg,transparent,#D4AF37,transparent);margin:18px auto 0;opacity:.7;"></div>
+</div>
+<div style="position:absolute;top:470px;left:0;right:0;text-align:center;">
+<div style="font-size:22px;color:#d4c79a;font-weight:500;font-family:'Tajawal',sans-serif;">تشهد المنصة بأن الطالب</div>
+</div>
+<div style="position:absolute;top:530px;left:0;right:0;text-align:center;padding:0 100px;">
+<div style="display:inline-block;font-size:60px;font-weight:900;color:#FFF3B0;padding:10px 80px 18px;border-bottom:3px solid #FFD700;text-shadow:0 6px 28px rgba(255,215,0,.65),0 0 60px rgba(255,215,0,.35);line-height:1.4;font-family:'Tajawal',sans-serif;">${studentName}</div>
+</div>
+<div style="position:absolute;top:680px;left:0;right:0;text-align:center;">
+<div style="font-size:22px;color:#d4c79a;font-weight:500;font-family:'Tajawal',sans-serif;">قد أتم بنجاح دراسة مادة</div>
+</div>
+<div style="position:absolute;top:740px;left:0;right:0;text-align:center;">
+<div style="display:inline-flex;align-items:center;gap:18px;padding:16px 50px;background:linear-gradient(135deg,rgba(255,215,0,.28),rgba(212,175,55,.12));border:2.5px solid rgba(255,215,0,.8);border-radius:20px;box-shadow:0 14px 44px rgba(212,175,55,.35),0 0 0 10px rgba(212,175,55,.08);">
+<span style="font-size:40px;">${subjectIcon}</span>
+<span style="font-size:36px;font-weight:900;color:#FFD700;text-shadow:0 2px 14px rgba(255,215,0,.5);font-family:'Tajawal',sans-serif;">${subjectName}</span>
+</div>
+</div>
+<div style="position:absolute;bottom:150px;left:150px;right:150px;display:flex;justify-content:space-between;align-items:flex-end;">
+<div style="text-align:center;width:280px;">
+<div style="font-size:12px;color:#8a7d55;margin-bottom:10px;font-weight:700;font-family:'Tajawal',sans-serif;">تاريخ الإصدار</div>
+<div style="font-size:17px;color:#d4c79a;font-weight:800;font-family:'Tajawal',sans-serif;">${issueDate}</div>
+<div style="width:180px;height:1.5px;background:linear-gradient(90deg,transparent,#D4AF37,transparent);margin:12px auto 0;opacity:.7;"></div>
+</div>
+<div style="position:relative;width:130px;height:130px;display:flex;align-items:center;justify-content:center;">
+<div style="position:absolute;inset:0;border-radius:50%;border:3px solid #D4AF37;box-shadow:0 0 40px rgba(212,175,55,.55),0 0 0 8px rgba(212,175,55,.12) inset;"></div>
+<div style="position:absolute;inset:14px;border-radius:50%;border:1.5px dashed rgba(212,175,55,.85);"></div>
+<div style="position:relative;text-align:center;color:#FFD700;">
+<div style="font-size:10px;letter-spacing:3px;font-weight:800;color:#d4c79a;font-family:'Cairo',sans-serif;">OFFICIAL</div>
+<div style="font-size:34px;font-weight:900;line-height:1;margin:6px 0;color:#FFF3B0;text-shadow:0 0 20px rgba(255,215,0,.85);">✦</div>
+<div style="font-size:9px;letter-spacing:2px;font-weight:800;color:#d4c79a;font-family:'Cairo',sans-serif;">MISSION EDU</div>
+</div>
+</div>
+<div style="text-align:center;width:280px;">
+<div style="font-size:12px;color:#8a7d55;margin-bottom:10px;font-weight:700;font-family:'Tajawal',sans-serif;">رقم الشهادة</div>
+<div style="font-size:14px;color:#d4c79a;font-weight:800;font-family:monospace;direction:ltr;letter-spacing:1.5px;">${certNumber}</div>
+<div style="width:180px;height:1.5px;background:linear-gradient(90deg,transparent,#D4AF37,transparent);margin:12px auto 0;opacity:.7;"></div>
+</div>
+</div>
+<div style="position:absolute;bottom:80px;left:0;right:0;text-align:center;">
+<div style="display:inline-block;padding:0 60px;">
+<div style="font-size:24px;font-weight:900;color:#FFD700;font-style:italic;font-family:'Cairo',sans-serif;text-shadow:0 2px 14px rgba(255,215,0,.5);">MISSION EDU</div>
+<div style="width:240px;height:1.5px;background:linear-gradient(90deg,transparent,#D4AF37,#FFD700,#D4AF37,transparent);margin:10px auto;opacity:.75;"></div>
+<div style="font-size:11px;color:#8a7d55;font-weight:700;font-family:'Tajawal',sans-serif;letter-spacing:2px;">التوقيع الرسمي</div>
+</div>
+</div>
+`;
+
+wrapper.appendChild(container);
+document.body.appendChild(wrapper);
+
+try{
+await document.fonts.ready;
+await new Promise(r => setTimeout(r, 1200));
+
+const canvas = await window.html2canvas(container, {
+scale: 2,
+backgroundColor: '#050a18',
+useCORS: true,
+logging: false,
+width: 1400,
+height: 990,
+windowWidth: 1400,
+windowHeight: 990,
+scrollX: 0,
+scrollY: 0,
+x: 0,
+y: 0
+});
+
+const imgData = canvas.toDataURL('image/jpeg', 0.95);
+const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+const pdfW = pdf.internal.pageSize.getWidth();
+const pdfH = pdf.internal.pageSize.getHeight();
+pdf.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
+pdf.save(`شهادة_${subjectName}_${studentName}.pdf`);
+app.toast.ok('تم تحميل الشهادة');
+}catch(e){
+console.error(e);
+app.toast.err('فشل توليد الشهادة');
+} finally {
+document.body.removeChild(wrapper);
+}
+}
+
 function ProfileRedirect(){
   useEffect(()=>{ window.location.href = "/student/profile.html"; },[]);
   return <div className="loading"><div className="spinner"></div>جارٍ التحويل...</div>;
@@ -1580,6 +1806,7 @@ function StudentApp(){
     {id:'subjects',icon:'book',label:'المواد'},
     {id:'missions',icon:'target',label:'المهام'},
     {id:'achievements',icon:'trophy',label:'الإنجازات'},
+    {id:'certificates',icon:'award',label:'شهاداتي'},
     {id:'notes',icon:'note',label:'ملاحظاتي',badge:app.notes?.length||null},
     {id:'polls',icon:'activity',label:'استطلاعات الرأي'},
     {id:'errors',icon:'alert',label:'دفتر أخطائي'},
@@ -1615,6 +1842,7 @@ function StudentApp(){
         {tab==='subject'&&selected&&<SubjectDetail subjectId={selected.id} setSelected={setSelected} setTab={setTab}/>}
         {tab==='missions'&&<Missions setSelected={setSelected} setTab={setTab}/>}
         {tab==='achievements'&&<Achievements/>}
+        {tab==='certificates'&&<CertificatesPage/>}
         {tab==='notes'&&<NotesPage setTab={setTab}/>}
         {tab==='polls'&&<PollsPage/>}
         {tab==='errors'&&<ErrorBook/>}
