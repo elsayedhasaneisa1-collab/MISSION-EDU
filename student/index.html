@@ -199,7 +199,11 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 .lock-overlay-tag i{font-size:9px}
 .cert-full{grid-template-columns:1fr!important;width:100%}
 .cert-full > *{width:100%}
-.social-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.social-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.social-card{display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 12px;border-radius:18px;text-decoration:none;color:inherit;background:linear-gradient(180deg,rgba(21,31,56,.72),rgba(11,17,34,.62));border:1px solid rgba(90,140,230,.22);transition:.28s cubic-bezier(.2,.8,.3,1);position:relative;overflow:hidden}
+.social-card:hover{transform:translateY(-4px);border-color:rgba(90,140,230,.55);box-shadow:0 12px 30px rgba(47,125,255,.25)}
+.social-card .icon{width:52px;height:52px;display:grid;place-items:center}
+.social-card .label{text-align:center;width:100%}
 @media(max-width:1080px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:860px){
   .sidebar{position:fixed;inset-inline-end:0;top:0;transform:translateX(-105%);transition:transform .34s;width:280px;max-width:85vw;box-shadow:-20px 0 60px rgba(0,0,0,.7);overflow-x:hidden}
@@ -209,7 +213,7 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
   .topbar{padding:10px 14px}
   .g2,.g3,.g4{grid-template-columns:1fr}
   .g-auto{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
-  .social-grid{grid-template-columns:1fr}
+  .social-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
   .btmnav{display:flex;position:fixed;bottom:0;inset-inline:0;z-index:55;background:rgba(6,9,20,.94);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:8px 6px;justify-content:space-around;padding-bottom:calc(8px + env(safe-area-inset-bottom));max-width:100vw;overflow-x:hidden}
   .btmnav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;border-radius:11px;color:var(--muted);font-size:10.5px;font-weight:700;transition:.2s;min-width:0}
   .btmnav button.on{color:var(--blue2);background:rgba(47,125,255,.12)}
@@ -231,9 +235,7 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 <script src="/db.js"></script>
 <script>
   if (window.Babel && Babel.availablePresets && Babel.availablePresets['react']) {
-    Babel.registerPreset('react-classic', {
-      presets: [[Babel.availablePresets['react'], { runtime: 'classic' }]]
-    });
+    Babel.registerPreset('react-classic', { presets: [[Babel.availablePresets['react'], { runtime: 'classic' }]] });
   }
   document.addEventListener('contextmenu', e => {
     const t = e.target;
@@ -281,7 +283,7 @@ const useToast=()=>useContext(ToastCtx);
 const AppCtx=createContext(null);
 const useApp=()=>useContext(AppCtx);
 function AppProvider({children}){
-  const [db,setDb]=useState({users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[],polls:[],poll_votes:[]});
+  const [db,setDb]=useState({users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[],polls:[],poll_votes:[],settings:[]});
   const [currentUser,setCurrentUser]=useState(null);
   const [attempts,setAttempts]=useState([]);
   const [errors,setErrors]=useState([]);
@@ -292,13 +294,7 @@ function AppProvider({children}){
   const toast=useToast();
   const lastNotifIdRef=useRef(null);
   const isFirstNotifLoadRef=useRef(true);
-  const reload=useCallback(async ()=>{
-    try{
-      await DB.cleanupExpiredPolls();
-      const data=await DB.loadAll();
-      setDb(data);
-    }catch(e){console.warn(e);}
-  },[]);
+  const reload=useCallback(async ()=>{try{await DB.cleanupExpiredPolls();const data=await DB.loadAll();setDb(data)}catch(e){console.warn(e)}},[]);
   const reloadUserData=useCallback(async ()=>{
     if(!currentUser) return;
     try{
@@ -312,16 +308,16 @@ function AppProvider({children}){
       setAttempts(a);setErrors(e);setNotes(n);setCertificates(c);
       const u=await DB.getUser(currentUser.id);
       if(u) setCurrentUser(u);
-    }catch(e){console.warn(e);}
+    }catch(e){console.warn(e)}
   },[currentUser]);
   useEffect(()=>{
     (async ()=>{
       try{
         const sid=DB.getSessionId();
-        if(!sid){window.location.replace('/auth/login.html');return;}
+        if(!sid){window.location.replace('/auth/login.html');return}
         const u=await DB.getUser(sid);
-        if(!u||u.active===false){DB.clearSession();window.location.replace('/auth/login.html');return;}
-        if(u.role==='admin'){window.location.replace('/admin/index.html');return;}
+        if(!u||u.active===false){DB.clearSession();window.location.replace('/auth/login.html');return}
+        if(u.role==='admin'){window.location.replace('/admin/index.html');return}
         setCurrentUser(u);
         const sb=await DB.getClient();
         const [a,e,n,c]=await Promise.all([
@@ -331,18 +327,15 @@ function AppProvider({children}){
           sb.from('certificates').select('*').eq('user_id',u.id).then(r=>r.data||[])
         ]);
         setAttempts(a);setErrors(e);setNotes(n);setCertificates(c);
-        const {data:st}=await sb.from('settings').select('*').eq('id','site').maybeSingle();
-        if(st){setSettings({about_title:st.about_title||'عن المنصة',about_text:st.about_text||'',social_links:Array.isArray(st.social_links)?st.social_links:[]});}
+        const st = await DB.getSettings();
+        setSettings(st);
         await reload();
-      }catch(e){console.warn(e);}
+      }catch(e){console.warn(e)}
       setLoading(false);
     })();
   },[]);
   useEffect(()=>{
-    const interval=setInterval(async ()=>{
-      const count=await DB.cleanupExpiredPolls();
-      if(count>0){ await reload(); }
-    },5*60*1000);
+    const interval=setInterval(async ()=>{const c=await DB.cleanupExpiredPolls();if(c>0){await reload()}},5*60*1000);
     return ()=>clearInterval(interval);
   },[reload]);
   useEffect(()=>{
@@ -352,16 +345,17 @@ function AppProvider({children}){
         const myNotifs = (db.notifications||[]).filter(n=>n.target==='all'||n.target===currentUser.id).sort((a,b)=>b.created_at-a.created_at);
         if(myNotifs.length===0) return;
         const latest = myNotifs[0];
-        if(isFirstNotifLoadRef.current){isFirstNotifLoadRef.current=false;lastNotifIdRef.current=latest.id;return;}
+        if(isFirstNotifLoadRef.current){isFirstNotifLoadRef.current=false;lastNotifIdRef.current=latest.id;return}
         if(latest.id!==lastNotifIdRef.current){
           lastNotifIdRef.current=latest.id;
           if(('Notification' in window) && Notification.permission==='granted'){
             try{
               const reg=await navigator.serviceWorker.ready;
-              reg.showNotification(latest.title||'MISSION EDU',{body:latest.body||'',icon:'/logo.png',badge:'/logo.png',dir:'rtl',lang:'ar',tag:'notif-'+latest.id,data:{url:'/student/index.html'}});
-            }catch(e){try{new Notification(latest.title||'MISSION EDU',{body:latest.body||'',icon:'/logo.png',dir:'rtl',lang:'ar'});}catch(err){}}
+              reg.showNotification(latest.title||'MISSION EDU',{body:latest.body||'',icon:'/logo.png',badge:'/logo.png',dir:'rtl',lang:'ar',tag:'notif-'+latest.id,data:{url: latest.url || '/student/index.html'}});
+            }catch(e){try{new Notification(latest.title||'MISSION EDU',{body:latest.body||'',icon:'/logo.png',dir:'rtl',lang:'ar'})}catch(err){}}
           }
           playSound('notify');
+          await reload();
         }
       }catch(e){}
     };
@@ -370,67 +364,30 @@ function AppProvider({children}){
     return ()=>clearInterval(interval);
   },[db.notifications,currentUser]);
   useEffect(()=>{
-    const unlock=()=>{
-      const ctx=getAudioCtx();
-      if(ctx&&ctx.state==='suspended') ctx.resume();
-      document.removeEventListener('click',unlock);
-      document.removeEventListener('touchstart',unlock);
-    };
+    const unlock=()=>{const c=getAudioCtx();if(c&&c.state==='suspended')c.resume();document.removeEventListener('click',unlock);document.removeEventListener('touchstart',unlock)};
     document.addEventListener('click',unlock,{once:true});
     document.addEventListener('touchstart',unlock,{once:true});
-    return ()=>{
-      document.removeEventListener('click',unlock);
-      document.removeEventListener('touchstart',unlock);
-    };
+    return ()=>{document.removeEventListener('click',unlock);document.removeEventListener('touchstart',unlock)};
   },[]);
   const logout=useCallback(()=>{
-    Swal.fire({
-      title:'تسجيل الخروج',text:'هل أنت متأكد؟',icon:'question',
-      showCancelButton:true,confirmButtonText:'نعم، خروج',cancelButtonText:'إلغاء',
-      confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
-      background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',
-      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
-    }).then(r=>{
-      if(r.isConfirmed){
-        try{localStorage.removeItem('student_tab');localStorage.removeItem('student_selected');}catch(e){}
-        DB.clearSession();
-        window.location.replace('/auth/login.html');
-      }
+    Swal.fire({title:'تسجيل الخروج',text:'هل أنت متأكد؟',icon:'question',showCancelButton:true,confirmButtonText:'نعم، خروج',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}}).then(r=>{
+      if(r.isConfirmed){try{localStorage.removeItem('student_tab');localStorage.removeItem('student_selected')}catch(e){}DB.clearSession();window.location.replace('/auth/login.html')}
     });
   },[]);
-  const updateUser=useCallback(async (id,patch)=>{
-    const u=await DB.updateUser(id,patch);
-    setCurrentUser(u);
-    return u;
-  },[]);
-  const getLevel=useCallback((xp)=>{
-    const ls=[...db.levels].sort((a,b)=>a.xp-b.xp);
-    if(ls.length===0) return {current:{level:1,name:'مبتدئ',xp:0},next:null};
-    let cur=ls[0],next=null;
-    for(let i=0;i<ls.length;i++){if(xp>=ls[i].xp){cur=ls[i];next=ls[i+1]||null;}}
-    return {current:cur,next};
-  },[db.levels]);
+  const updateUser=useCallback(async (id,patch)=>{const u=await DB.updateUser(id,patch);setCurrentUser(u);return u},[]);
+  const getLevel=useCallback((xp)=>{const ls=[...db.levels].sort((a,b)=>a.xp-b.xp);if(ls.length===0)return{current:{level:1,name:'مبتدئ',xp:0},next:null};let cur=ls[0],next=null;for(let i=0;i<ls.length;i++){if(xp>=ls[i].xp){cur=ls[i];next=ls[i+1]||null}}return{current:cur,next}},[db.levels]);
   const saveNote=useCallback(async (lessonId,text)=>{
     if(!currentUser) return;
     const sb=await DB.getClient();
     const existing=notes.find(n=>n.lesson_id===lessonId);
     const now=Date.now();
-    if(existing){
-      await sb.from('notes').update({text,updated_at:now}).eq('id',existing.id);
-      setNotes(x=>x.map(n=>n.id===existing.id?{...n,text,updated_at:now}:n));
-    } else {
-      const row={id:DB.uid('note_'),user_id:currentUser.id,lesson_id:lessonId,text,created_at:now,updated_at:now};
-      await sb.from('notes').insert([row]);
-      setNotes(x=>[...x,row]);
-    }
+    if(existing){await sb.from('notes').update({text,updated_at:now}).eq('id',existing.id);setNotes(x=>x.map(n=>n.id===existing.id?{...n,text,updated_at:now}:n))}
+    else{const row={id:DB.uid('note_'),user_id:currentUser.id,lesson_id:lessonId,text,created_at:now,updated_at:now};await sb.from('notes').insert([row]);setNotes(x=>[...x,row])}
   },[currentUser,notes]);
-  const getNote=useCallback((lessonId)=>{
-    return notes.find(n=>n.lesson_id===lessonId)?.text||'';
-  },[notes]);
+  const getNote=useCallback((lessonId)=>notes.find(n=>n.lesson_id===lessonId)?.text||'',[notes]);
   return <AppCtx.Provider value={{
     db,currentUser,attempts,errors,notes,certificates,settings,loading,
-    logout,updateUser,reload,reloadUserData,getLevel,toast,playSound,
-    saveNote,getNote,
+    logout,updateUser,reload,reloadUserData,getLevel,toast,playSound,saveNote,getNote,
     subject:id=>db.subjects.find(s=>s.id===id),
     unit:id=>db.units.find(u=>u.id===id),
     lesson:id=>db.lessons.find(l=>l.id===id),
@@ -474,372 +431,131 @@ const Icon=({name,size=18,color='currentColor'})=>{
   };
   return <svg {...p}>{paths[name]||paths.info}</svg>;
 };
-const SocialIcon=({platform,size=26})=>{
+
+const SocialIcon=({platform,size=52})=>{
   const icons={
-    facebook:<svg width={size} height={size} viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073C24 5.446 18.627.073 12 .073S0 5.446 0 12.073c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>,
-    tiktok:<svg width={size} height={size} viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#000"/><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" fill="#25F4EE"/><path d="M11.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" fill="#FE2C55" opacity=".85"/></svg>,
-    instagram:<svg width={size} height={size} viewBox="0 0 24 24"><defs><radialGradient id="igrad" cx="30%" cy="107%" r="150%"><stop offset="0%" stopColor="#fdf497"/><stop offset="5%" stopColor="#fdf497"/><stop offset="45%" stopColor="#fd5949"/><stop offset="60%" stopColor="#d6249f"/><stop offset="90%" stopColor="#285AEB"/></radialGradient></defs><rect width="24" height="24" rx="6" fill="url(#igrad)"/><rect x="4.5" y="4.5" width="15" height="15" rx="4.5" fill="none" stroke="#fff" strokeWidth="1.8"/><circle cx="12" cy="12" r="3.6" fill="none" stroke="#fff" strokeWidth="1.8"/><circle cx="17" cy="7" r="1.1" fill="#fff"/></svg>,
-    whatsapp_channel:<svg width={size} height={size} viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#25D366"/><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884" fill="#fff"/></svg>,
-    whatsapp_group:<svg width={size} height={size} viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#128C7E"/><circle cx="12" cy="8" r="3.2" fill="#fff"/><circle cx="6" cy="10" r="2.5" fill="#fff" opacity=".85"/><circle cx="18" cy="10" r="2.5" fill="#fff" opacity=".85"/><path d="M4 20c0-3 3-5 8-5s8 2 8 5" fill="#fff"/></svg>,
-    custom:<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+    facebook:(
+      <svg width={size} height={size} viewBox="0 0 48 48">
+        <defs><linearGradient id="fbg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#1877F2"/><stop offset="100%" stopColor="#0C63D4"/></linearGradient></defs>
+        <rect width="48" height="48" rx="14" fill="url(#fbg)"/>
+        <path d="M33 24c0-5-4-9-9-9s-9 4-9 9c0 4.5 3.3 8.2 7.6 8.9v-6.3h-2.3V24h2.3v-2c0-2.3 1.4-3.6 3.5-3.6 1 0 2 .2 2 .2v2.2h-1.1c-1.1 0-1.5.7-1.5 1.4V24h2.5l-.4 2.6h-2.1v6.3c4.3-.7 7.5-4.4 7.5-8.9z" fill="#fff"/>
+      </svg>
+    ),
+    tiktok:(
+      <svg width={size} height={size} viewBox="0 0 48 48">
+        <rect width="48" height="48" rx="14" fill="#010101"/>
+        <path d="M33 18.5c-2.5-.2-4.7-1.7-5.8-3.9v11.2c0 4-3.3 7.2-7.2 7.2s-7.2-3.2-7.2-7.2 3.3-7.2 7.2-7.2c.4 0 .8 0 1.2.1v4.6c-.4-.1-.8-.2-1.2-.2-1.5 0-2.7 1.2-2.7 2.7s1.2 2.7 2.7 2.7 2.7-1.2 2.7-2.7V9h4.5c.4 2.9 2.8 5.2 5.8 5.4v4.1z" fill="#25F4EE"/>
+        <path d="M32 18.5c-2.5-.2-4.7-1.7-5.8-3.9v11.2c0 4-3.3 7.2-7.2 7.2s-7.2-3.2-7.2-7.2 3.3-7.2 7.2-7.2c.4 0 .8 0 1.2.1v4.6c-.4-.1-.8-.2-1.2-.2-1.5 0-2.7 1.2-2.7 2.7s1.2 2.7 2.7 2.7 2.7-1.2 2.7-2.7V9h4.5c.4 2.9 2.8 5.2 5.8 5.4v4.1z" fill="#FE2C55" opacity=".85"/>
+      </svg>
+    ),
+    instagram:(
+      <svg width={size} height={size} viewBox="0 0 48 48">
+        <defs><radialGradient id="igg" cx="30%" cy="107%" r="150%"><stop offset="0%" stopColor="#fdf497"/><stop offset="5%" stopColor="#fdf497"/><stop offset="45%" stopColor="#fd5949"/><stop offset="60%" stopColor="#d6249f"/><stop offset="90%" stopColor="#285AEB"/></radialGradient></defs>
+        <rect width="48" height="48" rx="14" fill="url(#igg)"/>
+        <rect x="13" y="13" width="22" height="22" rx="6.5" fill="none" stroke="#fff" strokeWidth="3"/>
+        <circle cx="24" cy="24" r="5.5" fill="none" stroke="#fff" strokeWidth="3"/>
+        <circle cx="32" cy="16" r="1.8" fill="#fff"/>
+      </svg>
+    ),
+    whatsapp_channel:(
+      <svg width={size} height={size} viewBox="0 0 48 48">
+        <defs><linearGradient id="wcg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#25D366"/><stop offset="100%" stopColor="#128C7E"/></linearGradient></defs>
+        <rect width="48" height="48" rx="14" fill="url(#wcg)"/>
+        <path d="M14 16l18-4-6 10-8 2z" fill="#fff" opacity=".95"/>
+        <path d="M24 20l8-8-4 10-6 2z" fill="#DCF8C6"/>
+        <circle cx="24" cy="31" r="3.5" fill="#fff"/>
+        <circle cx="16" cy="34" r="2" fill="#fff" opacity=".7"/>
+        <circle cx="32" cy="34" r="2" fill="#fff" opacity=".7"/>
+      </svg>
+    ),
+    whatsapp_group:(
+      <svg width={size} height={size} viewBox="0 0 48 48">
+        <defs><linearGradient id="wgg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#25D366"/><stop offset="100%" stopColor="#075E54"/></linearGradient></defs>
+        <rect width="48" height="48" rx="14" fill="url(#wgg)"/>
+        <circle cx="24" cy="18" r="4.5" fill="#fff"/>
+        <circle cx="15" cy="20" r="3.2" fill="#fff" opacity=".85"/>
+        <circle cx="33" cy="20" r="3.2" fill="#fff" opacity=".85"/>
+        <path d="M14 34c0-4 4.5-7 10-7s10 3 10 7v2H14z" fill="#fff"/>
+        <path d="M7 34c0-3 3-5 6.5-5.5" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" opacity=".85"/>
+        <path d="M41 34c0-3-3-5-6.5-5.5" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" opacity=".85"/>
+      </svg>
+    ),
+    custom:(
+      <svg width={size} height={size} viewBox="0 0 48 48">
+        <defs><linearGradient id="ctg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#D4AF37"/><stop offset="100%" stopColor="#8B6914"/></linearGradient></defs>
+        <rect width="48" height="48" rx="14" fill="url(#ctg)"/>
+        <circle cx="24" cy="24" r="10" fill="none" stroke="#fff" strokeWidth="2.5"/>
+        <path d="M14 24h20M24 14a15 15 0 0 1 0 20M24 14a15 15 0 0 0 0 20" fill="none" stroke="#fff" strokeWidth="2.5"/>
+      </svg>
+    )
   };
   return icons[platform]||icons.custom;
 };
-function Stat({label,value,icon,color='var(--blue)',sub}){
-  return <div className="glass-s hv" style={{padding:16}}>
-    <div className="flex between center mb8">
-      <div className="stat-l">{label}</div>
-      <div style={{color}}>{typeof icon==='string'?<Icon name={icon} size={20}/>:icon}</div>
-    </div>
-    <div className="stat-n" style={{color}}>{value}</div>
-    {sub&&<div className="xs muted mt8">{sub}</div>}
-  </div>;
-}
-function Empty({icon='📭',title,desc}){
-  return <div className="empty">
-    <div className="empty-ico">{icon}</div>
-    <div className="h4 txt2 mb8">{title}</div>
-    {desc&&<div className="sm">{desc}</div>}
-  </div>;
-}
-function Ring({value,size=120,stroke=10,color='#2f7dff',children}){
-  const r=(size-stroke)/2,c=2*Math.PI*r,off=c-(value/100)*c;
-  return <div className="ring" style={{width:size,height:size}}>
-    <svg width={size} height={size} style={{transform:'rotate(-90deg)'}}>
-      <circle cx={size/2} cy={size/2} r={r} stroke="rgba(255,255,255,.07)" strokeWidth={stroke} fill="none"/>
-      <circle cx={size/2} cy={size/2} r={r} stroke={color} strokeWidth={stroke} fill="none" strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round" style={{transition:'stroke-dashoffset 1s'}}/>
-    </svg>
-    <div className="ring-t">{children}</div>
-  </div>;
-}
-function parseVideo(v){
-  if(!v) return null;
-  if(typeof v === 'string'){
-    try{ return JSON.parse(v); }catch(e){ return null; }
-  }
-  return v;
-}
-function isPaidContent(item){
-  if(!item) return false;
-  const checkFlag = (val)=>{
-    if(val === false) return true;
-    if(val === 'false') return true;
-    if(val === 'paid') return true;
-    if(val === 0) return true;
-    return false;
-  };
-  if(checkFlag(item.is_free)) return true;
-  const video = parseVideo(item.video);
-  if(video && checkFlag(video.is_free)) return true;
-  return false;
-}
-function hasSubscriptionAccess(user){
-  if(!user) return false;
-  if(user.subscription === 'vip' || user.subscription === 'VIP') return true;
-  if(user.subscription === 'paid' || user.subscription === 'PAID'){
-    if(!user.subscription_until) return true;
-    const until = typeof user.subscription_until === 'number'
-      ? user.subscription_until
-      : new Date(user.subscription_until).getTime();
-    if(!isNaN(until) && until > Date.now()) return true;
-  }
-  return false;
-}
-function hasAccess(user, item){
-  if(!isPaidContent(item)) return true;
-  return hasSubscriptionAccess(user);
-}
-function getLockReason(user, item){
-  if(!isPaidContent(item)) return '';
-  if(!user) return 'no_user';
-  if(user.subscription === 'vip' || user.subscription === 'VIP') return '';
-  if(user.subscription === 'paid' || user.subscription === 'PAID'){
-    if(!user.subscription_until) return '';
-    const until = typeof user.subscription_until === 'number' ? user.subscription_until : new Date(user.subscription_until).getTime();
-    if(until > Date.now()) return '';
-    return 'expired';
-  }
-  return 'no_subscription';
-}
-function showLockedMessage(){
-  Swal.fire({
-    icon: 'warning',
-    title: '🔒 محتوى مدفوع',
-    html: `
-      <div style="text-align:right;line-height:2;font-size:14px">
-        <p style="margin-bottom:10px">هذا المحتوى متاح <b style="color:#fbbf24">للمشتركين فقط</b>.</p>
-        <p style="color:#b7c6e4;font-size:13px;margin-bottom:10px">للاشتراك والاستفادة من كل المحتوى المدفوع، تواصل معنا:</p>
-        <div style="display:flex;align-items:center;gap:8px;background:rgba(37,211,102,.10);border:1px solid rgba(37,211,102,.3);border-radius:10px;padding:10px 14px;margin-top:8px">
-          <i class="fa-brands fa-whatsapp" style="color:#25d366;font-size:20px"></i>
-          <span style="color:#fff;font-weight:700">01128351702</span>
-        </div>
-      </div>`,
-    background: 'linear-gradient(180deg, #151f38, #0b1122)',
-    color: '#e8eefc',
-    showCancelButton: true,
-    confirmButtonText: '<i class="fa-brands fa-whatsapp"></i> تواصل واتساب',
-    cancelButtonText: 'إلغاء',
-    confirmButtonColor: '#25d366',
-    cancelButtonColor: '#64748b',
-    customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
-  }).then(r=>{
-    if(r.isConfirmed){
-      window.open("https://wa.me/201128351702?text=" + encodeURIComponent("مرحبًا، أريد الاشتراك في منصة MISSION EDU للوصول للمحتوى المدفوع"), "_blank");
-    }
-  });
-}
-function getSubscriptionBadge(user){
-  if(!user) return '';
-  if(user.subscription === 'vip' || user.subscription === 'VIP') return <span className="pill pill-vip"><i className="fa-solid fa-crown"></i> VIP</span>;
-  if(user.subscription === 'paid' || user.subscription === 'PAID'){
-    if(user.subscription_until){
-      const until = typeof user.subscription_until === 'number' ? user.subscription_until : new Date(user.subscription_until).getTime();
-      if(until > Date.now()){
-        const days = Math.ceil((until - Date.now()) / 86400000);
-        return <span className="pill pill-paid"><i className="fa-solid fa-crown"></i> مشترك ({days} يوم)</span>;
-      }
-      return <span className="pill pill-r"><i className="fa-solid fa-circle-xmark"></i> اشتراك منتهي</span>;
-    }
-    return <span className="pill pill-paid"><i className="fa-solid fa-crown"></i> مشترك</span>;
-  }
-  return <span className="pill pill-free"><i className="fa-solid fa-user"></i> مجاني</span>;
-}
+
+function Stat({label,value,icon,color='var(--blue)',sub}){return <div className="glass-s hv" style={{padding:16}}><div className="flex between center mb8"><div className="stat-l">{label}</div><div style={{color}}>{typeof icon==='string'?<Icon name={icon} size={20}/>:icon}</div></div><div className="stat-n" style={{color}}>{value}</div>{sub&&<div className="xs muted mt8">{sub}</div>}</div>;}
+function Empty({icon='📭',title,desc}){return <div className="empty"><div className="empty-ico">{icon}</div><div className="h4 txt2 mb8">{title}</div>{desc&&<div className="sm">{desc}</div>}</div>;}
+function Ring({value,size=120,stroke=10,color='#2f7dff',children}){const r=(size-stroke)/2,c=2*Math.PI*r,off=c-(value/100)*c;return <div className="ring" style={{width:size,height:size}}><svg width={size} height={size} style={{transform:'rotate(-90deg)'}}><circle cx={size/2} cy={size/2} r={r} stroke="rgba(255,255,255,.07)" strokeWidth={stroke} fill="none"/><circle cx={size/2} cy={size/2} r={r} stroke={color} strokeWidth={stroke} fill="none" strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round" style={{transition:'stroke-dashoffset 1s'}}/></svg><div className="ring-t">{children}</div></div>;}
+
+function parseVideo(v){if(!v)return null;if(typeof v==='string'){try{return JSON.parse(v)}catch(e){return null}}return v}
+function isPaidContent(item){if(!item)return false;const check=(val)=>{if(val===false||val==='false'||val==='paid'||val===0)return true;return false};if(check(item.is_free))return true;const v=parseVideo(item.video);if(v&&check(v.is_free))return true;return false}
+function hasSubscriptionAccess(user){if(!user)return false;if(user.subscription==='vip'||user.subscription==='VIP')return true;if(user.subscription==='paid'||user.subscription==='PAID'){if(!user.subscription_until)return true;const u=typeof user.subscription_until==='number'?user.subscription_until:new Date(user.subscription_until).getTime();if(!isNaN(u)&&u>Date.now())return true}return false}
+function hasAccess(user,item){if(!isPaidContent(item))return true;return hasSubscriptionAccess(user)}
+function getLockReason(user,item){if(!isPaidContent(item))return '';if(!user)return 'no_user';if(user.subscription==='vip'||user.subscription==='VIP')return '';if(user.subscription==='paid'||user.subscription==='PAID'){if(!user.subscription_until)return '';const u=typeof user.subscription_until==='number'?user.subscription_until:new Date(user.subscription_until).getTime();if(u>Date.now())return '';return 'expired'}return 'no_subscription'}
+function showLockedMessage(){Swal.fire({icon:'warning',title:'🔒 محتوى مدفوع',html:`<div style="text-align:right;line-height:2;font-size:14px"><p style="margin-bottom:10px">هذا المحتوى متاح <b style="color:#fbbf24">للمشتركين فقط</b>.</p><p style="color:#b7c6e4;font-size:13px;margin-bottom:10px">للاشتراك والاستفادة من كل المحتوى المدفوع، تواصل معنا:</p><div style="display:flex;align-items:center;gap:8px;background:rgba(37,211,102,.10);border:1px solid rgba(37,211,102,.3);border-radius:10px;padding:10px 14px;margin-top:8px"><i class="fa-brands fa-whatsapp" style="color:#25d366;font-size:20px"></i><span style="color:#fff;font-weight:700">01128351702</span></div></div>`,background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',showCancelButton:true,confirmButtonText:'<i class="fa-brands fa-whatsapp"></i> تواصل واتساب',cancelButtonText:'إلغاء',confirmButtonColor:'#25d366',cancelButtonColor:'#64748b',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}}).then(r=>{if(r.isConfirmed){window.open("https://wa.me/201128351702?text="+encodeURIComponent("مرحبًا، أريد الاشتراك في منصة MISSION EDU للوصول للمحتوى المدفوع"),"_blank")}})}
+function getSubscriptionBadge(user){if(!user)return '';if(user.subscription==='vip'||user.subscription==='VIP')return <span className="pill pill-vip"><i className="fa-solid fa-crown"></i> VIP</span>;if(user.subscription==='paid'||user.subscription==='PAID'){if(user.subscription_until){const u=typeof user.subscription_until==='number'?user.subscription_until:new Date(user.subscription_until).getTime();if(u>Date.now()){const d=Math.ceil((u-Date.now())/86400000);return <span className="pill pill-paid"><i className="fa-solid fa-crown"></i> مشترك ({d} يوم)</span>}return <span className="pill pill-r"><i className="fa-solid fa-circle-xmark"></i> اشتراك منتهي</span>}return <span className="pill pill-paid"><i className="fa-solid fa-crown"></i> مشترك</span>}return <span className="pill pill-free"><i className="fa-solid fa-user"></i> مجاني</span>}
+
 function PomodoroTimer({compact=false}){
-  const app=useApp();
-  const u=app.currentUser;
-  const [mode,setMode]=useState('work');
-  const [running,setRunning]=useState(false);
-  const [secondsLeft,setSecondsLeft]=useState(25*60);
-  const [sessions,setSessions]=useState(0);
-  const intervalRef=useRef(null);
-  const WORK_TIME=25*60;
-  const BREAK_TIME=5*60;
+  const app=useApp();const u=app.currentUser;
+  const [mode,setMode]=useState('work');const [running,setRunning]=useState(false);const [secondsLeft,setSecondsLeft]=useState(25*60);const [sessions,setSessions]=useState(0);
+  const intervalRef=useRef(null);const WORK_TIME=25*60;const BREAK_TIME=5*60;
   useEffect(()=>{
-    if(running){
-      intervalRef.current=setInterval(()=>{
-        setSecondsLeft(s=>{
-          if(s<=1){
-            clearInterval(intervalRef.current);
-            setRunning(false);
-            if(mode==='work'){
-              saveSession();
-              app.playSound('success');
-              Swal.fire({
-                icon:'success', title:'🎉 خلصت 25 دقيقة!', text:'خد راحة 5 دقايق',
-                background:'linear-gradient(180deg, #151f38, #0b1122)', color:'#e8eefc',
-                confirmButtonColor:'#2f7dff', confirmButtonText:'خد راحة',
-                customClass:{popup:'swal-custom-popup',title:'swal-custom-title'},
-                timer:5000, showConfirmButton:true
-              }).then(()=>{ setMode('break'); setSecondsLeft(BREAK_TIME); });
-            } else {
-              app.playSound('notify');
-              Swal.fire({
-                icon:'info', title:'☕ خلصت الراحة', text:'جاهز لـ 25 دقيقة جديدة؟',
-                background:'linear-gradient(180deg, #151f38, #0b1122)', color:'#e8eefc',
-                confirmButtonColor:'#2f7dff', confirmButtonText:'يلا نبدأ',
-                customClass:{popup:'swal-custom-popup',title:'swal-custom-title'},
-                timer:5000
-              }).then(()=>{ setMode('work'); setSecondsLeft(WORK_TIME); });
-            }
-            return 0;
-          }
-          return s-1;
-        });
-      },1000);
-    } else { clearInterval(intervalRef.current); }
-    return ()=>clearInterval(intervalRef.current);
+    if(running){intervalRef.current=setInterval(()=>{setSecondsLeft(s=>{if(s<=1){clearInterval(intervalRef.current);setRunning(false);if(mode==='work'){saveSession();app.playSound('success');Swal.fire({icon:'success',title:'🎉 خلصت 25 دقيقة!',text:'خد راحة 5 دقايق',background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',confirmButtonColor:'#2f7dff',confirmButtonText:'خد راحة',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'},timer:5000,showConfirmButton:true}).then(()=>{setMode('break');setSecondsLeft(BREAK_TIME)})}else{app.playSound('notify');Swal.fire({icon:'info',title:'☕ خلصت الراحة',text:'جاهز لـ 25 دقيقة جديدة؟',background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',confirmButtonColor:'#2f7dff',confirmButtonText:'يلا نبدأ',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'},timer:5000}).then(()=>{setMode('work');setSecondsLeft(WORK_TIME)})}return 0}return s-1})},1000)}else{clearInterval(intervalRef.current)}return ()=>clearInterval(intervalRef.current)
   },[running,mode]);
-  const saveSession=async ()=>{
-    try{
-      const sb=await DB.getClient();
-      await sb.from('pomodoro_sessions').insert([{
-        id:DB.uid('pomo_'), user_id:u.id, duration:25,
-        completed_at:Date.now(), created_at:Date.now()
-      }]);
-      setSessions(s=>s+1);
-      await DB.updateUser(u.id,{xp:(u.xp||0)+5});
-      app.reloadUserData();
-    }catch(e){console.warn(e);}
-  };
-  const reset=()=>{ setRunning(false); setMode('work'); setSecondsLeft(WORK_TIME); };
-  const total=mode==='work'?WORK_TIME:BREAK_TIME;
-  const progress=((total-secondsLeft)/total)*100;
-  const mins=Math.floor(secondsLeft/60);
-  const secs=secondsLeft%60;
-  const color=mode==='work'?'#f59e0b':'#22c55e';
-  if(compact){
-    return <div className="glass-s" style={{padding:12}}>
-      <div className="flex between center mb8">
-        <div className="flex center g8">
-          <span style={{color}}><Icon name="clock" size={16}/></span>
-          <span className="sm" style={{fontWeight:700}}>{mode==='work'?'🍅 مذاكرة':'☕ راحة'}</span>
-        </div>
-        <span className="h4" style={{fontVariantNumeric:'tabular-nums',color}}>
-          {String(mins).padStart(2,'0')}:{String(secs).padStart(2,'0')}
-        </span>
-      </div>
-      <div className="bar"><div className="bar-f" style={{width:`${progress}%`,background:color}}/></div>
-      <div className="flex g6 mt8">
-        <button className="btn btn-s btn-sm" style={{flex:1}} onClick={()=>setRunning(r=>!r)}>
-          {running?<><Icon name="pause" size={12}/> إيقاف</>:'▶️ تشغيل'}
-        </button>
-        <button className="btn btn-s btn-sm" onClick={reset}>
-          <Icon name="refresh" size={12}/>
-        </button>
-      </div>
-    </div>;
-  }
-  return <div className="glass" style={{padding:24,textAlign:'center'}}>
-    <div className="h3 mb16" style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
-      <span style={{color}}>{mode==='work'?'🍅':'☕'}</span>
-      {mode==='work'?'وقت المذاكرة':'وقت الراحة'}
-    </div>
-    <Ring value={progress} size={220} stroke={14} color={color}>
-      <div className="pomodoro-time">{String(mins).padStart(2,'0')}:{String(secs).padStart(2,'0')}</div>
-      <div className="pomodoro-label">{mode==='work'?'من 25 دقيقة':'من 5 دقايق'}</div>
-    </Ring>
-    <div className="flex center g8 mt20" style={{justifyContent:'center'}}>
-      <button className="btn btn-p" onClick={()=>setRunning(r=>!r)} style={{minWidth:140}}>
-        {running?<><Icon name="pause" size={14}/> إيقاف مؤقت</>:'▶️ ابدأ'}
-      </button>
-      <button className="btn btn-s" onClick={reset}><Icon name="refresh" size={14}/> إعادة</button>
-    </div>
-    {sessions > 0 && <div className="pill pill-g mt16" style={{display:'inline-flex'}}>✅ أكملت {sessions} جلسة النهاردة</div>}
-  </div>;
+  const saveSession=async ()=>{try{const sb=await DB.getClient();await sb.from('pomodoro_sessions').insert([{id:DB.uid('pomo_'),user_id:u.id,duration:25,completed_at:Date.now(),created_at:Date.now()}]);setSessions(s=>s+1);await DB.updateUser(u.id,{xp:(u.xp||0)+5});app.reloadUserData()}catch(e){console.warn(e)}};
+  const reset=()=>{setRunning(false);setMode('work');setSecondsLeft(WORK_TIME)};
+  const total=mode==='work'?WORK_TIME:BREAK_TIME;const progress=((total-secondsLeft)/total)*100;
+  const mins=Math.floor(secondsLeft/60);const secs=secondsLeft%60;const color=mode==='work'?'#f59e0b':'#22c55e';
+  if(compact){return <div className="glass-s" style={{padding:12}}><div className="flex between center mb8"><div className="flex center g8"><span style={{color}}><Icon name="clock" size={16}/></span><span className="sm" style={{fontWeight:700}}>{mode==='work'?'🍅 مذاكرة':'☕ راحة'}</span></div><span className="h4" style={{fontVariantNumeric:'tabular-nums',color}}>{String(mins).padStart(2,'0')}:{String(secs).padStart(2,'0')}</span></div><div className="bar"><div className="bar-f" style={{width:`${progress}%`,background:color}}/></div><div className="flex g6 mt8"><button className="btn btn-s btn-sm" style={{flex:1}} onClick={()=>setRunning(r=>!r)}>{running?<><Icon name="pause" size={12}/> إيقاف</>:'▶️ تشغيل'}</button><button className="btn btn-s btn-sm" onClick={reset}><Icon name="refresh" size={12}/></button></div></div>}
+  return <div className="glass" style={{padding:24,textAlign:'center'}}><div className="h3 mb16" style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8}}><span style={{color}}>{mode==='work'?'🍅':'☕'}</span>{mode==='work'?'وقت المذاكرة':'وقت الراحة'}</div><Ring value={progress} size={220} stroke={14} color={color}><div className="pomodoro-time">{String(mins).padStart(2,'0')}:{String(secs).padStart(2,'0')}</div><div className="pomodoro-label">{mode==='work'?'من 25 دقيقة':'من 5 دقايق'}</div></Ring><div className="flex center g8 mt20" style={{justifyContent:'center'}}><button className="btn btn-p" onClick={()=>setRunning(r=>!r)} style={{minWidth:140}}>{running?<><Icon name="pause" size={14}/> إيقاف مؤقت</>:'▶️ ابدأ'}</button><button className="btn btn-s" onClick={reset}><Icon name="refresh" size={14}/> إعادة</button></div>{sessions>0&&<div className="pill pill-g mt16" style={{display:'inline-flex'}}>✅ أكملت {sessions} جلسة النهاردة</div>}</div>;
 }
+
 function Sidebar({items,active,onNav,open,onClose}){
-  return <>
-    {open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.5)',zIndex:55}}/>}
-    <aside className={`sidebar ${open?'open':''}`}>
-      <div className="brand">
-        <div className="brand-logo">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
-            <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
-            <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
-            <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
-          </svg>
-        </div>
-        <div><div className="brand-name">MISSION EDU</div><div className="brand-sub">منصة المهام</div></div>
-      </div>
-      {items.map((g,gi)=><div key={gi}>
-        {g.title&&<div style={{fontSize:10.5,fontWeight:800,color:'var(--muted)',letterSpacing:1,padding:'14px 14px 4px'}}>{g.title}</div>}
-        {g.items.map(it=><button key={it.id} className={`nav-i ${active===it.id?'on':''}`} onClick={()=>{onNav(it.id);onClose?.();}}>
-          <span className="nav-ico"><Icon name={it.icon} size={16}/></span>
-          <span>{it.label}</span>
-          {it.badge!=null&&<span className="pill pill-b" style={{marginInlineStart:'auto'}}>{it.badge}</span>}
-        </button>)}
-      </div>)}
-    </aside>
-  </>;
+  return <>{open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.5)',zIndex:55}}/>}<aside className={`sidebar ${open?'open':''}`}><div className="brand"><div className="brand-logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></div><div><div className="brand-name">MISSION EDU</div><div className="brand-sub">منصة المهام</div></div></div>{items.map((g,gi)=><div key={gi}>{g.title&&<div style={{fontSize:10.5,fontWeight:800,color:'var(--muted)',letterSpacing:1,padding:'14px 14px 4px'}}>{g.title}</div>}{g.items.map(it=><button key={it.id} className={`nav-i ${active===it.id?'on':''}`} onClick={()=>{onNav(it.id);onClose?.()}}><span className="nav-ico"><Icon name={it.icon} size={16}/></span><span>{it.label}</span>{it.badge!=null&&<span className="pill pill-b" style={{marginInlineStart:'auto'}}>{it.badge}</span>}</button>)}</div>)}</aside></>;
 }
+
 function Topbar({user,onMenu,onLogout,onSearch,searchResults,unreadNotifs=0,onOpenNotifications}){
-  const [q,setQ]=useState('');
-  const [open,setOpen]=useState(false);
-  useEffect(()=>{
-    if(!q.trim()){setOpen(false);return;}
-    setOpen(true);
-    const t=setTimeout(()=>onSearch?.(q),150);
-    return ()=>clearTimeout(t);
-  },[q]);
-  return <div className="topbar">
-    <button className="icon-btn mbar" onClick={onMenu}><Icon name="menu" size={16}/></button>
-    <div style={{position:'relative',flex:1,maxWidth:520,minWidth:0}}>
-      <div className="search">
-        <Icon name="search" size={15} color="var(--muted)"/>
-        <input value={q} onChange={e=>setQ(e.target.value)} placeholder="ابحث عن درس، اختبار..."/>
-        {q&&<button onClick={()=>{setQ('');setOpen(false);}} style={{opacity:.6,color:'var(--txt)'}}><Icon name="close" size={14}/></button>}
-      </div>
-      {open&&searchResults?.length>0&&<div className="glass" style={{position:'absolute',top:'calc(100% + 8px)',insetInline:0,padding:8,zIndex:80,maxHeight:340,overflowY:'auto'}}>
-        {searchResults.slice(0,10).map((r,i)=><a key={i} href={r.href} className="nav-i">
-          <span className="nav-ico">{r.icon}</span>
-          <div style={{flex:1,textAlign:'right',minWidth:0}}>
-            <div style={{fontSize:13.5}}>{r.title}</div>
-            <div className="xs muted">{r.type}</div>
-          </div>
-        </a>)}
-      </div>}
-    </div>
-    <div className="flex center g8" style={{marginInlineStart:'auto',flexShrink:0}}>
-      <button className="icon-btn" onClick={onOpenNotifications} title="الإشعارات">
-        <Icon name="bell" size={16}/>
-        {unreadNotifs > 0 && (
-          <span style={{
-            position:'absolute',top:-4,insetInlineEnd:-4,
-            minWidth:18,height:18,borderRadius:9,
-            background:'linear-gradient(135deg,#2f7dff,#8b5cf6)',
-            color:'#fff',fontSize:10,fontWeight:900,
-            display:'grid',placeItems:'center',padding:'0 5px',
-            boxShadow:'0 0 10px rgba(47,125,255,.7)',animation:'pulse 2s infinite'
-          }}>{unreadNotifs > 9 ? '9+' : unreadNotifs}</span>
-        )}
-      </button>
-      <div className="glass-s" style={{padding:'5px 12px',display:'flex',alignItems:'center',gap:8}}>
-        <div className="avatar" style={{width:32,height:32,fontSize:15}}>{user.avatar||'👤'}</div>
-      </div>
-      <button className="icon-btn" onClick={onLogout}><Icon name="logout" size={16}/></button>
-    </div>
-  </div>;
+  const [q,setQ]=useState('');const [open,setOpen]=useState(false);
+  useEffect(()=>{if(!q.trim()){setOpen(false);return}setOpen(true);const t=setTimeout(()=>onSearch?.(q),150);return ()=>clearTimeout(t)},[q]);
+  return <div className="topbar"><button className="icon-btn mbar" onClick={onMenu}><Icon name="menu" size={16}/></button><div style={{position:'relative',flex:1,maxWidth:520,minWidth:0}}><div className="search"><Icon name="search" size={15} color="var(--muted)"/><input value={q} onChange={e=>setQ(e.target.value)} placeholder="ابحث عن درس، اختبار..."/>{q&&<button onClick={()=>{setQ('');setOpen(false)}} style={{opacity:.6,color:'var(--txt)'}}><Icon name="close" size={14}/></button>}</div>{open&&searchResults?.length>0&&<div className="glass" style={{position:'absolute',top:'calc(100% + 8px)',insetInline:0,padding:8,zIndex:80,maxHeight:340,overflowY:'auto'}}>{searchResults.slice(0,10).map((r,i)=><a key={i} href={r.href} className="nav-i"><span className="nav-ico">{r.icon}</span><div style={{flex:1,textAlign:'right',minWidth:0}}><div style={{fontSize:13.5}}>{r.title}</div><div className="xs muted">{r.type}</div></div></a>)}</div>}</div><div className="flex center g8" style={{marginInlineStart:'auto',flexShrink:0}}><button className="icon-btn" onClick={onOpenNotifications} title="الإشعارات"><Icon name="bell" size={16}/>{unreadNotifs>0&&(<span style={{position:'absolute',top:-4,insetInlineEnd:-4,minWidth:18,height:18,borderRadius:9,background:'linear-gradient(135deg,#2f7dff,#8b5cf6)',color:'#fff',fontSize:10,fontWeight:900,display:'grid',placeItems:'center',padding:'0 5px',boxShadow:'0 0 10px rgba(47,125,255,.7)',animation:'pulse 2s infinite'}}>{unreadNotifs>9?'9+':unreadNotifs}</span>)}</button><div className="glass-s" style={{padding:'5px 12px',display:'flex',alignItems:'center',gap:8}}><div className="avatar" style={{width:32,height:32,fontSize:15}}>{user.avatar||'👤'}</div></div><button className="icon-btn" onClick={onLogout}><Icon name="logout" size={16}/></button></div></div>;
 }
+
 function Home({onNav,setSelected}){
-  const app=useApp();
-  const u=app.currentUser;
+  const app=useApp();const u=app.currentUser;
   const {current,next}=app.getLevel(u.xp||0);
   const access=u.all_subjects?app.db.subjects.map(s=>s.id):(u.access_subjects||[]);
-  const accessibleLessons=app.db.lessons.filter(l=>{
-    const un=app.db.units.find(x=>x.id===l.unit_id);
-    return un&&access.includes(un.subject_id)&&l.published!==false;
-  });
+  const accessibleLessons=app.db.lessons.filter(l=>{const un=app.db.units.find(x=>x.id===l.unit_id);return un&&access.includes(un.subject_id)&&l.published!==false});
   const doneLessons=accessibleLessons.filter(l=>(u.completed_lessons||[]).includes(l.id));
   const progressPct=DB.pct(doneLessons.length,accessibleLessons.length);
   const top10=useMemo(()=>[...app.db.users.filter(x=>x.role==='student'&&x.active!==false)].sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,10),[app.db.users]);
   const recentAttempts=useMemo(()=>[...(app.attempts||[])].slice(0,3),[app.attempts]);
-  const lastLessonId=(()=>{try{return localStorage.getItem('student_last_lesson');}catch(e){return null;}})();
-  const lastLesson = lastLessonId ? app.lesson(lastLessonId) : null;
-  const lastLessonAccess = lastLesson ? hasAccess(u, lastLesson) : false;
+  const lastLessonId=(()=>{try{return localStorage.getItem('student_last_lesson')}catch(e){return null}})();
+  const lastLesson=lastLessonId?app.lesson(lastLessonId):null;
+  const lastLessonAccess=lastLesson?hasAccess(u,lastLesson):false;
   return <>
     <div className="hero mb16" style={{padding:'clamp(16px,4vw,24px)'}}>
       <div style={{display:'flex',flexDirection:'column',alignItems:'center',textAlign:'center',gap:'16px'}}>
         <div style={{width:'100%'}}>
-          <div className="h2 mb6" style={{whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
-            أهلًا بك {u.name.split(' ')[0]} 👋
-          </div>
+          <div className="h2 mb6" style={{whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>أهلًا بك {u.name.split(' ')[0]} 👋</div>
           <div className="sm txt2 mb12">مهمتك الحالية في انتظارك.</div>
-          <div style={{display:'flex',justifyContent:'center',gap:8,flexWrap:'wrap'}}>
-            {getSubscriptionBadge(u)}
-          </div>
+          <div style={{display:'flex',justifyContent:'center',gap:8,flexWrap:'wrap'}}>{getSubscriptionBadge(u)}</div>
         </div>
         <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'20px',flexWrap:'wrap'}}>
-          <Ring value={progressPct} size={100} stroke={8} color="#2f7dff">
-            <div className="stat-n">{progressPct}%</div>
-            <div className="xs muted">التقدم</div>
-          </Ring>
-          <Ring value={next?DB.pct((u.xp-current.xp),next.xp-current.xp):100} size={80} stroke={7} color="#8b5cf6">
-            <div style={{fontWeight:900}}>Lv {current.level}</div>
-            <div className="xs muted">{current.name}</div>
-          </Ring>
+          <Ring value={progressPct} size={100} stroke={8} color="#2f7dff"><div className="stat-n">{progressPct}%</div><div className="xs muted">التقدم</div></Ring>
+          <Ring value={next?DB.pct((u.xp-current.xp),next.xp-current.xp):100} size={80} stroke={7} color="#8b5cf6"><div style={{fontWeight:900}}>Lv {current.level}</div><div className="xs muted">{current.name}</div></Ring>
         </div>
         <div style={{display:'flex',gap:'8px',width:'100%',flexWrap:'wrap'}}>
-          {lastLesson && (
-            lastLessonAccess ? (
-              <a href={`/student/lesson.html?id=${lastLesson.id}`}
-                 className="btn btn-p"
-                 style={{textDecoration:'none',flex:'1 1 auto',minWidth:'140px',fontSize:'13px',padding:'10px 16px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
-                ▶️ متابعة الدرس
-              </a>
-            ) : (
-              <button className="btn btn-p"
-                 onClick={showLockedMessage}
-                 style={{flex:'1 1 auto',minWidth:'140px',fontSize:'13px',padding:'10px 16px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',background:'linear-gradient(135deg,#fbbf24,#f59e0b)',color:'#1a1206'}}>
-                <i className="fa-solid fa-lock"></i> متابعة الدرس (مدفوع)
-              </button>
-            )
-          )}
-          <button className="btn btn-g"
-                  onClick={()=>onNav('subjects')}
-                  style={{flex:'1 1 auto',minWidth:'140px',fontSize:'13px',padding:'10px 16px'}}>
-            <Icon name="book" size={14}/> استعرض المواد
-          </button>
+          {lastLesson&&(lastLessonAccess?<a href={`/student/lesson.html?id=${lastLesson.id}`} className="btn btn-p" style={{textDecoration:'none',flex:'1 1 auto',minWidth:'140px',fontSize:'13px',padding:'10px 16px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>▶️ متابعة الدرس</a>:<button className="btn btn-p" onClick={showLockedMessage} style={{flex:'1 1 auto',minWidth:'140px',fontSize:'13px',padding:'10px 16px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',background:'linear-gradient(135deg,#fbbf24,#f59e0b)',color:'#1a1206'}}><i className="fa-solid fa-lock"></i> متابعة الدرس (مدفوع)</button>)}
+          <button className="btn btn-g" onClick={()=>onNav('subjects')} style={{flex:'1 1 auto',minWidth:'140px',fontSize:'13px',padding:'10px 16px'}}><Icon name="book" size={14}/> استعرض المواد</button>
         </div>
       </div>
     </div>
@@ -852,67 +568,28 @@ function Home({onNav,setSelected}){
     <div className="grid g2 mb16">
       <PomodoroTimer compact={true}/>
       <div className="glass-s" style={{padding:12,cursor:'pointer'}} onClick={()=>onNav('notes')}>
-        <div className="flex between center mb8">
-          <div className="flex center g8">
-            <span style={{color:'var(--blue2)'}}><Icon name="note" size={16}/></span>
-            <span className="sm" style={{fontWeight:700}}>📝 ملاحظاتي</span>
-          </div>
-          <span className="pill pill-b">{app.notes?.length||0}</span>
-        </div>
+        <div className="flex between center mb8"><div className="flex center g8"><span style={{color:'var(--blue2)'}}><Icon name="note" size={16}/></span><span className="sm" style={{fontWeight:700}}>📝 ملاحظاتي</span></div><span className="pill pill-b">{app.notes?.length||0}</span></div>
         <div className="xs muted">عندك {app.notes?.length||0} ملاحظة محفوظة</div>
         <div className="xs mt8" style={{color:'var(--blue2)',fontWeight:700}}>اضغط لعرضهم ←</div>
       </div>
     </div>
     <div className="glass mb16" style={{padding:18}}>
-      <div className="flex between center mb12">
-        <div className="h3" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="medal" size={18}/> المتصدرون العشرة</div>
-        <button className="btn btn-s btn-sm" onClick={()=>onNav('leaderboard')}>الكل</button>
-      </div>
-      {top10.length===0?<div className="sm muted" style={{textAlign:'center',padding:12}}>لا يوجد طلاب بعد</div>:
-        top10.map((s,i)=>{
-          const {current:c}=app.getLevel(s.xp||0);
-          const isMe=s.id===u.id;
-          return <div key={s.id} className="flex center g12" style={{padding:'9px 0',borderBottom:'1px solid rgba(90,140,230,.08)',background:isMe?'rgba(47,125,255,.06)':'transparent',borderRadius:isMe?10:0,paddingInline:isMe?10:0}}>
-            <div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div>
-            <div className="avatar" style={{width:34,height:34,fontSize:14}}>{s.avatar||'👤'}</div>
-            <div style={{flex:1,minWidth:0}}>
-              <div className="sm" style={{whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{s.name} {isMe&&<span className="pill pill-b" style={{marginInlineStart:6}}>أنت</span>}</div>
-              <div className="xs muted">Lv {c.level} — {c.name}</div>
-            </div>
-            <span className="pill pill-b">{DB.fmt(s.xp||0)} XP</span>
-          </div>;
-        })
-      }
+      <div className="flex between center mb12"><div className="h3" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="medal" size={18}/> المتصدرون العشرة</div><button className="btn btn-s btn-sm" onClick={()=>onNav('leaderboard')}>الكل</button></div>
+      {top10.length===0?<div className="sm muted" style={{textAlign:'center',padding:12}}>لا يوجد طلاب بعد</div>:top10.map((s,i)=>{const {current:c}=app.getLevel(s.xp||0);const isMe=s.id===u.id;return <div key={s.id} className="flex center g12" style={{padding:'9px 0',borderBottom:'1px solid rgba(90,140,230,.08)',background:isMe?'rgba(47,125,255,.06)':'transparent',borderRadius:isMe?10:0,paddingInline:isMe?10:0}}><div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div><div className="avatar" style={{width:34,height:34,fontSize:14}}>{s.avatar||'👤'}</div><div style={{flex:1,minWidth:0}}><div className="sm" style={{whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{s.name} {isMe&&<span className="pill pill-b" style={{marginInlineStart:6}}>أنت</span>}</div><div className="xs muted">Lv {c.level} — {c.name}</div></div><span className="pill pill-b">{DB.fmt(s.xp||0)} XP</span></div>})}
     </div>
     <div className="glass" style={{padding:18}}>
       <div className="h3 mb12" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="clipboard" size={18}/> آخر الاختبارات</div>
-      {recentAttempts.length===0?<div className="sm muted" style={{textAlign:'center',padding:12}}>لم تجرِ اختبارًا بعد</div>:
-        recentAttempts.map((a,i)=>{
-          const e=app.exam(a.exam_id);
-          if(!e) return null;
-          return <a key={i} href={`/student/exam.html?id=${e.id}`} className="flex center g12" style={{padding:'9px 0',borderBottom:'1px solid rgba(90,140,230,.08)'}}>
-            <div style={{color:a.passed?'var(--green)':'var(--red)'}}><Icon name={a.passed?'check':'close'} size={18}/></div>
-            <div style={{flex:1,minWidth:0}}>
-              <div className="sm" style={{whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{e.title}</div>
-              <div className="xs muted">{a.score}/{a.total} — {a.pct}%</div>
-            </div>
-            <span className={`pill ${a.passed?'pill-g':'pill-r'}`}>{a.pct}%</span>
-          </a>;
-        })
-      }
+      {recentAttempts.length===0?<div className="sm muted" style={{textAlign:'center',padding:12}}>لم تجرِ اختبارًا بعد</div>:recentAttempts.map((a,i)=>{const e=app.exam(a.exam_id);if(!e)return null;return <a key={i} href={`/student/exam.html?id=${e.id}`} className="flex center g12" style={{padding:'9px 0',borderBottom:'1px solid rgba(90,140,230,.08)'}}><div style={{color:a.passed?'var(--green)':'var(--red)'}}><Icon name={a.passed?'check':'close'} size={18}/></div><div style={{flex:1,minWidth:0}}><div className="sm" style={{whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{e.title}</div><div className="xs muted">{a.score}/{a.total} — {a.pct}%</div></div><span className={`pill ${a.passed?'pill-g':'pill-r'}`}>{a.pct}%</span></a>})}
     </div>
   </>;
 }
+
 function Subjects({setSelected,setTab}){
-  const app=useApp();
-  const u=app.currentUser;
+  const app=useApp();const u=app.currentUser;
   const access=u.all_subjects?app.db.subjects.map(s=>s.id):(u.access_subjects||[]);
   const subjects=app.db.subjects.filter(s=>access.includes(s.id)).sort((a,b)=>a.sort_order-b.sort_order);
   return <>
-    <div className="flex between center mb16 wrap g8">
-      <div className="h2">المواد المتاحة</div>
-      {getSubscriptionBadge(u)}
-    </div>
+    <div className="flex between center mb16 wrap g8"><div className="h2">المواد المتاحة</div>{getSubscriptionBadge(u)}</div>
     {subjects.length===0?<div className="glass" style={{padding:30}}><Empty icon="📚" title="لا توجد مواد متاحة لك"/></div>:
       <div className="grid g-auto">
         {subjects.map(s=>{
@@ -920,108 +597,44 @@ function Subjects({setSelected,setTab}){
           const lessons=app.db.lessons.filter(l=>units.some(un=>un.id===l.unit_id)&&l.published!==false);
           const done=lessons.filter(l=>(u.completed_lessons||[]).includes(l.id)).length;
           const p=DB.pct(done,lessons.length);
-          const paidLessons = lessons.filter(l=>isPaidContent(l));
-          const hasPaid = paidLessons.length > 0;
-          return <div key={s.id} className={`glass hv ${hasPaid?'locked-lesson-card':''}`} style={{padding:20,cursor:'pointer',position:'relative'}} onClick={()=>{
-            if(typeof fbq!=='undefined') fbq('trackCustom','ViewSubject',{subject:s.name});
-            setSelected({type:'subject',id:s.id});setTab('subject');
-          }}>
-            {hasPaid && <div className="lock-overlay-tag"><i className="fa-solid fa-lock"></i> يحتوي على محتوى مدفوع</div>}
-            <div className="flex between center mb12">
-              <div style={{fontSize:38}}>{s.icon}</div>
-              <span className="pill pill-b">{lessons.length} درس</span>
-            </div>
+          const hasPaid=lessons.some(l=>isPaidContent(l));
+          return <div key={s.id} className={`glass hv ${hasPaid?'locked-lesson-card':''}`} style={{padding:20,cursor:'pointer',position:'relative'}} onClick={()=>{if(typeof fbq!=='undefined')fbq('trackCustom','ViewSubject',{subject:s.name});setSelected({type:'subject',id:s.id});setTab('subject')}}>
+            {hasPaid&&<div className="lock-overlay-tag"><i className="fa-solid fa-lock"></i> يحتوي على محتوى مدفوع</div>}
+            <div className="flex between center mb12"><div style={{fontSize:38}}>{s.icon}</div><span className="pill pill-b">{lessons.length} درس</span></div>
             <div className="h3 mb6">{s.name}</div>
             <div className="sm muted mb16" style={{minHeight:36}}>{s.desc}</div>
             <div className="bar"><div className="bar-f bar-b" style={{width:`${p}%`}}/></div>
-            <div className="flex between center mt8">
-              <span className="xs muted">{done}/{lessons.length}</span>
-              <span className="xs" style={{color:'var(--blue2)',fontWeight:700}}>{p}%</span>
-            </div>
+            <div className="flex between center mt8"><span className="xs muted">{done}/{lessons.length}</span><span className="xs" style={{color:'var(--blue2)',fontWeight:700}}>{p}%</span></div>
           </div>;
         })}
       </div>
     }
   </>;
 }
+
 function SubjectDetail({subjectId,setSelected,setTab}){
-  const app=useApp();
-  const u=app.currentUser;
+  const app=useApp();const u=app.currentUser;
   const s=app.subject(subjectId);
   if(!s) return <Empty icon="❓" title="المادة غير موجودة"/>;
   const units=app.db.units.filter(x=>x.subject_id===s.id).sort((a,b)=>a.sort_order-b.sort_order);
   return <>
     <button className="btn btn-s btn-sm mb16" onClick={()=>setTab('subjects')}>← المواد</button>
-    <div className="hero mb16">
-      <div className="flex center g16">
-        <div style={{fontSize:52}}>{s.icon}</div>
-        <div style={{flex:1,minWidth:0}}>
-          <div className="h1 mb6">{s.name}</div>
-          <div className="sm txt2">{s.desc}</div>
-        </div>
-      </div>
-    </div>
-    <div className="flex between center mb12 wrap g8">
-      <div className="h3" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="book" size={18}/> الوحدات والدروس</div>
-      {getSubscriptionBadge(u)}
-    </div>
+    <div className="hero mb16"><div className="flex center g16"><div style={{fontSize:52}}>{s.icon}</div><div style={{flex:1,minWidth:0}}><div className="h1 mb6">{s.name}</div><div className="sm txt2">{s.desc}</div></div></div></div>
+    <div className="flex between center mb12 wrap g8"><div className="h3" style={{display:'flex',alignItems:'center',gap:8}}><Icon name="book" size={18}/> الوحدات والدروس</div>{getSubscriptionBadge(u)}</div>
     {units.map(un=>{
-      const lessons=app.db.lessons.filter(l=>l.unit_id===un.id&&l.published!==false).sort((a,b)=>{
-        const sa=Number(a.sort_order)||999999,sb=Number(b.sort_order)||999999;
-        if(sa!==sb) return sa-sb;
-        const ta=new Date(a.created_at||a.createdAt||0).getTime()||0;
-        const tb=new Date(b.created_at||b.createdAt||0).getTime()||0;
-        return ta-tb;
-      });
-      const exams=app.db.exams.filter(e=>e.unit_id===un.id&&e.published!==false).sort((a,b)=>{
-        const sa=Number(a.sort_order)||999999,sb=Number(b.sort_order)||999999;
-        if(sa!==sb) return sa-sb;
-        const ta=new Date(a.created_at||a.createdAt||0).getTime()||0;
-        const tb=new Date(b.created_at||b.createdAt||0).getTime()||0;
-        return ta-tb;
-      });
+      const lessons=app.db.lessons.filter(l=>l.unit_id===un.id&&l.published!==false).sort((a,b)=>{const sa=Number(a.sort_order)||999999,sb=Number(b.sort_order)||999999;if(sa!==sb)return sa-sb;const ta=new Date(a.created_at||a.createdAt||0).getTime()||0,tb=new Date(b.created_at||b.createdAt||0).getTime()||0;return ta-tb});
+      const exams=app.db.exams.filter(e=>e.unit_id===un.id&&e.published!==false).sort((a,b)=>{const sa=Number(a.sort_order)||999999,sb=Number(b.sort_order)||999999;if(sa!==sb)return sa-sb;const ta=new Date(a.created_at||a.createdAt||0).getTime()||0,tb=new Date(b.created_at||b.createdAt||0).getTime()||0;return ta-tb});
       return <div key={un.id} className="glass mb16" style={{padding:18}}>
-        <div className="flex between center mb12">
-          <div style={{minWidth:0}}>
-            <div className="h4">{un.name}</div>
-            <div className="xs muted">{un.desc}</div>
-          </div>
-          <span className="pill pill-b">{lessons.length} درس</span>
-        </div>
+        <div className="flex between center mb12"><div style={{minWidth:0}}><div className="h4">{un.name}</div><div className="xs muted">{un.desc}</div></div><span className="pill pill-b">{lessons.length} درس</span></div>
         {lessons.length===0?<div className="sm muted" style={{textAlign:'center',padding:12}}>لا توجد دروس في هذه الوحدة</div>:
           <div className="grid g2">
             {lessons.map(l=>{
               const done=(u.completed_lessons||[]).includes(l.id);
-              const video = parseVideo(l.video);
-              const hasVideo = video && video.url;
-              const note=app.getNote(l.id);
-              const paid = isPaidContent(l);
-              const allowed = hasAccess(u, l);
-              const locked = paid && !allowed;
-              const cardContent = <>
-                {locked && <div className="lock-badge-mini"><i className="fa-solid fa-lock"></i></div>}
-                <div className="flex between center mb6">
-                  <span className={`pill ${done?'pill-g':(paid?'pill-paid':'pill-b')}`}>
-                    {done? <Icon name="check" size={12}/> : (paid ? <i className="fa-solid fa-lock" style={{fontSize:11}}/> : <Icon name="play" size={12}/>)}
-                    {paid && !done ? ' مدفوع' : ''}
-                  </span>
-                  <div className="flex g6">
-                    {note && <span className="pill pill-y" style={{fontSize:10}}>📝</span>}
-                    {hasVideo&&<span className="pill pill-v" style={{fontSize:10}}>🎬</span>}
-                  </div>
-                </div>
-                <div className="h4" style={{fontSize:14}}>{l.title}</div>
-                <div className="xs muted mt6">⏱ {l.duration}د • +{l.xp} XP</div>
-              </>;
-              if(locked){
-                return <div key={l.id} className="glass-s hv locked-lesson-card" style={{padding:14,textDecoration:'none',color:'inherit',cursor:'pointer'}} onClick={showLockedMessage}>
-                  {cardContent}
-                </div>;
-              }
-              return <a key={l.id} href={`/student/lesson.html?id=${l.id}`} className="glass-s hv" style={{padding:14,textDecoration:'none',color:'inherit'}}
-                onClick={()=>{if(typeof fbq!=='undefined') fbq('trackCustom','ViewLesson',{lesson:l.title});}}>
-                {cardContent}
-              </a>;
+              const video=parseVideo(l.video);const hasVideo=video&&video.url;
+              const note=app.getNote(l.id);const paid=isPaidContent(l);const allowed=hasAccess(u,l);const locked=paid&&!allowed;
+              const content=<>{locked&&<div className="lock-badge-mini"><i className="fa-solid fa-lock"></i></div>}<div className="flex between center mb6"><span className={`pill ${done?'pill-g':(paid?'pill-paid':'pill-b')}`}>{done?<Icon name="check" size={12}/>:(paid?<i className="fa-solid fa-lock" style={{fontSize:11}}/>:<Icon name="play" size={12}/>)}{paid&&!done?' مدفوع':''}</span><div className="flex g6">{note&&<span className="pill pill-y" style={{fontSize:10}}>📝</span>}{hasVideo&&<span className="pill pill-v" style={{fontSize:10}}>🎬</span>}</div></div><div className="h4" style={{fontSize:14}}>{l.title}</div><div className="xs muted mt6">⏱ {l.duration}د • +{l.xp} XP</div></>;
+              if(locked) return <div key={l.id} className="glass-s hv locked-lesson-card" style={{padding:14,textDecoration:'none',color:'inherit',cursor:'pointer'}} onClick={showLockedMessage}>{content}</div>;
+              return <a key={l.id} href={`/student/lesson.html?id=${l.id}`} className="glass-s hv" style={{padding:14,textDecoration:'none',color:'inherit'}} onClick={()=>{if(typeof fbq!=='undefined')fbq('trackCustom','ViewLesson',{lesson:l.title})}}>{content}</a>;
             })}
           </div>
         }
@@ -1032,29 +645,10 @@ function SubjectDetail({subjectId,setSelected,setTab}){
             {exams.map(e=>{
               const attempts=(app.attempts||[]).filter(a=>a.exam_id===e.id);
               const best=attempts.length?Math.max(...attempts.map(a=>a.pct)):0;
-              const paid = isPaidContent(e);
-              const allowed = hasAccess(u, e);
-              const locked = paid && !allowed;
-              const content = <>
-                {locked && <div className="lock-badge-mini"><i className="fa-solid fa-lock"></i></div>}
-                <div className="flex between center mb6">
-                  <span className={`pill ${locked?'pill-paid':(best>=e.pass_score?'pill-g':'pill-a')}`}>
-                    {locked ? <><i className="fa-solid fa-lock" style={{fontSize:11}}/> مدفوع</> : (attempts.length?`أفضل: ${best}%`:'جديد')}
-                  </span>
-                  <span className="xs muted">⏱ {e.duration}د</span>
-                </div>
-                <div className="h4" style={{fontSize:14}}>{e.title}</div>
-                <div className="xs muted mt6">+{e.xp} XP • {(e.question_ids||[]).length} أسئلة</div>
-              </>;
-              if(locked){
-                return <div key={e.id} className="glass-s hv locked-lesson-card" style={{padding:14,textDecoration:'none',color:'inherit',cursor:'pointer'}} onClick={showLockedMessage}>
-                  {content}
-                </div>;
-              }
-              return <a key={e.id} href={`/student/exam.html?id=${e.id}`} className="glass-s hv" style={{padding:14,textDecoration:'none',color:'inherit'}}
-                onClick={()=>{if(typeof fbq!=='undefined') fbq('track','InitiateCheckout',{content_name:e.title});}}>
-                {content}
-              </a>;
+              const paid=isPaidContent(e);const allowed=hasAccess(u,e);const locked=paid&&!allowed;
+              const content=<>{locked&&<div className="lock-badge-mini"><i className="fa-solid fa-lock"></i></div>}<div className="flex between center mb6"><span className={`pill ${locked?'pill-paid':(best>=e.pass_score?'pill-g':'pill-a')}`}>{locked?<><i className="fa-solid fa-lock" style={{fontSize:11}}/> مدفوع</>:(attempts.length?`أفضل: ${best}%`:'جديد')}</span><span className="xs muted">⏱ {e.duration}د</span></div><div className="h4" style={{fontSize:14}}>{e.title}</div><div className="xs muted mt6">+{e.xp} XP • {(e.question_ids||[]).length} أسئلة</div></>;
+              if(locked) return <div key={e.id} className="glass-s hv locked-lesson-card" style={{padding:14,textDecoration:'none',color:'inherit',cursor:'pointer'}} onClick={showLockedMessage}>{content}</div>;
+              return <a key={e.id} href={`/student/exam.html?id=${e.id}`} className="glass-s hv" style={{padding:14,textDecoration:'none',color:'inherit'}} onClick={()=>{if(typeof fbq!=='undefined')fbq('track','InitiateCheckout',{content_name:e.title})}}>{content}</a>;
             })}
           </div>
         </>}
@@ -1062,23 +656,12 @@ function SubjectDetail({subjectId,setSelected,setTab}){
     })}
   </>;
 }
+
 function Missions({setSelected,setTab}){
-  const app=useApp();
-  const u=app.currentUser;
+  const app=useApp();const u=app.currentUser;
   const access=u.all_subjects?app.db.subjects.map(s=>s.id):(u.access_subjects||[]);
   const missions=app.db.missions.filter(m=>access.includes(m.subject_id)).sort((a,b)=>a.sort_order-b.sort_order);
-  const complete=async m=>{
-    try{
-      await app.updateUser(u.id,{
-        completed_missions:[...(u.completed_missions||[]),m.id],
-        xp:(u.xp||0)+(m.xp||0)
-      });
-      DB.trackActivity({userId:u.id,userName:u.name,type:'mission_complete',target:m.title,details:{xp:m.xp}});
-      if(typeof fbq!=='undefined') fbq('trackCustom','CompleteMission',{mission:m.title,xp:m.xp});
-      app.toast.ok(`🎉 أكملت المهمة! +${m.xp} XP`);
-      await app.reload();
-    }catch(e){app.toast.err(e.message);}
-  };
+  const complete=async m=>{try{await app.updateUser(u.id,{completed_missions:[...(u.completed_missions||[]),m.id],xp:(u.xp||0)+(m.xp||0)});DB.trackActivity({userId:u.id,userName:u.name,type:'mission_complete',target:m.title,details:{xp:m.xp}});if(typeof fbq!=='undefined')fbq('trackCustom','CompleteMission',{mission:m.title,xp:m.xp});app.toast.ok(`🎉 أكملت المهمة! +${m.xp} XP`);await app.reload()}catch(e){app.toast.err(e.message)}};
   return <>
     <div className="h2 mb16">المهام</div>
     {missions.length===0?<div className="glass" style={{padding:30}}><Empty icon="🎯" title="لا توجد مهام متاحة"/></div>:
@@ -1086,35 +669,14 @@ function Missions({setSelected,setTab}){
         {missions.map(m=>{
           const done=(u.completed_missions||[]).includes(m.id);
           const reqs=[];
-          (m.required_lessons||[]).forEach(lid=>{
-            const l=app.lesson(lid);
-            reqs.push({label:l?.title||'درس',done:(u.completed_lessons||[]).includes(lid)});
-          });
-          if(m.required_exam_id){
-            const e=app.exam(m.required_exam_id);
-            const passed=(app.attempts||[]).some(a=>a.exam_id===m.required_exam_id&&a.passed);
-            reqs.push({label:e?.title||'اختبار',done:passed});
-          }
-          const reqsDone=reqs.filter(r=>r.done).length;
-          const canComplete=reqs.length>0&&reqsDone===reqs.length;
-          const s=app.subject(m.subject_id);
+          (m.required_lessons||[]).forEach(lid=>{const l=app.lesson(lid);reqs.push({label:l?.title||'درس',done:(u.completed_lessons||[]).includes(lid)})});
+          if(m.required_exam_id){const e=app.exam(m.required_exam_id);const passed=(app.attempts||[]).some(a=>a.exam_id===m.required_exam_id&&a.passed);reqs.push({label:e?.title||'اختبار',done:passed})}
+          const reqsDone=reqs.filter(r=>r.done).length;const canComplete=reqs.length>0&&reqsDone===reqs.length;const s=app.subject(m.subject_id);
           return <div key={m.id} className="glass hv" style={{padding:20}}>
-            <div className="flex between center mb12">
-              <span className="pill pill-b">{s?.icon} {s?.name}</span>
-              <span className={`pill ${done?'pill-g':'pill-v'}`}>{done?'مكتملة':`+${m.xp} XP`}</span>
-            </div>
+            <div className="flex between center mb12"><span className="pill pill-b">{s?.icon} {s?.name}</span><span className={`pill ${done?'pill-g':'pill-v'}`}>{done?'مكتملة':`+${m.xp} XP`}</span></div>
             <div className="h3 mb6">{m.title}</div>
             <div className="sm muted mb16">{m.desc}</div>
-            {reqs.length>0&&<div className="mb12">
-              <div className="flex between center mb8">
-                <span className="xs muted">المتطلبات</span>
-                <span className="xs" style={{color:'var(--blue2)',fontWeight:700}}>{reqsDone}/{reqs.length}</span>
-              </div>
-              {reqs.map((r,i)=><div key={i} className="flex g8 mb6" style={{alignItems:'center'}}>
-                <span style={{color:r.done?'var(--green)':'var(--muted)',fontWeight:800}}>{r.done?'✓':'○'}</span>
-                <span className="sm txt2">{r.label}</span>
-              </div>)}
-            </div>}
+            {reqs.length>0&&<div className="mb12"><div className="flex between center mb8"><span className="xs muted">المتطلبات</span><span className="xs" style={{color:'var(--blue2)',fontWeight:700}}>{reqsDone}/{reqs.length}</span></div>{reqs.map((r,i)=><div key={i} className="flex g8 mb6" style={{alignItems:'center'}}><span style={{color:r.done?'var(--green)':'var(--muted)',fontWeight:800}}>{r.done?'✓':'○'}</span><span className="sm txt2">{r.label}</span></div>)}</div>}
             {!done&&canComplete&&<button className="btn btn-ok btn-block" onClick={()=>complete(m)}>🎉 استلام المكافأة</button>}
             {!done&&!canComplete&&reqs.length>0&&<div className="sm muted" style={{textAlign:'center',padding:8}}>أكمل المتطلبات أعلاه</div>}
             {done&&<div className="sm" style={{textAlign:'center',color:'var(--green)',fontWeight:700}}>🎯 مكتملة</div>}
@@ -1124,91 +686,33 @@ function Missions({setSelected,setTab}){
     }
   </>;
 }
+
 function Achievements(){
-  const app=useApp();
-  const u=app.currentUser;
+  const app=useApp();const u=app.currentUser;
   return <>
     <div className="h2 mb16">الإنجازات</div>
     {app.db.achievements.length===0?<div className="glass" style={{padding:30}}><Empty icon="🏆" title="لا توجد إنجازات"/></div>:
       <div className="grid g-auto">
-        {app.db.achievements.map(a=>{
-          const got=(u.achievements||[]).includes(a.id);
-          return <div key={a.id} className={`glass hv ${got?'':'lock'}`} style={{padding:20,textAlign:'center'}}>
-            <div style={{fontSize:44,marginBottom:8}}>{a.icon}</div>
-            <div className="h4 mb6">{a.title}</div>
-            <div className="sm muted mb12">{a.desc}</div>
-            {got?<span className="pill pill-g">✓ محقق</span>:<span className="pill pill-y">🔒 مقفول</span>}
-          </div>;
-        })}
+        {app.db.achievements.map(a=>{const got=(u.achievements||[]).includes(a.id);return <div key={a.id} className={`glass hv ${got?'':'lock'}`} style={{padding:20,textAlign:'center'}}><div style={{fontSize:44,marginBottom:8}}>{a.icon}</div><div className="h4 mb6">{a.title}</div><div className="sm muted mb12">{a.desc}</div>{got?<span className="pill pill-g">✓ محقق</span>:<span className="pill pill-y">🔒 مقفول</span>}</div>})}
       </div>
     }
   </>;
 }
+
 function ErrorBook(){
-  const app=useApp();
-  const errs=app.errors;
+  const app=useApp();const errs=app.errors;
   return <>
     <div className="h2 mb16">دفتر أخطائي</div>
-    {errs.length===0?<div className="glass" style={{padding:30}}><Empty icon="✨" title="لا توجد أخطاء — أحسنت!"/></div>:
-      errs.map((e,i)=>{
-        const q=app.question(e.question_id);
-        if(!q) return null;
-        const l=app.lesson(q.lesson_id);
-        return <div key={i} className="glass mb12" style={{padding:16}}>
-          <div className="flex between center mb8">
-            <span className="pill pill-r">أخطأت {e.count||1} مرة</span>
-            <span className="xs muted">{new Date(e.at).toLocaleDateString('ar-EG')}</span>
-          </div>
-          <div className="h4 mb12">{q.text}</div>
-          <div className="grid g2 mb12">
-            <div className="eb">
-              <div className="xs muted">إجابتك</div>
-              <div className="sm" style={{color:'var(--red)'}}>{q.options[e.given]||'—'}</div>
-            </div>
-            <div className="eb">
-              <div className="xs muted">الإجابة الصحيحة</div>
-              <div className="sm" style={{color:'var(--green)'}}>{q.options[q.correct[0]]}</div>
-            </div>
-          </div>
-          <div className="glass-s" style={{padding:10}}>
-            <div className="xs muted mb6"><b style={{color:'var(--blue2)'}}>💡 الشرح:</b> {q.explanation}</div>
-            {l&&<div className="xs">📖 الدرس: <b>{l.title}</b></div>}
-          </div>
-        </div>;
-      })
-    }
+    {errs.length===0?<div className="glass" style={{padding:30}}><Empty icon="✨" title="لا توجد أخطاء — أحسنت!"/></div>:errs.map((e,i)=>{const q=app.question(e.question_id);if(!q)return null;const l=app.lesson(q.lesson_id);return <div key={i} className="glass mb12" style={{padding:16}}><div className="flex between center mb8"><span className="pill pill-r">أخطأت {e.count||1} مرة</span><span className="xs muted">{new Date(e.at).toLocaleDateString('ar-EG')}</span></div><div className="h4 mb12">{q.text}</div><div className="grid g2 mb12"><div className="eb"><div className="xs muted">إجابتك</div><div className="sm" style={{color:'var(--red)'}}>{q.options[e.given]||'—'}</div></div><div className="eb"><div className="xs muted">الإجابة الصحيحة</div><div className="sm" style={{color:'var(--green)'}}>{q.options[q.correct[0]]}</div></div></div><div className="glass-s" style={{padding:10}}><div className="xs muted mb6"><b style={{color:'var(--blue2)'}}>💡 الشرح:</b> {q.explanation}</div>{l&&<div className="xs">📖 الدرس: <b>{l.title}</b></div>}</div></div>})}
   </>;
 }
+
 function Leaderboard(){
-  const app=useApp();
-  const u=app.currentUser;
+  const app=useApp();const u=app.currentUser;
   const [period,setPeriod]=useState('week');
-  const weekStart = useMemo(()=>{
-    const d=new Date();
-    const day=d.getDay();
-    const diff=d.getDate()-day;
-    const ws=new Date(d.setDate(diff));
-    ws.setHours(0,0,0,0);
-    return ws.getTime();
-  },[]);
-  const weekXpByUser = useMemo(()=>{
-    const map={};
-    app.db.activity.forEach(a=>{
-      if(a.at && a.at >= weekStart && a.type === 'lesson_complete'){
-        const xp = (a.details && a.details.xp) || 20;
-        map[a.user_id] = (map[a.user_id] || 0) + xp;
-      }
-      if(a.at && a.at >= weekStart && a.type === 'exam_submit' && a.details && a.details.passed){
-        map[a.user_id] = (map[a.user_id] || 0) + 50;
-      }
-    });
-    return map;
-  }, [app.db.activity, weekStart]);
-  const sorted = useMemo(()=>{
-    return [...app.db.users.filter(x=>x.role==='student'&&x.active!==false)]
-      .map(s=>({...s,weekXp: period==='week' ? (weekXpByUser[s.id]||0) : (s.xp||0)}))
-      .sort((a,b)=>b.weekXp-a.weekXp).slice(0,10);
-  }, [app.db.users, weekXpByUser, period]);
+  const weekStart=useMemo(()=>{const d=new Date();const day=d.getDay();const diff=d.getDate()-day;const ws=new Date(d.setDate(diff));ws.setHours(0,0,0,0);return ws.getTime()},[]);
+  const weekXpByUser=useMemo(()=>{const map={};app.db.activity.forEach(a=>{if(a.at&&a.at>=weekStart&&a.type==='lesson_complete'){const xp=(a.details&&a.details.xp)||20;map[a.user_id]=(map[a.user_id]||0)+xp}if(a.at&&a.at>=weekStart&&a.type==='exam_submit'&&a.details&&a.details.passed){map[a.user_id]=(map[a.user_id]||0)+50}});return map},[app.db.activity,weekStart]);
+  const sorted=useMemo(()=>{return [...app.db.users.filter(x=>x.role==='student'&&x.active!==false)].map(s=>({...s,weekXp:period==='week'?(weekXpByUser[s.id]||0):(s.xp||0)})).sort((a,b)=>b.weekXp-a.weekXp).slice(0,10)},[app.db.users,weekXpByUser,period]);
   return <>
     <div className="flex between center mb16 wrap g8">
       <div className="h2">🏅 المتصدرون</div>
@@ -1217,298 +721,70 @@ function Leaderboard(){
         <button onClick={()=>setPeriod('all')} style={{padding:'8px 16px',borderRadius:10,background:period==='all'?'rgba(47,125,255,.22)':'transparent',border:period==='all'?'1px solid var(--blue)':'1px solid transparent',color:period==='all'?'#fff':'var(--txt2)',fontWeight:700,fontSize:13,cursor:'pointer',fontFamily:'inherit'}}>الكل</button>
       </div>
     </div>
-    {period==='week'&&<div className="glass-s mb16" style={{padding:12,borderColor:'var(--border2)'}}>
-      <div className="xs muted" style={{textAlign:'center'}}>🔥 يتم تحديث الترتيب الأسبوعي تلقائيًا كل يوم أحد</div>
-    </div>}
+    {period==='week'&&<div className="glass-s mb16" style={{padding:12,borderColor:'var(--border2)'}}><div className="xs muted" style={{textAlign:'center'}}>🔥 يتم تحديث الترتيب الأسبوعي تلقائيًا كل يوم أحد</div></div>}
     {sorted.length===0?<div className="glass" style={{padding:30}}><Empty icon="🏅" title="لا يوجد طلاب بعد"/></div>:
       <div className="glass" style={{padding:14}}>
-        <div className="sx">
-          <table className="tbl">
-            <thead><tr><th>#</th><th>الطالب</th><th>{period==='week'?'XP الأسبوع':'XP الكلي'}</th><th>المستوى</th></tr></thead>
-            <tbody>
-              {sorted.map((s,i)=>{
-                const {current}=app.getLevel(s.xp||0);
-                const isMe=s.id===u.id;
-                return <tr key={s.id} style={{background:isMe?'rgba(47,125,255,.06)':'transparent'}}>
-                  <td><div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div></td>
-                  <td><div className="flex center g8">
-                    <div className="avatar" style={{width:32,height:32,fontSize:14}}>{s.avatar||'👤'}</div>
-                    <span>{s.name} {isMe&&<span className="pill pill-b" style={{marginInlineStart:6}}>أنت</span>}</span>
-                  </div></td>
-                  <td><b>{DB.fmt(s.weekXp)}</b></td>
-                  <td><span className="pill pill-v">Lv {current.level} — {current.name}</span></td>
-                </tr>;
-              })}
-            </tbody>
-          </table>
-        </div>
+        <div className="sx"><table className="tbl">
+          <thead><tr><th>#</th><th>الطالب</th><th>{period==='week'?'XP الأسبوع':'XP الكلي'}</th><th>المستوى</th></tr></thead>
+          <tbody>{sorted.map((s,i)=>{const {current}=app.getLevel(s.xp||0);const isMe=s.id===u.id;return <tr key={s.id} style={{background:isMe?'rgba(47,125,255,.06)':'transparent'}}><td><div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div></td><td><div className="flex center g8"><div className="avatar" style={{width:32,height:32,fontSize:14}}>{s.avatar||'👤'}</div><span>{s.name} {isMe&&<span className="pill pill-b" style={{marginInlineStart:6}}>أنت</span>}</span></div></td><td><b>{DB.fmt(s.weekXp)}</b></td><td><span className="pill pill-v">Lv {current.level} — {current.name}</span></td></tr>})}</tbody>
+        </table></div>
       </div>
     }
   </>;
 }
+
 function NotesPage({setTab}){
-  const app=useApp();
-  const notes = app.notes || [];
-  const sortedNotes = useMemo(()=>[...notes].sort((a,b)=>(b.updated_at||0)-(a.updated_at||0)),[notes]);
-  const [editing,setEditing]=useState(null);
-  const [text,setText]=useState('');
-  const startEdit=(n)=>{setEditing(n.id);setText(n.text||'');};
-  const cancelEdit=()=>{setEditing(null);setText('');};
-  const saveEdit=async (n)=>{
-    try{await app.saveNote(n.lesson_id,text);app.toast.ok('تم الحفظ');setEditing(null);}
-    catch(e){app.toast.err(e.message);}
-  };
-  const delNote=async (n)=>{
-    const r=await Swal.fire({
-      title:'حذف الملاحظة؟',icon:'warning',showCancelButton:true,
-      confirmButtonText:'نعم',cancelButtonText:'إلغاء',
-      confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
-      background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',
-      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
-    });
-    if(!r.isConfirmed) return;
-    try{
-      const sb=await DB.getClient();
-      await sb.from('notes').delete().eq('id',n.id);
-      app.reloadUserData();
-      app.toast.warn('تم الحذف');
-    }catch(e){app.toast.err(e.message);}
-  };
+  const app=useApp();const notes=app.notes||[];
+  const sortedNotes=useMemo(()=>[...notes].sort((a,b)=>(b.updated_at||0)-(a.updated_at||0)),[notes]);
+  const [editing,setEditing]=useState(null);const [text,setText]=useState('');
+  const startEdit=(n)=>{setEditing(n.id);setText(n.text||'')};
+  const cancelEdit=()=>{setEditing(null);setText('')};
+  const saveEdit=async (n)=>{try{await app.saveNote(n.lesson_id,text);app.toast.ok('تم الحفظ');setEditing(null)}catch(e){app.toast.err(e.message)}};
+  const delNote=async (n)=>{const r=await Swal.fire({title:'حذف الملاحظة؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{const sb=await DB.getClient();await sb.from('notes').delete().eq('id',n.id);app.reloadUserData();app.toast.warn('تم الحذف')}catch(e){app.toast.err(e.message)}};
   return <>
     <div className="flex between center mb16 wrap g8">
-      <div>
-        <div className="h2 grad">📝 ملاحظاتي</div>
-        <div className="sm muted mt6">كل ملاحظاتك على الدروس في مكان واحد</div>
-      </div>
+      <div><div className="h2 title-row"><i className="fa-solid fa-note-sticky" style={{color:'#fbbf24'}}></i><span className="grad">ملاحظاتي</span></div><div className="sm muted mt6">كل ملاحظاتك على الدروس في مكان واحد</div></div>
       <span className="pill pill-b">{sortedNotes.length} ملاحظة</span>
     </div>
     {sortedNotes.length===0?<div className="glass" style={{padding:30}}><Empty icon="📝" title="لا توجد ملاحظات" desc="ابدأ بكتابة ملاحظاتك من صفحة الدرس"/></div>:
       <div className="grid g2">
-        {sortedNotes.map(n=>{
-          const l = app.lesson(n.lesson_id);
-          const isEditing = editing===n.id;
-          return <div key={n.id} className="glass" style={{padding:16}}>
-            <div className="flex between center mb12">
-              <div className="flex center g8" style={{flex:1,minWidth:0}}>
-                <span className="pill pill-b" style={{fontSize:11}}><Icon name="note" size={11}/> درس</span>
-                {l?<a href={`/student/lesson.html?id=${l.id}`} className="sm" style={{fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{l.title}</a>:<span className="sm muted">درس محذوف</span>}
-              </div>
-              <span className="xs muted">{new Date(n.updated_at||n.created_at).toLocaleDateString('ar-EG')}</span>
-            </div>
-            {isEditing?<>
-              <textarea className="input" value={text} onChange={e=>setText(e.target.value)} rows="5"/>
-              <div className="flex g8 mt12">
-                <button className="btn btn-p btn-sm" style={{flex:1}} onClick={()=>saveEdit(n)}>💾 حفظ</button>
-                <button className="btn btn-s btn-sm" onClick={cancelEdit}>إلغاء</button>
-              </div>
-            </>:<>
-              <div className="sm txt2" style={{background:'rgba(0,0,0,.20)',padding:10,borderRadius:10,borderInlineStart:'2px solid var(--blue)',whiteSpace:'pre-wrap',minHeight:60}}>{n.text||'—'}</div>
-              <div className="flex g8 mt12">
-                <button className="btn btn-s btn-sm" style={{flex:1}} onClick={()=>startEdit(n)}><Icon name="edit" size={12}/> تعديل</button>
-                <button className="btn btn-sm" onClick={()=>delNote(n)} style={{background:'rgba(239,68,68,.14)',color:'#fca5a5',border:'1px solid rgba(239,68,68,.32)',padding:'7px 13px',borderRadius:10}}><Icon name="trash" size={12}/></button>
-              </div>
-            </>}
-          </div>;
-        })}
+        {sortedNotes.map(n=>{const l=app.lesson(n.lesson_id);const isEditing=editing===n.id;return <div key={n.id} className="glass" style={{padding:16}}><div className="flex between center mb12"><div className="flex center g8" style={{flex:1,minWidth:0}}><span className="pill pill-b" style={{fontSize:11}}><Icon name="note" size={11}/> درس</span>{l?<a href={`/student/lesson.html?id=${l.id}`} className="sm" style={{fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{l.title}</a>:<span className="sm muted">درس محذوف</span>}</div><span className="xs muted">{new Date(n.updated_at||n.created_at).toLocaleDateString('ar-EG')}</span></div>{isEditing?<><textarea className="input" value={text} onChange={e=>setText(e.target.value)} rows="5"/><div className="flex g8 mt12"><button className="btn btn-p btn-sm" style={{flex:1}} onClick={()=>saveEdit(n)}>💾 حفظ</button><button className="btn btn-s btn-sm" onClick={cancelEdit}>إلغاء</button></div></>:<><div className="sm txt2" style={{background:'rgba(0,0,0,.20)',padding:10,borderRadius:10,borderInlineStart:'2px solid var(--blue)',whiteSpace:'pre-wrap',minHeight:60}}>{n.text||'—'}</div><div className="flex g8 mt12"><button className="btn btn-s btn-sm" style={{flex:1}} onClick={()=>startEdit(n)}><Icon name="edit" size={12}/> تعديل</button><button className="btn btn-sm" onClick={()=>delNote(n)} style={{background:'rgba(239,68,68,.14)',color:'#fca5a5',border:'1px solid rgba(239,68,68,.32)',padding:'7px 13px',borderRadius:10}}><Icon name="trash" size={12}/></button></div></>}</div>})}
       </div>
     }
   </>;
 }
+
 function PollsPage(){
-  const app=useApp();
-  const u=app.currentUser;
-  const [loading,setLoading]=useState(true);
-  const [polls,setPolls]=useState([]);
-  const [votes,setVotes]=useState([]);
-  const [voting,setVoting]=useState(null);
-  const loadData = useCallback(async ()=>{
-    try{
-      await DB.cleanupExpiredPolls();
-      const sb = await DB.getClient();
-      const [pRes, vRes] = await Promise.all([
-        sb.from('polls').select('*').eq('active', true).order('created_at',{ascending:false}),
-        sb.from('poll_votes').select('*')
-      ]);
-      const now = Date.now();
-      const activePolls = (pRes.data || []).filter(p => !p.ends_at || p.ends_at > now);
-      setPolls(activePolls);
-      setVotes(vRes.data || []);
-    }catch(e){console.warn(e);}
-    setLoading(false);
-  },[]);
-  useEffect(()=>{ loadData(); },[loadData]);
-  const myVote = (pollId) => votes.find(v => v.poll_id === pollId && v.user_id === u.id);
-  const vote = async (poll, optionIndex) => {
-    if(myVote(poll.id)) return app.toast.warn('صوّت بالفعل');
-    setVoting(poll.id + ':' + optionIndex);
-    try{
-      const sb = await DB.getClient();
-      await sb.from('poll_votes').insert([{
-        id: DB.uid('vote_'),
-        poll_id: poll.id,
-        user_id: u.id,
-        option_index: optionIndex,
-        created_at: Date.now()
-      }]);
-      await loadData();
-      app.toast.ok('✅ تم تسجيل صوتك');
-      if(typeof fbq!=='undefined') fbq('trackCustom','PollVote',{poll:poll.question});
-      DB.trackActivity({
-        userId: u.id, userName: u.name, type: 'poll_vote',
-        target: poll.question, details: { poll_id: poll.id, option: optionIndex }
-      });
-    }catch(e){ app.toast.err(e.message); }
-    setVoting(null);
-  };
-  const getStats = (poll) => {
-    const pollVotes = votes.filter(v => v.poll_id === poll.id);
-    const total = pollVotes.length;
-    const counts = (poll.options||[]).map((_, i) =>
-      pollVotes.filter(v => v.option_index === i).length
-    );
-    return { total, counts };
-  };
+  const app=useApp();const u=app.currentUser;
+  const [loading,setLoading]=useState(true);const [polls,setPolls]=useState([]);const [votes,setVotes]=useState([]);const [voting,setVoting]=useState(null);
+  const loadData=useCallback(async ()=>{try{await DB.cleanupExpiredPolls();const sb=await DB.getClient();const [pRes,vRes]=await Promise.all([sb.from('polls').select('*').eq('active',true).order('created_at',{ascending:false}),sb.from('poll_votes').select('*')]);const now=Date.now();const activePolls=(pRes.data||[]).filter(p=>!p.ends_at||p.ends_at>now);setPolls(activePolls);setVotes(vRes.data||[])}catch(e){console.warn(e)}setLoading(false)},[]);
+  useEffect(()=>{loadData()},[loadData]);
+  const myVote=(pollId)=>votes.find(v=>v.poll_id===pollId&&v.user_id===u.id);
+  const vote=async (poll,optionIndex)=>{if(myVote(poll.id))return app.toast.warn('صوّت بالفعل');setVoting(poll.id+':'+optionIndex);try{const sb=await DB.getClient();await sb.from('poll_votes').insert([{id:DB.uid('vote_'),poll_id:poll.id,user_id:u.id,option_index:optionIndex,created_at:Date.now()}]);await loadData();app.toast.ok('✅ تم تسجيل صوتك');if(typeof fbq!=='undefined')fbq('trackCustom','PollVote',{poll:poll.question});DB.trackActivity({userId:u.id,userName:u.name,type:'poll_vote',target:poll.question,details:{poll_id:poll.id,option:optionIndex}})}catch(e){app.toast.err(e.message)}setVoting(null)};
+  const getStats=(poll)=>{const pollVotes=votes.filter(v=>v.poll_id===poll.id);const total=pollVotes.length;const counts=(poll.options||[]).map((_,i)=>pollVotes.filter(v=>v.option_index===i).length);return{total,counts}};
   return <>
     <div className="flex between center mb16 wrap g8">
-      <div>
-        <div className="h2 grad">🗳️ استطلاعات الرأي</div>
-        <div className="sm muted mt6">شاركنا رأيك — صوتك يهمنا</div>
-      </div>
+      <div><div className="h2 title-row"><i className="fa-solid fa-square-poll-vertical" style={{color:'#c4b5fd'}}></i><span className="grad">استطلاعات الرأي</span></div><div className="sm muted mt6">شاركنا رأيك — صوتك يهمنا</div></div>
       <span className="pill pill-b">{polls.length} استطلاع</span>
     </div>
-    {loading ? (
-      <div className="glass" style={{padding:40,textAlign:'center'}}>
-        <div className="spinner" style={{margin:'0 auto 14px'}}></div>
-        جارٍ التحميل...
-      </div>
-    ) : polls.length === 0 ? (
-      <div className="glass" style={{padding:30}}>
-        <Empty icon="🗳️" title="لا توجد استطلاعات حالياً" desc="هيظهر هنا أي استطلاع جديد"/>
-      </div>
-    ) : (
+    {loading?(<div className="glass" style={{padding:40,textAlign:'center'}}><div className="spinner" style={{margin:'0 auto 14px'}}></div>جارٍ التحميل...</div>):polls.length===0?(<div className="glass" style={{padding:30}}><Empty icon="🗳️" title="لا توجد استطلاعات حالياً" desc="هيظهر هنا أي استطلاع جديد"/></div>):(
       <div className="flex col g16">
-        {polls.map(p => {
-          const { total, counts } = getStats(p);
-          const mine = myVote(p.id);
-          const hasVoted = !!mine;
-          return <div key={p.id} className="glass" style={{padding:22}}>
-            <div className="flex between center mb16 wrap g8">
-              <span className="pill pill-b">📊 {total} صوت</span>
-              {hasVoted && <span className="pill pill-g">✓ صوّتت</span>}
-            </div>
-            <div className="h3 mb16" style={{lineHeight:1.5}}>{p.question}</div>
-            <div className="flex col g10">
-              {(p.options||[]).map((opt, i) => {
-                const cnt = counts[i] || 0;
-                const perc = total ? Math.round((cnt/total)*100) : 0;
-                const isMyPick = mine && mine.option_index === i;
-                const isVoting = voting === p.id + ':' + i;
-                if(!hasVoted){
-                  return <button key={i}
-                    onClick={()=>vote(p, i)}
-                    disabled={!!voting}
-                    className="glass-s hv"
-                    style={{
-                      padding:'14px 18px',
-                      cursor: isVoting ? 'wait' : 'pointer',
-                      textAlign:'right',
-                      display:'flex',
-                      alignItems:'center',
-                      gap:12,
-                      border: '1.5px solid var(--border)',
-                      fontFamily:'inherit',
-                      color:'inherit',
-                      width:'100%',
-                      transition:'.2s'
-                    }}
-                  >
-                    <span style={{
-                      width:32,height:32,borderRadius:'50%',
-                      display:'grid',placeItems:'center',
-                      background:'rgba(47,125,255,.12)',
-                      border:'1.5px solid var(--border2)',
-                      fontWeight:800,fontSize:13,
-                      color:'var(--blue2)',
-                      flexShrink:0
-                    }}>{['أ','ب','ج','د','هـ','و'][i]}</span>
-                    <span style={{flex:1,fontWeight:600}}>{opt}</span>
-                    {isVoting && <span className="spinner" style={{width:16,height:16,borderWidth:2}}/>}
-                  </button>;
-                }
-                return <div key={i} className="glass-s" style={{
-                  padding:'14px 18px',
-                  border: isMyPick ? '1.5px solid var(--green)' : '1.5px solid var(--border)',
-                  background: isMyPick ? 'rgba(34,197,94,.08)' : 'rgba(21,31,56,.62)'
-                }}>
-                  <div className="flex between center mb8">
-                    <div className="flex g8 center">
-                      <span style={{
-                        width:32,height:32,borderRadius:'50%',
-                        display:'grid',placeItems:'center',
-                        background: isMyPick ? 'var(--green)' : 'rgba(47,125,255,.12)',
-                        color: isMyPick ? '#fff' : 'var(--blue2)',
-                        border: isMyPick ? 'none' : '1.5px solid var(--border2)',
-                        fontWeight:800,fontSize:13,
-                        flexShrink:0
-                      }}>{['أ','ب','ج','د','هـ','و'][i]}</span>
-                      <span style={{fontWeight:600}}>{opt}</span>
-                      {isMyPick && <span className="pill pill-g" style={{fontSize:10}}>اختيارك</span>}
-                    </div>
-                    <div className="flex g6 center">
-                      <span className="xs muted">{cnt}</span>
-                      <span className="sm" style={{fontWeight:800,color:isMyPick?'var(--green)':'var(--blue2)'}}>{perc}%</span>
-                    </div>
-                  </div>
-                  <div className="bar" style={{height:8}}>
-                    <div
-                      className={`bar-f ${isMyPick?'bar-g':'bar-b'}`}
-                      style={{width:`${perc}%`}}
-                    />
-                  </div>
-                </div>;
-              })}
-            </div>
-            {p.ends_at && (
-              <div className="xs muted mt16" style={{textAlign:'center'}}>
-                ⏰ ينتهي: {DB.formatDate(p.ends_at)}
-              </div>
-            )}
-          </div>;
-        })}
+        {polls.map(p=>{const {total,counts}=getStats(p);const mine=myVote(p.id);const hasVoted=!!mine;return <div key={p.id} className="glass" style={{padding:22}}><div className="flex between center mb16 wrap g8"><span className="pill pill-b">📊 {total} صوت</span>{hasVoted&&<span className="pill pill-g">✓ صوّتت</span>}</div><div className="h3 mb16" style={{lineHeight:1.5}}>{p.question}</div><div className="flex col g10">{(p.options||[]).map((opt,i)=>{const cnt=counts[i]||0;const perc=total?Math.round((cnt/total)*100):0;const isMyPick=mine&&mine.option_index===i;const isVoting=voting===p.id+':'+i;if(!hasVoted){return <button key={i} onClick={()=>vote(p,i)} disabled={!!voting} className="glass-s hv" style={{padding:'14px 18px',cursor:isVoting?'wait':'pointer',textAlign:'right',display:'flex',alignItems:'center',gap:12,border:'1.5px solid var(--border)',fontFamily:'inherit',color:'inherit',width:'100%',transition:'.2s'}}><span style={{width:32,height:32,borderRadius:'50%',display:'grid',placeItems:'center',background:'rgba(47,125,255,.12)',border:'1.5px solid var(--border2)',fontWeight:800,fontSize:13,color:'var(--blue2)',flexShrink:0}}>{['أ','ب','ج','د','هـ','و'][i]}</span><span style={{flex:1,fontWeight:600}}>{opt}</span>{isVoting&&<span className="spinner" style={{width:16,height:16,borderWidth:2}}/>}</button>}return <div key={i} className="glass-s" style={{padding:'14px 18px',border:isMyPick?'1.5px solid var(--green)':'1.5px solid var(--border)',background:isMyPick?'rgba(34,197,94,.08)':'rgba(21,31,56,.62)'}}><div className="flex between center mb8"><div className="flex g8 center"><span style={{width:32,height:32,borderRadius:'50%',display:'grid',placeItems:'center',background:isMyPick?'var(--green)':'rgba(47,125,255,.12)',color:isMyPick?'#fff':'var(--blue2)',border:isMyPick?'none':'1.5px solid var(--border2)',fontWeight:800,fontSize:13,flexShrink:0}}>{['أ','ب','ج','د','هـ','و'][i]}</span><span style={{fontWeight:600}}>{opt}</span>{isMyPick&&<span className="pill pill-g" style={{fontSize:10}}>اختيارك</span>}</div><div className="flex g6 center"><span className="xs muted">{cnt}</span><span className="sm" style={{fontWeight:800,color:isMyPick?'var(--green)':'var(--blue2)'}}>{perc}%</span></div></div><div className="bar" style={{height:8}}><div className={`bar-f ${isMyPick?'bar-g':'bar-b'}`} style={{width:`${perc}%`}}/></div></div>})}</div>{p.ends_at&&(<div className="xs muted mt16" style={{textAlign:'center'}}>⏰ ينتهي: {DB.formatDate(p.ends_at)}</div>)}</div>})}
       </div>
     )}
   </>;
 }
+
 function Notifications(){
-  const app=useApp();
-  const u=app.currentUser;
+  const app=useApp();const u=app.currentUser;
   const list=app.db.notifications.filter(n=>n.target==='all'||n.target===u.id).sort((a,b)=>b.created_at-a.created_at);
-  const markRead=async id=>{
-    try{
-      const n=list.find(x=>x.id===id);
-      const readBy=[...(n.read_by||[])];
-      if(!readBy.includes(u.id)) readBy.push(u.id);
-      await DB.save('notifications',{...n,read_by:readBy});
-      await app.reload();
-    }catch(e){}
-  };
+  const markRead=async id=>{try{const n=list.find(x=>x.id===id);const readBy=[...(n.read_by||[])];if(!readBy.includes(u.id))readBy.push(u.id);await DB.save('notifications',{...n,read_by:readBy});await app.reload()}catch(e){}};
   return <>
     <div className="h2 mb16">الإشعارات</div>
-    {list.length===0?<div className="glass" style={{padding:30}}><Empty icon="🔕" title="لا توجد إشعارات"/></div>:
-      list.map(n=>{
-        const read=(n.read_by||[]).includes(u.id);
-        return <div key={n.id} className="glass mb12" style={{padding:16,borderColor:read?'var(--border)':'var(--border2)'}}>
-          <div className="flex between center mb6">
-            <div className="h4">{n.title} {!read&&<span className="pill pill-b" style={{marginInlineStart:8}}>جديد</span>}</div>
-            <span className="xs muted">{new Date(n.created_at).toLocaleDateString('ar-EG')}</span>
-          </div>
-          <div className="sm txt2 mb12">{n.body}</div>
-          {!read&&<button className="btn btn-s btn-sm" onClick={()=>markRead(n.id)}>تحديد كمقروء</button>}
-        </div>;
-      })
-    }
+    {list.length===0?<div className="glass" style={{padding:30}}><Empty icon="🔕" title="لا توجد إشعارات"/></div>:list.map(n=>{const read=(n.read_by||[]).includes(u.id);return <div key={n.id} className="glass mb12" style={{padding:16,borderColor:read?'var(--border)':'var(--border2)'}}><div className="flex between center mb6"><div className="h4">{n.title} {!read&&<span className="pill pill-b" style={{marginInlineStart:8}}>جديد</span>}</div><span className="xs muted">{new Date(n.created_at).toLocaleDateString('ar-EG')}</span></div><div className="sm txt2 mb12">{n.body}</div>{!read&&<button className="btn btn-s btn-sm" onClick={()=>markRead(n.id)}>تحديد كمقروء</button>}</div>})}
   </>;
 }
+
 function AboutPage(){
   const app=useApp();
   const [notifPerm,setNotifPerm]=useState(typeof Notification!=='undefined'?Notification.permission:'unsupported');
@@ -1531,51 +807,57 @@ function AboutPage(){
   };
   const labels={facebook:'فيسبوك',tiktok:'تيك توك',instagram:'إنستجرام',whatsapp_channel:'قناة واتساب',whatsapp_group:'جروب واتساب',custom:'رابط'};
   return <>
-    <div className="hero mb16" style={{textAlign:'center'}}>
-      <div style={{fontSize:64,marginBottom:10,filter:'drop-shadow(0 8px 24px rgba(47,125,255,.5))'}}>🎓</div>
-      <div className="h1 grad mb10">{data.about_title||'عن المنصة'}</div>
-      <div className="sm txt2" style={{maxWidth:640,margin:'0 auto',lineHeight:1.95,whiteSpace:'pre-wrap'}}>{data.about_text||'منصة تعليمية متكاملة تجمعلك كل الدروس والاختبارات والمهام في مكان واحد.'}</div>
+    <div className="glass mb16" style={{padding:'32px 22px',textAlign:'center',position:'relative',overflow:'hidden'}}>
+      <div style={{position:'absolute',top:'-60px',right:'-60px',width:'220px',height:'220px',background:'radial-gradient(circle,rgba(47,125,255,.18),transparent 70%)',pointerEvents:'none'}}/>
+      <div style={{position:'absolute',bottom:'-60px',left:'-60px',width:'220px',height:'220px',background:'radial-gradient(circle,rgba(139,92,246,.15),transparent 70%)',pointerEvents:'none'}}/>
+      <div style={{width:'84px',height:'84px',borderRadius:'24px',margin:'0 auto 16px',display:'grid',placeItems:'center',background:'linear-gradient(140deg,#2f7dff,#8b5cf6)',boxShadow:'0 14px 40px rgba(47,125,255,.5)',position:'relative'}}>
+        <span style={{fontSize:'42px',lineHeight:1}}>🎓</span>
+      </div>
+      <div className="h1 grad mb10" style={{position:'relative'}}>{data.about_title||'عن المنصة'}</div>
+      <div className="sm txt2" style={{maxWidth:600,margin:'0 auto',lineHeight:1.95,whiteSpace:'pre-wrap',position:'relative'}}>{data.about_text||'منصة تعليمية متكاملة تجمعلك كل الدروس والاختبارات والمهام في مكان واحد.'}</div>
     </div>
-    <div className="glass mb16" style={{padding:20}}>
-      <div className="h3 mb16" style={{display:'flex',alignItems:'center',gap:10}}>
-        <span style={{fontSize:24}}>🔗</span> تابعنا على
+    <div className="glass mb16" style={{padding:22}}>
+      <div className="flex center g10 mb16" style={{justifyContent:'center'}}>
+        <span style={{fontSize:'24px'}}>🔗</span>
+        <span className="h3">تابعنا على</span>
       </div>
       {(data.social_links||[]).length===0?(
         <div className="sm muted" style={{textAlign:'center',padding:24}}>لا توجد لينكات بعد</div>
       ):(
         <div className="social-grid">
           {(data.social_links||[]).map(l=>(
-            <a key={l.id} href={l.url} target="_blank" rel="noopener noreferrer" className="glass-s hv" style={{padding:14,display:'flex',alignItems:'center',gap:12,textDecoration:'none',color:'inherit'}}>
-              <div style={{width:46,height:46,borderRadius:13,display:'grid',placeItems:'center',background:'rgba(255,255,255,.04)',border:'1px solid var(--border)',flexShrink:0}}>
-                <SocialIcon platform={l.platform} size={28}/>
+            <a key={l.id} href={l.url} target="_blank" rel="noopener noreferrer" className="social-card">
+              <div className="icon">
+                <SocialIcon platform={l.platform} size={52}/>
               </div>
-              <div style={{flex:1,minWidth:0}}>
-                <div className="h4" style={{fontSize:14}}>{l.label||labels[l.platform]||'رابط'}</div>
-                <div className="xs muted" dir="ltr" style={{whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{l.url}</div>
+              <div className="label">
+                <div className="h4" style={{fontSize:13.5,fontWeight:800,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
+                  {l.label||labels[l.platform]||'رابط'}
+                </div>
               </div>
-              <span style={{color:'var(--blue2)',fontSize:18}}>↗</span>
             </a>
           ))}
         </div>
       )}
     </div>
-    <div className="glass" style={{padding:20}}>
-      <div className="h3 mb16" style={{display:'flex',alignItems:'center',gap:10}}>
-        <span style={{fontSize:24}}>🔔</span> الإشعارات
+    <div className="glass" style={{padding:22}}>
+      <div className="flex center g10 mb16" style={{justifyContent:'center'}}>
+        <span style={{fontSize:'24px'}}>🔔</span>
+        <span className="h3">الإشعارات</span>
       </div>
       {notifPerm==='granted'?(
-        <div className="flex between center wrap g8">
-          <span className="pill pill-g">✅ الإشعارات مفعّلة</span>
-          <span className="xs muted">هتوصلك إشعارات المنصة أول بأول</span>
+        <div style={{textAlign:'center'}}>
+          <div className="pill pill-g" style={{padding:'10px 22px',fontSize:14,display:'inline-flex'}}>✅ الإشعارات مفعّلة</div>
+          <div className="xs muted mt12">هتوصلك إشعارات المنصة أول بأول</div>
         </div>
       ):notifPerm==='denied'?(
-        <div className="sm" style={{color:'#fca5a5'}}>❌ الإشعارات مرفوضة — فعّلها من إعدادات المتصفح</div>
+        <div className="sm" style={{color:'#fca5a5',textAlign:'center'}}>❌ الإشعارات مرفوضة — فعّلها من إعدادات المتصفح</div>
       ):notifPerm==='unsupported'?(
-        <div className="sm muted">المتصفح لا يدعم الإشعارات</div>
+        <div className="sm muted" style={{textAlign:'center'}}>المتصفح لا يدعم الإشعارات</div>
       ):(
         <>
-          <div className="sm txt2 mb12">فعّل الإشعارات عشان توصلك كل جديد من المنصة فورًا 🔔</div>
-          <button className="btn btn-p btn-block" onClick={askNotifPerm}>🔔 تفعيل الإشعارات</button>
+          <div className="sm txt2 mb16" style={{textAlign:'center',lineHeight:1.8}}>فعّل الإشعارات عشان توصلك كل جديد من المنصة فورًا 🔔</div>
+          <button className="btn btn-p btn-block btn-lg" onClick={askNotifPerm}>🔔 تفعيل الإشعارات</button>
         </>
       )}
     </div>
@@ -1694,40 +976,28 @@ container.style.cssText = 'position:relative!important;display:block!important;w
 container.innerHTML = `
 <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 8%,rgba(0,145,255,.22),transparent 35%),radial-gradient(circle at 10% 80%,rgba(0,80,255,.18),transparent 35%),radial-gradient(circle at 90% 75%,rgba(0,210,255,.13),transparent 35%),linear-gradient(135deg,#020b20 0%,#062452 45%,#020817 100%);pointer-events:none;"></div>
 <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(40,180,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(40,180,255,.035) 1px,transparent 1px);background-size:32px 32px;opacity:.8;pointer-events:none;"></div>
-
-<!-- futuristic frame -->
 <div style="position:absolute;inset:18px;border:2px solid #18bfff;border-radius:18px;box-shadow:0 0 24px rgba(0,174,255,.45),inset 0 0 24px rgba(0,174,255,.12);"></div>
 <div style="position:absolute;inset:34px;border:1px solid rgba(72,210,255,.35);border-radius:13px;"></div>
 <div style="position:absolute;inset:55px;border:1px dashed rgba(70,205,255,.2);border-radius:9px;"></div>
-
-<!-- cyber corner brackets -->
 <div style="position:absolute;top:26px;left:26px;width:105px;height:105px;border-top:6px solid #18bfff;border-left:6px solid #18bfff;border-top-left-radius:10px;filter:drop-shadow(0 0 10px #18bfff);"></div>
 <div style="position:absolute;top:26px;right:26px;width:105px;height:105px;border-top:6px solid #18bfff;border-right:6px solid #18bfff;border-top-right-radius:10px;filter:drop-shadow(0 0 10px #18bfff);"></div>
 <div style="position:absolute;bottom:26px;left:26px;width:105px;height:105px;border-bottom:6px solid #18bfff;border-left:6px solid #18bfff;border-bottom-left-radius:10px;filter:drop-shadow(0 0 10px #18bfff);"></div>
 <div style="position:absolute;bottom:26px;right:26px;width:105px;height:105px;border-bottom:6px solid #18bfff;border-right:6px solid #18bfff;border-bottom-right-radius:10px;filter:drop-shadow(0 0 10px #18bfff);"></div>
-
-<!-- gold accent bars -->
 <div style="position:absolute;top:27px;left:250px;width:95px;height:5px;background:#ffd21a;box-shadow:0 0 12px rgba(255,210,26,.7);transform:skewX(-28deg);"></div>
 <div style="position:absolute;top:27px;right:250px;width:95px;height:5px;background:#ffd21a;box-shadow:0 0 12px rgba(255,210,26,.7);transform:skewX(28deg);"></div>
 <div style="position:absolute;bottom:27px;left:250px;width:95px;height:5px;background:#ffd21a;box-shadow:0 0 12px rgba(255,210,26,.7);transform:skewX(28deg);"></div>
 <div style="position:absolute;bottom:27px;right:250px;width:95px;height:5px;background:#ffd21a;box-shadow:0 0 12px rgba(255,210,26,.7);transform:skewX(-28deg);"></div>
-
-<!-- subtle graduation cap -->
 <div style="position:absolute;left:52px;top:110px;width:190px;height:100px;opacity:.24;transform:rotate(-7deg);">
 <div style="position:absolute;left:15px;top:18px;width:155px;height:70px;background:linear-gradient(135deg,#0b7fff,#063d9e);clip-path:polygon(50% 0,100% 35%,50% 70%,0 35%);box-shadow:0 0 30px #008cff;"></div>
 <div style="position:absolute;left:73px;top:55px;width:48px;height:65px;background:#063a91;border-radius:0 0 18px 18px;"></div>
 <div style="position:absolute;left:146px;top:48px;width:4px;height:70px;background:#18cfff;"></div>
 <div style="position:absolute;left:138px;top:112px;width:20px;height:20px;border-radius:50%;background:#ffd21a;"></div>
 </div>
-
-<!-- top branding -->
 <div style="position:absolute;top:38px;left:0;right:0;text-align:center;display:flex;flex-direction:column;align-items:center;">
 ${logoBase64 ? `<img src="${logoBase64}" style="width:92px;height:92px;object-fit:contain;filter:drop-shadow(0 0 22px rgba(0,174,255,.5));"/>` : `<div style="width:92px;height:92px;border-radius:22px;background:linear-gradient(135deg,#0a8cff,#18cfff,#0751b8);display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:900;color:#fff;">M</div>`}
 <div style="font-size:40px;font-weight:900;margin-top:2px;color:#2f8cff;line-height:1;font-family:'Cairo',sans-serif;text-shadow:0 0 20px rgba(47,141,255,.7);">MISSION <span style="color:#ffd21a;text-shadow:0 0 18px rgba(255,210,26,.7);">EDU</span></div>
 <div style="font-size:15px;color:#d5ebff;margin-top:7px;font-weight:600;font-family:'Tajawal',sans-serif;">منصة تعليمية متكاملة</div>
 </div>
-
-<!-- title badge -->
 <div style="position:absolute;top:205px;left:250px;right:250px;height:165px;text-align:center;">
 <div style="position:absolute;inset:20px 0 0;background:linear-gradient(135deg,rgba(4,72,160,.94),rgba(3,24,65,.96));border:3px solid #18bfff;clip-path:polygon(7% 0,93% 0,100% 50%,93% 100%,7% 100%,0 50%);box-shadow:0 0 28px rgba(0,174,255,.45),inset 0 0 35px rgba(0,174,255,.2);"></div>
 <div style="position:absolute;top:31px;left:55px;right:55px;height:4px;background:linear-gradient(90deg,transparent,#ffd21a,#18bfff,#ffd21a,transparent);box-shadow:0 0 12px rgba(24,191,255,.8);"></div>
@@ -1737,32 +1007,22 @@ ${logoBase64 ? `<img src="${logoBase64}" style="width:92px;height:92px;object-fi
 <div style="position:relative;padding-top:42px;font-size:70px;font-weight:900;color:#fff !important;-webkit-text-fill-color:#fff !important;font-family:'Cairo','Tajawal',sans-serif;line-height:1.1;text-shadow:0 0 18px rgba(255,255,255,.35);">شهادة إتمام</div>
 <div style="position:relative;font-size:14px;color:#bfefff;margin-top:8px;font-weight:800;font-family:'Cairo',sans-serif;letter-spacing:6px;">CERTIFICATE OF COMPLETION</div>
 </div>
-
-<!-- student intro -->
 <div style="position:absolute;top:445px;left:0;right:0;text-align:center;">
 <div style="font-size:22px;color:#e7f6ff;font-weight:600;font-family:'Tajawal',sans-serif;">تشهد المنصة بأن الطالب</div>
 </div>
-
-<!-- student name -->
 <div style="position:absolute;top:492px;left:0;right:0;text-align:center;padding:0 90px;">
 <div style="display:inline-block;font-size:60px;font-weight:900;color:#ffe58a;padding:8px 55px 16px;text-shadow:0 0 18px rgba(255,205,55,.5),0 0 42px rgba(255,190,30,.2);line-height:1.3;font-family:'Tajawal',sans-serif;">${studentName}</div>
 <div style="width:660px;max-width:70%;height:3px;margin:3px auto 0;background:linear-gradient(90deg,transparent,#18cfff,#ffd21a,#18cfff,transparent);box-shadow:0 0 13px rgba(24,191,255,.7);"></div>
 </div>
-
-<!-- subject intro -->
 <div style="position:absolute;top:640px;left:0;right:0;text-align:center;">
 <div style="font-size:22px;color:#e7f6ff;font-weight:600;font-family:'Tajawal',sans-serif;">قد أتم بنجاح دراسة مادة</div>
 </div>
-
-<!-- subject -->
 <div style="position:absolute;top:690px;left:0;right:0;text-align:center;">
 <div style="display:inline-flex;align-items:center;gap:22px;padding:10px 35px 12px;">
 <span style="font-size:43px;filter:drop-shadow(0 0 8px rgba(24,191,255,.7));">${subjectIcon}</span>
 <span style="display:inline-block;font-size:38px;font-weight:900;color:#fff !important;-webkit-text-fill-color:#fff !important;font-family:'Tajawal',sans-serif;text-shadow:0 0 12px rgba(255,255,255,.3);padding:0 12px 9px;border-bottom:4px solid #19c8ff;box-shadow:0 7px 0 -4px rgba(25,200,255,.45);">${subjectName}</span>
 </div>
 </div>
-
-<!-- metadata -->
 <div style="position:absolute;bottom:90px;left:145px;right:145px;display:flex;justify-content:space-between;align-items:flex-end;">
 <div style="text-align:center;width:285px;">
 <div style="font-size:12px;color:#73cfff;margin-bottom:9px;font-weight:800;font-family:'Tajawal',sans-serif;">رقم الشهادة</div>
@@ -1773,22 +1033,16 @@ ${logoBase64 ? `<img src="${logoBase64}" style="width:92px;height:92px;object-fi
 <div style="display:inline-block;padding:10px 26px;border:1px solid rgba(24,191,255,.8);border-radius:14px;background:rgba(2,22,60,.55);box-shadow:0 0 18px rgba(0,174,255,.15);font-size:16px;color:#fff;font-weight:800;font-family:'Tajawal',sans-serif;">${issueDate}</div>
 </div>
 </div>
-
-<!-- footer -->
 <div style="position:absolute;bottom:34px;left:0;right:0;text-align:center;">
 <div style="font-size:24px;font-weight:900;color:#2f8cff;font-style:italic;font-family:'Cairo',sans-serif;text-shadow:0 0 16px rgba(47,141,255,.7);">MISSION <span style="color:#ffd21a;">EDU</span></div>
 <div style="width:220px;height:2px;background:linear-gradient(90deg,transparent,#18bfff,#ffd21a,#18bfff,transparent);margin:6px auto 6px;"></div>
 <div dir="rtl" style="font-size:11px;color:#b8e7ff;font-weight:700;font-family:'Tajawal','Cairo',sans-serif;white-space:nowrap;">التوقيع الرسمي</div>
 </div>
-
-<!-- right decorative book -->
 <div style="position:absolute;right:38px;bottom:180px;width:170px;height:120px;opacity:.16;transform:rotate(-8deg);">
 <div style="position:absolute;right:0;bottom:0;width:155px;height:65px;background:linear-gradient(135deg,#0a6ad8,#021b51);border:2px solid #18bfff;border-radius:8px;box-shadow:0 0 20px rgba(0,174,255,.45);"></div>
 <div style="position:absolute;right:12px;bottom:55px;width:135px;height:38px;background:#073c91;border:2px solid #18bfff;border-radius:8px 8px 2px 2px;"></div>
 <div style="position:absolute;right:34px;bottom:24px;width:90px;height:2px;background:#18bfff;box-shadow:0 0 8px #18bfff;"></div>
 </div>
-
-<!-- right geometric Islamic motif -->
 <div style="position:absolute;right:58px;top:125px;width:150px;height:170px;opacity:.12;">
 <div style="position:absolute;inset:0;border:18px solid #0b73dc;border-bottom-color:transparent;border-radius:80px 80px 0 0;"></div>
 <div style="position:absolute;left:45px;top:35px;width:60px;height:60px;border:10px solid #18bfff;transform:rotate(45deg);"></div>
