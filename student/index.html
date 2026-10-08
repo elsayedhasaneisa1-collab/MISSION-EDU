@@ -1614,11 +1614,13 @@ const subjectName = subject?.name || 'المادة';
 const subjectIcon = subject?.icon || '📚';
 
 const wrapper = document.createElement('div');
-wrapper.style.cssText = 'position:fixed;top:-1200px;left:0;width:1400px;height:990px;overflow:hidden;z-index:-9999;background:#0a1428;pointer-events:none;';
+wrapper.className = 'mission-cert-render-root';
+wrapper.style.cssText = 'position:fixed;top:0;left:-2000px;width:1400px;min-width:1400px;max-width:none!important;height:990px;min-height:990px;max-height:none!important;overflow:hidden;z-index:2147483647;background:#050a18;pointer-events:none;display:block!important;';
 
 const container = document.createElement('div');
+container.className = 'mission-cert-render';
 container.setAttribute('dir', 'rtl');
-container.style.cssText = 'position:relative;width:1400px;height:990px;font-family:"Tajawal","Cairo",sans-serif;direction:rtl;background:radial-gradient(1400px 900px at 50% -10%,#1e3a6b 0%,#0d1a3a 45%,#050a18 100%);box-sizing:border-box;overflow:hidden;color:#f7f0dd;';
+container.style.cssText = 'position:relative!important;display:block!important;width:1400px!important;min-width:1400px!important;max-width:none!important;height:990px!important;min-height:990px!important;max-height:none!important;flex:none!important;grid:none!important;margin:0!important;padding:0!important;font-family:"Tajawal","Cairo",sans-serif;direction:rtl;background:radial-gradient(1400px 900px at 50% -10%,#1e3a6b 0%,#0d1a3a 45%,#050a18 100%);box-sizing:border-box;overflow:hidden;color:#f7f0dd;';
 
 container.innerHTML = `
 <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(212,175,55,.02) 0,rgba(212,175,55,.02) 2px,transparent 2px,transparent 22px),repeating-linear-gradient(-45deg,rgba(212,175,55,.02) 0,rgba(212,175,55,.02) 2px,transparent 2px,transparent 22px);pointer-events:none;"></div>
@@ -1706,6 +1708,9 @@ const oldScrollX = window.scrollX;
 document.documentElement.setAttribute('dir', oldDir || 'rtl');
 document.body.style.direction = oldBodyDirection || oldDir;
 
+const isolationStyle = document.createElement('style');
+isolationStyle.textContent = '.mission-cert-render-root,.mission-cert-render-root *{max-width:none!important;max-height:none!important;box-sizing:border-box!important;} .mission-cert-render-root img{max-width:none!important;}';
+wrapper.appendChild(isolationStyle);
 wrapper.appendChild(container);
 document.body.appendChild(wrapper);
 
