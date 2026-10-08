@@ -1612,7 +1612,7 @@ const subjectName = subject?.name || 'المادة';
 const subjectIcon = subject?.icon || '📚';
 
 const wrapper = document.createElement('div');
-wrapper.style.cssText = 'position:fixed;top:0;left:50%;margin-left:-700px;width:1400px;height:990px;overflow:hidden;z-index:-1;background:#0a1428;';
+wrapper.style.cssText = 'position:fixed;top:0;left:-99999px;width:1400px;height:990px;overflow:hidden;z-index:-1;background:#0a1428;pointer-events:none;';
 
 const container = document.createElement('div');
 container.setAttribute('dir', 'rtl');
@@ -1698,9 +1698,10 @@ ${logoBase64 ? `<img src="${logoBase64}" style="width:90px;height:90px;object-fi
 `;
 
 const oldDir = document.documentElement.getAttribute('dir');
+const oldScrollY = window.scrollY;
+const oldScrollX = window.scrollX;
 document.documentElement.setAttribute('dir', 'ltr');
 document.body.style.direction = 'ltr';
-window.scrollTo(0, 0);
 
 wrapper.appendChild(container);
 document.body.appendChild(wrapper);
@@ -1738,6 +1739,7 @@ app.toast.err('فشل توليد الشهادة');
   document.body.removeChild(wrapper);
   document.documentElement.setAttribute('dir', oldDir || 'rtl');
   document.body.style.direction = '';
+  window.scrollTo(oldScrollX, oldScrollY);
 } 
 }
 
