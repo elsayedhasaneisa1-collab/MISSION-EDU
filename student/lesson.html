@@ -485,47 +485,19 @@ watermark.textContent = phone;
 }
 const container = document.getElementById('playerContainer');
 if(container){
-if(type === 'youtube'){
-const ytId = getYouTubeId(url);
-if(ytId){
+const playerParams = new URLSearchParams({
+  type: type,
+  url: url,
+  title: lesson.title || 'الدرس',
+  wm: (user.country_code || '') + (user.phone || '') || user.name || 'طالب'
+});
 container.innerHTML = `<iframe
-src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&fs=1&autoplay=1&showinfo=0&controls=1&disablekb=0"
-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-allowfullscreen
-referrerpolicy="strict-origin-when-cross-origin"
-title="فيديو الدرس"
+  src="player.html?${playerParams.toString()}"
+  title="مشغل فيديو MISSION EDU"
+  allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+  allowfullscreen
+  referrerpolicy="strict-origin-when-cross-origin"
 ></iframe>`;
-} else {
-container.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:Tajawal,sans-serif">رابط YouTube غير صالح</div>`;
-}
-} else if(type === 'vimeo'){
-const vId = (url.match(/vimeo\.com\/(?:video\/)?(\d+)/) || [])[1];
-container.innerHTML = `<iframe
-src="https://player.vimeo.com/video/${vId}?byline=0&portrait=0&title=0&dnt=1&autoplay=1"
-allow="autoplay; fullscreen; picture-in-picture"
-allowfullscreen
-title="فيديو الدرس"
-></iframe>`;
-} else if(type === 'mp4'){
-container.innerHTML = `<video
-id="mp4Video"
-controls
-controlsList="nodownload noremoteplayback noplaybackrate"
-disablePictureInPicture
-playsinline
-autoplay
-style="position:absolute;inset:0;width:100%;height:100%;background:#000;object-fit:contain"
->
-<source src="${esc(url)}" type="video/mp4"/>
-</video>`;
-} else {
-container.innerHTML = `<iframe
-src="${esc(url)}"
-allowfullscreen
-sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"
-title="فيديو الدرس"
-></iframe>`;
-}
 }
 const modal = document.getElementById('playerModal');
 if(modal){
