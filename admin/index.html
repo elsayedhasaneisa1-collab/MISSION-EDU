@@ -427,6 +427,259 @@ function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick,theme
     </div>
   </div>;
 }
+function ExamResultsPage(){
+const app=useApp();
+const [loading,setLoading]=useState(true);
+const [attempts,setAttempts]=useState([]);
+const [filterExam,setFilterExam]=useState('all');
+const [filterStudent,setFilterStudent]=useState('all');
+const [filterStatus,setFilterStatus]=useState('all');
+const [sortBy,setSortBy]=useState('recent');
+const [q,setQ]=useState('');
+
+const loadData = useCallback(async ()=>{
+try{
+const sb = await DB.getClient();
+const { data, error } = await sb.from('exam_attempts').select('*').order('at',{ascending:false}).limit(2000);
+if(error) throw error;
+setAttempts(data||[]);
+}catch(e){console.warn('Load attempts error:', e);}
+setLoading(false);
+},[]);
+
+useEffect(()=>{ loadData(); },[loadData]);
+
+const enriched = useMemo(()=>{
+return attempts.map(a=>{
+const student = app.db.users.find(u=>u.id===a.user_id);
+const exam = app.db.exams.find(e=>e.id===a.exam_id);
+return {
+...a,
+student,
+exam,
+studentName: student?.name || 'طالب محذوف',
+examTitle: exam?.title || 'اختبار محذوف',
+atMs: Number(a.at) || 0,
+startedAtMs: Number(a.started_at) || 0,
+durationSec: Number(a.duration_seconds) || 0,
+correctCount: Number(a.score) || 0,
+wrongCount: (Number(a.total)||0) - (Number(a.score)||0)
+};
+});
+},[attempts, app.db.users, app.db.exams]);
+
+const filtered = useMemo(()=>{
+let list = [...enriched];
+if(filterExam !== 'all') list = list.filter(x=>x.exam_id === filterExam);
+if(filterStudent !== 'all') list = list.filter(x=>x.user_id === filterStudent);
+if(filterStatus !== 'all'){
+if(filterStatus === 'passed') list = list.filter(x=>x.passed);
+else if(filterStatus === 'failed') list = list.filter(x=>!x.passed);
+}
+if(q.trim()){
+const lc = q.toLowerCase();
+list = list.filter(x=> x.studentName.toLowerCase().includes(lc) || x.examTitle.toLowerCase().includes(lc));
+}
+if(sortBy === 'recent') list.sort((a,b)=>b.atMs - a.atMs);
+else if(sortBy === 'oldest') list.sort((a,b)=>a.atMs - b.atMs);
+else if(sortBy === 'highest') list.sort((a,b)=>b.pct - a.pct);
+else if(sortBy === 'lowest') list.sort((a,b)=>a.pct - b.pct);
+else if(sortBy === 'fastest') list.sort((a,b)=>a.durationSec - b.durationSec);
+else if(sortBy === 'slowest') list.sort((a,b)=>b.durationSec - a.durationSec);
+return list;
+},[enriched, filterExam, filterStudent, filterStatus, sortBy, q]);
+
+const stats = useMemo(()=>{
+const total = enriched.length;
+const passed = enriched.filter(x=>x.passed).length;
+const failed = total - passed;
+const avgPct = total ? Math.round(enriched.reduce((s,x)=>s+(x.pct||0),0)/total) : 0;
+const avgDuration = total ? Math.round(enriched.reduce((s,x)=>s+(x.durationSec||0),0)/total) : 0;
+const uniqueStudents = new Set(enriched.map(x=>x.user_id)).size;
+return { total, passed, failed, avgPct, avgDuration, uniqueStudents };
+},[enriched]);
+
+const uniqueExams = useMemo(()=>{
+const ids = [...new Set(enriched.map(x=>x.exam_id))];
+return ids.map(id=>({id, title: enriched.find(x=>x.exam_id===id)?.examTitle || 'اختبار'})).sort((a,b)=>a.title.localeCompare(b.title,'ar'));
+},[enriched]);
+
+const uniqueStudents = useMemo(()=>{
+const ids = [...new Set(enriched.map(x=>x.user_id))];
+return ids.map(id=>({id, name: enriched.find(x=>x.user_id===id)?.studentName || 'طالب'})).sort((a,b)=>a.name.localeCompare(b.name,'ar'));
+},[enriched]);
+
+const formatDuration = (sec)=>{
+if(!sec || sec <= 0) return '—';
+if(sec < 60) return `${sec} ثانية`;
+const m = Math.floor(sec/60);
+const s = sec % 60;
+return s > 0 ? `${m}د ${s}ث` : `${m} دقيقة`;
+};
+
+const exportCSV = ()=>{
+const headers = ['الطالب','الاختبار','التاريخ والوقت','المدة','النتيجة','نسبة النجاح','عدد الأسئلة','صحيح','خطأ','الحالة'];
+const rows = filtered.map(x=>[
+x.studentName,
+x.examTitle,
+x.atMs ? new Date(x.atMs).toLocaleString('ar-EG') : '—',
+formatDuration(x.durationSec),
+`${x.score}/${x.total}`,
+`${x.pct}%`,
+x.total,
+x.correctCount,
+x.wrongCount,
+x.passed ? 'ناجح' : 'راسب'
+]);
+const csv = [headers, ...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = `exam_results_${new Date().toISOString().slice(0,10)}.csv`;
+a.click();
+URL.revokeObjectURL(url);
+app.toast.ok('تم تصدير النتائج');
+};
+
+return <>
+<div className="flex between center mb16 wrap g8">
+<div>
+<div className="h2 grad">📊 نتايج الاختبارات</div>
+<div className="sm muted mt6">متابعة كل محاولات الطلاب بالتفصيل</div>
+</div>
+<div className="flex g8">
+<button className="btn btn-s" onClick={loadData}>🔄 تحديث</button>
+<button className="btn btn-p" onClick={exportCSV} disabled={filtered.length===0}>
+<Icon name="download" size={14}/> تصدير CSV
+</button>
+</div>
+</div>
+
+<div className="grid g4 mb16">
+<Stat label="إجمالي المحاولات" value={DB.fmt(stats.total)} icon="clipboard" color="#FFD700"/>
+<Stat label="طلاب شاركوا" value={DB.fmt(stats.uniqueStudents)} icon="users" color="#5aa9ff"/>
+<Stat label="ناجحون" value={DB.fmt(stats.passed)} icon="check" color="#22c55e" sub={`${stats.total ? Math.round((stats.passed/stats.total)*100) : 0}%`}/>
+<Stat label="راسبون" value={DB.fmt(stats.failed)} icon="close" color="#ef4444" sub={`${stats.total ? Math.round((stats.failed/stats.total)*100) : 0}%`}/>
+</div>
+
+<div className="grid g2 mb16">
+<Stat label="متوسط النسبة" value={`${stats.avgPct}%`} icon="trend" color="#8b5cf6"/>
+<Stat label="متوسط وقت الإجابة" value={formatDuration(stats.avgDuration)} icon="clock" color="#f59e0b"/>
+</div>
+
+<div className="glass mb16" style={{padding:14}}>
+<div className="grid g4" style={{gap:10}}>
+<div>
+<label className="lbl">الاختبار</label>
+<select className="input" value={filterExam} onChange={e=>setFilterExam(e.target.value)}>
+<option value="all">كل الاختبارات ({uniqueExams.length})</option>
+{uniqueExams.map(e=><option key={e.id} value={e.id}>{e.title}</option>)}
+</select>
+</div>
+<div>
+<label className="lbl">الطالب</label>
+<select className="input" value={filterStudent} onChange={e=>setFilterStudent(e.target.value)}>
+<option value="all">كل الطلاب ({uniqueStudents.length})</option>
+{uniqueStudents.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
+</select>
+</div>
+<div>
+<label className="lbl">الحالة</label>
+<select className="input" value={filterStatus} onChange={e=>setFilterStatus(e.target.value)}>
+<option value="all">الكل</option>
+<option value="passed">✓ ناجح فقط</option>
+<option value="failed">✗ راسب فقط</option>
+</select>
+</div>
+<div>
+<label className="lbl">الترتيب حسب</label>
+<select className="input" value={sortBy} onChange={e=>setSortBy(e.target.value)}>
+<option value="recent">الأحدث أولاً</option>
+<option value="oldest">الأقدم أولاً</option>
+<option value="highest">أعلى نسبة</option>
+<option value="lowest">أقل نسبة</option>
+<option value="fastest">أسرع وقت</option>
+<option value="slowest">أطول وقت</option>
+</select>
+</div>
+</div>
+<div className="mt12">
+<input className="input" placeholder="🔍 ابحث باسم الطالب أو الاختبار..." value={q} onChange={e=>setQ(e.target.value)}/>
+</div>
+</div>
+
+<div className="glass" style={{padding:14}}>
+{loading ? (
+<div style={{textAlign:'center',padding:40}}>
+<div className="spinner" style={{margin:'0 auto 14px'}}></div>
+جارٍ تحميل النتائج...
+</div>
+) : filtered.length === 0 ? (
+<Empty icon="📊" title="لا توجد نتائج" desc="مفيش محاولات اختبار مطابقة للفلاتر الحالية"/>
+) : (
+<>
+<div className="flex between center mb12 wrap g8">
+<span className="pill pill-b">{filtered.length} نتيجة</span>
+</div>
+<div className="sx">
+<table className="tbl">
+<thead>
+<tr>
+<th>الطالب</th>
+<th>الاختبار</th>
+<th>التاريخ والوقت</th>
+<th>المدة</th>
+<th>النتيجة</th>
+<th>صحيح</th>
+<th>خطأ</th>
+<th>النسبة</th>
+<th>الحالة</th>
+</tr>
+</thead>
+<tbody>
+{filtered.map((x,i)=>(
+<tr key={x.id}>
+<td>
+<div className="flex center g8">
+<div className="avatar" style={{width:28,height:28,fontSize:12}}>{x.student?.avatar||'👤'}</div>
+<div>
+<div className="sm" style={{fontWeight:700}}>{x.studentName}</div>
+{x.student?.phone && <div className="xs muted" dir="ltr">{(x.student.country_code||'+20')}{x.student.phone}</div>}
+</div>
+</div>
+</td>
+<td className="sm">{x.examTitle}</td>
+<td>
+<div className="sm">{x.atMs ? new Date(x.atMs).toLocaleDateString('ar-EG',{day:'numeric',month:'short',year:'numeric'}) : '—'}</div>
+<div className="xs muted">{x.atMs ? new Date(x.atMs).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit',hour12:true}) : ''}</div>
+</td>
+<td>
+<div className="sm" style={{fontWeight:700,color:'#f59e0b'}}>{formatDuration(x.durationSec)}</div>
+</td>
+<td><span className="pill pill-y" style={{fontFamily:'monospace'}}>{x.score}/{x.total}</span></td>
+<td><span className="pill pill-g" style={{fontWeight:800}}>{x.correctCount}</span></td>
+<td><span className="pill pill-r" style={{fontWeight:800}}>{x.wrongCount}</span></td>
+<td>
+<div className="flex center g6">
+<span className="sm" style={{fontWeight:800,color:x.passed?'#22c55e':'#ef4444',minWidth:42}}>{x.pct}%</span>
+<div style={{flex:1,minWidth:60,height:6,background:'rgba(255,255,255,.06)',borderRadius:20,overflow:'hidden'}}>
+<div style={{width:`${x.pct}%`,height:'100%',background:x.passed?'linear-gradient(90deg,#16a34a,#4ade80)':'linear-gradient(90deg,#dc2626,#f87171)',borderRadius:20}}/>
+</div>
+</div>
+</td>
+<td>{x.passed ? <span className="pill pill-g">✓ ناجح</span> : <span className="pill pill-r">✗ راسب</span>}</td>
+</tr>
+))}
+</tbody>
+</table>
+</div>
+</>
+)}
+</div>
+</>;
+}
+
 function Dashboard(){
   const app=useApp();
   const students=app.db.users.filter(u=>u.role==='student');
@@ -1736,7 +1989,7 @@ function AdminApp(){
   useEffect(()=>{const baseTitle = 'MISSION EDU — لوحة الإدارة';document.title = unreadNotifs > 0 ? `(${unreadNotifs}) ${baseTitle}` : baseTitle;},[unreadNotifs]);
   useEffect(()=>{if(tab === 'notifications'){try{ localStorage.setItem('admin_last_notif_seen', Date.now().toString()); }catch(e){}}},[tab]);
   const items=[
-    {title:'الرئيسية',items:[{id:'dashboard',icon:'dashboard',label:'لوحة التحكم'},{id:'activity',icon:'activity',label:'سجل النشاط'},{id:'errors',icon:'alert',label:'تحليل الأخطاء'}]},
+    {title:'الرئيسية',items:[{id:'dashboard',icon:'dashboard',label:'لوحة التحكم'},{id:'activity',icon:'activity',label:'سجل النشاط'},{id:'exam-results',icon:'clipboard',label:'نتايج الاختبارات'},{id:'errors',icon:'alert',label:'تحليل الأخطاء'}]},
     {title:'المحتوى',items:[{id:'grades',icon:'school',label:'الصفوف'},{id:'subjects',icon:'book',label:'المواد'},{id:'units',icon:'folder',label:'الوحدات'},{id:'lessons',icon:'file',label:'الدروس'},{id:'questions',icon:'help',label:'بنك الأسئلة'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'missions',icon:'target',label:'المهام'}]},
     {title:'التحفيز',items:[{id:'achievements',icon:'trophy',label:'الإنجازات'},{id:'levels',icon:'trend',label:'المستويات'},{id:'certificates',icon:'award',label:'الشهادات'}]},
     {title:'المستخدمون',items:[{id:'students',icon:'users',label:'الطلاب'},{id:'notes',icon:'note',label:'ملاحظات الطلاب'},{id:'notifications',icon:'bell',label:'الإشعارات',badge:unreadNotifs||null},{id:'reports',icon:'link',label:'البلاغات'}]},
@@ -1759,6 +2012,7 @@ function AdminApp(){
       <div className="content">
         {tab==='dashboard'&&<Dashboard/>}
         {tab==='activity'&&<ActivityLog/>}
+        {tab==='exam-results'&&<ExamResultsPage/>}
         {tab==='errors'&&<ErrorsAnalyticsPage/>}
         {tab==='grades'&&<GradesPage/>}
         {tab==='subjects'&&<SubjectsPage/>}
