@@ -81,7 +81,7 @@ ul{list-style:none}
 .avatar{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:14px;background:linear-gradient(140deg,#2f7dff,#8b5cf6);color:#fff;flex-shrink:0}
 .grid-main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px}
 @media(max-width:900px){.grid-main{grid-template-columns:1fr}}
-.vid-shell{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#000;border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.6);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;isolation:isolate;cursor:pointer}
+.vid-shell{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#000;border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.6);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;isolation:isolate}
 .vp-error{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:'Tajawal','Cairo',sans-serif;text-align:center;padding:20px}
 .locked-shell{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,rgba(4,6,14,.96),rgba(11,18,38,.98));border:1px solid rgba(251,191,36,.35);box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 40px rgba(251,191,36,.12) inset;display:flex;align-items:center;justify-content:center;padding:16px}
 .lock-content{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:100%;max-width:420px}
@@ -449,6 +449,223 @@ state.noteTimer = setTimeout(()=>{
 saveNote(true);
 }, 1500);
 }
+function openPlayer(lesson, user){
+if(!state.hasVideoAccess){
+showLockedMessage();
+return;
+}
+const video = parseVideo(lesson.video) || {};
+const url = video.url || "";
+const type = video.type || "youtube";
+if(!url){
+Swal.fire({
+icon: 'warning',
+title: 'لا يوجد فيديو',
+text: 'هذا الدرس لا يحتوي على فيديو',
+background: 'linear-gradient(180deg, #151f38, #0b1122)',
+color: '#e8eefc',
+confirmButtonColor: '#2f7dff',
+customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
+});
+return;
+}
+const playerTitle = document.getElementById('playerTitle');
+if(playerTitle) playerTitle.textContent = lesson.title || 'الدرس';
+const watermark = document.getElementById('watermark');
+if(watermark){
+const phone = (user.country_code || '') + (user.phone || '') || user.name || 'طالب';
+watermark.textContent = phone;
+}
+const container = document.getElementById('playerContainer');
+if(container){
+if(type === 'youtube'){
+const ytId = getYouTubeId(url);
+if(ytId){
+container.innerHTML = `<iframe
+src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&fs=1&autoplay=1&showinfo=0&controls=1&disablekb=0"
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+allowfullscreen
+referrerpolicy="strict-origin-when-cross-origin"
+title="فيديو الدرس"
+></iframe>`;
+} else {
+container.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:Tajawal,sans-serif">رابط YouTube غير صالح</div>`;
+}
+} else if(type === 'vimeo'){
+const vId = (url.match(/vimeo\.com\/(?:video\/)?(\d+)/) || [])[1];
+container.innerHTML = `<iframe
+src="https://player.vimeo.com/video/${vId}?byline=0&portrait=0&title=0&dnt=1&autoplay=1"
+allow="autoplay; fullscreen; picture-in-picture"
+allowfullscreen
+title="فيديو الدرس"
+></iframe>`;
+} else if(type === 'mp4'){
+container.innerHTML = `<video
+id="mp4Video"
+controls
+controlsList="nodownload noremoteplayback noplaybackrate"
+disablePictureInPicture
+playsinline
+autoplay
+style="position:absolute;inset:0;width:100%;height:100%;background:#000;object-fit:contain"
+>
+<source src="${esc(url)}" type="video/mp4"/>
+</video>`;
+} else {
+container.innerHTML = `<iframe
+src="${esc(url)}"
+allowfullscreen
+sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"
+title="فيديو الدرس"
+></iframe>`;
+}
+}
+const modal = document.getElementById('playerModal');
+if(modal){
+modal.classList.add('open');
+document.body.style.overflow = 'hidden';
+}
+setTimeout(()=>{
+enterFullscreenLandscape();
+}, 100);
+startWatermarkMotion();
+try{
+DB.trackActivity({
+userId: user.id, userName: user.name,
+type: "video_play", target: lesson.title,
+details: { lesson: lesson.title }
+});
+}catch(e){}
+}
+function closePlayer(){
+const modal = document.getElementById('playerModal');
+if(modal){
+modal.classList.remove('open');
+modal.classList.remove('fullscreen');
+}
+document.body.style.overflow = '';
+exitFullscreen();
+lockOrientation('portrait');
+const container = document.getElementById('playerContainer');
+if(container) container.innerHTML = '';
+stopWatermarkMotion();
+}
+async function enterFullscreenLandscape(){
+const modal = document.getElementById('playerModal');
+const box = modal?.querySelector('.player-box');
+try{
+if(box){
+if(box.requestFullscreen){
+await box.requestFullscreen();
+} else if(box.webkitRequestFullscreen){
+box.webkitRequestFullscreen();
+} else if(box.msRequestFullscreen){
+box.msRequestFullscreen();
+}
+}
+if(screen.orientation && screen.orientation.lock){
+try{
+await screen.orientation.lock('landscape');
+}catch(e){
+console.warn('Orientation lock failed:', e.message);
+}
+}
+modal.classList.add('fullscreen');
+state.isFullscreen = true;
+}catch(e){
+console.warn('Fullscreen failed:', e.message);
+modal.classList.add('fullscreen');
+state.isFullscreen = true;
+}
+}
+async function exitFullscreen(){
+try{
+if(document.fullscreenElement){
+if(document.exitFullscreen) await document.exitFullscreen();
+else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+else if(document.msExitFullscreen) document.msExitFullscreen();
+}
+}catch(e){}
+state.isFullscreen = false;
+if(screen.orientation && screen.orientation.unlock){
+try{ screen.orientation.unlock(); }catch(e){}
+}
+}
+async function lockOrientation(mode){
+if(screen.orientation && screen.orientation.lock){
+try{
+await screen.orientation.lock(mode);
+}catch(e){}
+}
+}
+function toggleFullscreen(){
+const modal = document.getElementById('playerModal');
+if(!modal) return;
+if(state.isFullscreen){
+exitFullscreen().then(()=>{
+modal.classList.remove('fullscreen');
+lockOrientation('portrait');
+});
+} else {
+enterFullscreenLandscape();
+}
+}
+function moveWatermark(){
+const wm = document.getElementById('watermark');
+const stage = document.getElementById('playerStage');
+if(!wm || !stage) return;
+const w = stage.offsetWidth;
+const h = stage.offsetHeight;
+const maxX = Math.max(20, w - 180);
+const maxY = Math.max(20, h - 50);
+const x = Math.floor(Math.random() * maxX) + 10;
+const y = Math.floor(Math.random() * maxY) + 10;
+wm.style.left = x + 'px';
+wm.style.top = y + 'px';
+wm.style.right = 'auto';
+wm.style.bottom = 'auto';
+}
+function startWatermarkMotion(){
+moveWatermark();
+state.watermarkTimer = setInterval(moveWatermark, 5000);
+}
+function stopWatermarkMotion(){
+if(state.watermarkTimer){
+clearInterval(state.watermarkTimer);
+state.watermarkTimer = null;
+}
+}
+function attachProtection(){
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+if(e.key === 'F12'){ e.preventDefault(); return false; }
+if(e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())){ e.preventDefault(); return false; }
+if(e.ctrlKey && e.key.toUpperCase() === 'U'){ e.preventDefault(); return false; }
+if(e.ctrlKey && e.key.toUpperCase() === 'S'){ e.preventDefault(); return false; }
+if(e.ctrlKey && e.key.toUpperCase() === 'P'){ e.preventDefault(); return false; }
+if(e.key === 'PrintScreen'){
+try{ navigator.clipboard.writeText(''); }catch(err){}
+}
+if(e.key === 'Escape'){
+const modal = document.getElementById('playerModal');
+if(modal && modal.classList.contains('open')) closePlayer();
+}
+});
+document.addEventListener('copy', e => {
+const t = e.target?.tagName?.toLowerCase();
+if(t !== 'input' && t !== 'textarea') e.preventDefault();
+});
+document.addEventListener('cut', e => {
+const t = e.target?.tagName?.toLowerCase();
+if(t !== 'input' && t !== 'textarea') e.preventDefault();
+});
+document.addEventListener('dragstart', e => e.preventDefault());
+document.addEventListener('selectstart', e => {
+const t = e.target?.tagName?.toLowerCase();
+if(t !== 'input' && t !== 'textarea') e.preventDefault();
+});
+document.addEventListener('dblclick', e => e.preventDefault());
+}
 function buildPlayerHTML(video, lessonTitle, hasAccess){
 const v = parseVideo(video);
 if(!v || !v.url){
@@ -476,7 +693,7 @@ return `
 return `
 <div class="vid-shell" id="vidShell">
 <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(4,6,14,.92),rgba(11,18,38,.94));display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;z-index:2;">
-<button id="btnOpenPlayer" type="button" style="width:clamp(60px,15vw,90px);height:clamp(60px,15vw,90px);border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 16px 50px rgba(47,125,255,.55);padding-right:5px;margin:0 0 clamp(10px,2.5vw,20px);cursor:pointer;animation:pulsePlay 2.5s ease-in-out infinite;border:none;flex-shrink:0;">
+<button id="btnOpenPlayer" type="button" onclick="if(window._openLessonPlayer) window._openLessonPlayer()" ontouchend="event.preventDefault();if(window._openLessonPlayer) window._openLessonPlayer()" style="width:clamp(60px,15vw,90px);height:clamp(60px,15vw,90px);border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 16px 50px rgba(47,125,255,.55);padding-right:5px;margin:0 0 clamp(10px,2.5vw,20px);cursor:pointer;animation:pulsePlay 2.5s ease-in-out infinite;border:none;flex-shrink:0;pointer-events:auto;">
 <svg width="clamp(24px,6vw,36px)" height="clamp(24px,6vw,36px)" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
 </button>
 <div style="font-size:clamp(14px,3.5vw,20px);font-weight:900;color:#e8eefc;margin-bottom:8px;line-height:1.4;max-width:90%;">${esc(lessonTitle)}</div>
@@ -643,16 +860,13 @@ ${buildRelatedExamsHTML(state.relatedExams)}
 `;
 const lockedSubscribeBtn = document.getElementById('btnLockedSubscribe');
 if(lockedSubscribeBtn) lockedSubscribeBtn.addEventListener('click', showLockedMessage);
-const openBtn = document.getElementById('btnOpenPlayer');
-if(openBtn){
-const openHandler = (e)=>{
-e.preventDefault();
-e.stopPropagation();
+window._openLessonPlayer = ()=>{
+try{
 openPlayer(l, u);
-};
-openBtn.addEventListener('click', openHandler);
-openBtn.addEventListener('touchend', openHandler, { passive: false });
+}catch(err){
+console.error('Open player error:', err);
 }
+};
 const lockedExamCards = app.querySelectorAll('.exam-card[data-locked="true"]');
 lockedExamCards.forEach(card=>{
 card.addEventListener('click', (e)=>{
