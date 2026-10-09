@@ -299,17 +299,20 @@ const API = {
     }
   },
 
-  async saveAttempt({ userId, examId, score, total, pct, passed, answers }) {
-    const sb = await getClient();
-    const now = Date.now();
-    const row = {
-      id: uid("att_"), user_id: userId, exam_id: examId,
-      score, total, pct, passed, answers, at: now, created_at: now
-    };
-    const { data, error } = await sb.from("exam_attempts").insert([row]).select().single();
-    if (error) throw new Error(error.message);
-    return data;
-  },
+  async saveAttempt({ userId, examId, score, total, pct, passed, answers, startedAt, durationSeconds }) {
+  const sb = await getClient();
+  const now = Date.now();
+  const row = {
+    id: uid("att_"), user_id: userId, exam_id: examId,
+    score, total, pct, passed, answers,
+    started_at: startedAt || null,
+    duration_seconds: durationSeconds || null,
+    at: now, created_at: now
+  };
+  const { data, error } = await sb.from("exam_attempts").insert([row]).select().single();
+  if (error) throw new Error(error.message);
+  return data;
+},
 
   async getAttempts(userId) {
     if (!userId) return [];
