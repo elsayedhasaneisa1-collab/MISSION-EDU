@@ -1015,14 +1015,15 @@ function LessonsPage(){
           <textarea className="input" rows="3" value={editQ.text||''} onChange={e=>setEditQ({...editQ,text:e.target.value})}/>
         </Field>
         <Field label="الخيارات — اضغط على الحرف لتحديد الإجابة الصحيحة">
-          {(editQ.options||['','','','']).map((op,oi)=>(
-            <div key={oi} className="flex g8 mb6 center">
-              <button type="button" className={`btn btn-sm ${editQ.correct===oi?'btn-ok':'btn-s'}`} onClick={()=>setEditQ({...editQ,correct:oi})} style={{minWidth:44}}>
-                {['أ','ب','ج','د'][oi]}
-              </button>
-              <input className="input" value={op} onChange={e=>{const opts=[...(editQ.options||['','','',''])];opts[oi]=e.target.value;setEditQ({...editQ,options:opts});}} placeholder={`الخيار ${['أ','ب','ج','د'][oi]}`}/>
-            </div>
-          ))}
+          
+          {(()=>{const correctIdx = Array.isArray(editQ.correct) ? editQ.correct[0] : (editQ.correct ?? 0);return (editQ.options||['','','','']).map((op,oi)=>(
+  <div key={oi} className="flex g8 mb6 center">
+    <button type="button" className={`btn btn-sm ${correctIdx===oi?'btn-ok':'btn-s'}`} onClick={()=>setEditQ({...editQ,correct:[oi]})} style={{minWidth:44}}>
+      {['أ','ب','ج','د'][oi]}
+    </button>
+    <input className="input" value={op} onChange={e=>{const opts=[...(editQ.options||['','','',''])];opts[oi]=e.target.value;setEditQ({...editQ,options:opts});}} placeholder={`الخيار ${['أ','ب','ج','د'][oi]}`}/>
+  </div>
+));})()}
         </Field>
         <Field label="شرح الإجابة (اختياري)">
           <textarea className="input" rows="2" value={editQ.explanation||''} onChange={e=>setEditQ({...editQ,explanation:e.target.value})} placeholder="اشرح سبب الإجابة الصحيحة..."/>
