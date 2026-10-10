@@ -607,8 +607,9 @@ function ExamResultsPage(){
     if(filterExam !== 'all') list = list.filter(x=>x.exam_id === filterExam);
     if(filterStudent !== 'all') list = list.filter(x=>x.user_id === filterStudent);
     if(filterStatus !== 'all'){
-      if(filterStatus === 'passed') list = list.filter(x=>x.passed);
-      else if(filterStatus === 'failed') list = list.filter(x=>!x.passed);
+      if(filterStatus === 'passed') list = list.filter(x=>x.status === 'passed' || (x.passed && x.status !== 'cancelled'));
+else if(filterStatus === 'failed') list = list.filter(x=>x.status === 'failed' || (!x.passed && x.status !== 'cancelled'));
+else if(filterStatus === 'cancelled') list = list.filter(x=>x.status === 'cancelled');
     }
     if(q.trim()){
       const lc = q.toLowerCase();
@@ -669,7 +670,12 @@ function ExamResultsPage(){
       <div className="grid g4" style={{gap:10}}>
         <div><label className="lbl">الاختبار</label><select className="input" value={filterExam} onChange={e=>setFilterExam(e.target.value)}><option value="all">كل الاختبارات ({uniqueExams.length})</option>{uniqueExams.map(e=><option key={e.id} value={e.id}>{e.title}</option>)}</select></div>
         <div><label className="lbl">الطالب</label><select className="input" value={filterStudent} onChange={e=>setFilterStudent(e.target.value)}><option value="all">كل الطلاب ({uniqueStudents.length})</option>{uniqueStudents.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></div>
-        <div><label className="lbl">الحالة</label><select className="input" value={filterStatus} onChange={e=>setFilterStatus(e.target.value)}><option value="all">الكل</option><option value="passed">✓ ناجح فقط</option><option value="failed">✗ راسب فقط</option></select></div>
+        <div><label className="lbl">الحالة</label><select className="input" value={filterStatus} onChange={e=>setFilterStatus(e.target.value)}>
+<option value="all">الكل</option>
+<option value="passed">✓ ناجح فقط</option>
+<option value="failed">✗ راسب فقط</option>
+<option value="cancelled">⛔ ملغي فقط</option>
+</select></div>
         <div><label className="lbl">الترتيب حسب</label><select className="input" value={sortBy} onChange={e=>setSortBy(e.target.value)}><option value="recent">الأحدث أولاً</option><option value="oldest">الأقدم أولاً</option><option value="highest">أعلى نسبة</option><option value="lowest">أقل نسبة</option><option value="fastest">أسرع وقت</option><option value="slowest">أطول وقت</option></select></div>
       </div>
       <div className="mt12"><input className="input" placeholder="🔍 ابحث باسم الطالب أو الاختبار..." value={q} onChange={e=>setQ(e.target.value)}/></div>
@@ -691,7 +697,7 @@ function ExamResultsPage(){
                   <td><span className="pill pill-g" style={{fontWeight:800}}>{x.correctCount}</span></td>
                   <td><span className="pill pill-r" style={{fontWeight:800}}>{x.wrongCount}</span></td>
                   <td><div className="flex center g6"><span className="sm" style={{fontWeight:800,color:x.passed?'#22c55e':'#ef4444',minWidth:42}}>{x.pct}%</span><div style={{flex:1,minWidth:60,height:6,background:'rgba(255,255,255,.06)',borderRadius:20,overflow:'hidden'}}><div style={{width:`${x.pct}%`,height:'100%',background:x.passed?'linear-gradient(90deg,#16a34a,#4ade80)':'linear-gradient(90deg,#dc2626,#f87171)',borderRadius:20}}/></div></div></td>
-                  <td>{x.passed ? <span className="pill pill-g">✓ ناجح</span> : <span className="pill pill-r">✗ راسب</span>}</td>
+                  <td>{x.status === 'cancelled' ? <span className="pill pill-y">⛔ ملغي</span> : x.passed ? <span className="pill pill-g">✓ ناجح</span> : <span className="pill pill-r">✗ راسب</span>}</td>
                 </tr>))}
               </tbody>
             </table>
