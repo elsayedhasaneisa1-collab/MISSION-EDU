@@ -957,8 +957,45 @@ function QuestionsPage(){
   const [bulkMode,setBulkMode]=useState(false);
   const [bulkForm,setBulkForm]=useState({lesson_id:'',difficulty:'medium',xp:10,questions:[{text:'',options:['','','',''],correct:0,explanation:''}]});
   const [busy,setBusy]=useState(false);
+  const [pasteQuestion,setPasteQuestion]=useState('');
   const [filterLesson,setFilterLesson]=useState('all');
   const openNew=()=>{setForm({text:'',options:['','','',''],correct:[0],explanation:'',lesson_id:'',difficulty:'medium',xp:'',type:'mcq'});setEditing('new');};
+  const autoFillFromText=()=>{
+    const raw=(pasteQuestion||'').trim();
+    if(!raw) return app.toast.warn('الصق نص السؤال كاملًا أولاً');
+    const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+    const optionRegex=/^(?:[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]|[أبجدهـabcdABCD][)\.\-:：])\s*/u;
+    const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة|الإجابة الصحيحة|الاجابة الصحيحة)\s*[:：]/u.test(x));
+    const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
+    const optionLines=lines.filter(x=>optionRegex.test(x) && !/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
+    if(optionLines.length<2) return app.toast.warn('مش قادر أتعرف على الاختيارات. اكتب كل اختيار في سطر منفصل مثل 🔵 الاختيار');
+    const cleanOption=x=>x.replace(optionRegex,'').replace(/[.。؛;]+$/u,'').trim();
+    const options=optionLines.slice(0,4).map(cleanOption);
+    while(options.length<4) options.push('');
+    const answerText=answerLine?answerLine.replace(/^.*?(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]\s*/u,'').replace(/[.。]+$/u,'').trim():'';
+    const answerEmoji=(answerText.match(/^[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]/u)||[])[0]||'';
+    const answerClean=cleanOption(answerText);
+    let correctIndex=options.findIndex(o=>o && (answerClean.includes(o)||o.includes(answerClean)));
+    if(correctIndex<0 && answerEmoji){
+      const target=optionLines.findIndex(x=>x.startsWith(answerEmoji));
+      if(target>=0) correctIndex=target;
+    }
+    if(correctIndex<0 && answerText){
+      const answerKey=answerClean.replace(/\s/g,'').toLowerCase();
+      correctIndex=options.findIndex(o=>o.replace(/\s/g,'').toLowerCase()===answerKey);
+    }
+    const exp=explanationLine?explanationLine.replace(/^.*?(?:التعليل|الشرح|السبب)\s*[:：]\s*/u,'').trim():'';
+    const optionStart=lines.findIndex(x=>optionRegex.test(x));
+    const titlePattern=/^.*?السؤال\s*(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر|\d+)\s*(?:[|｜\-–—:]\s*.*)?$/u;
+    let questionLines=lines.slice(0,optionStart).filter(x=>!titlePattern.test(x));
+    if(questionLines.length===0) questionLines=lines.slice(0,optionStart);
+    const questionText=questionLines.join('\n').trim();
+    if(!questionText) return app.toast.warn('نص السؤال نفسه مش واضح؛ اكتب السؤال تحت العنوان مباشرة');
+    if(!answerText) return app.toast.warn('السؤال اتقري، لكن مش لاقي سطر الإجابة الصحيحة. أضف: ✅ الإجابة الصحيحة: ...');
+    if(correctIndex<0) return app.toast.warn('اتعرفت الاختيارات لكن مش قادر أحدد الإجابة الصحيحة؛ تأكد إن نص الإجابة مطابق لأحد الاختيارات');
+    setForm(f=>({...f,text:questionText,options,correct:[correctIndex],explanation:exp}));
+    app.toast.ok('✅ تم تعبئة السؤال والاختيارات والإجابة والشرح. راجعهم قبل الحفظ');
+  };
   const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
   const save=async ()=>{
     if(!form.text||!form.lesson_id) return app.toast.warn('النص والدرس مطلوبان');
@@ -1025,7 +1062,16 @@ function QuestionsPage(){
       </table></div>}
     </div>
     {editing!==null&&<Modal title={editing==='new'?'سؤال جديد':'تعديل السؤال'} onClose={()=>setEditing(null)} wide>
-      <Field label="نص السؤال"><textarea className="input" value={form.text||''} onChange={e=>setForm({...form,text:e.target.value})}/></Field>
+      <Field label="الصق السؤال كاملًا هنا" hint="الصق النص بنفس التنسيق اللي بتجهزه: السؤال والاختيارات والإجابة الصحيحة والتعليل.">
+        <textarea className="input" rows="8" value={pasteQuestion} onChange={e=>setPasteQuestion(e.target.value)} placeholder={'🧪 السؤال الرابع | الخواص المغناطيسية\n\nأي الأيونات التالية يُتوقع أن يكون دايامغناطيسيًا؟\n\n🔵 Mn²⁺\n🟢 Fe³⁺\n🟡 Zn²⁺\n🔴 Cu²⁺\n\n✅ الإجابة الصحيحة: 🟡 Zn²⁺.\n\n💡 التعليل: اكتب سبب الإجابة هنا.'}/>
+      </Field>
+      <div className="flex g8 wrap center mb12">
+        <button type="button" className="btn btn-p" onClick={autoFillFromText}>⚡ تعبئة تلقائية من النص</button>
+        <button type="button" className="btn btn-s" onClick={()=>setPasteQuestion('')}>مسح النص</button>
+        <span className="xs muted">بدون ذكاء اصطناعي أو اتصال خارجي — بيقرأ التنسيق اللي لصقته ويملأ الخانات تلقائيًا.</span>
+      </div>
+      <div className="div mb12"/>
+      <Field label="نص السؤال"><textarea className="input" rows="3" value={form.text||''} onChange={e=>setForm({...form,text:e.target.value})} placeholder="نص السؤال بعد التعبئة التلقائية..."/></Field>
       <Field label="الخيارات">
         {(form.options||[]).map((op,i)=><div key={i} className="flex g8 mb6 center">
           <button type="button" className={`btn btn-sm ${form.correct?.includes(i)?'btn-ok':'btn-s'}`} onClick={()=>setForm({...form,correct:[i]})}>{['أ','ب','ج','د'][i]}</button>
