@@ -968,8 +968,19 @@ function LessonsPage(){
     if(!form.title) return app.toast.warn('العنوان مطلوب');
     if(!form.unit_id) return app.toast.warn('اختر الوحدة');
     setBusy(true);
-    try{await app.save('lessons',form);app.toast.ok('تم الحفظ');setEditing(null);}
-    catch(e){app.toast.err(e.message);}
+    try{
+      const saved=await app.save('lessons',form);
+      if(editing==='new'){
+        const lesson=saved||form;
+        setForm(lesson);
+        setEditing(lesson.id);
+        setLessonTestTitle(`اختبار ${lesson.title||'الدرس'}`);
+        app.toast.ok('تم حفظ الدرس. انزل لأسفل وستجد قسم إضافة أسئلة الاختبار.');
+      }else{
+        app.toast.ok('تم الحفظ');
+        setEditing(null);
+      }
+    }catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
   const del=async id=>{
@@ -1038,7 +1049,7 @@ function LessonsPage(){
       <Field label="النقاط المهمة" full hint="سطر لكل نقطة"><textarea className="input" value={(form.key_points||[]).join('\n')} onChange={e=>setForm({...form,key_points:e.target.value.split('\n').filter(Boolean)})}/></Field>
       <Field label="ملاحظات" full><textarea className="input" value={form.notes||''} onChange={e=>setForm({...form,notes:e.target.value})}/></Field>
       <div className="section-title"><span className="ico">📝</span> اختبار الدرس — يظهر بعد الدرس مباشرة</div>
-      {editing==='new'?<div className="glass-s" style={{padding:12,marginBottom:12}}><div className="sm">احفظ الدرس أولًا، ثم افتحه للتعديل وستجد هنا إضافة الاختبار مباشرة، من غير الدخول إلى بنك الأسئلة.</div></div>:<>
+      {editing==='new'?<div className="glass-s" style={{padding:12,marginBottom:12}}><div className="sm">احفظ الدرس أولًا، وسيظهر قسم إضافة أسئلة الاختبار هنا مباشرة دون إغلاق النافذة.</div></div>:<>
         <div className="glass-s" style={{padding:12,marginBottom:12}}>
           <div className="sm muted mb8">الاختبارات المرتبطة بهذا الدرس</div>
           {(app.db.exams||[]).filter(e=>(e.lesson_ids||[]).includes(form.id)).length===0?<div className="sm muted">لا يوجد اختبار مرتبط بالدرس حتى الآن.</div>:(app.db.exams||[]).filter(e=>(e.lesson_ids||[]).includes(form.id)).map(e=><div key={e.id} className="flex between center mb6"><span>{e.title} · {(e.question_ids||[]).length} سؤال</span><span className="pill pill-g">مرتبط بالدرس</span></div>)}
@@ -1050,8 +1061,8 @@ function LessonsPage(){
           <Field label="XP لكل سؤال"><input type="number" className="input" min="0" value={lessonTestXp} onChange={e=>setLessonTestXp(e.target.value===''?'':+e.target.value)}/></Field>
         </div>
         <Field label="نوع الاختبار"><AccessToggle value={lessonTestFree} onChange={setLessonTestFree}/></Field>
-        <Field label="الصق مجموعة الأسئلة كاملة" hint="كل سؤال يبدأ بعنوان مثل: 🧪 السؤال الأول، ويحتوي على 4 اختيارات، وسطر الإجابة الصحيحة، والتعليل."><textarea className="input" rows="10" value={lessonTestText} onChange={e=>setLessonTestText(e.target.value)} placeholder="الصق كل الأسئلة هنا مرة واحدة..."/></Field>
-        <div className="flex g8 mb12"><button type="button" className="btn btn-p" onClick={createTestForLesson} disabled={lessonTestBusy} style={{flex:1}}>{lessonTestBusy?'جارٍ إنشاء الاختبار...':'⚡ إنشاء الاختبار وربطه بالدرس'}</button><button type="button" className="btn btn-s" onClick={()=>setLessonTestText('')}>مسح النص</button></div>
+        <Field label="إضافة أسئلة الاختبار — الصق المجموعة كاملة" hint="كل سؤال يبدأ بعنوان مثل: 🧪 السؤال الأول، ويحتوي على 4 اختيارات، وسطر الإجابة الصحيحة، والتعليل."><textarea className="input" rows="10" value={lessonTestText} onChange={e=>setLessonTestText(e.target.value)} placeholder="الصق كل الأسئلة هنا مرة واحدة..."/></Field>
+        <div className="flex g8 mb12"><button type="button" className="btn btn-p" onClick={createTestForLesson} disabled={lessonTestBusy} style={{flex:1}}>{lessonTestBusy?'جارٍ إنشاء الاختبار...':'⚡ إضافة الأسئلة وإنشاء الاختبار'}</button><button type="button" className="btn btn-s" onClick={()=>setLessonTestText('')}>مسح النص</button></div>
       </>}
       <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ الدرس'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
     </Modal>}
