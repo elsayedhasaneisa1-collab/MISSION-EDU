@@ -125,6 +125,43 @@ ul{list-style:none}
 .swal-custom-popup{border:1px solid rgba(90,140,230,.3) !important;border-radius:22px !important;background:linear-gradient(180deg, #151f38, #0b1122) !important;color:#e8eefc !important;font-family:'Tajawal','Cairo',sans-serif !important}
 .swal-custom-title{color:#e8eefc !important;font-weight:800 !important;font-family:'Tajawal','Cairo',sans-serif !important}
 .swal-custom-input{background:rgba(10,16,32,.75) !important;border:1.5px solid rgba(90,140,230,.3) !important;color:#e8eefc !important;border-radius:12px !important}
+.exam-modal{position:fixed;inset:0;z-index:99999;background:rgba(3,5,12,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:flex;align-items:flex-start;justify-content:center;padding:0;overflow-y:auto;animation:pu .3s;overscroll-behavior:contain}
+.exam-box{width:100%;max-width:820px;min-height:100vh;background:linear-gradient(180deg,rgba(21,31,56,.98),rgba(11,17,34,.98));display:flex;flex-direction:column;position:relative}
+@media(min-width:900px){.exam-modal{padding:20px;align-items:center}.exam-box{min-height:0;max-height:92vh;border-radius:24px;border:1px solid var(--border);overflow:hidden}}
+.exam-header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:14px 18px;background:linear-gradient(180deg,rgba(11,17,34,.98),rgba(11,17,34,.94));border-bottom:1px solid var(--border);backdrop-filter:blur(20px)}
+.exam-title{flex:1;min-width:0;font-size:15px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exam-timer{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;background:rgba(47,125,255,.15);border:1px solid rgba(47,125,255,.35);font-size:14px;font-weight:900;font-variant-numeric:tabular-nums;color:#7db6ff;font-family:monospace}
+.exam-timer::before{content:'⏱';font-size:12px}
+.exam-close{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;font-size:16px;font-weight:900;flex-shrink:0;cursor:pointer;transition:.2s}
+.exam-close:hover{background:rgba(239,68,68,.25);color:#fff}
+.exam-body{flex:1;padding:16px;overflow-y:auto}
+.exam-q{padding:18px;margin-bottom:14px;border-radius:16px;background:linear-gradient(180deg,rgba(21,31,56,.72),rgba(11,17,34,.62));border:1px solid var(--border)}
+.exam-q-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.exam-q-num{padding:3px 11px;border-radius:20px;font-size:11px;font-weight:800;background:rgba(47,125,255,.15);color:#7db6ff;border:1px solid rgba(47,125,255,.28)}
+.exam-q-diff{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800;background:rgba(139,92,246,.15);color:#c4b5fd;border:1px solid rgba(139,92,246,.28)}
+.exam-q-text{font-size:15px;font-weight:700;line-height:1.7;margin-bottom:14px;white-space:pre-wrap;color:#e8eefc}
+.exam-options{display:flex;flex-direction:column;gap:8px}
+.exam-opt{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:12px;background:rgba(255,255,255,.03);border:1.5px solid var(--border);cursor:pointer;transition:.2s;text-align:right;font-family:inherit;color:inherit;width:100%}
+.exam-opt:hover{background:rgba(47,125,255,.08);border-color:var(--border2)}
+.exam-opt.selected{background:linear-gradient(135deg,rgba(47,125,255,.20),rgba(47,125,255,.08));border-color:#2f7dff;box-shadow:0 0 20px rgba(47,125,255,.25)}
+.exam-opt-letter{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(47,125,255,.12);border:1.5px solid var(--border2);font-weight:800;font-size:13px;color:#7db6ff;flex-shrink:0}
+.exam-opt.selected .exam-opt-letter{background:#2f7dff;color:#fff;border-color:#2f7dff}
+.exam-opt-text{flex:1;font-size:14px;font-weight:600;line-height:1.5}
+.exam-footer{position:sticky;bottom:0;padding:14px 18px;background:linear-gradient(0deg,rgba(11,17,34,.98),rgba(11,17,34,.94));border-top:1px solid var(--border);backdrop-filter:blur(20px)}
+.exam-result{padding:40px 24px;text-align:center}
+.exam-result-icon{font-size:72px;line-height:1;margin-bottom:12px;filter:drop-shadow(0 8px 24px currentColor)}
+.exam-result-title{font-size:22px;font-weight:900;margin-bottom:8px}
+.exam-result-pct{font-size:64px;font-weight:900;letter-spacing:-3px;margin:12px 0;font-variant-numeric:tabular-nums;text-shadow:0 8px 24px currentColor}
+.exam-result-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0;padding:0 10px}
+@media(max-width:600px){.exam-result-stats{grid-template-columns:repeat(2,1fr)}}
+.exam-stat{padding:14px 8px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--border)}
+.exam-stat-n{font-size:20px;font-weight:900;line-height:1;margin-bottom:4px;font-variant-numeric:tabular-nums}
+.exam-stat-l{font-size:10.5px;color:#7f93b8;font-weight:700}
+.exam-xp{display:inline-block;padding:8px 22px;border-radius:20px;background:linear-gradient(135deg,rgba(34,197,94,.22),rgba(34,197,94,.10));border:1px solid rgba(34,197,94,.45);color:#6ee7a0;font-size:15px;font-weight:900;margin-top:8px;box-shadow:0 8px 24px rgba(34,197,94,.25)}
+.lesson-exam-card{padding:16px;margin-bottom:12px;border-radius:16px;background:linear-gradient(135deg,rgba(34,197,94,.06),rgba(21,31,56,.55));border:1px solid rgba(34,197,94,.30);position:relative;overflow:hidden}
+.lesson-exam-card.locked{background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(21,31,56,.55));border-color:rgba(251,191,36,.35)}
+.lesson-exam-title{font-size:15px;font-weight:800;color:#e8eefc;line-height:1.4}
+.lesson-exam-card .btn-block{margin-top:14px}
 .player-modal{position:fixed;inset:0;z-index:9999;background:rgba(3,5,12,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;padding:0;animation:pu .3s}
 .player-modal.open{display:flex}
 .player-box{position:relative;width:100%;max-width:1400px;background:#000;border-radius:0;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.9);display:flex;flex-direction:column;max-height:100vh}
@@ -139,50 +176,10 @@ ul{list-style:none}
 .player-stage{position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;isolation:isolate;flex:1}
 .player-stage iframe,.player-stage video{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;pointer-events:auto}
 .watermark{position:absolute;z-index:100;font-size:15px;font-weight:900;font-family:'Cairo','Tajawal',sans-serif;color:rgba(255,60,60,.32);text-shadow:0 0 4px rgba(255,60,60,.15),1px 1px 1px rgba(0,0,0,.3);padding:0;background:transparent;border:none;outline:none;pointer-events:none;user-select:none;-webkit-user-select:none;white-space:nowrap;transition:top 1.8s cubic-bezier(.4,0,.2,1),left 1.8s cubic-bezier(.4,0,.2,1);letter-spacing:1px;direction:ltr}
-.yt-blocker-top{
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  height:70px;
-  z-index:90;
-  background:transparent;
-  cursor:default;
-  pointer-events:auto;
-}
-.yt-blocker-corner{
-.yt-blocker-bottom{
-  position:absolute;
-  bottom:0;
-  left:0;
-  right:0;
-  height:60px;
-  z-index:90;
-  background:transparent;
-  cursor:default;
-  pointer-events:auto;
-}
-.yt-blocker-bottom-corner{
-  position:absolute;
-  bottom:0;
-  inset-inline-end:0;
-  width:180px;
-  height:60px;
-  z-index:91;
-  background:transparent;
-  cursor:default;
-  pointer-events:auto;
-}
-  position:absolute;
-  top:0;
-  inset-inline-end:0;
-  width:140px;
-  height:70px;
-  z-index:91;
-  background:transparent;
-  cursor:default;
-  pointer-events:auto;
-}
+.yt-blocker-top{position:absolute;top:0;left:0;right:0;height:70px;z-index:90;background:transparent;cursor:default;pointer-events:auto}
+.yt-blocker-corner{position:absolute;top:0;inset-inline-end:0;width:140px;height:70px;z-index:91;background:transparent;cursor:default;pointer-events:auto}
+.yt-blocker-bottom{position:absolute;bottom:0;left:0;right:0;height:60px;z-index:90;background:transparent;cursor:default;pointer-events:auto}
+.yt-blocker-bottom-corner{position:absolute;bottom:0;inset-inline-end:0;width:180px;height:60px;z-index:91;background:transparent;cursor:default;pointer-events:auto}
 .shield-overlay{position:absolute;inset:0;z-index:80;pointer-events:none}
 .shield-overlay::before{content:'';position:absolute;top:0;left:0;right:0;height:60px;background:transparent;pointer-events:auto;cursor:default}
 .shield-overlay::after{content:'';position:absolute;bottom:0;left:0;right:0;height:80px;background:transparent;pointer-events:auto;cursor:default}
@@ -278,7 +275,8 @@ user: null, lesson: null, unit: null, subject: null,
 relatedExams: [], unitPct: 0, doneUnit: 0, totalUnit: 0,
 isDone: false, watermarkTimer: null, isFullscreen: false,
 note: '', noteId: null, noteTimer: null, noteSaving: false, noteDirty: false,
-hasVideoAccess: false, hasExamAccess: {}, debugReason: ''
+hasVideoAccess: false, hasExamAccess: {}, debugReason: '',
+examSession: null, examSubmitting: false, examResult: null
 };
 function esc(str){
 return String(str||"").replace(/[&<>"']/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[s]);
@@ -799,7 +797,7 @@ ${locked ? `<div class="exam-lock-badge"><i class="fa-solid fa-lock"></i></div>`
 <i class="fa-solid ${paid?'fa-lock':'fa-unlock'}"></i>
 ${paid?'مدفوع':'مجاني'}
 </span>
-<span className="pill pill-v">+${e.xp} XP</span>
+<span class="pill pill-v">+${e.xp} XP</span>
 </div>
 <div style="font-size:14px;font-weight:700;color:#e8eefc">${esc(e.title)}</div>
 <div style="font-size:11.5px;color:#7f93b8;margin-top:6px">⏱ ${e.duration}د • درجة النجاح: ${e.pass_score}%</div>
@@ -809,6 +807,253 @@ ${locked ? '<div class="pill pill-paid" style="margin-top:8px;font-size:10px"><i
 }).join('')}
 </div>
 `;
+}
+async function startLessonExam(exam){
+if(!state.user || !state.lesson) return;
+if(!state.hasExamAccess[exam.id]){
+showLockedMessage();
+return;
+}
+try{
+const sb = await DB.getClient();
+const { data: prevAttempts } = await sb.from('exam_attempts').select('id').eq('user_id', state.user.id).eq('exam_id', exam.id);
+const maxAtt = Number(exam.max_attempts) || 0;
+if(maxAtt > 0 && (prevAttempts||[]).length >= maxAtt){
+Swal.fire({icon:'info',title:'لا يمكن المحاولة',text:`استنفذت عدد المحاولات المسموح بها (${maxAtt})`,background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',confirmButtonColor:'#2f7dff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+return;
+}
+const ids = exam.question_ids || [];
+if(ids.length === 0){
+Swal.fire({icon:'error',title:'لا توجد أسئلة',text:'هذا الاختبار لا يحتوي على أسئلة',background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',confirmButtonColor:'#2f7dff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+return;
+}
+const { data: qs } = await sb.from('questions').select('*').in('id', ids);
+const ordered = ids.map(id => (qs||[]).find(q => q.id === id)).filter(Boolean);
+if(ordered.length === 0){
+Swal.fire({icon:'error',title:'لا توجد أسئلة',text:'الأسئلة غير موجودة',background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',confirmButtonColor:'#2f7dff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+return;
+}
+state.examSession = {
+exam, questions: ordered, answers: {},
+startedAt: Date.now(),
+remaining: Math.max(60, (Number(exam.duration)||15)*60),
+timer: null
+};
+state.examResult = null;
+renderExamModal();
+startExamTimer();
+DB.trackActivity({userId:state.user.id,userName:state.user.name,type:'exam_start',target:exam.title,details:{exam_id:exam.id}});
+}catch(e){
+Swal.fire({icon:'error',title:'خطأ',text:e.message||'حدث خطأ',background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',confirmButtonColor:'#2f7dff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+}
+}
+function startExamTimer(){
+if(state.examSession?.timer) clearInterval(state.examSession.timer);
+state.examSession.timer = setInterval(()=>{
+if(!state.examSession) return;
+state.examSession.remaining = Math.max(0, state.examSession.remaining - 1);
+const timerEl = document.getElementById('examTimer');
+if(timerEl){
+const m = Math.floor(state.examSession.remaining/60);
+const s = state.examSession.remaining % 60;
+timerEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+if(state.examSession.remaining <= 60) timerEl.style.color = '#ef4444';
+}
+if(state.examSession.remaining <= 0){
+clearInterval(state.examSession.timer);
+submitLessonExam(true);
+}
+}, 1000);
+}
+function renderExamModal(){
+const old = document.getElementById('examModal');
+if(old) old.remove();
+const s = state.examSession;
+if(!s) return;
+const exam = s.exam;
+const m = Math.floor(s.remaining/60), sec = s.remaining%60;
+const html = `
+<div class="exam-modal" id="examModal">
+<div class="exam-box">
+<div class="exam-header">
+<div class="exam-title">${esc(exam.title)}</div>
+<div class="exam-timer" id="examTimer">${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}</div>
+<button class="exam-close" id="examClose" type="button">✕</button>
+</div>
+<div class="exam-body">
+${s.questions.map((q, idx) => {
+const given = s.answers[q.id];
+return `
+<div class="exam-q">
+<div class="exam-q-header">
+<span class="exam-q-num">سؤال ${idx+1} من ${s.questions.length}</span>
+<span class="exam-q-diff">+${q.xp || 0} XP</span>
+</div>
+<div class="exam-q-text">${esc(q.text)}</div>
+<div class="exam-options">
+${(q.options||[]).map((opt, oi) => `
+<button type="button" class="exam-opt ${given===oi?'selected':''}" data-qid="${q.id}" data-oi="${oi}">
+<span class="exam-opt-letter">${['أ','ب','ج','د'][oi]||'-'}</span>
+<span class="exam-opt-text">${esc(opt||'—')}</span>
+</button>
+`).join('')}
+</div>
+</div>
+`;
+}).join('')}
+</div>
+<div class="exam-footer">
+<button class="btn btn-p btn-block btn-lg" id="examSubmit" type="button">📤 تسليم الاختبار</button>
+</div>
+</div>
+</div>
+`;
+document.body.insertAdjacentHTML('beforeend', html);
+document.body.style.overflow = 'hidden';
+document.getElementById('examClose').addEventListener('click', ()=>{
+Swal.fire({
+title:'إغلاق الاختبار؟',
+text:'لو قفلت دلوقتي الإجابات هتضيع',
+icon:'warning',showCancelButton:true,confirmButtonText:'نعم، اقفل',cancelButtonText:'كمّل الاختبار',
+confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
+background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',
+customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+}).then(r=>{if(r.isConfirmed) closeExam();});
+});
+document.getElementById('examSubmit').addEventListener('click', ()=>submitLessonExam(false));
+document.querySelectorAll('.exam-opt').forEach(btn=>{
+btn.addEventListener('click', ()=>{
+const qid = btn.dataset.qid;
+const oi = +btn.dataset.oi;
+state.examSession.answers[qid] = oi;
+document.querySelectorAll(`.exam-opt[data-qid="${qid}"]`).forEach(b=>b.classList.remove('selected'));
+btn.classList.add('selected');
+});
+});
+}
+async function submitLessonExam(autoSubmit){
+if(state.examSubmitting) return;
+if(!state.examSession) return;
+if(!autoSubmit){
+const unanswered = state.examSession.questions.filter(q => state.examSession.answers[q.id] === undefined).length;
+const confirmRes = await Swal.fire({
+title:'تسليم الاختبار؟',
+html: unanswered > 0 ? `<div style="font-size:14px">عندك <b style="color:#fbbf24">${unanswered}</b> سؤال لم تجب عليه</div>` : `<div style="font-size:14px">متأكد من تسليم الاختبار؟</div>`,
+icon:'question',showCancelButton:true,confirmButtonText:'نعم، سلّم',cancelButtonText:'رجوع',
+confirmButtonColor:'#22c55e',cancelButtonColor:'#64748b',
+background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',
+customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+});
+if(!confirmRes.isConfirmed) return;
+}
+state.examSubmitting = true;
+clearInterval(state.examSession.timer);
+const exam = state.examSession.exam;
+const questions = state.examSession.questions;
+let correct = 0;
+const answers = {};
+const errorsToSave = [];
+questions.forEach(q=>{
+const given = state.examSession.answers[q.id];
+answers[q.id] = given === undefined ? null : given;
+const correctIdx = (q.correct||[])[0] ?? 0;
+if(given === correctIdx) correct++;
+else if(given !== undefined && given !== null){
+errorsToSave.push({q, given, correct: correctIdx});
+}
+});
+const total = questions.length;
+const pct = total ? Math.round((correct/total)*100) : 0;
+const passed = pct >= (Number(exam.pass_score)||0);
+const durationSeconds = Math.max(0, Math.floor((Date.now() - state.examSession.startedAt)/1000));
+try{
+const sb = await DB.getClient();
+const row = {
+id: DB.uid('att_'),
+user_id: state.user.id,
+exam_id: exam.id,
+score: correct,
+total,
+pct,
+passed,
+answers,
+started_at: state.examSession.startedAt,
+duration_seconds: durationSeconds,
+at: Date.now(),
+created_at: Date.now()
+};
+await sb.from('exam_attempts').insert([row]);
+if(passed && (Number(exam.xp)||0) > 0){
+try{
+const { data: userRow } = await sb.from('users').select('xp').eq('id', state.user.id).maybeSingle();
+const curXp = Number(userRow?.xp)||0;
+await DB.updateUser(state.user.id, {xp: curXp + Number(exam.xp)});
+}catch(e){console.warn(e);}
+}
+for(const err of errorsToSave){
+try{
+const { data: exist } = await sb.from('user_errors').select('*').eq('user_id', state.user.id).eq('question_id', err.q.id).maybeSingle();
+if(exist){
+await sb.from('user_errors').update({given: err.given, correct: err.correct, count: (exist.count||1)+1, at: Date.now()}).eq('id', exist.id);
+} else {
+await sb.from('user_errors').insert([{
+id: DB.uid('err_'), user_id: state.user.id, question_id: err.q.id,
+lesson_id: state.lesson.id, given: err.given, correct: err.correct,
+count: 1, at: Date.now(), created_at: Date.now()
+}]);
+}
+}catch(e){console.warn(e);}
+}
+DB.trackActivity({
+userId: state.user.id, userName: state.user.name,
+type: 'exam_submit', target: exam.title,
+details: { exam_id: exam.id, score: correct, total, pct, passed, duration_seconds: durationSeconds }
+});
+}catch(e){console.warn('Submit error:', e);}
+state.examResult = { score: correct, total, pct, passed, durationSeconds, answers };
+state.examSubmitting = false;
+renderExamResult();
+}
+function renderExamResult(){
+const old = document.getElementById('examModal');
+if(old) old.remove();
+const res = state.examResult;
+const exam = state.examSession?.exam;
+if(!res || !exam) return;
+const m = Math.floor(res.durationSeconds/60), sec = res.durationSeconds%60;
+const durText = m > 0 ? `${m}د ${sec}ث` : `${sec} ث`;
+const html = `
+<div class="exam-modal" id="examModal">
+<div class="exam-box">
+<div class="exam-result">
+<div class="exam-result-icon" style="color:${res.passed?'#22c55e':'#ef4444'}">${res.passed?'🎉':'😔'}</div>
+<div class="exam-result-title" style="color:${res.passed?'#6ee7a0':'#fca5a5'}">${res.passed?'مبروك، نجحت!':'للأسف، لم تنجح'}</div>
+<div class="exam-result-pct" style="color:${res.passed?'#22c55e':'#ef4444'}">${res.pct}%</div>
+<div class="exam-result-stats">
+<div class="exam-stat"><div class="exam-stat-n" style="color:#6ee7a0">${res.score}</div><div class="exam-stat-l">صح</div></div>
+<div class="exam-stat"><div class="exam-stat-n" style="color:#fca5a5">${res.total-res.score}</div><div class="exam-stat-l">غلط</div></div>
+<div class="exam-stat"><div class="exam-stat-n" style="color:#fbbf24">${durText}</div><div class="exam-stat-l">المدة</div></div>
+<div class="exam-stat"><div class="exam-stat-n" style="color:#5aa9ff">${exam.pass_score||0}%</div><div class="exam-stat-l">النجاح</div></div>
+</div>
+${res.passed && exam.xp ? `<div class="exam-xp">+${exam.xp} XP 🎯</div>` : ''}
+<button class="btn btn-p btn-block btn-lg mt20" id="examBack" type="button">↩ رجوع للدرس</button>
+</div>
+</div>
+</div>
+`;
+document.body.insertAdjacentHTML('beforeend', html);
+document.getElementById('examBack').addEventListener('click', ()=>{
+closeExam();
+location.reload();
+});
+}
+function closeExam(){
+if(state.examSession?.timer) clearInterval(state.examSession.timer);
+const modal = document.getElementById('examModal');
+if(modal) modal.remove();
+state.examSession = null;
+state.examResult = null;
+document.body.style.overflow = '';
 }
 function render(){
 const l = state.lesson;
@@ -877,6 +1122,35 @@ ${state.isDone ? '<i class="fa-solid fa-check"></i> تم إكمال الدرس' 
 <i class="fa-solid fa-rotate-left"></i> أحتاج مراجعة
 </button>
 </div>
+${state.relatedExams.length > 0 ? `
+<div class="div"></div>
+<div class="h4 mb12" style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">📝</span> اختبار الدرس</div>
+${state.relatedExams.map(e=>{
+const paid = isPaidContent(e);
+const allowed = state.hasExamAccess[e.id] !== false;
+const locked = paid && !allowed;
+return `
+<div class="lesson-exam-card ${locked?'locked':''}" data-exam-id="${e.id}">
+<div class="flex between center mb8 wrap-fl g8">
+<span class="pill ${paid?'pill-paid':'pill-free'}">
+<i class="fa-solid ${paid?'fa-lock':'fa-unlock'}"></i>
+${paid?'مدفوع':'مجاني'}
+</span>
+<span class="pill pill-v">+${e.xp||0} XP</span>
+</div>
+<div class="lesson-exam-title">${esc(e.title)}</div>
+<div class="flex wrap-fl g12 xs muted mt8">
+<span>⏱ ${e.duration||15} دقيقة</span>
+<span>❓ ${(e.question_ids||[]).length} سؤال</span>
+<span>🎯 نجاح: ${e.pass_score||0}%</span>
+</div>
+${locked 
+? `<button class="btn btn-s btn-block mt12" data-action="locked" type="button">🔒 يتطلب اشتراك</button>`
+: `<button class="btn btn-ok btn-block mt12" data-action="start" type="button">🚀 ابدأ الاختبار</button>`}
+</div>
+`;
+}).join('')}
+` : ''}
 </div>
 </div>
 <div>
@@ -1041,6 +1315,18 @@ customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
 });
 });
 }
+document.querySelectorAll('.lesson-exam-card').forEach(card=>{
+const examId = card.dataset.examId;
+const exam = state.relatedExams.find(e=>e.id===examId);
+if(!exam) return;
+card.querySelectorAll('button[data-action]').forEach(btn=>{
+btn.addEventListener('click', ()=>{
+const action = btn.dataset.action;
+if(action === 'locked'){ showLockedMessage(); return; }
+if(action === 'start'){ startLessonExam(exam); return; }
+});
+});
+});
 const noteEl = document.getElementById('lessonNote');
 if(noteEl){
 noteEl.value = state.note || '';
