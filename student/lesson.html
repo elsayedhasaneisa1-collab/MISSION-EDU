@@ -7,15 +7,15 @@
 <meta property="og:type" content="website" />
 <meta property="og:title" content="الدرس | MISSION EDU" />
 <meta property="og:description" content="منصة تعليمية متكاملة — تابع دروسك واختباراتك في مكان واحد" />
-<meta property="og:image" content="/exam.png" />
-<meta property="og:image:secure_url" content="/exam.png" />
+<meta property="og:image" content="/logo.png" />
+<meta property="og:image:secure_url" content="/logo.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:site_name" content="MISSION EDU" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="الدرس | MISSION EDU" />
 <meta name="twitter:description" content="منصة تعليمية متكاملة — تابع دروسك واختباراتك في مكان واحد" />
-<meta name="twitter:image" content="/exam.png" />
+<meta name="twitter:image" content="/logo.png" />
 <title>الدرس | MISSION EDU</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
@@ -86,6 +86,7 @@ ul{list-style:none}
 @keyframes noteBlink{0%,100%{opacity:1}50%{opacity:.55}}
 @keyframes lockPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 20px rgba(251,191,36,.5))}50%{transform:scale(1.08);filter:drop-shadow(0 0 35px rgba(251,191,36,.9))}}
 @keyframes crownFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-6px) rotate(3deg)}}
+@keyframes cancelledPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 20px rgba(239,68,68,.5))}50%{transform:scale(1.05);filter:drop-shadow(0 0 40px rgba(239,68,68,.85))}}
 .fade-in{animation:fu .5s}
 .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(6,9,20,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
 .back-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--txt2);font-size:13.5px;font-weight:700;transition:.2s;text-decoration:none}
@@ -148,6 +149,8 @@ ul{list-style:none}
 .exam-title{flex:1;min-width:0;font-size:15px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .exam-timer{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;background:rgba(47,125,255,.15);border:1px solid rgba(47,125,255,.35);font-size:14px;font-weight:900;font-variant-numeric:tabular-nums;color:#7db6ff;font-family:monospace}
 .exam-timer::before{content:'⏱';font-size:12px}
+.exam-close{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;font-size:16px;font-weight:900;flex-shrink:0;cursor:pointer;transition:.2s}
+.exam-close:hover{background:rgba(239,68,68,.25);color:#fff}
 .exam-body{flex:1;padding:16px;overflow-y:auto}
 .exam-q{padding:18px;margin-bottom:14px;border-radius:16px;background:linear-gradient(180deg,rgba(21,31,56,.72),rgba(11,17,34,.62));border:1px solid var(--border)}
 .exam-q-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
@@ -176,6 +179,9 @@ ul{list-style:none}
 .exam-cancelled-icon{font-size:80px;margin-bottom:16px;filter:drop-shadow(0 8px 24px rgba(239,68,68,.5))}
 .exam-cancelled-title{font-size:24px;font-weight:900;color:#fca5a5;margin-bottom:10px}
 .exam-cancelled-desc{font-size:14px;color:var(--txt2);line-height:1.8;max-width:420px;margin:0 auto 20px}
+.exam-block-overlay{position:fixed;inset:0;z-index:999999;background:rgba(10,5,5,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;padding:20px;pointer-events:all!important;cursor:not-allowed;animation:pu .15s ease-out}
+.exam-block-overlay .exam-block-msg{padding:24px 32px;border-radius:20px;background:linear-gradient(180deg,rgba(21,31,56,.98),rgba(11,17,34,.98));border:2px solid rgba(239,68,68,.6);color:#fca5a5;font-weight:900;font-size:16px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.85),0 0 40px rgba(239,68,68,.25);max-width:420px;line-height:1.7}
+.exam-block-overlay .exam-block-ico{font-size:52px;margin-bottom:12px;filter:drop-shadow(0 8px 20px rgba(239,68,68,.5));animation:cancelledPulse 1.5s ease-in-out infinite}
 .lesson-exam-card{padding:16px;margin-bottom:12px;border-radius:16px;background:linear-gradient(135deg,rgba(34,197,94,.06),rgba(21,31,56,.55));border:1px solid rgba(34,197,94,.30);position:relative;overflow:hidden}
 .lesson-exam-card.locked{background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(21,31,56,.55));border-color:rgba(251,191,36,.35)}
 .lesson-exam-title{font-size:15px;font-weight:800;color:#e8eefc;line-height:1.4}
@@ -307,7 +313,8 @@ hasVideoAccess: false, hasExamAccess: {}, debugReason: '',
 examSession: null, examSubmitting: false, examResult: null,
 examFullscreenActive: false, examVisibilityHandler: null,
 examBlurHandler: null, examContextMenuHandler: null,
-examKeyHandler: null, examBeforeUnloadHandler: null
+examKeyHandler: null, examBeforeUnloadHandler: null,
+examFsChangeHandler: null
 };
 function esc(str){
 return String(str||"").replace(/[&<>"']/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[s]);
@@ -812,7 +819,7 @@ return `
 }
 return `
 <div class="glass" style="padding:16px">
-<div class="h4 mb12">📝 اختبارات مرتبطة (${exams.length})</div>
+<div className="h4 mb12">📝 اختبارات مرتبطة (${exams.length})</div>
 ${exams.map(e=>{
 const paid = isPaidContent(e);
 const access = state.hasExamAccess[e.id] !== false;
@@ -838,6 +845,36 @@ ${locked ? '<div class="pill pill-paid" style="margin-top:8px;font-size:10px"><i
 }).join('')}
 </div>
 `;
+}
+function showExamBlockOverlay(){
+if(document.getElementById('examBlockOverlay')) return;
+if(!state.examSession || state.examSession.cancelled) return;
+const el = document.createElement('div');
+el.id = 'examBlockOverlay';
+el.className = 'exam-block-overlay';
+el.innerHTML = `
+<div class="exam-block-msg">
+<div class="exam-block-ico">⛔</div>
+<div>تم كشف خروج من وضع ملء الشاشة</div>
+<div style="font-size:13px;color:#7f93b8;margin-top:8px;font-weight:600">جاري إلغاء الاختبار...</div>
+</div>
+`;
+const blockAll = (e)=>{
+try{ e.stopPropagation(); e.stopImmediatePropagation(); e.preventDefault(); }catch(err){}
+return false;
+};
+el.addEventListener('click', blockAll, true);
+el.addEventListener('mousedown', blockAll, true);
+el.addEventListener('mouseup', blockAll, true);
+el.addEventListener('touchstart', blockAll, {capture:true, passive:false});
+el.addEventListener('touchend', blockAll, {capture:true, passive:false});
+el.addEventListener('touchmove', blockAll, {capture:true, passive:false});
+el.addEventListener('contextmenu', blockAll, true);
+document.body.appendChild(el);
+}
+function removeExamBlockOverlay(){
+const el = document.getElementById('examBlockOverlay');
+if(el) el.remove();
 }
 async function startLessonExam(exam){
 if(!state.user || !state.lesson) return;
@@ -896,22 +933,29 @@ state.examSession.fullscreenEntered = true;
 function setupExamProtection(){
 const modal = document.getElementById('examModal');
 if(!modal) return;
+document.body.classList.add('exam-active');
 const checkFs = ()=>{
 if(!state.examSession || state.examSession.cancelled) return;
 const isFs = document.fullscreenElement === modal || document.webkitFullscreenElement === modal || document.msFullscreenElement === modal;
 if(state.examSession.fullscreenEntered && !isFs){
-cancelExam('exit-fullscreen');
+showExamBlockOverlay();
+setTimeout(()=>{ cancelExam('exit-fullscreen'); }, 50);
 }
 };
+state.examFsChangeHandler = checkFs;
 state.examVisibilityHandler = ()=>{
 if(document.hidden && state.examSession && !state.examSession.cancelled){
-cancelExam('visibility-hidden');
+showExamBlockOverlay();
+setTimeout(()=>{ cancelExam('visibility-hidden'); }, 50);
 }
 };
 state.examBlurHandler = ()=>{
 if(state.examSession && !state.examSession.cancelled && state.examSession.fullscreenEntered){
 setTimeout(()=>{
-if(document.hidden) cancelExam('window-blur');
+if(document.hidden && state.examSession && !state.examSession.cancelled){
+showExamBlockOverlay();
+setTimeout(()=>{ cancelExam('window-blur'); }, 50);
+}
 }, 300);
 }
 };
@@ -924,8 +968,8 @@ try{ navigator.clipboard.writeText(''); }catch(err){}
 state.examKeyHandler = (e)=>{
 if(!state.examSession || state.examSession.cancelled) return;
 if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())) || (e.ctrlKey && e.key.toUpperCase() === 'U') || (e.ctrlKey && e.key.toUpperCase() === 'S') || (e.ctrlKey && e.key.toUpperCase() === 'P')){ e.preventDefault(); return false; }
+if(e.ctrlKey && (e.key.toUpperCase() === 'C' || e.key.toUpperCase() === 'X' || e.key.toUpperCase() === 'A')){ e.preventDefault(); return false; }
 if(e.key === 'PrintScreen'){ try{ navigator.clipboard.writeText(''); }catch(err){} }
-if(e.ctrlKey && (e.key.toUpperCase() === 'C' || e.key.toUpperCase() === 'X')){ e.preventDefault(); return false; }
 };
 state.examBeforeUnloadHandler = (e)=>{
 if(state.examSession && !state.examSession.cancelled){
@@ -934,9 +978,9 @@ e.returnValue = '';
 return '';
 }
 };
-document.addEventListener('fullscreenchange', checkFs);
-document.addEventListener('webkitfullscreenchange', checkFs);
-document.addEventListener('msfullscreenchange', checkFs);
+document.addEventListener('fullscreenchange', state.examFsChangeHandler);
+document.addEventListener('webkitfullscreenchange', state.examFsChangeHandler);
+document.addEventListener('msfullscreenchange', state.examFsChangeHandler);
 document.addEventListener('visibilitychange', state.examVisibilityHandler);
 window.addEventListener('blur', state.examBlurHandler);
 modal.addEventListener('contextmenu', state.examContextMenuHandler);
@@ -947,13 +991,17 @@ window.addEventListener('beforeunload', state.examBeforeUnloadHandler);
 setTimeout(()=>{ enterExamFullscreen(); }, 100);
 }
 function removeExamProtection(){
-document.removeEventListener('fullscreenchange', ()=>{});
-document.removeEventListener('webkitfullscreenchange', ()=>{});
-document.removeEventListener('msfullscreenchange', ()=>{});
+document.body.classList.remove('exam-active');
+if(state.examFsChangeHandler){
+document.removeEventListener('fullscreenchange', state.examFsChangeHandler);
+document.removeEventListener('webkitfullscreenchange', state.examFsChangeHandler);
+document.removeEventListener('msfullscreenchange', state.examFsChangeHandler);
+}
 if(state.examVisibilityHandler) document.removeEventListener('visibilitychange', state.examVisibilityHandler);
 if(state.examBlurHandler) window.removeEventListener('blur', state.examBlurHandler);
 if(state.examKeyHandler) document.removeEventListener('keydown', state.examKeyHandler);
 if(state.examBeforeUnloadHandler) window.removeEventListener('beforeunload', state.examBeforeUnloadHandler);
+state.examFsChangeHandler = null;
 state.examVisibilityHandler = null;
 state.examBlurHandler = null;
 state.examKeyHandler = null;
@@ -1047,6 +1095,7 @@ async function cancelExam(reason){
 if(!state.examSession || state.examSession.cancelled) return;
 state.examSession.cancelled = true;
 if(state.examSession.timer) clearInterval(state.examSession.timer);
+showExamBlockOverlay();
 removeExamProtection();
 const exam = state.examSession.exam;
 const durationSeconds = Math.max(0, Math.floor((Date.now() - state.examSession.startedAt)/1000));
@@ -1078,9 +1127,9 @@ details: { exam_id: exam.id, reason, duration_seconds: durationSeconds }
 try{
 if(document.fullscreenElement && document.exitFullscreen) await document.exitFullscreen();
 }catch(e){}
+setTimeout(()=>{ removeExamBlockOverlay(); }, 600);
 const modal = document.getElementById('examModal');
 if(modal) modal.remove();
-const s = state.examSession;
 state.examSession = null;
 state.examResult = null;
 document.body.style.overflow = '';
@@ -1094,12 +1143,12 @@ const cancelledHTML = `
 reason === 'exit-fullscreen' ? 'خرجت من وضع ملء الشاشة، فتم إلغاء الاختبار تلقائيًا.' :
 reason === 'visibility-hidden' ? 'خرجت من الصفحة أو تصفحت تطبيق آخر، فتم إلغاء الاختبار تلقائيًا.' :
 reason === 'window-blur' ? 'فقدت الاتصال بالصفحة، فتم إلغاء الاختبار تلقائيًا.' :
-reason === 'user-closed' ? 'قمت بإغلاق الاختبار بنفسك.' :
+reason === 'user-closed' ? 'قمت بإلغاء الاختبار بنفسك.' :
 'تم إلغاء الاختبار.'
 }</div>
 <div class="glass-s" style="padding:14px;margin:0 auto 20px;max-width:340px">
 <div class="flex between center mb6"><span class="sm muted">النتيجة</span><span class="pill pill-r">ملغي</span></div>
-<div class="flex between center"><span class="sm muted">المدة</span><span class="sm" style="font-weight:700;color:#f59e0b">${Math.floor(durationSeconds/60)}د ${durationSeconds%60}ث</span></div>
+<div class="flex between center"><span className="sm muted">المدة</span><span className="sm" style="font-weight:700;color:#f59e0b">${Math.floor(durationSeconds/60)}د ${durationSeconds%60}ث</span></div>
 </div>
 <button class="btn btn-p btn-block btn-lg" id="examBack" type="button">↩ رجوع للدرس</button>
 </div>
@@ -1132,6 +1181,9 @@ if(!confirmRes.isConfirmed) return;
 state.examSubmitting = true;
 if(state.examSession.timer) clearInterval(state.examSession.timer);
 removeExamProtection();
+try{
+if(document.fullscreenElement && document.exitFullscreen) await document.exitFullscreen();
+}catch(e){}
 const exam = state.examSession.exam;
 const questions = state.examSession.questions;
 let correct = 0;
@@ -1237,6 +1289,7 @@ location.reload();
 function closeExam(){
 if(state.examSession?.timer) clearInterval(state.examSession.timer);
 removeExamProtection();
+removeExamBlockOverlay();
 const modal = document.getElementById('examModal');
 if(modal) modal.remove();
 state.examSession = null;
