@@ -246,7 +246,7 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 [data-theme="light"] .search input{color:var(--txt)}
 [data-theme="light"] .input,[data-theme="light"] select.input,[data-theme="light"] textarea.input{background:rgba(255,252,242,.92);border-color:var(--border);color:var(--txt)}
 [data-theme="light"] .input::placeholder{color:var(--muted)}
-[data-theme="light"] select.input{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238B6914' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>")}
+[data-theme="light"] select.input{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238B6914' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>")};background-repeat:no-repeat;background-position:left 14px center;background-size:14px 14px
 [data-theme="light"] .modal-bg{background:rgba(245,241,232,.88)}
 [data-theme="light"] .nav-i{color:var(--txt2)}
 [data-theme="light"] .nav-i:hover{background:rgba(212,175,55,.15);color:var(--txt)}
@@ -859,7 +859,7 @@ function Crud({title,collection,defaultItem,fields,columns}){
     if(correct<0) return null;
     const optionStart=lines.findIndex(x=>optionRegex.test(x));
     const titlePattern=/^.*?السؤال\s*(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر|\d+)\s*(?:[|｜\-–—:]\s*.*)?$/u;
-    const questionText=lines.slice(0,optionStart).filter(x=>!titlePattern.test(x)).join('\n').trim();
+    const questionText=lines.slice(0,optionStart).filter(x=>!titlePattern.test(x)).join('\n').trim().replace(/^السؤال\\s*(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر|\\d+)\\s*[:：|｜\\-–—.]?\\s*/u,'').trim();
     if(!questionText) return null;
     const explanation=explanationLine?explanationLine.replace(/^.*?(?:التعليل|الشرح|السبب)\s*[:：]\s*/u,'').trim():'';
     return {text:questionText,options,correct,explanation};
