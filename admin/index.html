@@ -2123,7 +2123,7 @@ function AdminApp(){
   useEffect(()=>{if(tab === 'notifications'){try{ localStorage.setItem('admin_last_notif_seen', Date.now().toString()); }catch(e){}}},[tab]);
   const items=[
     {title:'الرئيسية',items:[{id:'dashboard',icon:'dashboard',label:'لوحة التحكم'},{id:'activity',icon:'activity',label:'سجل النشاط'},{id:'exam-results',icon:'clipboard',label:'نتايج الاختبارات'},{id:'errors',icon:'alert',label:'تحليل الأخطاء'}]},
-    {title:'المحتوى',items:[{id:'grades',icon:'school',label:'الصفوف'},{id:'subjects',icon:'book',label:'المواد'},{id:'units',icon:'folder',label:'الوحدات'},{id:'lessons',icon:'file',label:'الدروس'},{id:'questions',icon:'help',label:'بنك الأسئلة'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'missions',icon:'target',label:'المهام'}]},
+    {title:'المحتوى',items:[{id:'grades',icon:'school',label:'الصفوف'},{id:'subjects',icon:'book',label:'المواد'},{id:'units',icon:'folder',label:'الوحدات'},{id:'lessons',icon:'file',label:'الدروس'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'missions',icon:'target',label:'المهام'}]},
     {title:'التحفيز',items:[{id:'achievements',icon:'trophy',label:'الإنجازات'},{id:'levels',icon:'trend',label:'المستويات'},{id:'certificates',icon:'award',label:'الشهادات'}]},
     {title:'المستخدمون',items:[{id:'students',icon:'users',label:'الطلاب'},{id:'notes',icon:'note',label:'ملاحظات الطلاب'},{id:'notifications',icon:'bell',label:'الإشعارات',badge:unreadNotifs||null},{id:'reports',icon:'link',label:'البلاغات'}]},
     {title:'النمو',items:[{id:'coupons',icon:'coupon',label:'الكوبونات'},{id:'referrals',icon:'share',label:'الإحالات'},{id:'polls',icon:'activity',label:'الاستطلاعات'}]},
@@ -2135,7 +2135,7 @@ function AdminApp(){
     app.db.subjects.filter(s=>s.name.toLowerCase().includes(lc)).forEach(s=>res.push({type:'مادة',icon:s.icon||'📚',title:s.name,nav:'subjects'}));
     app.db.lessons.filter(l=>l.title.toLowerCase().includes(lc)).slice(0,5).forEach(l=>res.push({type:'درس',icon:<Icon name="file" size={16}/>,title:l.title,nav:'lessons'}));
     app.db.exams.filter(e=>e.title.toLowerCase().includes(lc)).slice(0,5).forEach(e=>res.push({type:'اختبار',icon:<Icon name="clipboard" size={16}/>,title:e.title,nav:'exams'}));
-    app.db.questions.filter(x=>x.text.toLowerCase().includes(lc)).slice(0,5).forEach(x=>res.push({type:'سؤال',icon:<Icon name="help" size={16}/>,title:x.text.slice(0,50),nav:'questions'}));
+    
     setSearchResults(res);
   };
   return <div className="app">
@@ -2151,7 +2151,7 @@ function AdminApp(){
         {tab==='subjects'&&<SubjectsPage/>}
         {tab==='units'&&<UnitsPage/>}
         {tab==='lessons'&&<LessonsPage/>}
-        {tab==='questions'&&<QuestionsPage/>}
+        
         {tab==='exams'&&<ExamsPage/>}
         {tab==='missions'&&<MissionsPage/>}
         {tab==='achievements'&&<AchievementsPage/>}
