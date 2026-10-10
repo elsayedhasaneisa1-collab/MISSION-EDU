@@ -2,26 +2,24 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
 <meta name="theme-color" content="#04060e" />
-<!-- Open Graph: معاينة مشاركة الرابط على واتساب وفيسبوك -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="MISSION EDU">
 <meta property="og:locale" content="ar_AR">
 <meta property="og:title" content="الامتحان | MISSION EDU">
 <meta property="og:description" content="اختبر مستواك وحقق النجاح مع MISSION EDU">
 <meta property="og:url" content="https://mission-edu.vercel.app/student/exam.html">
-<meta property="og:image" content="https://mission-edu.vercel.app/exam.png">
-<meta property="og:image:secure_url" content="https://mission-edu.vercel.app/exam.png">
+<meta property="og:image" content="/exam.png">
+<meta property="og:image:secure_url" content="/exam.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="MISSION EDU - الامتحان">
-<!-- Twitter / large preview -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="الامتحان | MISSION EDU">
 <meta name="twitter:description" content="اختبر مستواك وحقق النجاح مع MISSION EDU">
-<meta name="twitter:image" content="https://mission-edu.vercel.app/exam.png">
+<meta name="twitter:image" content="/exam.png">
 <title>الاختبار | MISSION EDU</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
@@ -91,6 +89,7 @@ a{color:inherit;text-decoration:none}
 @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes lockPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 20px rgba(251,191,36,.5))}50%{transform:scale(1.08);filter:drop-shadow(0 0 35px rgba(251,191,36,.9))}}
 @keyframes crownFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-6px) rotate(3deg)}}
+@keyframes cancelledPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 20px rgba(239,68,68,.5))}50%{transform:scale(1.05);filter:drop-shadow(0 0 40px rgba(239,68,68,.85))}}
 .fade-in{animation:fu .3s ease-out}
 .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(6,9,20,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
 .back-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--txt2);font-size:13.5px;font-weight:700;transition:.2s;text-decoration:none}
@@ -122,6 +121,26 @@ a{color:inherit;text-decoration:none}
 .lock-btn:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(251,191,36,.6)}
 .lock-btn i{font-size:clamp(13px,3.2vw,16px)}
 .lock-note{margin-top:clamp(10px,2.8vw,16px);font-size:clamp(10px,2.5vw,12px);color:#7f93b8;opacity:.85}
+.cancelled-shell{width:100%;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,rgba(20,4,4,.96),rgba(38,11,11,.98));border:1px solid rgba(239,68,68,.4);box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 40px rgba(239,68,68,.15) inset;display:flex;align-items:center;justify-content:center;padding:44px 24px;text-align:center}
+.cancelled-content{display:flex;flex-direction:column;align-items:center;max-width:460px;width:100%}
+.cancelled-icon-wrap{width:clamp(90px,22vw,130px);height:clamp(90px,22vw,130px);border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 30% 30%,rgba(239,68,68,.35),rgba(239,68,68,.08) 70%,transparent);border:2px solid rgba(239,68,68,.5);box-shadow:0 0 40px rgba(239,68,68,.35);margin-bottom:22px;animation:cancelledPulse 2.5s ease-in-out infinite}
+.cancelled-icon-wrap i{font-size:clamp(38px,9vw,58px);color:#fca5a5;filter:drop-shadow(0 4px 10px rgba(0,0,0,.5))}
+.cancelled-title{font-size:clamp(20px,4.8vw,26px);font-weight:900;color:#fca5a5;margin-bottom:10px;text-shadow:0 2px 12px rgba(239,68,68,.4)}
+.cancelled-desc{font-size:clamp(13px,3.2vw,15px);color:#b7c6e4;line-height:1.8;margin-bottom:20px;padding:0 10px}
+.cancelled-reason{padding:14px 18px;border-radius:14px;background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.3);font-size:13.5px;color:#fca5a5;font-weight:700;margin-bottom:22px;line-height:1.7}
+.cancelled-note{padding:12px 18px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--border);font-size:12px;color:var(--muted);margin-bottom:24px;line-height:1.6}
+.exam-modal:fullscreen .wrap,.exam-modal:-webkit-full-screen .wrap{padding:0}
+.exam-modal::before{content:'🛡 محمي';position:fixed;top:12px;left:50%;transform:translateX(-50%);padding:4px 14px;border-radius:20px;background:rgba(239,68,68,.20);border:1px solid rgba(239,68,68,.5);color:#fca5a5;font-size:10.5px;font-weight:800;z-index:100000;letter-spacing:1px;pointer-events:none}
+body.exam-active{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+body.exam-active .opt{cursor:pointer}
+body.exam-active input,body.exam-active textarea{user-select:text!important;-webkit-user-select:text!important}
+@media(max-width:640px){
+.wrap{padding:14px 14px 100px}
+.topbar{padding:10px 14px}
+.glass{padding:18px}
+.opt{padding:12px 14px;font-size:13.5px}
+.opt-l{width:28px;height:28px;font-size:12px}
+}
 </style>
 </head>
 <body>
@@ -165,7 +184,10 @@ let state = {
 user: null, exam: null, questions: [], attempts: [],
 started: false, submitted: false, current: 0, answers: {},
 timeLeft: 0, timer: null, result: null, hasAccess: false,
-startedAt: null
+startedAt: null, cancelled: false,
+fullscreenEntered: false, fullscreenActive: false,
+visibilityHandler: null, blurHandler: null, keyHandler: null,
+contextHandler: null, fsChangeHandler: null, beforeUnloadHandler: null
 };
 function esc(str){
 return String(str||"").replace(/[&<>"']/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[s]);
@@ -216,18 +238,6 @@ return false;
 function hasAccess(user, item){
 if(!isPaidContent(item)) return true;
 return hasSubscriptionAccess(user);
-}
-function getLockReason(user, item){
-if(!isPaidContent(item)) return '';
-if(!user) return 'no_user';
-if(user.subscription === 'vip' || user.subscription === 'VIP') return '';
-if(user.subscription === 'paid' || user.subscription === 'PAID'){
-if(!user.subscription_until) return '';
-const until = typeof user.subscription_until === 'number' ? user.subscription_until : new Date(user.subscription_until).getTime();
-if(until > Date.now()) return '';
-return 'expired';
-}
-return 'no_subscription';
 }
 function getSubscriptionBadge(user){
 if(!user) return '';
@@ -308,8 +318,9 @@ if(btn) btn.addEventListener('click', showLockedMessage);
 }
 function renderStart(){
 const e = state.exam;
-const attempts = state.attempts;
-const canTry = attempts.length < (e.max_attempts || 99);
+const attempts = state.attempts.filter(a => a.status !== 'cancelled');
+const validAttempts = attempts.length;
+const canTry = validAttempts < (e.max_attempts || 99);
 const qCount = (e.question_ids || []).length;
 const hasWon = attempts.some(a => a.passed);
 const bestPct = attempts.length ? Math.max(...attempts.map(a=>a.pct)) : 0;
@@ -352,6 +363,13 @@ ${paid ? '<span class="pill pill-paid"><i class="fa-solid fa-lock"></i> مدفو
 <div class="stat"><span class="stat-l">درجة النجاح</span><span class="stat-v">${e.pass_score}%</span></div>
 <div class="stat"><span class="stat-l">المكافأة</span><span class="stat-v">+${e.xp} XP</span></div>
 </div>
+<div class="glass-s mb16" style="padding:14px;border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.05)">
+<div class="flex center g8 mb6">
+<span style="font-size:18px">🛡</span>
+<div class="sm" style="font-weight:800;color:#fca5a5">الاختبار محمي</div>
+</div>
+<div class="xs muted" style="line-height:1.7">لو خرجت من وضع ملء الشاشة أو فتحت تطبيق آخر، هيتم <b style="color:#fca5a5">إلغاء الاختبار تلقائيًا</b> وهيظهر للأدمن بحالة (ملغي)</div>
+</div>
 ${attempts.length > 0 ? `
 <div class="glass-s mb16" style="padding:12px">
 <div class="h4 mb8">محاولاتك السابقة:</div>
@@ -370,9 +388,186 @@ ${attempts.map((a,i) => `
 const startBtn = document.getElementById("btnStart");
 if(startBtn) startBtn.addEventListener("click", startExam);
 }
+async function enterExamFullscreen(){
+const wrap = document.querySelector('.wrap');
+const body = document.body;
+try{
+if(body.requestFullscreen){ await body.requestFullscreen(); }
+else if(body.webkitRequestFullscreen){ body.webkitRequestFullscreen(); }
+else if(body.msRequestFullscreen){ body.msRequestFullscreen(); }
+if(screen.orientation && screen.orientation.lock){
+try{ await screen.orientation.lock('portrait'); }catch(e){}
+}
+state.fullscreenEntered = true;
+}catch(e){ console.warn('Fullscreen failed:', e); }
+}
+async function exitExamFullscreen(){
+try{
+if(document.fullscreenElement){
+if(document.exitFullscreen) await document.exitFullscreen();
+else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+else if(document.msExitFullscreen) document.msExitFullscreen();
+}
+}catch(e){}
+if(screen.orientation && screen.orientation.unlock){
+try{ screen.orientation.unlock(); }catch(e){}
+}
+}
+function setupExamProtection(){
+document.body.classList.add('exam-active');
+const checkFs = ()=>{
+if(!state.started || state.submitted || state.cancelled) return;
+const isFs = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+if(state.fullscreenEntered && !isFs){
+cancelExam('exit-fullscreen');
+}
+};
+state.visibilityHandler = ()=>{
+if(document.hidden && state.started && !state.submitted && !state.cancelled){
+cancelExam('visibility-hidden');
+}
+};
+state.blurHandler = ()=>{
+if(!state.started || state.submitted || state.cancelled) return;
+setTimeout(()=>{
+if(document.hidden && state.started && !state.cancelled){
+cancelExam('window-blur');
+}
+}, 400);
+};
+state.contextHandler = (e)=>{
+if(state.started && !state.submitted && !state.cancelled){
+e.preventDefault();
+try{ navigator.clipboard.writeText(''); }catch(err){}
+return false;
+}
+};
+state.keyHandler = (e)=>{
+if(!state.started || state.submitted || state.cancelled) return;
+if(e.key === 'F12'){ e.preventDefault(); return false; }
+if(e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())){ e.preventDefault(); return false; }
+if(e.ctrlKey && e.key.toUpperCase() === 'U'){ e.preventDefault(); return false; }
+if(e.ctrlKey && e.key.toUpperCase() === 'S'){ e.preventDefault(); return false; }
+if(e.ctrlKey && e.key.toUpperCase() === 'P'){ e.preventDefault(); return false; }
+if(e.ctrlKey && (e.key.toUpperCase() === 'C' || e.key.toUpperCase() === 'X' || e.key.toUpperCase() === 'A')){ e.preventDefault(); return false; }
+if(e.key === 'PrintScreen'){ try{ navigator.clipboard.writeText(''); }catch(err){} }
+};
+state.beforeUnloadHandler = (e)=>{
+if(state.started && !state.submitted && !state.cancelled){
+e.preventDefault();
+e.returnValue = '';
+return '';
+}
+};
+state.fsChangeHandler = checkFs;
+document.addEventListener('fullscreenchange', state.fsChangeHandler);
+document.addEventListener('webkitfullscreenchange', state.fsChangeHandler);
+document.addEventListener('msfullscreenchange', state.fsChangeHandler);
+document.addEventListener('visibilitychange', state.visibilityHandler);
+window.addEventListener('blur', state.blurHandler);
+document.addEventListener('contextmenu', state.contextHandler);
+document.addEventListener('keydown', state.keyHandler);
+document.addEventListener('copy', state.contextHandler);
+document.addEventListener('cut', state.contextHandler);
+window.addEventListener('beforeunload', state.beforeUnloadHandler);
+setTimeout(()=>{ enterExamFullscreen(); }, 200);
+}
+function removeExamProtection(){
+document.body.classList.remove('exam-active');
+if(state.fsChangeHandler){
+document.removeEventListener('fullscreenchange', state.fsChangeHandler);
+document.removeEventListener('webkitfullscreenchange', state.fsChangeHandler);
+document.removeEventListener('msfullscreenchange', state.fsChangeHandler);
+}
+if(state.visibilityHandler) document.removeEventListener('visibilitychange', state.visibilityHandler);
+if(state.blurHandler) window.removeEventListener('blur', state.blurHandler);
+if(state.contextHandler){
+document.removeEventListener('contextmenu', state.contextHandler);
+document.removeEventListener('copy', state.contextHandler);
+document.removeEventListener('cut', state.contextHandler);
+}
+if(state.keyHandler) document.removeEventListener('keydown', state.keyHandler);
+if(state.beforeUnloadHandler) window.removeEventListener('beforeunload', state.beforeUnloadHandler);
+state.fsChangeHandler = null;
+state.visibilityHandler = null;
+state.blurHandler = null;
+state.contextHandler = null;
+state.keyHandler = null;
+state.beforeUnloadHandler = null;
+}
+async function cancelExam(reason){
+if(state.cancelled || state.submitted) return;
+state.cancelled = true;
+clearInterval(state.timer);
+removeExamProtection();
+await exitExamFullscreen();
+const durationSeconds = state.startedAt ? Math.max(0, Math.floor((Date.now() - state.startedAt)/1000)) : 0;
+try{
+const sb = await DB.getClient();
+await sb.from('exam_attempts').insert([{
+id: DB.uid('att_'),
+user_id: state.user.id,
+exam_id: state.exam.id,
+score: 0,
+total: (state.exam.question_ids||[]).length,
+pct: 0,
+passed: false,
+answers: {},
+started_at: state.startedAt || Date.now(),
+duration_seconds: durationSeconds,
+status: 'cancelled',
+cancelled_at: Date.now(),
+cancel_reason: reason || 'unknown',
+at: Date.now(),
+created_at: Date.now()
+}]);
+DB.trackActivity({
+userId: state.user.id, userName: state.user.name,
+type: 'exam_cancelled', target: state.exam.title,
+details: { exam_id: state.exam.id, reason, duration_seconds: durationSeconds }
+});
+}catch(e){console.warn('Cancel error:', e);}
+renderCancelled(reason, durationSeconds);
+}
+function renderCancelled(reason, durationSeconds){
+const reasonText = 
+reason === 'exit-fullscreen' ? 'خرجت من وضع ملء الشاشة، فتم إلغاء الاختبار تلقائيًا.' :
+reason === 'visibility-hidden' ? 'خرجت من الصفحة أو تصفحت تطبيق آخر، فتم إلغاء الاختبار تلقائيًا.' :
+reason === 'window-blur' ? 'فقدت الاتصال بالصفحة، فتم إلغاء الاختبار تلقائيًا.' :
+reason === 'user-closed' ? 'قمت بإلغاء الاختبار بنفسك.' :
+'تم إلغاء الاختبار لأسباب أمنية.';
+const durText = durationSeconds > 60 
+? `${Math.floor(durationSeconds/60)}د ${durationSeconds%60}ث` 
+: `${durationSeconds} ث`;
+app.innerHTML = `
+<div class="fade-in">
+<div class="cancelled-shell">
+<div class="cancelled-content">
+<div class="cancelled-icon-wrap">
+<i class="fa-solid fa-ban"></i>
+</div>
+<div class="cancelled-title">تم إلغاء الاختبار</div>
+<div class="cancelled-reason">${esc(reasonText)}</div>
+<div class="flex g12 wrap-fl" style="justify-content:center;margin-bottom:22px">
+<div class="pill pill-r" style="padding:8px 16px;font-size:13px"><i class="fa-solid fa-clock"></i> ${durText}</div>
+<div class="pill pill-y" style="padding:8px 16px;font-size:13px"><i class="fa-solid fa-xmark"></i> الحالة: ملغي</div>
+</div>
+<div class="cancelled-note">
+⛔ تم تسجيل هذه المحاولة في سجلك كـ <b style="color:#fca5a5">ملغي</b> وسيراها الأدمن في نتائج الاختبارات.
+</div>
+<a href="/student/index.html" class="btn btn-p btn-lg" style="text-decoration:none;min-width:220px">
+<i class="fa-solid fa-arrow-right"></i> رجوع للرئيسية
+</a>
+</div>
+</div>
+</div>
+`;
+window.scrollTo({top:0,behavior:'smooth'});
+}
 function startExam(){
 state.started = true;
 state.submitted = false;
+state.cancelled = false;
 state.current = 0;
 state.answers = {};
 state.timeLeft = state.exam.duration * 60;
@@ -392,8 +587,12 @@ submitExam();
 return;
 }
 const timerEl = document.getElementById("timerDisplay");
-if(timerEl) timerEl.textContent = "⏱ " + fmtTime(state.timeLeft);
+if(timerEl){
+timerEl.textContent = "⏱ " + fmtTime(state.timeLeft);
+if(state.timeLeft <= 60) timerEl.style.color = '#fca5a5';
+}
 }, 1000);
+setupExamProtection();
 renderExam();
 }
 function renderExam(){
@@ -461,7 +660,11 @@ customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
 });
 }
 async function submitExam(){
+if(state.submitted || state.cancelled) return;
+state.submitted = true;
 clearInterval(state.timer);
+removeExamProtection();
+await exitExamFullscreen();
 let score = 0;
 for(let i=0; i<state.questions.length; i++){
 const q = state.questions[i];
@@ -483,31 +686,39 @@ lessonId: q.lesson_id
 const total = state.questions.length;
 const pct = Math.round((score/total)*100);
 const passed = pct >= state.exam.pass_score;
-const hasWonBefore = state.attempts.some(a => a.passed);
+const validAttempts = state.attempts.filter(a => a.status !== 'cancelled');
+const hasWonBefore = validAttempts.some(a => a.passed);
 const gained = (passed && !hasWonBefore) ? (state.exam.xp || 0) : 0;
-const durationSeconds = state.startedAt ? Math.round((Date.now() - state.startedAt) / 1000) : null;
+const durationSeconds = state.startedAt ? Math.max(0, Math.floor((Date.now() - state.startedAt)/1000)) : 0;
 try{
-await DB.saveAttempt({
-userId: state.user.id,
-examId: state.exam.id,
+const sb = await DB.getClient();
+await sb.from('exam_attempts').insert([{
+id: DB.uid('att_'),
+user_id: state.user.id,
+exam_id: state.exam.id,
 score, total, pct, passed,
 answers: state.answers,
-startedAt: state.startedAt || Date.now(),
-durationSeconds: durationSeconds
-});
-}catch(e){}
+started_at: state.startedAt || Date.now(),
+duration_seconds: durationSeconds,
+status: passed ? 'passed' : 'failed',
+at: Date.now(),
+created_at: Date.now()
+}]);
+}catch(e){console.warn('Save attempt error:', e);}
 if(gained > 0){
 try{
-await DB.updateUser(state.user.id, { xp: (state.user.xp || 0) + gained });
+const sb = await DB.getClient();
+const { data: userRow } = await sb.from('users').select('xp').eq('id', state.user.id).maybeSingle();
+const curXp = Number(userRow?.xp)||0;
+await DB.updateUser(state.user.id, { xp: curXp + gained });
 }catch(e){}
 }
 DB.trackActivity({
 userId: state.user.id, userName: state.user.name,
 type: "exam_submit", target: state.exam.title,
-details: { score, total, pct, passed, gained, repeat: hasWonBefore, duration: durationSeconds }
+details: { score, total, pct, passed, gained, repeat: hasWonBefore, duration: durationSeconds, status: passed ? 'passed' : 'failed' }
 });
 state.result = { score, total, pct, passed, gained, hasWonBefore, durationSeconds };
-state.submitted = true;
 renderResult();
 }
 function renderResult(){
@@ -541,6 +752,9 @@ app.innerHTML = `
 <div class="sm muted mb20">حصلت على ${r.score} من ${r.total}</div>
 ${buildRing(r.pct, 140, 10, color)}
 ${xpMessage}
+<div class="pill ${r.passed?'pill-g':'pill-r'}" style="margin-top:16px;padding:6px 16px;font-size:12.5px">
+${r.passed ? '✓ ناجح' : '✗ راسب'}
+</div>
 </div>
 <div class="h3 mb12">📋 مراجعة الإجابات</div>
 ${state.questions.map((q,i) => {
@@ -608,7 +822,6 @@ state.exam = exam;
 state.hasAccess = hasAccess(user, exam);
 if(!state.hasAccess){
 renderLocked();
-document.addEventListener("contextmenu", e=>e.preventDefault());
 return;
 }
 const qIds = exam.question_ids || [];
@@ -625,10 +838,6 @@ state.questions = orderedQs;
 const { data: attempts } = await sb.from("exam_attempts").select("*").eq("user_id", user.id).eq("exam_id", examId).order("at", {ascending:false});
 state.attempts = attempts || [];
 renderStart();
-document.addEventListener("contextmenu", e=>e.preventDefault());
-document.addEventListener("keydown", e=>{
-if(e.key === "F12" || (e.ctrlKey && e.shiftKey && ["I","J","C"].includes(e.key.toUpperCase()))) e.preventDefault();
-});
 }
 window.openWhatsApp = ()=>{
 window.open("https://wa.me/201128351702?text=" + encodeURIComponent("مرحبًا، أريد الاستفسار عن منصة MISSION EDU"), "_blank");
