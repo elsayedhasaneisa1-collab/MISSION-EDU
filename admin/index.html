@@ -919,6 +919,7 @@ function LessonsPage(){
   const [lessonTestXp,setLessonTestXp]=useState(10);
   const [lessonTestFree,setLessonTestFree]=useState(true);
   const [lessonTestBusy,setLessonTestBusy]=useState(false);
+  const [previewQs,setPreviewQs]=useState(null);
   const openNew=()=>{setForm({title:'',desc:'',summary:'',video:{type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true},pdf_url:'',duration:'',xp:'',sort_order:'',unit_id:'',published:true,key_points:[],examples:[],notes:''});setLessonTestText('');setLessonTestTitle('');setLessonTestDuration(15);setLessonTestPassScore(50);setLessonTestXp(10);setLessonTestFree(true);setEditing('new');};
   const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(!c.video)c.video={type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true};if(c.video.is_free===undefined)c.video.is_free=true;if(!c.key_points)c.key_points=[];if(!c.pdf_url)c.pdf_url='';setForm(c);setLessonTestText('');setLessonTestTitle(`اختبار ${c.title||'الدرس'}`);setLessonTestDuration(15);setLessonTestPassScore(50);setLessonTestXp(10);setLessonTestFree(true);setEditing(it.id);};
   const parseLessonTestQuestion=(raw)=>{
@@ -942,14 +943,23 @@ function LessonsPage(){
     const explanation=explanationLine?explanationLine.replace(/^.*?(?:التعليل|الشرح|السبب)\s*[:：]\s*/u,'').trim():'';
     return {text:questionText,options,correct,explanation};
   };
-  const createTestForLesson=async()=>{
-    if(editing==='new'||!form.id)return app.toast.warn('احفظ الدرس أولًا، ثم افتحه للتعديل لإضافة الاختبار');
-    if(!lessonTestTitle.trim())return app.toast.warn('اكتب اسم الاختبار');
-    const raw=(lessonTestText||'').trim();if(!raw)return app.toast.warn('الصق الأسئلة كاملة أولًا');
+  const parseBlock=()=>{
+    const raw=(lessonTestText||'').trim();
+    if(!raw)return [];
     const heading=/^(?=.*السؤال)(?=.*(?:🧪|[|｜:—–-]|\d)).*$/gmu;
     const starts=[...raw.matchAll(heading)].map(m=>m.index);
     const blocks=starts.length>1?starts.map((start,i)=>raw.slice(start,starts[i+1]??raw.length).trim()).filter(Boolean):[raw];
-    const parsed=blocks.map(parseLessonTestQuestion).filter(Boolean);
+    return blocks.map(parseLessonTestQuestion).filter(Boolean);
+  };
+  const previewTest=()=>{
+    const parsed=parseBlock();
+    if(!parsed.length)return app.toast.warn('لا توجد أسئلة صالحة للمعاينة');
+    setPreviewQs(parsed);
+  };
+  const createTestForLesson=async()=>{
+    if(editing==='new'||!form.id)return app.toast.warn('احفظ الدرس أولًا، ثم افتحه للتعديل لإضافة الاختبار');
+    if(!lessonTestTitle.trim())return app.toast.warn('اكتب اسم الاختبار');
+    const parsed=parseBlock();
     if(!parsed.length)return app.toast.warn('لم أتعرف على الأسئلة. تأكد أن كل سؤال يحتوي 4 اختيارات والإجابة الصحيحة والتعليل.');
     const lesson=app.lesson(form.id)||form;const unit=app.unit(lesson.unit_id);const subjectId=unit?.subject_id||'';
     if(!subjectId)return app.toast.warn('لازم يكون الدرس مرتبطًا بوحدة ومادة قبل إنشاء الاختبار');
@@ -965,8 +975,37 @@ function LessonsPage(){
       await app.save('exams',exam);
       app.toast.ok(`تم إنشاء الاختبار وربطه بالدرس، بعدد ${questionIds.length} سؤال`);
       setLessonTestText('');
+      setPreviewQs(null);
     }catch(e){app.toast.err('تعذر إنشاء الاختبار: '+(e.message||'حدث خطأ'));}
     setLessonTestBusy(false);
+  };
+  const getLessonQuestions=(lessonId)=>app.db.questions.filter(q=>q.lesson_id===lessonId);
+  const getLessonExams=(lessonId)=>app.db.exams.filter(e=>(e.lesson_ids||[]).includes(lessonId));
+  const deleteLessonQuestion=async(qId)=>{
+    const r=await Swal.fire({title:'حذف السؤال؟',text:'هيتشال من الدرس نهائيًا',icon:'warning',showCancelButton:true,confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+    if(!r.isConfirmed)return;
+    try{
+      const examsUsingIt=(app.db.exams||[]).filter(e=>(e.question_ids||[]).includes(qId));
+      for(const ex of examsUsingIt){
+        await app.save('exams',{...ex,question_ids:(ex.question_ids||[]).filter(x=>x!==qId)});
+      }
+      await app.remove('questions',qId);
+      app.toast.warn('تم حذف السؤال');
+    }catch(e){app.toast.err(e.message);}
+  };
+  const deleteLessonExam=async(examId)=>{
+    const r=await Swal.fire({title:'حذف الاختبار كامل؟',text:'هيتشال الاختبار وكل أسئلته من الدرس',icon:'warning',showCancelButton:true,confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+    if(!r.isConfirmed)return;
+    try{
+      const exam=(app.db.exams||[]).find(e=>e.id===examId);
+      if(exam){
+        for(const qId of (exam.question_ids||[])){
+          await app.remove('questions',qId);
+        }
+        await app.remove('exams',examId);
+      }
+      app.toast.warn('تم حذف الاختبار وأسئلته');
+    }catch(e){app.toast.err(e.message);}
   };
   const save=async ()=>{
     if(!form.title) return app.toast.warn('العنوان مطلوب');
@@ -997,6 +1036,8 @@ function LessonsPage(){
   const filteredLessons = useMemo(()=>{let list = sortedLessons;if(filterUnit !== 'all') list = list.filter(l=>l.unit_id === filterUnit);if(filterAccess !== 'all'){list = list.filter(l=>{const isFree = !l.video || !l.video.url || l.video.is_free !== false;return filterAccess === 'free' ? isFree : !isFree;});}return list;},[sortedLessons, filterUnit, filterAccess]);
   const freeCount = sortedLessons.filter(l=>!l.video || !l.video.url || l.video.is_free !== false).length;
   const paidCount = sortedLessons.length - freeCount;
+  const currentLessonQuestions = editing && editing!=='new' ? getLessonQuestions(editing) : [];
+  const currentLessonExams = editing && editing!=='new' ? getLessonExams(editing) : [];
   return <>
     <div className="flex between center mb16 wrap g8">
       <div className="h2 grad">📖 إدارة الدروس</div>
@@ -1027,8 +1068,8 @@ function LessonsPage(){
     </div>
     <div className="glass" style={{padding:14}}>
       {filteredLessons.length===0?<Empty title="لا توجد دروس"/>:<div className="sx"><table className="tbl">
-        <thead><tr><th>الدرس</th><th>الوحدة</th><th>الفيديو</th><th>الوصول</th><th>PDF</th><th>XP</th><th>الحالة</th><th>إجراءات</th></tr></thead>
-        <tbody>{filteredLessons.map(l=>{const isFree = !l.video || !l.video.url || l.video.is_free !== false;const badge = !l.video || !l.video.url ? <span className="pill pill-y">لا فيديو</span> : (()=>{const map={youtube:'📺 YouTube',vimeo:'🎬 Vimeo',mp4:'🎥 MP4',external:'🔗 خارجي'};return <span className="pill pill-b">{map[l.video.type]||l.video.type}</span>;})();return <tr key={l.id}><td><b>{l.title}</b></td><td className="sm">{app.unit(l.unit_id)?.name||'—'}</td><td>{badge}</td><td><AccessBadge value={isFree}/></td><td>{l.pdf_url ? <span className="pill pill-r">📄 PDF</span> : <span className="xs muted">—</span>}</td><td>{l.xp}</td><td>{l.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(l)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(l.id)}><Icon name="trash" size={13}/></button></div></td></tr>;})}</tbody>
+        <thead><tr><th>الدرس</th><th>الوحدة</th><th>الفيديو</th><th>الوصول</th><th>اختبار</th><th>XP</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+        <tbody>{filteredLessons.map(l=>{const isFree = !l.video || !l.video.url || l.video.is_free !== false;const badge = !l.video || !l.video.url ? <span className="pill pill-y">لا فيديو</span> : (()=>{const map={youtube:'📺 YouTube',vimeo:'🎬 Vimeo',mp4:'🎥 MP4',external:'🔗 خارجي'};return <span className="pill pill-b">{map[l.video.type]||l.video.type}</span>;})();const examCount=getLessonExams(l.id).length;return <tr key={l.id}><td><b>{l.title}</b></td><td className="sm">{app.unit(l.unit_id)?.name||'—'}</td><td>{badge}</td><td><AccessBadge value={isFree}/></td><td>{examCount>0?<span className="pill pill-g">✓ {examCount}</span>:<span className="xs muted">—</span>}</td><td>{l.xp}</td><td>{l.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(l)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(l.id)}><Icon name="trash" size={13}/></button></div></td></tr>;})}</tbody>
       </table></div>}
     </div>
     {editing!==null&&<Modal title={editing==='new'?'درس جديد':'تعديل الدرس'} onClose={()=>setEditing(null)} wide>
@@ -1054,10 +1095,39 @@ function LessonsPage(){
       <Field label="ملاحظات" full><textarea className="input" value={form.notes||''} onChange={e=>setForm({...form,notes:e.target.value})}/></Field>
       <div className="section-title"><span className="ico">📝</span> اختبار الدرس — يظهر بعد الدرس مباشرة</div>
       {editing==='new'?<div className="glass-s" style={{padding:12,marginBottom:12}}><div className="sm">احفظ الدرس أولًا، وسيظهر قسم إضافة أسئلة الاختبار هنا مباشرة دون إغلاق النافذة.</div></div>:<>
-        <div className="glass-s" style={{padding:12,marginBottom:12}}>
-          <div className="sm muted mb8">الاختبارات المرتبطة بهذا الدرس</div>
-          {(app.db.exams||[]).filter(e=>(e.lesson_ids||[]).includes(form.id)).length===0?<div className="sm muted">لا يوجد اختبار مرتبط بالدرس حتى الآن.</div>:(app.db.exams||[]).filter(e=>(e.lesson_ids||[]).includes(form.id)).map(e=><div key={e.id} className="flex between center mb6"><span>{e.title} · {(e.question_ids||[]).length} سؤال</span><span className="pill pill-g">مرتبط بالدرس</span></div>)}
-        </div>
+        {currentLessonExams.length>0 && (<div className="glass-s" style={{padding:14,marginBottom:12,borderColor:'rgba(34,197,94,.4)'}}>
+          <div className="flex between center mb12">
+            <div className="sm" style={{fontWeight:800,color:'#6ee7a0'}}>✅ اختبارات مرتبطة بهذا الدرس ({currentLessonExams.length})</div>
+          </div>
+          {currentLessonExams.map(e=>(
+            <div key={e.id} className="flex between center mb6" style={{padding:'8px 12px',background:'rgba(34,197,94,.06)',borderRadius:10,border:'1px solid rgba(34,197,94,.20)'}}>
+              <div style={{flex:1,minWidth:0}}>
+                <div className="sm" style={{fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>📋 {e.title}</div>
+                <div className="xs muted">⏱ {e.duration}د • 🎯 {e.pass_score}% • ❓ {(e.question_ids||[]).length} سؤال</div>
+              </div>
+              <button className="btn btn-dn btn-sm" onClick={()=>deleteLessonExam(e.id)} style={{flexShrink:0}}>
+                <Icon name="trash" size={12}/> حذف كامل
+              </button>
+            </div>
+          ))}
+        </div>)}
+        {currentLessonQuestions.length>0 && (<div className="glass-s" style={{padding:14,marginBottom:12,maxHeight:280,overflowY:'auto'}}>
+          <div className="flex between center mb12">
+            <div className="sm" style={{fontWeight:800,color:'#FFD700'}}>❓ الأسئلة الحالية ({currentLessonQuestions.length})</div>
+          </div>
+          {currentLessonQuestions.map((q,idx)=>(
+            <div key={q.id} style={{padding:'10px 12px',background:'rgba(212,175,55,.05)',borderRadius:10,border:'1px solid var(--border)',marginBottom:6}}>
+              <div className="flex between center mb6" style={{gap:8}}>
+                <span className="pill pill-b" style={{fontSize:10,flexShrink:0}}>س {idx+1}</span>
+                <div className="sm" style={{flex:1,fontWeight:600,lineHeight:1.5}}>{q.text.length>100?q.text.slice(0,100)+'...':q.text}</div>
+                <button className="btn btn-dn btn-sm" onClick={()=>deleteLessonQuestion(q.id)} style={{flexShrink:0}}>
+                  <Icon name="trash" size={11}/>
+                </button>
+              </div>
+              <div className="xs muted" style={{paddingInlineStart:34}}>✅ الإجابة: {(q.options||[])[q.correct?.[0]||0]}</div>
+            </div>
+          ))}
+        </div>)}
         <div className="grid g2">
           <Field label="اسم الاختبار"><input className="input" value={lessonTestTitle} onChange={e=>setLessonTestTitle(e.target.value)} placeholder={`اختبار ${form.title||'الدرس'}`}/></Field>
           <Field label="المدة بالدقائق"><input type="number" className="input" min="1" value={lessonTestDuration} onChange={e=>setLessonTestDuration(e.target.value===''?'':+e.target.value)}/></Field>
@@ -1066,231 +1136,42 @@ function LessonsPage(){
         </div>
         <Field label="نوع الاختبار"><AccessToggle value={lessonTestFree} onChange={setLessonTestFree}/></Field>
         <Field label="إضافة أسئلة الاختبار — الصق المجموعة كاملة" hint="كل سؤال يبدأ بعنوان مثل: 🧪 السؤال الأول، ويحتوي على 4 اختيارات، وسطر الإجابة الصحيحة، والتعليل."><textarea className="input" rows="10" value={lessonTestText} onChange={e=>setLessonTestText(e.target.value)} placeholder="الصق كل الأسئلة هنا مرة واحدة..."/></Field>
-        <div className="flex g8 mb12"><button type="button" className="btn btn-p" onClick={createTestForLesson} disabled={lessonTestBusy} style={{flex:1}}>{lessonTestBusy?'جارٍ إنشاء الاختبار...':'⚡ إضافة الأسئلة وإنشاء الاختبار'}</button><button type="button" className="btn btn-s" onClick={()=>setLessonTestText('')}>مسح النص</button></div>
+        <div className="flex g8 mb12" style={{flexWrap:'wrap'}}>
+          <button type="button" className="btn btn-s" onClick={previewTest} disabled={!lessonTestText.trim()} style={{flex:'1 1 auto'}}>👁️ معاينة الأسئلة</button>
+          <button type="button" className="btn btn-p" onClick={createTestForLesson} disabled={lessonTestBusy} style={{flex:'2 1 auto'}}>{lessonTestBusy?'جارٍ إنشاء الاختبار...':'⚡ إضافة الأسئلة وإنشاء الاختبار'}</button>
+          <button type="button" className="btn btn-s" onClick={()=>setLessonTestText('')}>مسح النص</button>
+        </div>
       </>}
       <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ الدرس'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
     </Modal>}
-  </>;
-}
-function QuestionsPage(){
-  const app=useApp();
-  const stripQuestionHeading=(value)=>String(value||'').replace(/^\s*(?:🧪\s*)?السؤال\s*(?:(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر)|(?:رقم\s*)?[٠-٩0-9]+)\s*(?:[:：|｜\-–—.]\s*)?/u,'').trim();
-  const [editing,setEditing]=useState(null);
-  const [form,setForm]=useState({});
-  const [bulkMode,setBulkMode]=useState(false);
-  const [bulkForm,setBulkForm]=useState({lesson_id:'',difficulty:'medium',xp:10,questions:[{text:'',options:['','','',''],correct:0,explanation:''}]});
-  const [busy,setBusy]=useState(false);
-  const [pasteQuestion,setPasteQuestion]=useState('');
-  const [bulkPasteText,setBulkPasteText]=useState('');
-  const [filterLesson,setFilterLesson]=useState('all');
-  const openNew=()=>{setForm({text:'',options:['','','',''],correct:[0],explanation:'',lesson_id:'',difficulty:'medium',xp:'',type:'mcq'});setEditing('new');};
-  const autoFillFromText=()=>{
-    const raw=(pasteQuestion||'').trim();
-    if(!raw) return app.toast.warn('الصق نص السؤال كاملًا أولاً');
-    const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد](?:[)\.\-:：]\s*|\s+))|(?:[🔵🟢🟡🔴🟣🟠⚫⚪]\s*))/u;
-    const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة|الإجابة الصحيحة|الاجابة الصحيحة)\s*[:：]/u.test(x));
-    const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
-    const optionLines=lines.filter(x=>optionRegex.test(x) && !/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
-    if(optionLines.length<2) return app.toast.warn('مش قادر أتعرف على الاختيارات. اكتب كل اختيار في سطر منفصل مثل 🔵 الاختيار');
-    const cleanOption=x=>x.replace(optionRegex,'').replace(/[.。؛;]+$/u,'').trim();
-    const options=optionLines.slice(0,4).map(cleanOption);
-    while(options.length<4) options.push('');
-    const answerText=answerLine?answerLine.replace(/^.*?(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]\s*/u,'').replace(/[.。]+$/u,'').trim():'';
-    const answerClean=cleanOption(answerText).replace(/^[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🅲🅳🔹🔸▪️•\s]+/u,'').trim();
-    const normalizeAnswer=value=>String(value||'').normalize('NFKC').toLowerCase().replace(/[\u064B-\u065F\u0670]/g,'').replace(/[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🅲🅳🔹🔸▪️•]/gu,'').replace(/^[\s]*(?:[a-dأبجد])[)\.\-:：]\s*/u,'').replace(/[\s.,،؛;:：()\[\]{}\-–—]+/g,'').trim();
-    const answerKey=normalizeAnswer(answerClean);
-    const answerLetterMatch=answerText.trim().match(/^(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد])[)\.\-:：]?$/u);
-    const letterToken=answerLetterMatch?answerText.trim().replace(/[)\.\-:：]/g,'').toLowerCase():'';
-    const letterIndex=({'🅰️':0,'🅱️':1,'🅲':2,'🅳':3,'a':0,'b':1,'c':2,'d':3,'أ':0,'ب':1,'ج':2,'د':3})[letterToken]??-1;
-    let correctIndex=options.findIndex(o=>normalizeAnswer(o) && answerKey && normalizeAnswer(o)===answerKey);
-    if(correctIndex<0 && answerKey) correctIndex=options.findIndex(o=>{const k=normalizeAnswer(o);return k && (k.includes(answerKey)||answerKey.includes(k));});
-    if(correctIndex<0 && letterIndex>=0 && letterIndex<optionLines.length) correctIndex=letterIndex;
-    const exp=explanationLine?explanationLine.replace(/^.*?(?:التعليل|الشرح|السبب)\s*[:：]\s*/u,'').trim():'';
-    const optionStart=lines.findIndex(x=>optionRegex.test(x));
-    const titlePattern=/^\s*(?:🧪\s*)?السؤال\s*(?:(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر)|(?:رقم\s*)?[٠-٩0-9]+)\s*[:：|｜\-–—.]?\s*$/u;
-    let questionLines=lines.slice(0,optionStart).map((x,i)=>i===0?stripQuestionHeading(x):x).filter(x=>!titlePattern.test(x));
-    const questionText=questionLines.join('\n').trim();
-    if(!questionText) return app.toast.warn('نص السؤال نفسه مش واضح؛ اكتب السؤال تحت العنوان مباشرة');
-    if(!answerText) return app.toast.warn('السؤال اتقري، لكن مش لاقي سطر الإجابة الصحيحة. أضف: ✅ الإجابة الصحيحة: ...');
-    if(correctIndex<0) return app.toast.warn('اتعرفت الاختيارات لكن مش قادر أحدد الإجابة الصحيحة؛ تأكد إن نص الإجابة مطابق لأحد الاختيارات');
-    setForm(f=>({...f,text:questionText,options,correct:[correctIndex],explanation:exp}));
-    app.toast.ok('✅ تم تعبئة السؤال والاختيارات والإجابة والشرح. راجعهم قبل الحفظ');
-  };
-  const parseQuestionBlock=(raw)=>{
-    const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد](?:[)\.\-:：]\s*|\s+))|(?:[🔵🟢🟡🔴🟣🟠⚫⚪]\s*))/u;
-    const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]/u.test(x));
-    const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
-    const optionLines=lines.filter(x=>optionRegex.test(x) && !/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
-    if(optionLines.length<2 || !answerLine) return null;
-    const cleanOption=x=>x.replace(optionRegex,'').replace(/[.。؛;]+$/u,'').trim();
-    const options=optionLines.slice(0,4).map(cleanOption);
-    while(options.length<4) options.push('');
-    const answerText=answerLine.replace(/^.*?(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]\s*/u,'').replace(/[.。]+$/u,'').trim();
-    const answerClean=cleanOption(answerText).replace(/^[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🅲🅳🔹🔸▪️•\s]+/u,'').trim();
-    const answerLetter=(answerText.match(/(?:^|\s)([A-Da-dأبجد])(?:[)\.\s:：]|$)/u)||[])[1];
-    const letterIndex=answerLetter?({'a':0,'b':1,'c':2,'d':3,'أ':0,'ب':1,'ج':2,'د':3}[answerLetter.toLowerCase()]):-1;
-    let correct=options.findIndex(o=>o && answerClean && (answerClean.includes(o)||o.includes(answerClean)));
-    if(correct<0 && letterIndex>=0 && letterIndex<optionLines.length) correct=letterIndex;
-    if(correct<0){const key=answerClean.replace(/[\s.,؛;()]/g,'').toLowerCase();correct=options.findIndex(o=>o.replace(/[\s.,؛;()]/g,'').toLowerCase()===key);}
-    if(correct<0) return null;
-    const optionStart=lines.findIndex(x=>optionRegex.test(x));
-    const titlePattern=/^\s*(?:🧪\s*)?السؤال\s*(?:(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر)|(?:رقم\s*)?[٠-٩0-9]+)\s*[:：|｜\-–—.]?\s*$/u;
-    const questionText=lines.slice(0,optionStart).map((x,i)=>i===0?stripQuestionHeading(x):x).filter(x=>!titlePattern.test(x)).join('\n').trim();
-    if(!questionText) return null;
-    const explanation=explanationLine?explanationLine.replace(/^.*?(?:التعليل|الشرح|السبب)\s*[:：]\s*/u,'').trim():'';
-    return {text:questionText,options,correct,explanation};
-  };
-  const autoFillBulkFromText=()=>{
-    const raw=(bulkPasteText||'').trim();
-    if(!raw) return app.toast.warn('الصق مجموعة الأسئلة أولاً');
-    const heading=/^(?=.*السؤال)(?=.*(?:🧪|[|｜:—–-]|\d)).*$/gmu;
-    const starts=[...raw.matchAll(heading)].map(m=>m.index);
-    let blocks=[];
-    if(starts.length>1){blocks=starts.map((start,i)=>raw.slice(start,starts[i+1]??raw.length).trim()).filter(Boolean);}
-    else blocks=[raw];
-    const parsed=blocks.map(parseQuestionBlock).filter(Boolean);
-    if(!parsed.length) return app.toast.warn('ملقتش أسئلة مكتملة. تأكد إن كل سؤال فيه اختيارات وسطر الإجابة الصحيحة.');
-    setBulkForm(f=>({...f,questions:parsed}));
-    app.toast.ok(`✅ تم تجهيز ${parsed.length} سؤال. راجعهم قبل الحفظ`);
-  };
-  const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
-  const save=async ()=>{
-    if(!form.text||!form.lesson_id) return app.toast.warn('النص والدرس مطلوبان');
-    const lesson=app.lesson(form.lesson_id);
-    const unit_id=lesson?.unit_id||'';
-    const subject_id=app.unit(unit_id)?.subject_id||'';
-    setBusy(true);
-    try{await app.save('questions',{...form,unit_id,subject_id});app.toast.ok('تم الحفظ');setEditing(null);}
-    catch(e){app.toast.err(e.message);}
-    setBusy(false);
-  };
-  const saveBulk=async ()=>{
-    if(!bulkForm.lesson_id) return app.toast.warn('اختر الدرس');
-    const validQs = bulkForm.questions.filter(q=>q.text.trim() && q.options.some(o=>o.trim()));
-    if(validQs.length===0) return app.toast.warn('أضف سؤالاً واحداً على الأقل');
-    const lesson = app.lesson(bulkForm.lesson_id);
-    const unit_id = lesson?.unit_id || '';
-    const subject_id = app.unit(unit_id)?.subject_id || '';
-    setBusy(true);
-    try{
-      for(const q of validQs){
-        const record = {text: q.text.trim(),options: q.options.map(o=>o.trim()),correct: [q.correct],explanation: q.explanation.trim(),lesson_id: bulkForm.lesson_id,unit_id, subject_id,difficulty: bulkForm.difficulty,xp: bulkForm.xp,type: 'mcq'};
-        await app.save('questions', record);
-      }
-      app.toast.ok(`✅ تمت إضافة ${validQs.length} سؤال`);
-      setBulkMode(false);
-      setBulkForm({lesson_id:'', difficulty:'medium', xp:10, questions:[{text:'',options:['','','',''],correct:0,explanation:''}]});
-    }catch(e){app.toast.err(e.message);}
-    setBusy(false);
-  };
-  const del=async id=>{
-    const r=await Swal.fire({title:'حذف السؤال؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
-    if(!r.isConfirmed) return;
-    try{await app.remove('questions',id);app.toast.warn('تم الحذف');}
-    catch(e){app.toast.err(e.message);}
-  };
-  const addBulkQuestion=()=>{setBulkForm(f=>({...f,questions:[...f.questions,{text:'',options:['','','',''],correct:0,explanation:''}]}));};
-  const removeBulkQuestion=(idx)=>{setBulkForm(f=>({...f,questions:f.questions.filter((_,i)=>i!==idx)}));};
-  const updateBulkQuestion=(idx,patch)=>{setBulkForm(f=>({...f,questions:f.questions.map((q,i)=>i===idx?{...q,...patch}:q)}));};
-  const filteredQuestions = filterLesson === 'all' ? app.db.questions : app.db.questions.filter(q=>q.lesson_id === filterLesson);
-  const sortedQuestions = useMemo(()=>{return [...filteredQuestions].sort((a,b)=>{const ta = new Date(a.created_at || a.createdAt || 0).getTime() || 0;const tb = new Date(b.created_at || b.createdAt || 0).getTime() || 0;return ta - tb;});},[filteredQuestions]);
-  return <>
-    <div className="flex between center mb16 wrap g8">
-      <div className="h2 grad">❓ بنك الأسئلة</div>
-      <div className="flex g8">
-        <button className="btn btn-s" onClick={()=>setBulkMode(true)}><Icon name="plus" size={14}/> إضافة مجموعة أسئلة</button>
-        <button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> سؤال واحد</button>
+    {previewQs && (<Modal title={`👁️ معاينة الأسئلة (${previewQs.length})`} onClose={()=>setPreviewQs(null)} wide>
+      <div className="glass-s mb12" style={{padding:12}}>
+        <div className="sm" style={{color:'#FFD700',fontWeight:800}}>راجع الأسئلة دي قبل ما تحفظها للاختبار</div>
+        <div className="xs muted mt6">لو كل حاجة تمام، اقفل النافذة دي واضغط "⚡ إضافة الأسئلة وإنشاء الاختبار"</div>
       </div>
-    </div>
-    <div className="flex between center mb12 wrap g8">
-      <div className="flex center g8">
-        <span className="sm muted">تصفية حسب الدرس:</span>
-        <select className="input" style={{maxWidth:280}} value={filterLesson} onChange={e=>setFilterLesson(e.target.value)}>
-          <option value="all">جميع الدروس ({app.db.questions.length})</option>
-          {app.db.lessons.map(l=>{const count = app.db.questions.filter(q=>q.lesson_id===l.id).length;return <option key={l.id} value={l.id}>{l.title} ({count})</option>;})}
-        </select>
-      </div>
-      <span className="pill pill-b">{sortedQuestions.length} سؤال</span>
-    </div>
-    <div className="glass" style={{padding:14}}>
-      {sortedQuestions.length===0?<Empty title="لا توجد أسئلة"/>:<div className="sx"><table className="tbl">
-        <thead><tr><th>السؤال</th><th>الدرس</th><th>الصعوبة</th><th>XP</th><th>إجراءات</th></tr></thead>
-        <tbody>{sortedQuestions.map(q=><tr key={q.id}><td style={{maxWidth:340}}>{q.text.slice(0,80)}{q.text.length>80?'...':''}</td><td className="sm">{app.lesson(q.lesson_id)?.title||'—'}</td><td><span className={`pill ${q.difficulty==='easy'?'pill-g':q.difficulty==='hard'?'pill-r':'pill-a'}`}>{q.difficulty}</span></td><td>{q.xp}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(q)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(q.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody>
-      </table></div>}
-    </div>
-    {editing!==null&&<Modal title={editing==='new'?'سؤال جديد':'تعديل السؤال'} onClose={()=>setEditing(null)} wide>
-      <Field label="الصق السؤال كاملًا هنا" hint="الصق النص بنفس التنسيق اللي بتجهزه: السؤال والاختيارات والإجابة الصحيحة والتعليل.">
-        <textarea className="input" rows="8" value={pasteQuestion} onChange={e=>setPasteQuestion(e.target.value)} placeholder={'الصق نص السؤال هنا مع الاختيارات والإجابة الصحيحة والتعليل...'}/>
-      </Field>
-      <div className="flex g8 wrap center mb12">
-        <button type="button" className="btn btn-p" onClick={autoFillFromText}>⚡ تعبئة تلقائية من النص</button>
-        <button type="button" className="btn btn-s" onClick={()=>setPasteQuestion('')}>مسح النص</button>
-        <span className="xs muted">بدون ذكاء اصطناعي أو اتصال خارجي — بيقرأ التنسيق اللي لصقته ويملأ الخانات تلقائيًا.</span>
-      </div>
-      <div className="div mb12"/>
-      <Field label="نص السؤال"><textarea className="input" rows="3" value={form.text||''} onChange={e=>setForm({...form,text:e.target.value})} placeholder="نص السؤال بعد التعبئة التلقائية..."/></Field>
-      <Field label="الخيارات">
-        {(form.options||[]).map((op,i)=><div key={i} className="flex g8 mb6 center">
-          <button type="button" className={`btn btn-sm ${form.correct?.includes(i)?'btn-ok':'btn-s'}`} onClick={()=>setForm({...form,correct:[i]})}>{['أ','ب','ج','د'][i]}</button>
-          <input className="input" value={op} onChange={e=>{const o=[...form.options];o[i]=e.target.value;setForm({...form,options:o});}}/>
-        </div>)}
-      </Field>
-      <Field label="شرح الإجابة"><textarea className="input" value={form.explanation||''} onChange={e=>setForm({...form,explanation:e.target.value})}/></Field>
-      <div className="grid g2">
-        <Field label="الدرس"><select className="input" value={form.lesson_id||''} onChange={e=>setForm({...form,lesson_id:e.target.value})}><option value="">— اختر —</option>{app.db.lessons.map(l=><option key={l.id} value={l.id}>{l.title}</option>)}</select></Field>
-        <Field label="الصعوبة"><select className="input" value={form.difficulty||'medium'} onChange={e=>setForm({...form,difficulty:e.target.value})}><option value="easy">سهل</option><option value="medium">متوسط</option><option value="hard">صعب</option></select></Field>
-        <Field label="XP"><input type="number" className="input" value={form.xp ?? ''} onChange={e=>setForm({...form,xp: e.target.value === '' ? '' : +e.target.value})}/></Field>
-      </div>
-      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
-    </Modal>}
-    {bulkMode&&<Modal title="📚 إضافة مجموعة أسئلة" onClose={()=>setBulkMode(false)} wide>
-      <Field label="الصق مجموعة الأسئلة كاملة" hint="الصق الأسئلة وراء بعضها بنفس التنسيق: عنوان السؤال، نصه، الاختيارات، الإجابة الصحيحة، والتعليل. لازم كل سؤال يبدأ بعنوان مثل: السؤال الأول أو السؤال 1.">
-        <textarea className="input" rows="8" value={bulkPasteText} onChange={e=>setBulkPasteText(e.target.value)} placeholder="الصق هنا مجموعة الأسئلة كاملة..." />
-      </Field>
-      <div className="flex g8 wrap center mb12">
-        <button type="button" className="btn btn-p" onClick={autoFillBulkFromText}>⚡ تعبئة المجموعة تلقائيًا</button>
-        <button type="button" className="btn btn-s" onClick={()=>setBulkPasteText('')}>مسح النص</button>
-        <span className="xs muted">بدون ذكاء اصطناعي — راجع الأسئلة قبل الحفظ.</span>
-      </div>
-      <div className="div mb12"/>
-      <div className="grid g2 mb12">
-        <Field label="الدرس المستهدف">
-          <select className="input" value={bulkForm.lesson_id} onChange={e=>setBulkForm({...bulkForm,lesson_id:e.target.value})}>
-            <option value="">— اختر الدرس —</option>
-            {app.db.lessons.map(l=><option key={l.id} value={l.id}>{app.subject(app.unit(l.unit_id)?.subject_id)?.name} — {l.title}</option>)}
-          </select>
-        </Field>
-        <Field label="الصعوبة">
-          <select className="input" value={bulkForm.difficulty} onChange={e=>setBulkForm({...bulkForm,difficulty:e.target.value})}>
-            <option value="easy">سهل</option><option value="medium">متوسط</option><option value="hard">صعب</option>
-          </select>
-        </Field>
-        <Field label="XP لكل سؤال"><input type="number" className="input" value={bulkForm.xp ?? ''} onChange={e=>setBulkForm({...bulkForm,xp: e.target.value === '' ? '' : +e.target.value})}/></Field>
-        <Field label="عدد الأسئلة"><div className="pill pill-b" style={{padding:'12px 20px',fontSize:14}}>{bulkForm.questions.length} سؤال</div></Field>
-      </div>
-      <div className="div"/>
       <div style={{maxHeight:'60vh',overflowY:'auto',paddingInlineEnd:6}}>
-        {bulkForm.questions.map((q,idx)=>(
-          <div key={idx} className="glass-s mb12" style={{padding:16,borderColor:'var(--border2)'}}>
-            <div className="flex between center mb12">
-              <span className="pill pill-b">سؤال {idx+1}</span>
-              {bulkForm.questions.length > 1 && (<button className="btn btn-dn btn-sm" onClick={()=>removeBulkQuestion(idx)}><Icon name="trash" size={12}/> حذف</button>)}
+        {previewQs.map((q,idx)=>(
+          <div key={idx} className="glass-s mb12" style={{padding:14,borderColor:'rgba(255,215,0,.35)'}}>
+            <div className="flex between center mb10">
+              <span className="pill pill-b" style={{fontWeight:800}}>سؤال {idx+1}</span>
+              <span className="pill pill-v" style={{fontSize:10}}>+{lessonTestXp} XP</span>
             </div>
-            <Field label="نص السؤال"><textarea className="input" rows="2" value={q.text} onChange={e=>updateBulkQuestion(idx,{text:e.target.value})} placeholder="اكتب السؤال هنا..."/></Field>
-            <Field label="الخيارات (اضغط على الحرف لتحديد الإجابة الصحيحة)">
-              {q.options.map((op,oi)=>(<div key={oi} className="flex g8 mb6 center"><button type="button" className={`btn btn-sm ${q.correct===oi?'btn-ok':'btn-s'}`} onClick={()=>updateBulkQuestion(idx,{correct:oi})} style={{minWidth:44}}>{['أ','ب','ج','د'][oi]}</button><input className="input" value={op} onChange={e=>{const opts=[...q.options]; opts[oi]=e.target.value;updateBulkQuestion(idx,{options:opts});}} placeholder={`الخيار ${['أ','ب','ج','د'][oi]}`}/></div>))}
-            </Field>
-            <Field label="شرح الإجابة (اختياري)"><textarea className="input" rows="2" value={q.explanation} onChange={e=>updateBulkQuestion(idx,{explanation:e.target.value})} placeholder="اشرح سبب الإجابة الصحيحة..."/></Field>
+            <div className="sm mb10" style={{fontWeight:700,lineHeight:1.7,whiteSpace:'pre-wrap'}}>{q.text}</div>
+            <div className="flex col g6 mb10">
+              {q.options.map((opt,oi)=>{const isCorrect=q.correct===oi;return <div key={oi} className="flex center g8" style={{padding:'6px 10px',borderRadius:8,background:isCorrect?'rgba(34,197,94,.10)':'rgba(255,255,255,.03)',border:`1px solid ${isCorrect?'rgba(34,197,94,.4)':'var(--border)'}`}}>
+                <span style={{width:24,height:24,borderRadius:'50%',display:'grid',placeItems:'center',background:isCorrect?'#22c55e':'rgba(255,255,255,.06)',color:isCorrect?'#fff':'var(--txt2)',fontWeight:800,fontSize:11,flexShrink:0}}>{['أ','ب','ج','د'][oi]}</span>
+                <span className="sm" style={{flex:1,color:isCorrect?'#6ee7a0':'var(--txt)'}}>{opt||'—'}</span>
+                {isCorrect && <span className="pill pill-g" style={{fontSize:9}}>✓ صح</span>}
+              </div>;})}
+            </div>
+            {q.explanation && (<div className="xs muted" style={{padding:'8px 10px',background:'rgba(0,0,0,.20)',borderRadius:8,borderInlineStart:'2px solid var(--gold)',whiteSpace:'pre-wrap'}}>💡 {q.explanation}</div>)}
           </div>
         ))}
       </div>
-      <div className="flex g8 mt12">
-        <button className="btn btn-s" onClick={addBulkQuestion} style={{flex:1}}><Icon name="plus" size={14}/> إضافة سؤال آخر</button>
-        <button className="btn btn-p" onClick={saveBulk} disabled={busy} style={{flex:1}}>{busy?'جارٍ الحفظ...':`💾 حفظ ${bulkForm.questions.length} سؤال`}</button>
+      <div className="flex g8 mt16">
+        <button className="btn btn-p btn-block" onClick={()=>setPreviewQs(null)}>تمام، رجعت للفورم</button>
       </div>
-    </Modal>}
+    </Modal>)}
   </>;
 }
 function ExamsPage(){
