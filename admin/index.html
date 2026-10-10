@@ -863,7 +863,7 @@ function Crud({title,collection,defaultItem,fields,columns}){
   const autoFillBulkFromText=()=>{
     const raw=(bulkPasteText||'').trim();
     if(!raw) return app.toast.warn('الصق مجموعة الأسئلة أولاً');
-    const heading=/^(?=.*السؤال\s*(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر|\d+)).*$/gmu;
+    const heading=/^(?=.*السؤال)(?=.*(?:🧪|[|｜:—–-]|\d)).*$/gmu;
     const starts=[...raw.matchAll(heading)].map(m=>m.index);
     let blocks=[];
     if(starts.length>1){blocks=starts.map((start,i)=>raw.slice(start,starts[i+1]??raw.length).trim()).filter(Boolean);}
@@ -908,8 +908,62 @@ function LessonsPage(){
   const [busy,setBusy]=useState(false);
   const [filterUnit,setFilterUnit]=useState('all');
   const [filterAccess,setFilterAccess]=useState('all');
-  const openNew=()=>{setForm({title:'',desc:'',summary:'',video:{type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true},pdf_url:'',duration:'',xp:'',sort_order:'',unit_id:'',published:true,key_points:[],examples:[],notes:''});setEditing('new');};
-  const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(!c.video)c.video={type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true};if(c.video.is_free===undefined)c.video.is_free=true;if(!c.key_points)c.key_points=[];if(!c.pdf_url)c.pdf_url='';setForm(c);setEditing(it.id);};
+  const [lessonTestText,setLessonTestText]=useState('');
+  const [lessonTestTitle,setLessonTestTitle]=useState('');
+  const [lessonTestDuration,setLessonTestDuration]=useState(15);
+  const [lessonTestPassScore,setLessonTestPassScore]=useState(50);
+  const [lessonTestXp,setLessonTestXp]=useState(10);
+  const [lessonTestFree,setLessonTestFree]=useState(true);
+  const [lessonTestBusy,setLessonTestBusy]=useState(false);
+  const openNew=()=>{setForm({title:'',desc:'',summary:'',video:{type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true},pdf_url:'',duration:'',xp:'',sort_order:'',unit_id:'',published:true,key_points:[],examples:[],notes:''});setLessonTestText('');setLessonTestTitle('');setLessonTestDuration(15);setLessonTestPassScore(50);setLessonTestXp(10);setLessonTestFree(true);setEditing('new');};
+  const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(!c.video)c.video={type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true};if(c.video.is_free===undefined)c.video.is_free=true;if(!c.key_points)c.key_points=[];if(!c.pdf_url)c.pdf_url='';setForm(c);setLessonTestText('');setLessonTestTitle(`اختبار ${c.title||'الدرس'}`);setLessonTestDuration(15);setLessonTestPassScore(50);setLessonTestXp(10);setLessonTestFree(true);setEditing(it.id);};
+  const parseLessonTestQuestion=(raw)=>{
+    const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+    const optionRegex=/^(?:[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]|[أبجدهـabcdABCD][)\.\-:：])\s*/u;
+    const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]/u.test(x));
+    const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
+    const optionLines=lines.filter(x=>optionRegex.test(x)&&!/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
+    if(optionLines.length<4||!answerLine)return null;
+    const cleanOption=x=>x.replace(optionRegex,'').replace(/[.。؛;]+$/u,'').trim();
+    const options=optionLines.slice(0,4).map(cleanOption);
+    const answerText=answerLine.replace(/^.*?(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]\s*/u,'').trim();
+    const answerEmoji=(answerText.match(/^[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]/u)||[])[0]||'';
+    const answerClean=cleanOption(answerText);
+    let correct=options.findIndex(o=>o&&(answerClean.includes(o)||o.includes(answerClean)));
+    if(correct<0&&answerEmoji){const target=optionLines.findIndex(x=>x.startsWith(answerEmoji));if(target>=0)correct=target;}
+    if(correct<0)return null;
+    const optionStart=lines.findIndex(x=>optionRegex.test(x));
+    const questionText=lines.slice(0,optionStart).filter(x=>!/^.*السؤال.*(?:🧪|[|｜\-–—:]).*$/u.test(x)).join('\n').trim();
+    if(!questionText)return null;
+    const explanation=explanationLine?explanationLine.replace(/^.*?(?:التعليل|الشرح|السبب)\s*[:：]\s*/u,'').trim():'';
+    return {text:questionText,options,correct,explanation};
+  };
+  const createTestForLesson=async()=>{
+    if(editing==='new'||!form.id)return app.toast.warn('احفظ الدرس أولًا، ثم افتحه للتعديل لإضافة الاختبار');
+    if(!lessonTestTitle.trim())return app.toast.warn('اكتب اسم الاختبار');
+    const raw=(lessonTestText||'').trim();if(!raw)return app.toast.warn('الصق الأسئلة كاملة أولًا');
+    const heading=/^(?=.*السؤال)(?=.*(?:🧪|[|｜:—–-]|\d)).*$/gmu;
+    const starts=[...raw.matchAll(heading)].map(m=>m.index);
+    const blocks=starts.length>1?starts.map((start,i)=>raw.slice(start,starts[i+1]??raw.length).trim()).filter(Boolean):[raw];
+    const parsed=blocks.map(parseLessonTestQuestion).filter(Boolean);
+    if(!parsed.length)return app.toast.warn('لم أتعرف على الأسئلة. تأكد أن كل سؤال يحتوي 4 اختيارات والإجابة الصحيحة والتعليل.');
+    const lesson=app.lesson(form.id)||form;const unit=app.unit(lesson.unit_id);const subjectId=unit?.subject_id||'';
+    if(!subjectId)return app.toast.warn('لازم يكون الدرس مرتبطًا بوحدة ومادة قبل إنشاء الاختبار');
+    setLessonTestBusy(true);
+    try{
+      const questionIds=[];
+      for(const q of parsed){
+        const id=DB.uid('q_');
+        await app.save('questions',{id,text:q.text,options:q.options,correct:[q.correct],explanation:q.explanation,lesson_id:lesson.id,unit_id:lesson.unit_id,subject_id:subjectId,difficulty:'medium',xp:Number(lessonTestXp)||0,type:'mcq'});
+        questionIds.push(id);
+      }
+      const exam={id:DB.uid('exam_'),title:lessonTestTitle.trim(),subject_id:subjectId,unit_id:lesson.unit_id,lesson_ids:[lesson.id],question_ids:questionIds,duration:Number(lessonTestDuration)||15,pass_score:Number(lessonTestPassScore)||0,max_attempts:0,xp:Number(lessonTestXp)||0,published:true,sort_order:0,is_free:lessonTestFree};
+      await app.save('exams',exam);
+      app.toast.ok(`تم إنشاء الاختبار وربطه بالدرس، بعدد ${questionIds.length} سؤال`);
+      setLessonTestText('');
+    }catch(e){app.toast.err('تعذر إنشاء الاختبار: '+(e.message||'حدث خطأ'));}
+    setLessonTestBusy(false);
+  };
   const save=async ()=>{
     if(!form.title) return app.toast.warn('العنوان مطلوب');
     if(!form.unit_id) return app.toast.warn('اختر الوحدة');
@@ -983,7 +1037,23 @@ function LessonsPage(){
       <Field label="ملخص الدرس" full><textarea className="input" value={form.summary||''} onChange={e=>setForm({...form,summary:e.target.value})}/></Field>
       <Field label="النقاط المهمة" full hint="سطر لكل نقطة"><textarea className="input" value={(form.key_points||[]).join('\n')} onChange={e=>setForm({...form,key_points:e.target.value.split('\n').filter(Boolean)})}/></Field>
       <Field label="ملاحظات" full><textarea className="input" value={form.notes||''} onChange={e=>setForm({...form,notes:e.target.value})}/></Field>
-      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
+      <div className="section-title"><span className="ico">📝</span> اختبار الدرس — يظهر بعد الدرس مباشرة</div>
+      {editing==='new'?<div className="glass-s" style={{padding:12,marginBottom:12}}><div className="sm">احفظ الدرس أولًا، ثم افتحه للتعديل وستجد هنا إضافة الاختبار مباشرة، من غير الدخول إلى بنك الأسئلة.</div></div>:<>
+        <div className="glass-s" style={{padding:12,marginBottom:12}}>
+          <div className="sm muted mb8">الاختبارات المرتبطة بهذا الدرس</div>
+          {(app.db.exams||[]).filter(e=>(e.lesson_ids||[]).includes(form.id)).length===0?<div className="sm muted">لا يوجد اختبار مرتبط بالدرس حتى الآن.</div>:(app.db.exams||[]).filter(e=>(e.lesson_ids||[]).includes(form.id)).map(e=><div key={e.id} className="flex between center mb6"><span>{e.title} · {(e.question_ids||[]).length} سؤال</span><span className="pill pill-g">مرتبط بالدرس</span></div>)}
+        </div>
+        <div className="grid g2">
+          <Field label="اسم الاختبار"><input className="input" value={lessonTestTitle} onChange={e=>setLessonTestTitle(e.target.value)} placeholder={`اختبار ${form.title||'الدرس'}`}/></Field>
+          <Field label="المدة بالدقائق"><input type="number" className="input" min="1" value={lessonTestDuration} onChange={e=>setLessonTestDuration(e.target.value===''?'':+e.target.value)}/></Field>
+          <Field label="درجة النجاح %"><input type="number" className="input" min="0" max="100" value={lessonTestPassScore} onChange={e=>setLessonTestPassScore(e.target.value===''?'':+e.target.value)}/></Field>
+          <Field label="XP لكل سؤال"><input type="number" className="input" min="0" value={lessonTestXp} onChange={e=>setLessonTestXp(e.target.value===''?'':+e.target.value)}/></Field>
+        </div>
+        <Field label="نوع الاختبار"><AccessToggle value={lessonTestFree} onChange={setLessonTestFree}/></Field>
+        <Field label="الصق مجموعة الأسئلة كاملة" hint="كل سؤال يبدأ بعنوان مثل: 🧪 السؤال الأول، ويحتوي على 4 اختيارات، وسطر الإجابة الصحيحة، والتعليل."><textarea className="input" rows="10" value={lessonTestText} onChange={e=>setLessonTestText(e.target.value)} placeholder="الصق كل الأسئلة هنا مرة واحدة..."/></Field>
+        <div className="flex g8 mb12"><button type="button" className="btn btn-p" onClick={createTestForLesson} disabled={lessonTestBusy} style={{flex:1}}>{lessonTestBusy?'جارٍ إنشاء الاختبار...':'⚡ إنشاء الاختبار وربطه بالدرس'}</button><button type="button" className="btn btn-s" onClick={()=>setLessonTestText('')}>مسح النص</button></div>
+      </>}
+      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ الدرس'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
     </Modal>}
   </>;
 }
@@ -1061,7 +1131,7 @@ function QuestionsPage(){
   const autoFillBulkFromText=()=>{
     const raw=(bulkPasteText||'').trim();
     if(!raw) return app.toast.warn('الصق مجموعة الأسئلة أولاً');
-    const heading=/^(?=.*السؤال\s*(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر|\d+)).*$/gmu;
+    const heading=/^(?=.*السؤال)(?=.*(?:🧪|[|｜:—–-]|\d)).*$/gmu;
     const starts=[...raw.matchAll(heading)].map(m=>m.index);
     let blocks=[];
     if(starts.length>1){blocks=starts.map((start,i)=>raw.slice(start,starts[i+1]??raw.length).trim()).filter(Boolean);}
@@ -1316,7 +1386,7 @@ function MissionsPage(){
   const autoFillBulkFromText=()=>{
     const raw=(bulkPasteText||'').trim();
     if(!raw) return app.toast.warn('الصق مجموعة الأسئلة أولاً');
-    const heading=/^(?=.*السؤال\s*(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر|\d+)).*$/gmu;
+    const heading=/^(?=.*السؤال)(?=.*(?:🧪|[|｜:—–-]|\d)).*$/gmu;
     const starts=[...raw.matchAll(heading)].map(m=>m.index);
     let blocks=[];
     if(starts.length>1){blocks=starts.map((start,i)=>raw.slice(start,starts[i+1]??raw.length).trim()).filter(Boolean);}
@@ -2157,7 +2227,7 @@ function AdminApp(){
   useEffect(()=>{if(tab === 'notifications'){try{ localStorage.setItem('admin_last_notif_seen', Date.now().toString()); }catch(e){}}},[tab]);
   const items=[
     {title:'الرئيسية',items:[{id:'dashboard',icon:'dashboard',label:'لوحة التحكم'},{id:'activity',icon:'activity',label:'سجل النشاط'},{id:'exam-results',icon:'clipboard',label:'نتايج الاختبارات'},{id:'errors',icon:'alert',label:'تحليل الأخطاء'}]},
-    {title:'المحتوى',items:[{id:'grades',icon:'school',label:'الصفوف'},{id:'subjects',icon:'book',label:'المواد'},{id:'units',icon:'folder',label:'الوحدات'},{id:'lessons',icon:'file',label:'الدروس'},{id:'questions',icon:'help',label:'بنك الأسئلة'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'missions',icon:'target',label:'المهام'}]},
+    {title:'المحتوى',items:[{id:'grades',icon:'school',label:'الصفوف'},{id:'subjects',icon:'book',label:'المواد'},{id:'units',icon:'folder',label:'الوحدات'},{id:'lessons',icon:'file',label:'الدروس'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'missions',icon:'target',label:'المهام'}]},
     {title:'التحفيز',items:[{id:'achievements',icon:'trophy',label:'الإنجازات'},{id:'levels',icon:'trend',label:'المستويات'},{id:'certificates',icon:'award',label:'الشهادات'}]},
     {title:'المستخدمون',items:[{id:'students',icon:'users',label:'الطلاب'},{id:'notes',icon:'note',label:'ملاحظات الطلاب'},{id:'notifications',icon:'bell',label:'الإشعارات',badge:unreadNotifs||null},{id:'reports',icon:'link',label:'البلاغات'}]},
     {title:'النمو',items:[{id:'coupons',icon:'coupon',label:'الكوبونات'},{id:'referrals',icon:'share',label:'الإحالات'},{id:'polls',icon:'activity',label:'الاستطلاعات'}]},
