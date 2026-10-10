@@ -427,259 +427,6 @@ function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick,theme
     </div>
   </div>;
 }
-function ExamResultsPage(){
-const app=useApp();
-const [loading,setLoading]=useState(true);
-const [attempts,setAttempts]=useState([]);
-const [filterExam,setFilterExam]=useState('all');
-const [filterStudent,setFilterStudent]=useState('all');
-const [filterStatus,setFilterStatus]=useState('all');
-const [sortBy,setSortBy]=useState('recent');
-const [q,setQ]=useState('');
-
-const loadData = useCallback(async ()=>{
-try{
-const sb = await DB.getClient();
-const { data, error } = await sb.from('exam_attempts').select('*').order('at',{ascending:false}).limit(2000);
-if(error) throw error;
-setAttempts(data||[]);
-}catch(e){console.warn('Load attempts error:', e);}
-setLoading(false);
-},[]);
-
-useEffect(()=>{ loadData(); },[loadData]);
-
-const enriched = useMemo(()=>{
-return attempts.map(a=>{
-const student = app.db.users.find(u=>u.id===a.user_id);
-const exam = app.db.exams.find(e=>e.id===a.exam_id);
-return {
-...a,
-student,
-exam,
-studentName: student?.name || 'طالب محذوف',
-examTitle: exam?.title || 'اختبار محذوف',
-atMs: Number(a.at) || 0,
-startedAtMs: Number(a.started_at) || 0,
-durationSec: Number(a.duration_seconds) || 0,
-correctCount: Number(a.score) || 0,
-wrongCount: (Number(a.total)||0) - (Number(a.score)||0)
-};
-});
-},[attempts, app.db.users, app.db.exams]);
-
-const filtered = useMemo(()=>{
-let list = [...enriched];
-if(filterExam !== 'all') list = list.filter(x=>x.exam_id === filterExam);
-if(filterStudent !== 'all') list = list.filter(x=>x.user_id === filterStudent);
-if(filterStatus !== 'all'){
-if(filterStatus === 'passed') list = list.filter(x=>x.passed);
-else if(filterStatus === 'failed') list = list.filter(x=>!x.passed);
-}
-if(q.trim()){
-const lc = q.toLowerCase();
-list = list.filter(x=> x.studentName.toLowerCase().includes(lc) || x.examTitle.toLowerCase().includes(lc));
-}
-if(sortBy === 'recent') list.sort((a,b)=>b.atMs - a.atMs);
-else if(sortBy === 'oldest') list.sort((a,b)=>a.atMs - b.atMs);
-else if(sortBy === 'highest') list.sort((a,b)=>b.pct - a.pct);
-else if(sortBy === 'lowest') list.sort((a,b)=>a.pct - b.pct);
-else if(sortBy === 'fastest') list.sort((a,b)=>a.durationSec - b.durationSec);
-else if(sortBy === 'slowest') list.sort((a,b)=>b.durationSec - a.durationSec);
-return list;
-},[enriched, filterExam, filterStudent, filterStatus, sortBy, q]);
-
-const stats = useMemo(()=>{
-const total = enriched.length;
-const passed = enriched.filter(x=>x.passed).length;
-const failed = total - passed;
-const avgPct = total ? Math.round(enriched.reduce((s,x)=>s+(x.pct||0),0)/total) : 0;
-const avgDuration = total ? Math.round(enriched.reduce((s,x)=>s+(x.durationSec||0),0)/total) : 0;
-const uniqueStudents = new Set(enriched.map(x=>x.user_id)).size;
-return { total, passed, failed, avgPct, avgDuration, uniqueStudents };
-},[enriched]);
-
-const uniqueExams = useMemo(()=>{
-const ids = [...new Set(enriched.map(x=>x.exam_id))];
-return ids.map(id=>({id, title: enriched.find(x=>x.exam_id===id)?.examTitle || 'اختبار'})).sort((a,b)=>a.title.localeCompare(b.title,'ar'));
-},[enriched]);
-
-const uniqueStudents = useMemo(()=>{
-const ids = [...new Set(enriched.map(x=>x.user_id))];
-return ids.map(id=>({id, name: enriched.find(x=>x.user_id===id)?.studentName || 'طالب'})).sort((a,b)=>a.name.localeCompare(b.name,'ar'));
-},[enriched]);
-
-const formatDuration = (sec)=>{
-if(!sec || sec <= 0) return '—';
-if(sec < 60) return `${sec} ثانية`;
-const m = Math.floor(sec/60);
-const s = sec % 60;
-return s > 0 ? `${m}د ${s}ث` : `${m} دقيقة`;
-};
-
-const exportCSV = ()=>{
-const headers = ['الطالب','الاختبار','التاريخ والوقت','المدة','النتيجة','نسبة النجاح','عدد الأسئلة','صحيح','خطأ','الحالة'];
-const rows = filtered.map(x=>[
-x.studentName,
-x.examTitle,
-x.atMs ? new Date(x.atMs).toLocaleString('ar-EG') : '—',
-formatDuration(x.durationSec),
-`${x.score}/${x.total}`,
-`${x.pct}%`,
-x.total,
-x.correctCount,
-x.wrongCount,
-x.passed ? 'ناجح' : 'راسب'
-]);
-const csv = [headers, ...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
-const url = URL.createObjectURL(blob);
-const a = document.createElement('a');
-a.href = url;
-a.download = `exam_results_${new Date().toISOString().slice(0,10)}.csv`;
-a.click();
-URL.revokeObjectURL(url);
-app.toast.ok('تم تصدير النتائج');
-};
-
-return <>
-<div className="flex between center mb16 wrap g8">
-<div>
-<div className="h2 grad">📊 نتايج الاختبارات</div>
-<div className="sm muted mt6">متابعة كل محاولات الطلاب بالتفصيل</div>
-</div>
-<div className="flex g8">
-<button className="btn btn-s" onClick={loadData}>🔄 تحديث</button>
-<button className="btn btn-p" onClick={exportCSV} disabled={filtered.length===0}>
-<Icon name="download" size={14}/> تصدير CSV
-</button>
-</div>
-</div>
-
-<div className="grid g4 mb16">
-<Stat label="إجمالي المحاولات" value={DB.fmt(stats.total)} icon="clipboard" color="#FFD700"/>
-<Stat label="طلاب شاركوا" value={DB.fmt(stats.uniqueStudents)} icon="users" color="#5aa9ff"/>
-<Stat label="ناجحون" value={DB.fmt(stats.passed)} icon="check" color="#22c55e" sub={`${stats.total ? Math.round((stats.passed/stats.total)*100) : 0}%`}/>
-<Stat label="راسبون" value={DB.fmt(stats.failed)} icon="close" color="#ef4444" sub={`${stats.total ? Math.round((stats.failed/stats.total)*100) : 0}%`}/>
-</div>
-
-<div className="grid g2 mb16">
-<Stat label="متوسط النسبة" value={`${stats.avgPct}%`} icon="trend" color="#8b5cf6"/>
-<Stat label="متوسط وقت الإجابة" value={formatDuration(stats.avgDuration)} icon="clock" color="#f59e0b"/>
-</div>
-
-<div className="glass mb16" style={{padding:14}}>
-<div className="grid g4" style={{gap:10}}>
-<div>
-<label className="lbl">الاختبار</label>
-<select className="input" value={filterExam} onChange={e=>setFilterExam(e.target.value)}>
-<option value="all">كل الاختبارات ({uniqueExams.length})</option>
-{uniqueExams.map(e=><option key={e.id} value={e.id}>{e.title}</option>)}
-</select>
-</div>
-<div>
-<label className="lbl">الطالب</label>
-<select className="input" value={filterStudent} onChange={e=>setFilterStudent(e.target.value)}>
-<option value="all">كل الطلاب ({uniqueStudents.length})</option>
-{uniqueStudents.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
-</select>
-</div>
-<div>
-<label className="lbl">الحالة</label>
-<select className="input" value={filterStatus} onChange={e=>setFilterStatus(e.target.value)}>
-<option value="all">الكل</option>
-<option value="passed">✓ ناجح فقط</option>
-<option value="failed">✗ راسب فقط</option>
-</select>
-</div>
-<div>
-<label className="lbl">الترتيب حسب</label>
-<select className="input" value={sortBy} onChange={e=>setSortBy(e.target.value)}>
-<option value="recent">الأحدث أولاً</option>
-<option value="oldest">الأقدم أولاً</option>
-<option value="highest">أعلى نسبة</option>
-<option value="lowest">أقل نسبة</option>
-<option value="fastest">أسرع وقت</option>
-<option value="slowest">أطول وقت</option>
-</select>
-</div>
-</div>
-<div className="mt12">
-<input className="input" placeholder="🔍 ابحث باسم الطالب أو الاختبار..." value={q} onChange={e=>setQ(e.target.value)}/>
-</div>
-</div>
-
-<div className="glass" style={{padding:14}}>
-{loading ? (
-<div style={{textAlign:'center',padding:40}}>
-<div className="spinner" style={{margin:'0 auto 14px'}}></div>
-جارٍ تحميل النتائج...
-</div>
-) : filtered.length === 0 ? (
-<Empty icon="📊" title="لا توجد نتائج" desc="مفيش محاولات اختبار مطابقة للفلاتر الحالية"/>
-) : (
-<>
-<div className="flex between center mb12 wrap g8">
-<span className="pill pill-b">{filtered.length} نتيجة</span>
-</div>
-<div className="sx">
-<table className="tbl">
-<thead>
-<tr>
-<th>الطالب</th>
-<th>الاختبار</th>
-<th>التاريخ والوقت</th>
-<th>المدة</th>
-<th>النتيجة</th>
-<th>صحيح</th>
-<th>خطأ</th>
-<th>النسبة</th>
-<th>الحالة</th>
-</tr>
-</thead>
-<tbody>
-{filtered.map((x,i)=>(
-<tr key={x.id}>
-<td>
-<div className="flex center g8">
-<div className="avatar" style={{width:28,height:28,fontSize:12}}>{x.student?.avatar||'👤'}</div>
-<div>
-<div className="sm" style={{fontWeight:700}}>{x.studentName}</div>
-{x.student?.phone && <div className="xs muted" dir="ltr">{(x.student.country_code||'+20')}{x.student.phone}</div>}
-</div>
-</div>
-</td>
-<td className="sm">{x.examTitle}</td>
-<td>
-<div className="sm">{x.atMs ? new Date(x.atMs).toLocaleDateString('ar-EG',{day:'numeric',month:'short',year:'numeric'}) : '—'}</div>
-<div className="xs muted">{x.atMs ? new Date(x.atMs).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit',hour12:true}) : ''}</div>
-</td>
-<td>
-<div className="sm" style={{fontWeight:700,color:'#f59e0b'}}>{formatDuration(x.durationSec)}</div>
-</td>
-<td><span className="pill pill-y" style={{fontFamily:'monospace'}}>{x.score}/{x.total}</span></td>
-<td><span className="pill pill-g" style={{fontWeight:800}}>{x.correctCount}</span></td>
-<td><span className="pill pill-r" style={{fontWeight:800}}>{x.wrongCount}</span></td>
-<td>
-<div className="flex center g6">
-<span className="sm" style={{fontWeight:800,color:x.passed?'#22c55e':'#ef4444',minWidth:42}}>{x.pct}%</span>
-<div style={{flex:1,minWidth:60,height:6,background:'rgba(255,255,255,.06)',borderRadius:20,overflow:'hidden'}}>
-<div style={{width:`${x.pct}%`,height:'100%',background:x.passed?'linear-gradient(90deg,#16a34a,#4ade80)':'linear-gradient(90deg,#dc2626,#f87171)',borderRadius:20}}/>
-</div>
-</div>
-</td>
-<td>{x.passed ? <span className="pill pill-g">✓ ناجح</span> : <span className="pill pill-r">✗ راسب</span>}</td>
-</tr>
-))}
-</tbody>
-</table>
-</div>
-</>
-)}
-</div>
-</>;
-}
-
 function Dashboard(){
   const app=useApp();
   const students=app.db.users.filter(u=>u.role==='student');
@@ -829,6 +576,131 @@ function ActivityLog(){
     </div>
   </>;
 }
+function ExamResultsPage(){
+  const app=useApp();
+  const [loading,setLoading]=useState(true);
+  const [attempts,setAttempts]=useState([]);
+  const [filterExam,setFilterExam]=useState('all');
+  const [filterStudent,setFilterStudent]=useState('all');
+  const [filterStatus,setFilterStatus]=useState('all');
+  const [sortBy,setSortBy]=useState('recent');
+  const [q,setQ]=useState('');
+  const loadData = useCallback(async ()=>{
+    try{
+      const sb = await DB.getClient();
+      const { data, error } = await sb.from('exam_attempts').select('*').order('at',{ascending:false}).limit(2000);
+      if(error) throw error;
+      setAttempts(data||[]);
+    }catch(e){console.warn('Load attempts error:', e);}
+    setLoading(false);
+  },[]);
+  useEffect(()=>{ loadData(); },[loadData]);
+  const enriched = useMemo(()=>{
+    return attempts.map(a=>{
+      const student = app.db.users.find(u=>u.id===a.user_id);
+      const exam = app.db.exams.find(e=>e.id===a.exam_id);
+      return {...a,student,exam,studentName: student?.name || 'طالب محذوف',examTitle: exam?.title || 'اختبار محذوف',atMs: Number(a.at) || 0,startedAtMs: Number(a.started_at) || 0,durationSec: Number(a.duration_seconds) || 0,correctCount: Number(a.score) || 0,wrongCount: (Number(a.total)||0) - (Number(a.score)||0)};
+    });
+  },[attempts, app.db.users, app.db.exams]);
+  const filtered = useMemo(()=>{
+    let list = [...enriched];
+    if(filterExam !== 'all') list = list.filter(x=>x.exam_id === filterExam);
+    if(filterStudent !== 'all') list = list.filter(x=>x.user_id === filterStudent);
+    if(filterStatus !== 'all'){
+      if(filterStatus === 'passed') list = list.filter(x=>x.passed);
+      else if(filterStatus === 'failed') list = list.filter(x=>!x.passed);
+    }
+    if(q.trim()){
+      const lc = q.toLowerCase();
+      list = list.filter(x=> x.studentName.toLowerCase().includes(lc) || x.examTitle.toLowerCase().includes(lc));
+    }
+    if(sortBy === 'recent') list.sort((a,b)=>b.atMs - a.atMs);
+    else if(sortBy === 'oldest') list.sort((a,b)=>a.atMs - b.atMs);
+    else if(sortBy === 'highest') list.sort((a,b)=>b.pct - a.pct);
+    else if(sortBy === 'lowest') list.sort((a,b)=>a.pct - b.pct);
+    else if(sortBy === 'fastest') list.sort((a,b)=>a.durationSec - b.durationSec);
+    else if(sortBy === 'slowest') list.sort((a,b)=>b.durationSec - a.durationSec);
+    return list;
+  },[enriched, filterExam, filterStudent, filterStatus, sortBy, q]);
+  const stats = useMemo(()=>{
+    const total = enriched.length;
+    const passed = enriched.filter(x=>x.passed).length;
+    const failed = total - passed;
+    const avgPct = total ? Math.round(enriched.reduce((s,x)=>s+(x.pct||0),0)/total) : 0;
+    const avgDuration = total ? Math.round(enriched.reduce((s,x)=>s+(x.durationSec||0),0)/total) : 0;
+    const uniqueStudents = new Set(enriched.map(x=>x.user_id)).size;
+    return { total, passed, failed, avgPct, avgDuration, uniqueStudents };
+  },[enriched]);
+  const uniqueExams = useMemo(()=>{const ids = [...new Set(enriched.map(x=>x.exam_id))];return ids.map(id=>({id, title: enriched.find(x=>x.exam_id===id)?.examTitle || 'اختبار'})).sort((a,b)=>a.title.localeCompare(b.title,'ar'));},[enriched]);
+  const uniqueStudents = useMemo(()=>{const ids = [...new Set(enriched.map(x=>x.user_id))];return ids.map(id=>({id, name: enriched.find(x=>x.user_id===id)?.studentName || 'طالب'})).sort((a,b)=>a.name.localeCompare(b.name,'ar'));},[enriched]);
+  const formatDuration = (sec)=>{if(!sec || sec <= 0) return '—';if(sec < 60) return `${sec} ثانية`;const m = Math.floor(sec/60);const s = sec % 60;return s > 0 ? `${m}د ${s}ث` : `${m} دقيقة`;};
+  const exportCSV = ()=>{
+    const headers = ['الطالب','الاختبار','التاريخ والوقت','المدة','النتيجة','نسبة النجاح','عدد الأسئلة','صحيح','خطأ','الحالة'];
+    const rows = filtered.map(x=>[x.studentName,x.examTitle,x.atMs ? new Date(x.atMs).toLocaleString('ar-EG') : '—',formatDuration(x.durationSec),`${x.score}/${x.total}`,`${x.pct}%`,x.total,x.correctCount,x.wrongCount,x.passed ? 'ناجح' : 'راسب']);
+    const csv = [headers, ...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `exam_results_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    app.toast.ok('تم تصدير النتائج');
+  };
+  return <>
+    <div className="flex between center mb16 wrap g8">
+      <div><div className="h2 grad">📊 نتايج الاختبارات</div><div className="sm muted mt6">متابعة كل محاولات الطلاب بالتفصيل</div></div>
+      <div className="flex g8">
+        <button className="btn btn-s" onClick={loadData}>🔄 تحديث</button>
+        <button className="btn btn-p" onClick={exportCSV} disabled={filtered.length===0}><Icon name="download" size={14}/> تصدير CSV</button>
+      </div>
+    </div>
+    <div className="grid g4 mb16">
+      <Stat label="إجمالي المحاولات" value={DB.fmt(stats.total)} icon="clipboard" color="#FFD700"/>
+      <Stat label="طلاب شاركوا" value={DB.fmt(stats.uniqueStudents)} icon="users" color="#5aa9ff"/>
+      <Stat label="ناجحون" value={DB.fmt(stats.passed)} icon="check" color="#22c55e" sub={`${stats.total ? Math.round((stats.passed/stats.total)*100) : 0}%`}/>
+      <Stat label="راسبون" value={DB.fmt(stats.failed)} icon="close" color="#ef4444" sub={`${stats.total ? Math.round((stats.failed/stats.total)*100) : 0}%`}/>
+    </div>
+    <div className="grid g2 mb16">
+      <Stat label="متوسط النسبة" value={`${stats.avgPct}%`} icon="trend" color="#8b5cf6"/>
+      <Stat label="متوسط وقت الإجابة" value={formatDuration(stats.avgDuration)} icon="clock" color="#f59e0b"/>
+    </div>
+    <div className="glass mb16" style={{padding:14}}>
+      <div className="grid g4" style={{gap:10}}>
+        <div><label className="lbl">الاختبار</label><select className="input" value={filterExam} onChange={e=>setFilterExam(e.target.value)}><option value="all">كل الاختبارات ({uniqueExams.length})</option>{uniqueExams.map(e=><option key={e.id} value={e.id}>{e.title}</option>)}</select></div>
+        <div><label className="lbl">الطالب</label><select className="input" value={filterStudent} onChange={e=>setFilterStudent(e.target.value)}><option value="all">كل الطلاب ({uniqueStudents.length})</option>{uniqueStudents.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></div>
+        <div><label className="lbl">الحالة</label><select className="input" value={filterStatus} onChange={e=>setFilterStatus(e.target.value)}><option value="all">الكل</option><option value="passed">✓ ناجح فقط</option><option value="failed">✗ راسب فقط</option></select></div>
+        <div><label className="lbl">الترتيب حسب</label><select className="input" value={sortBy} onChange={e=>setSortBy(e.target.value)}><option value="recent">الأحدث أولاً</option><option value="oldest">الأقدم أولاً</option><option value="highest">أعلى نسبة</option><option value="lowest">أقل نسبة</option><option value="fastest">أسرع وقت</option><option value="slowest">أطول وقت</option></select></div>
+      </div>
+      <div className="mt12"><input className="input" placeholder="🔍 ابحث باسم الطالب أو الاختبار..." value={q} onChange={e=>setQ(e.target.value)}/></div>
+    </div>
+    <div className="glass" style={{padding:14}}>
+      {loading ? (<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div>جارٍ تحميل النتائج...</div>) : filtered.length === 0 ? (<Empty icon="📊" title="لا توجد نتائج" desc="مفيش محاولات اختبار مطابقة للفلاتر الحالية"/>) : (
+        <>
+          <div className="flex between center mb12 wrap g8"><span className="pill pill-b">{filtered.length} نتيجة</span></div>
+          <div className="sx">
+            <table className="tbl">
+              <thead><tr><th>الطالب</th><th>الاختبار</th><th>التاريخ والوقت</th><th>المدة</th><th>النتيجة</th><th>صحيح</th><th>خطأ</th><th>النسبة</th><th>الحالة</th></tr></thead>
+              <tbody>
+                {filtered.map((x,i)=>(<tr key={x.id}>
+                  <td><div className="flex center g8"><div className="avatar" style={{width:28,height:28,fontSize:12}}>{x.student?.avatar||'👤'}</div><div><div className="sm" style={{fontWeight:700}}>{x.studentName}</div>{x.student?.phone && <div className="xs muted" dir="ltr">{(x.student.country_code||'+20')}{x.student.phone}</div>}</div></div></td>
+                  <td className="sm">{x.examTitle}</td>
+                  <td><div className="sm">{x.atMs ? new Date(x.atMs).toLocaleDateString('ar-EG',{day:'numeric',month:'short',year:'numeric'}) : '—'}</div><div className="xs muted">{x.atMs ? new Date(x.atMs).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit',hour12:true}) : ''}</div></td>
+                  <td><div className="sm" style={{fontWeight:700,color:'#f59e0b'}}>{formatDuration(x.durationSec)}</div></td>
+                  <td><span className="pill pill-y" style={{fontFamily:'monospace'}}>{x.score}/{x.total}</span></td>
+                  <td><span className="pill pill-g" style={{fontWeight:800}}>{x.correctCount}</span></td>
+                  <td><span className="pill pill-r" style={{fontWeight:800}}>{x.wrongCount}</span></td>
+                  <td><div className="flex center g6"><span className="sm" style={{fontWeight:800,color:x.passed?'#22c55e':'#ef4444',minWidth:42}}>{x.pct}%</span><div style={{flex:1,minWidth:60,height:6,background:'rgba(255,255,255,.06)',borderRadius:20,overflow:'hidden'}}><div style={{width:`${x.pct}%`,height:'100%',background:x.passed?'linear-gradient(90deg,#16a34a,#4ade80)':'linear-gradient(90deg,#dc2626,#f87171)',borderRadius:20}}/></div></div></td>
+                  <td>{x.passed ? <span className="pill pill-g">✓ ناجح</span> : <span className="pill pill-r">✗ راسب</span>}</td>
+                </tr>))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+    </div>
+  </>;
+}
 function Crud({title,collection,defaultItem,fields,columns}){
   const app=useApp();
   const [editing,setEditing]=useState(null);
@@ -836,47 +708,6 @@ function Crud({title,collection,defaultItem,fields,columns}){
   const [busy,setBusy]=useState(false);
   const items=[...(app.db[collection]||[])].sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
   const openNew=()=>{setForm(defaultItem());setEditing('new');};
-  const parseQuestionBlock=(raw)=>{
-    const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد](?:[)\.\-:：]\s*|\s+))|(?:[🔵🟢🟡🔴🟣🟠⚫⚪]\s*))/u;
-    const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]/u.test(x));
-    const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
-    const optionLines=lines.filter(x=>optionRegex.test(x) && !/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
-    if(optionLines.length<2 || !answerLine) return null;
-    const cleanOption=x=>x.replace(optionRegex,'').replace(/[.。؛;]+$/u,'').trim();
-    const options=optionLines.slice(0,4).map(cleanOption);
-    while(options.length<4) options.push('');
-    const answerText=answerLine.replace(/^.*?(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]\s*/u,'').replace(/[.。]+$/u,'').trim();
-    const answerClean=cleanOption(answerText).replace(/^[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🅲🅳🔹🔸▪️•\s]+/u,'').trim();
-    const normalizeAnswer=value=>String(value||'').normalize('NFKC').toLowerCase().replace(/[\u064B-\u065F\u0670]/g,'').replace(/[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🅲🅳🔹🔸▪️•]/gu,'').replace(/^[\s]*(?:[a-dأبجد])[)\.\-:：]\s*/u,'').replace(/[\s.,،؛;:：()\[\]{}\-–—]+/g,'').trim();
-    const answerKey=normalizeAnswer(answerClean);
-    const answerLetterMatch=answerText.trim().match(/^(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد])[)\.\-:：]?$/u);
-    const letterToken=answerLetterMatch?answerText.trim().replace(/[)\.\-:：]/g,'').toLowerCase():'';
-    const letterIndex=({'🅰️':0,'🅱️':1,'🅲':2,'🅳':3,'a':0,'b':1,'c':2,'d':3,'أ':0,'ب':1,'ج':2,'د':3})[letterToken]??-1;
-    let correct=options.findIndex(o=>normalizeAnswer(o) && answerKey && normalizeAnswer(o)===answerKey);
-    if(correct<0 && answerKey) correct=options.findIndex(o=>{const k=normalizeAnswer(o);return k && (k.includes(answerKey)||answerKey.includes(k));});
-    if(correct<0 && letterIndex>=0 && letterIndex<optionLines.length) correct=letterIndex;
-    if(correct<0) return null;
-    const optionStart=lines.findIndex(x=>optionRegex.test(x));
-    const titlePattern=/^\s*(?:🧪\s*)?السؤال\s*(?:(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر)|(?:رقم\s*)?[٠-٩0-9]+)\s*[:：|｜\-–—.]?\s*$/u;
-    const questionText=lines.slice(0,optionStart).map((x,i)=>i===0?stripQuestionHeading(x):x).filter(x=>!titlePattern.test(x)).join('\n').trim();
-    if(!questionText) return null;
-    const explanation=explanationLine?explanationLine.replace(/^.*?(?:التعليل|الشرح|السبب)\s*[:：]\s*/u,'').trim():'';
-    return {text:questionText,options,correct,explanation};
-  };
-  const autoFillBulkFromText=()=>{
-    const raw=(bulkPasteText||'').trim();
-    if(!raw) return app.toast.warn('الصق مجموعة الأسئلة أولاً');
-    const heading=/^(?=.*السؤال)(?=.*(?:🧪|[|｜:—–-]|\d)).*$/gmu;
-    const starts=[...raw.matchAll(heading)].map(m=>m.index);
-    let blocks=[];
-    if(starts.length>1){blocks=starts.map((start,i)=>raw.slice(start,starts[i+1]??raw.length).trim()).filter(Boolean);}
-    else blocks=[raw];
-    const parsed=blocks.map(parseQuestionBlock).filter(Boolean);
-    if(!parsed.length) return app.toast.warn('ملقتش أسئلة مكتملة. تأكد إن كل سؤال فيه اختيارات وسطر الإجابة الصحيحة.');
-    setBulkForm(f=>({...f,questions:parsed}));
-    app.toast.ok(`✅ تم تجهيز ${parsed.length} سؤال. راجعهم قبل الحفظ`);
-  };
   const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
   const save=async ()=>{setBusy(true);try{await app.save(collection,form);app.toast.ok(editing==='new'?'تمت الإضافة':'تم الحفظ');setEditing(null);}catch(e){app.toast.err(e.message);}setBusy(false);};
   const del=async id=>{const r=await Swal.fire({title:'تأكيد الحذف',text:'سيتم حذف هذا العنصر نهائيًا',icon:'warning',showCancelButton:true,confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed) return;try{await app.remove(collection,id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
@@ -920,6 +751,8 @@ function LessonsPage(){
   const [lessonTestFree,setLessonTestFree]=useState(true);
   const [lessonTestBusy,setLessonTestBusy]=useState(false);
   const [previewQs,setPreviewQs]=useState(null);
+  const [editQ,setEditQ]=useState(null);
+  const [editQBusy,setEditQBusy]=useState(false);
   const openNew=()=>{setForm({title:'',desc:'',summary:'',video:{type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true},pdf_url:'',duration:'',xp:'',sort_order:'',unit_id:'',published:true,key_points:[],examples:[],notes:''});setLessonTestText('');setLessonTestTitle('');setLessonTestDuration(15);setLessonTestPassScore(50);setLessonTestXp(10);setLessonTestFree(true);setEditing('new');};
   const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(!c.video)c.video={type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true};if(c.video.is_free===undefined)c.video.is_free=true;if(!c.key_points)c.key_points=[];if(!c.pdf_url)c.pdf_url='';setForm(c);setLessonTestText('');setLessonTestTitle(`اختبار ${c.title||'الدرس'}`);setLessonTestDuration(15);setLessonTestPassScore(50);setLessonTestXp(10);setLessonTestFree(true);setEditing(it.id);};
   const parseLessonTestQuestion=(raw)=>{
@@ -981,6 +814,30 @@ function LessonsPage(){
   };
   const getLessonQuestions=(lessonId)=>app.db.questions.filter(q=>q.lesson_id===lessonId);
   const getLessonExams=(lessonId)=>app.db.exams.filter(e=>(e.lesson_ids||[]).includes(lessonId));
+  const saveEditedQuestion=async()=>{
+    if(!editQ) return;
+    if(!editQ.text||!editQ.text.trim()) return app.toast.warn('نص السؤال مطلوب');
+    if(!editQ.options||editQ.options.filter(o=>o&&o.trim()).length < 2) return app.toast.warn('لازم خيارين على الأقل');
+    setEditQBusy(true);
+    try{
+      await app.save('questions',{
+        id: editQ.id,
+        text: editQ.text.trim(),
+        options: (editQ.options||[]).map(o=>(o||'').trim()),
+        correct: [editQ.correct],
+        explanation: (editQ.explanation||'').trim(),
+        lesson_id: editQ.lesson_id,
+        unit_id: editQ.unit_id,
+        subject_id: editQ.subject_id,
+        difficulty: editQ.difficulty||'medium',
+        xp: Number(editQ.xp)||0,
+        type: 'mcq'
+      });
+      app.toast.ok('تم حفظ تعديل السؤال');
+      setEditQ(null);
+    }catch(e){app.toast.err(e.message||'فشل الحفظ');}
+    setEditQBusy(false);
+  };
   const deleteLessonQuestion=async(qId)=>{
     const r=await Swal.fire({title:'حذف السؤال؟',text:'هيتشال من الدرس نهائيًا',icon:'warning',showCancelButton:true,confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
     if(!r.isConfirmed)return;
@@ -1111,7 +968,7 @@ function LessonsPage(){
             </div>
           ))}
         </div>)}
-        {currentLessonQuestions.length>0 && (<div className="glass-s" style={{padding:14,marginBottom:12,maxHeight:280,overflowY:'auto'}}>
+        {currentLessonQuestions.length>0 && (<div className="glass-s" style={{padding:14,marginBottom:12,maxHeight:340,overflowY:'auto'}}>
           <div className="flex between center mb12">
             <div className="sm" style={{fontWeight:800,color:'#FFD700'}}>❓ الأسئلة الحالية ({currentLessonQuestions.length})</div>
           </div>
@@ -1120,9 +977,14 @@ function LessonsPage(){
               <div className="flex between center mb6" style={{gap:8}}>
                 <span className="pill pill-b" style={{fontSize:10,flexShrink:0}}>س {idx+1}</span>
                 <div className="sm" style={{flex:1,fontWeight:600,lineHeight:1.5}}>{q.text.length>100?q.text.slice(0,100)+'...':q.text}</div>
-                <button className="btn btn-dn btn-sm" onClick={()=>deleteLessonQuestion(q.id)} style={{flexShrink:0}}>
-                  <Icon name="trash" size={11}/>
-                </button>
+                <div className="flex g6" style={{flexShrink:0}}>
+                  <button className="btn btn-s btn-sm" onClick={()=>setEditQ(JSON.parse(JSON.stringify(q)))} title="تعديل السؤال">
+                    <Icon name="edit" size={11}/>
+                  </button>
+                  <button className="btn btn-dn btn-sm" onClick={()=>deleteLessonQuestion(q.id)} title="حذف السؤال">
+                    <Icon name="trash" size={11}/>
+                  </button>
+                </div>
               </div>
               <div className="xs muted" style={{paddingInlineStart:34}}>✅ الإجابة: {(q.options||[])[q.correct?.[0]||0]}</div>
             </div>
@@ -1144,6 +1006,47 @@ function LessonsPage(){
       </>}
       <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ الدرس'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
     </Modal>}
+    {editQ && (
+      <Modal title="✏️ تعديل السؤال" onClose={()=>setEditQ(null)} wide>
+        <div className="glass-s mb12" style={{padding:12}}>
+          <div className="sm" style={{color:'#FFD700',fontWeight:800}}>عدّل السؤال أو الخيارات أو الإجابة، ثم اضغط حفظ</div>
+        </div>
+        <Field label="نص السؤال">
+          <textarea className="input" rows="3" value={editQ.text||''} onChange={e=>setEditQ({...editQ,text:e.target.value})}/>
+        </Field>
+        <Field label="الخيارات — اضغط على الحرف لتحديد الإجابة الصحيحة">
+          {(editQ.options||['','','','']).map((op,oi)=>(
+            <div key={oi} className="flex g8 mb6 center">
+              <button type="button" className={`btn btn-sm ${editQ.correct===oi?'btn-ok':'btn-s'}`} onClick={()=>setEditQ({...editQ,correct:oi})} style={{minWidth:44}}>
+                {['أ','ب','ج','د'][oi]}
+              </button>
+              <input className="input" value={op} onChange={e=>{const opts=[...(editQ.options||['','','',''])];opts[oi]=e.target.value;setEditQ({...editQ,options:opts});}} placeholder={`الخيار ${['أ','ب','ج','د'][oi]}`}/>
+            </div>
+          ))}
+        </Field>
+        <Field label="شرح الإجابة (اختياري)">
+          <textarea className="input" rows="2" value={editQ.explanation||''} onChange={e=>setEditQ({...editQ,explanation:e.target.value})} placeholder="اشرح سبب الإجابة الصحيحة..."/>
+        </Field>
+        <div className="grid g2">
+          <Field label="الصعوبة">
+            <select className="input" value={editQ.difficulty||'medium'} onChange={e=>setEditQ({...editQ,difficulty:e.target.value})}>
+              <option value="easy">سهل</option>
+              <option value="medium">متوسط</option>
+              <option value="hard">صعب</option>
+            </select>
+          </Field>
+          <Field label="XP">
+            <input type="number" className="input" value={editQ.xp ?? ''} onChange={e=>setEditQ({...editQ,xp: e.target.value==='' ? '' : +e.target.value})}/>
+          </Field>
+        </div>
+        <div className="flex g8 mt16">
+          <button className="btn btn-p" onClick={saveEditedQuestion} disabled={editQBusy} style={{flex:1}}>
+            {editQBusy?'جارٍ الحفظ...':'💾 حفظ التعديلات'}
+          </button>
+          <button className="btn btn-s" onClick={()=>setEditQ(null)}>إلغاء</button>
+        </div>
+      </Modal>
+    )}
     {previewQs && (<Modal title={`👁️ معاينة الأسئلة (${previewQs.length})`} onClose={()=>setPreviewQs(null)} wide>
       <div className="glass-s mb12" style={{padding:12}}>
         <div className="sm" style={{color:'#FFD700',fontWeight:800}}>راجع الأسئلة دي قبل ما تحفظها للاختبار</div>
@@ -1254,44 +1157,6 @@ function MissionsPage(){
   const [form,setForm]=useState({});
   const [busy,setBusy]=useState(false);
   const openNew=()=>{setForm({title:'',desc:'',subject_id:'',required_lessons:[],required_exam_id:'',xp:'',sort_order:''});setEditing('new');};
-  const parseQuestionBlock=(raw)=>{
-    const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد](?:[)\.\-:：]\s*|\s+))|(?:[🔵🟢🟡🔴🟣🟠⚫⚪]\s*))/u;
-    const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]/u.test(x));
-    const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
-    const optionLines=lines.filter(x=>optionRegex.test(x) && !/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
-    if(optionLines.length<2 || !answerLine) return null;
-    const cleanOption=x=>x.replace(optionRegex,'').replace(/[.。؛;]+$/u,'').trim();
-    const options=optionLines.slice(0,4).map(cleanOption);
-    while(options.length<4) options.push('');
-    const answerText=answerLine.replace(/^.*?(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]\s*/u,'').replace(/[.。]+$/u,'').trim();
-    const answerClean=cleanOption(answerText).replace(/^[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🅲🅳🔹🔸▪️•\s]+/u,'').trim();
-    const answerLetter=(answerText.match(/(?:^|\s)([A-Da-dأبجد])(?:[)\.\s:：]|$)/u)||[])[1];
-    const letterIndex=answerLetter?({'a':0,'b':1,'c':2,'d':3,'أ':0,'ب':1,'ج':2,'د':3}[answerLetter.toLowerCase()]):-1;
-    let correct=options.findIndex(o=>o && answerClean && (answerClean.includes(o)||o.includes(answerClean)));
-    if(correct<0 && letterIndex>=0 && letterIndex<optionLines.length) correct=letterIndex;
-    if(correct<0){const key=answerClean.replace(/[\s.,؛;()]/g,'').toLowerCase();correct=options.findIndex(o=>o.replace(/[\s.,؛;()]/g,'').toLowerCase()===key);}
-    if(correct<0) return null;
-    const optionStart=lines.findIndex(x=>optionRegex.test(x));
-    const titlePattern=/^\s*(?:🧪\s*)?السؤال\s*(?:(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر)|(?:رقم\s*)?[٠-٩0-9]+)\s*[:：|｜\-–—.]?\s*$/u;
-    const questionText=lines.slice(0,optionStart).map((x,i)=>i===0?stripQuestionHeading(x):x).filter(x=>!titlePattern.test(x)).join('\n').trim();
-    if(!questionText) return null;
-    const explanation=explanationLine?explanationLine.replace(/^.*?(?:التعليل|الشرح|السبب)\s*[:：]\s*/u,'').trim():'';
-    return {text:questionText,options,correct,explanation};
-  };
-  const autoFillBulkFromText=()=>{
-    const raw=(bulkPasteText||'').trim();
-    if(!raw) return app.toast.warn('الصق مجموعة الأسئلة أولاً');
-    const heading=/^(?=.*السؤال)(?=.*(?:🧪|[|｜:—–-]|\d)).*$/gmu;
-    const starts=[...raw.matchAll(heading)].map(m=>m.index);
-    let blocks=[];
-    if(starts.length>1){blocks=starts.map((start,i)=>raw.slice(start,starts[i+1]??raw.length).trim()).filter(Boolean);}
-    else blocks=[raw];
-    const parsed=blocks.map(parseQuestionBlock).filter(Boolean);
-    if(!parsed.length) return app.toast.warn('ملقتش أسئلة مكتملة. تأكد إن كل سؤال فيه اختيارات وسطر الإجابة الصحيحة.');
-    setBulkForm(f=>({...f,questions:parsed}));
-    app.toast.ok(`✅ تم تجهيز ${parsed.length} سؤال. راجعهم قبل الحفظ`);
-  };
   const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
   const save=async ()=>{
     if(!form.title) return app.toast.warn('العنوان مطلوب');
@@ -2135,7 +2000,6 @@ function AdminApp(){
     app.db.subjects.filter(s=>s.name.toLowerCase().includes(lc)).forEach(s=>res.push({type:'مادة',icon:s.icon||'📚',title:s.name,nav:'subjects'}));
     app.db.lessons.filter(l=>l.title.toLowerCase().includes(lc)).slice(0,5).forEach(l=>res.push({type:'درس',icon:<Icon name="file" size={16}/>,title:l.title,nav:'lessons'}));
     app.db.exams.filter(e=>e.title.toLowerCase().includes(lc)).slice(0,5).forEach(e=>res.push({type:'اختبار',icon:<Icon name="clipboard" size={16}/>,title:e.title,nav:'exams'}));
-    
     setSearchResults(res);
   };
   return <div className="app">
@@ -2151,7 +2015,6 @@ function AdminApp(){
         {tab==='subjects'&&<SubjectsPage/>}
         {tab==='units'&&<UnitsPage/>}
         {tab==='lessons'&&<LessonsPage/>}
-        
         {tab==='exams'&&<ExamsPage/>}
         {tab==='missions'&&<MissionsPage/>}
         {tab==='achievements'&&<AchievementsPage/>}
