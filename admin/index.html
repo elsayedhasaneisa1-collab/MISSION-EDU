@@ -838,7 +838,7 @@ function Crud({title,collection,defaultItem,fields,columns}){
   const openNew=()=>{setForm(defaultItem());setEditing('new');};
   const parseQuestionBlock=(raw)=>{
     const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    const optionRegex=/^(?:[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]|[أبجدهـabcdABCD][)\.\-:：])\s*/u;
+    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:[🔵🟢🟡🔴🟣🟠⚫⚪])\s*)?(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد][)\.\-:：]?\s*)\s*/u;
     const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]/u.test(x));
     const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
     const optionLines=lines.filter(x=>optionRegex.test(x) && !/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
@@ -847,11 +847,15 @@ function Crud({title,collection,defaultItem,fields,columns}){
     const options=optionLines.slice(0,4).map(cleanOption);
     while(options.length<4) options.push('');
     const answerText=answerLine.replace(/^.*?(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]\s*/u,'').replace(/[.。]+$/u,'').trim();
-    const answerEmoji=(answerText.match(/^[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]/u)||[])[0]||'';
-    const answerClean=cleanOption(answerText);
-    let correct=options.findIndex(o=>o && (answerClean.includes(o)||o.includes(answerClean)));
-    if(correct<0 && answerEmoji){const target=optionLines.findIndex(x=>x.startsWith(answerEmoji));if(target>=0) correct=target;}
-    if(correct<0){const key=answerClean.replace(/\s/g,'').toLowerCase();correct=options.findIndex(o=>o.replace(/\s/g,'').toLowerCase()===key);}
+    const answerClean=cleanOption(answerText).replace(/^[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🅲🅳🔹🔸▪️•\s]+/u,'').trim();
+    const normalizeAnswer=value=>String(value||'').normalize('NFKC').toLowerCase().replace(/[\u064B-\u065F\u0670]/g,'').replace(/[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🅲🅳🔹🔸▪️•]/gu,'').replace(/^[\s]*(?:[a-dأبجد])[)\.\-:：]\s*/u,'').replace(/[\s.,،؛;:：()\[\]{}\-–—]+/g,'').trim();
+    const answerKey=normalizeAnswer(answerClean);
+    const answerLetterMatch=answerText.trim().match(/^(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد])[)\.\-:：]?$/u);
+    const letterToken=answerLetterMatch?answerText.trim().replace(/[)\.\-:：]/g,'').toLowerCase():'';
+    const letterIndex=({'🅰️':0,'🅱️':1,'🅲':2,'🅳':3,'a':0,'b':1,'c':2,'d':3,'أ':0,'ب':1,'ج':2,'د':3})[letterToken]??-1;
+    let correct=options.findIndex(o=>normalizeAnswer(o) && answerKey && normalizeAnswer(o)===answerKey);
+    if(correct<0 && answerKey) correct=options.findIndex(o=>{const k=normalizeAnswer(o);return k && (k.includes(answerKey)||answerKey.includes(k));});
+    if(correct<0 && letterIndex>=0 && letterIndex<optionLines.length) correct=letterIndex;
     if(correct<0) return null;
     const optionStart=lines.findIndex(x=>optionRegex.test(x));
     const titlePattern=/^.*?السؤال\s*(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر|\d+)\s*(?:[|｜\-–—:]\s*.*)?$/u;
@@ -919,7 +923,7 @@ function LessonsPage(){
   const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(!c.video)c.video={type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true};if(c.video.is_free===undefined)c.video.is_free=true;if(!c.key_points)c.key_points=[];if(!c.pdf_url)c.pdf_url='';setForm(c);setLessonTestText('');setLessonTestTitle(`اختبار ${c.title||'الدرس'}`);setLessonTestDuration(15);setLessonTestPassScore(50);setLessonTestXp(10);setLessonTestFree(true);setEditing(it.id);};
   const parseLessonTestQuestion=(raw)=>{
     const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    const optionRegex=/^(?:[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]|[أبجدهـabcdABCD][)\.\-:：])\s*/u;
+    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:[🔵🟢🟡🔴🟣🟠⚫⚪])\s*)?(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد][)\.\-:：]?\s*)\s*/u;
     const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]/u.test(x));
     const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
     const optionLines=lines.filter(x=>optionRegex.test(x)&&!/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
@@ -1083,7 +1087,7 @@ function QuestionsPage(){
     const raw=(pasteQuestion||'').trim();
     if(!raw) return app.toast.warn('الصق نص السؤال كاملًا أولاً');
     const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    const optionRegex=/^(?:[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]|[أبجدهـabcdABCD][)\.\-:：])\s*/u;
+    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:[🔵🟢🟡🔴🟣🟠⚫⚪])\s*)?(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد][)\.\-:：]?\s*)\s*/u;
     const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة|الإجابة الصحيحة|الاجابة الصحيحة)\s*[:：]/u.test(x));
     const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
     const optionLines=lines.filter(x=>optionRegex.test(x) && !/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
@@ -1092,17 +1096,15 @@ function QuestionsPage(){
     const options=optionLines.slice(0,4).map(cleanOption);
     while(options.length<4) options.push('');
     const answerText=answerLine?answerLine.replace(/^.*?(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]\s*/u,'').replace(/[.。]+$/u,'').trim():'';
-    const answerEmoji=(answerText.match(/^[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]/u)||[])[0]||'';
-    const answerClean=cleanOption(answerText);
-    let correctIndex=options.findIndex(o=>o && (answerClean.includes(o)||o.includes(answerClean)));
-    if(correctIndex<0 && answerEmoji){
-      const target=optionLines.findIndex(x=>x.startsWith(answerEmoji));
-      if(target>=0) correctIndex=target;
-    }
-    if(correctIndex<0 && answerText){
-      const answerKey=answerClean.replace(/\s/g,'').toLowerCase();
-      correctIndex=options.findIndex(o=>o.replace(/\s/g,'').toLowerCase()===answerKey);
-    }
+    const answerClean=cleanOption(answerText).replace(/^[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🅲🅳🔹🔸▪️•\s]+/u,'').trim();
+    const normalizeAnswer=value=>String(value||'').normalize('NFKC').toLowerCase().replace(/[\u064B-\u065F\u0670]/g,'').replace(/[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🅲🅳🔹🔸▪️•]/gu,'').replace(/^[\s]*(?:[a-dأبجد])[)\.\-:：]\s*/u,'').replace(/[\s.,،؛;:：()\[\]{}\-–—]+/g,'').trim();
+    const answerKey=normalizeAnswer(answerClean);
+    const answerLetterMatch=answerText.trim().match(/^(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد])[)\.\-:：]?$/u);
+    const letterToken=answerLetterMatch?answerText.trim().replace(/[)\.\-:：]/g,'').toLowerCase():'';
+    const letterIndex=({'🅰️':0,'🅱️':1,'🅲':2,'🅳':3,'a':0,'b':1,'c':2,'d':3,'أ':0,'ب':1,'ج':2,'د':3})[letterToken]??-1;
+    let correctIndex=options.findIndex(o=>normalizeAnswer(o) && answerKey && normalizeAnswer(o)===answerKey);
+    if(correctIndex<0 && answerKey) correctIndex=options.findIndex(o=>{const k=normalizeAnswer(o);return k && (k.includes(answerKey)||answerKey.includes(k));});
+    if(correctIndex<0 && letterIndex>=0 && letterIndex<optionLines.length) correctIndex=letterIndex;
     const exp=explanationLine?explanationLine.replace(/^.*?(?:التعليل|الشرح|السبب)\s*[:：]\s*/u,'').trim():'';
     const optionStart=lines.findIndex(x=>optionRegex.test(x));
     const titlePattern=/^.*?السؤال\s*(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر|\d+)\s*(?:[|｜\-–—:]\s*.*)?$/u;
@@ -1117,7 +1119,7 @@ function QuestionsPage(){
   };
   const parseQuestionBlock=(raw)=>{
     const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    const optionRegex=/^(?:[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]|[أبجدهـabcdABCD][)\.\-:：])\s*/u;
+    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:[🔵🟢🟡🔴🟣🟠⚫⚪])\s*)?(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد][)\.\-:：]?\s*)\s*/u;
     const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]/u.test(x));
     const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
     const optionLines=lines.filter(x=>optionRegex.test(x) && !/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
@@ -1126,11 +1128,12 @@ function QuestionsPage(){
     const options=optionLines.slice(0,4).map(cleanOption);
     while(options.length<4) options.push('');
     const answerText=answerLine.replace(/^.*?(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]\s*/u,'').replace(/[.。]+$/u,'').trim();
-    const answerEmoji=(answerText.match(/^[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]/u)||[])[0]||'';
-    const answerClean=cleanOption(answerText);
-    let correct=options.findIndex(o=>o && (answerClean.includes(o)||o.includes(answerClean)));
-    if(correct<0 && answerEmoji){const target=optionLines.findIndex(x=>x.startsWith(answerEmoji));if(target>=0) correct=target;}
-    if(correct<0){const key=answerClean.replace(/\s/g,'').toLowerCase();correct=options.findIndex(o=>o.replace(/\s/g,'').toLowerCase()===key);}
+    const answerClean=cleanOption(answerText).replace(/^[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🅲🅳🔹🔸▪️•\s]+/u,'').trim();
+    const answerLetter=(answerText.match(/(?:^|\s)([A-Da-dأبجد])(?:[)\.\s:：]|$)/u)||[])[1];
+    const letterIndex=answerLetter?({'a':0,'b':1,'c':2,'d':3,'أ':0,'ب':1,'ج':2,'د':3}[answerLetter.toLowerCase()]):-1;
+    let correct=options.findIndex(o=>o && answerClean && (answerClean.includes(o)||o.includes(answerClean)));
+    if(correct<0 && letterIndex>=0 && letterIndex<optionLines.length) correct=letterIndex;
+    if(correct<0){const key=answerClean.replace(/[\s.,؛;()]/g,'').toLowerCase();correct=options.findIndex(o=>o.replace(/[\s.,؛;()]/g,'').toLowerCase()===key);}
     if(correct<0) return null;
     const optionStart=lines.findIndex(x=>optionRegex.test(x));
     const titlePattern=/^.*?السؤال\s*(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر|\d+)\s*(?:[|｜\-–—:]\s*.*)?$/u;
@@ -1372,7 +1375,7 @@ function MissionsPage(){
   const openNew=()=>{setForm({title:'',desc:'',subject_id:'',required_lessons:[],required_exam_id:'',xp:'',sort_order:''});setEditing('new');};
   const parseQuestionBlock=(raw)=>{
     const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    const optionRegex=/^(?:[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]|[أبجدهـabcdABCD][)\.\-:：])\s*/u;
+    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:[🔵🟢🟡🔴🟣🟠⚫⚪])\s*)?(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد][)\.\-:：]?\s*)\s*/u;
     const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]/u.test(x));
     const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
     const optionLines=lines.filter(x=>optionRegex.test(x) && !/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
@@ -1381,11 +1384,12 @@ function MissionsPage(){
     const options=optionLines.slice(0,4).map(cleanOption);
     while(options.length<4) options.push('');
     const answerText=answerLine.replace(/^.*?(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]\s*/u,'').replace(/[.。]+$/u,'').trim();
-    const answerEmoji=(answerText.match(/^[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]/u)||[])[0]||'';
-    const answerClean=cleanOption(answerText);
-    let correct=options.findIndex(o=>o && (answerClean.includes(o)||o.includes(answerClean)));
-    if(correct<0 && answerEmoji){const target=optionLines.findIndex(x=>x.startsWith(answerEmoji));if(target>=0) correct=target;}
-    if(correct<0){const key=answerClean.replace(/\s/g,'').toLowerCase();correct=options.findIndex(o=>o.replace(/\s/g,'').toLowerCase()===key);}
+    const answerClean=cleanOption(answerText).replace(/^[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🅲🅳🔹🔸▪️•\s]+/u,'').trim();
+    const answerLetter=(answerText.match(/(?:^|\s)([A-Da-dأبجد])(?:[)\.\s:：]|$)/u)||[])[1];
+    const letterIndex=answerLetter?({'a':0,'b':1,'c':2,'d':3,'أ':0,'ب':1,'ج':2,'د':3}[answerLetter.toLowerCase()]):-1;
+    let correct=options.findIndex(o=>o && answerClean && (answerClean.includes(o)||o.includes(answerClean)));
+    if(correct<0 && letterIndex>=0 && letterIndex<optionLines.length) correct=letterIndex;
+    if(correct<0){const key=answerClean.replace(/[\s.,؛;()]/g,'').toLowerCase();correct=options.findIndex(o=>o.replace(/[\s.,؛;()]/g,'').toLowerCase()===key);}
     if(correct<0) return null;
     const optionStart=lines.findIndex(x=>optionRegex.test(x));
     const titlePattern=/^.*?السؤال\s*(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر|\d+)\s*(?:[|｜\-–—:]\s*.*)?$/u;
