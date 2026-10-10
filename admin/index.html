@@ -838,7 +838,7 @@ function Crud({title,collection,defaultItem,fields,columns}){
   const openNew=()=>{setForm(defaultItem());setEditing('new');};
   const parseQuestionBlock=(raw)=>{
     const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:[🔵🟢🟡🔴🟣🟠⚫⚪])\s*)?(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد](?:[)\.\-:：]\s*|\s+))\s*/u;
+    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد](?:[)\.\-:：]\s*|\s+))|(?:[🔵🟢🟡🔴🟣🟠⚫⚪]\s*))/u;
     const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]/u.test(x));
     const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
     const optionLines=lines.filter(x=>optionRegex.test(x) && !/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
@@ -923,7 +923,7 @@ function LessonsPage(){
   const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(!c.video)c.video={type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true};if(c.video.is_free===undefined)c.video.is_free=true;if(!c.key_points)c.key_points=[];if(!c.pdf_url)c.pdf_url='';setForm(c);setLessonTestText('');setLessonTestTitle(`اختبار ${c.title||'الدرس'}`);setLessonTestDuration(15);setLessonTestPassScore(50);setLessonTestXp(10);setLessonTestFree(true);setEditing(it.id);};
   const parseLessonTestQuestion=(raw)=>{
     const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:[🔵🟢🟡🔴🟣🟠⚫⚪])\s*)?(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد](?:[)\.\-:：]\s*|\s+))\s*/u;
+    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد](?:[)\.\-:：]\s*|\s+))|(?:[🔵🟢🟡🔴🟣🟠⚫⚪]\s*))/u;
     const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]/u.test(x));
     const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
     const optionLines=lines.filter(x=>optionRegex.test(x)&&!/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
@@ -1088,7 +1088,7 @@ function QuestionsPage(){
     const raw=(pasteQuestion||'').trim();
     if(!raw) return app.toast.warn('الصق نص السؤال كاملًا أولاً');
     const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:[🔵🟢🟡🔴🟣🟠⚫⚪])\s*)?(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد](?:[)\.\-:：]\s*|\s+))\s*/u;
+    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد](?:[)\.\-:：]\s*|\s+))|(?:[🔵🟢🟡🔴🟣🟠⚫⚪]\s*))/u;
     const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة|الإجابة الصحيحة|الاجابة الصحيحة)\s*[:：]/u.test(x));
     const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
     const optionLines=lines.filter(x=>optionRegex.test(x) && !/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
@@ -1119,7 +1119,7 @@ function QuestionsPage(){
   };
   const parseQuestionBlock=(raw)=>{
     const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:[🔵🟢🟡🔴🟣🟠⚫⚪])\s*)?(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد](?:[)\.\-:：]\s*|\s+))\s*/u;
+    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد](?:[)\.\-:：]\s*|\s+))|(?:[🔵🟢🟡🔴🟣🟠⚫⚪]\s*))/u;
     const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]/u.test(x));
     const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
     const optionLines=lines.filter(x=>optionRegex.test(x) && !/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
@@ -1375,7 +1375,7 @@ function MissionsPage(){
   const openNew=()=>{setForm({title:'',desc:'',subject_id:'',required_lessons:[],required_exam_id:'',xp:'',sort_order:''});setEditing('new');};
   const parseQuestionBlock=(raw)=>{
     const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:[🔵🟢🟡🔴🟣🟠⚫⚪])\s*)?(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد](?:[)\.\-:：]\s*|\s+))\s*/u;
+    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد](?:[)\.\-:：]\s*|\s+))|(?:[🔵🟢🟡🔴🟣🟠⚫⚪]\s*))/u;
     const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]/u.test(x));
     const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
     const optionLines=lines.filter(x=>optionRegex.test(x) && !/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
