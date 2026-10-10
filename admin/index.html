@@ -836,6 +836,43 @@ function Crud({title,collection,defaultItem,fields,columns}){
   const [busy,setBusy]=useState(false);
   const items=[...(app.db[collection]||[])].sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
   const openNew=()=>{setForm(defaultItem());setEditing('new');};
+  const parseQuestionBlock=(raw)=>{
+    const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+    const optionRegex=/^(?:[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]|[أبجدهـabcdABCD][)\.\-:：])\s*/u;
+    const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]/u.test(x));
+    const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
+    const optionLines=lines.filter(x=>optionRegex.test(x) && !/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
+    if(optionLines.length<2 || !answerLine) return null;
+    const cleanOption=x=>x.replace(optionRegex,'').replace(/[.。؛;]+$/u,'').trim();
+    const options=optionLines.slice(0,4).map(cleanOption);
+    while(options.length<4) options.push('');
+    const answerText=answerLine.replace(/^.*?(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]\s*/u,'').replace(/[.。]+$/u,'').trim();
+    const answerEmoji=(answerText.match(/^[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]/u)||[])[0]||'';
+    const answerClean=cleanOption(answerText);
+    let correct=options.findIndex(o=>o && (answerClean.includes(o)||o.includes(answerClean)));
+    if(correct<0 && answerEmoji){const target=optionLines.findIndex(x=>x.startsWith(answerEmoji));if(target>=0) correct=target;}
+    if(correct<0){const key=answerClean.replace(/\s/g,'').toLowerCase();correct=options.findIndex(o=>o.replace(/\s/g,'').toLowerCase()===key);}
+    if(correct<0) return null;
+    const optionStart=lines.findIndex(x=>optionRegex.test(x));
+    const titlePattern=/^.*?السؤال\s*(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر|\d+)\s*(?:[|｜\-–—:]\s*.*)?$/u;
+    const questionText=lines.slice(0,optionStart).filter(x=>!titlePattern.test(x)).join('\n').trim();
+    if(!questionText) return null;
+    const explanation=explanationLine?explanationLine.replace(/^.*?(?:التعليل|الشرح|السبب)\s*[:：]\s*/u,'').trim():'';
+    return {text:questionText,options,correct,explanation};
+  };
+  const autoFillBulkFromText=()=>{
+    const raw=(bulkPasteText||'').trim();
+    if(!raw) return app.toast.warn('الصق مجموعة الأسئلة أولاً');
+    const heading=/^(?=.*السؤال\s*(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر|\d+)).*$/gmu;
+    const starts=[...raw.matchAll(heading)].map(m=>m.index);
+    let blocks=[];
+    if(starts.length>1){blocks=starts.map((start,i)=>raw.slice(start,starts[i+1]??raw.length).trim()).filter(Boolean);}
+    else blocks=[raw];
+    const parsed=blocks.map(parseQuestionBlock).filter(Boolean);
+    if(!parsed.length) return app.toast.warn('ملقتش أسئلة مكتملة. تأكد إن كل سؤال فيه اختيارات وسطر الإجابة الصحيحة.');
+    setBulkForm(f=>({...f,questions:parsed}));
+    app.toast.ok(`✅ تم تجهيز ${parsed.length} سؤال. راجعهم قبل الحفظ`);
+  };
   const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
   const save=async ()=>{setBusy(true);try{await app.save(collection,form);app.toast.ok(editing==='new'?'تمت الإضافة':'تم الحفظ');setEditing(null);}catch(e){app.toast.err(e.message);}setBusy(false);};
   const del=async id=>{const r=await Swal.fire({title:'تأكيد الحذف',text:'سيتم حذف هذا العنصر نهائيًا',icon:'warning',showCancelButton:true,confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed) return;try{await app.remove(collection,id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
@@ -958,6 +995,7 @@ function QuestionsPage(){
   const [bulkForm,setBulkForm]=useState({lesson_id:'',difficulty:'medium',xp:10,questions:[{text:'',options:['','','',''],correct:0,explanation:''}]});
   const [busy,setBusy]=useState(false);
   const [pasteQuestion,setPasteQuestion]=useState('');
+  const [bulkPasteText,setBulkPasteText]=useState('');
   const [filterLesson,setFilterLesson]=useState('all');
   const openNew=()=>{setForm({text:'',options:['','','',''],correct:[0],explanation:'',lesson_id:'',difficulty:'medium',xp:'',type:'mcq'});setEditing('new');};
   const autoFillFromText=()=>{
@@ -995,6 +1033,43 @@ function QuestionsPage(){
     if(correctIndex<0) return app.toast.warn('اتعرفت الاختيارات لكن مش قادر أحدد الإجابة الصحيحة؛ تأكد إن نص الإجابة مطابق لأحد الاختيارات');
     setForm(f=>({...f,text:questionText,options,correct:[correctIndex],explanation:exp}));
     app.toast.ok('✅ تم تعبئة السؤال والاختيارات والإجابة والشرح. راجعهم قبل الحفظ');
+  };
+  const parseQuestionBlock=(raw)=>{
+    const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+    const optionRegex=/^(?:[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]|[أبجدهـabcdABCD][)\.\-:：])\s*/u;
+    const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]/u.test(x));
+    const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
+    const optionLines=lines.filter(x=>optionRegex.test(x) && !/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
+    if(optionLines.length<2 || !answerLine) return null;
+    const cleanOption=x=>x.replace(optionRegex,'').replace(/[.。؛;]+$/u,'').trim();
+    const options=optionLines.slice(0,4).map(cleanOption);
+    while(options.length<4) options.push('');
+    const answerText=answerLine.replace(/^.*?(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]\s*/u,'').replace(/[.。]+$/u,'').trim();
+    const answerEmoji=(answerText.match(/^[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]/u)||[])[0]||'';
+    const answerClean=cleanOption(answerText);
+    let correct=options.findIndex(o=>o && (answerClean.includes(o)||o.includes(answerClean)));
+    if(correct<0 && answerEmoji){const target=optionLines.findIndex(x=>x.startsWith(answerEmoji));if(target>=0) correct=target;}
+    if(correct<0){const key=answerClean.replace(/\s/g,'').toLowerCase();correct=options.findIndex(o=>o.replace(/\s/g,'').toLowerCase()===key);}
+    if(correct<0) return null;
+    const optionStart=lines.findIndex(x=>optionRegex.test(x));
+    const titlePattern=/^.*?السؤال\s*(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر|\d+)\s*(?:[|｜\-–—:]\s*.*)?$/u;
+    const questionText=lines.slice(0,optionStart).filter(x=>!titlePattern.test(x)).join('\n').trim();
+    if(!questionText) return null;
+    const explanation=explanationLine?explanationLine.replace(/^.*?(?:التعليل|الشرح|السبب)\s*[:：]\s*/u,'').trim():'';
+    return {text:questionText,options,correct,explanation};
+  };
+  const autoFillBulkFromText=()=>{
+    const raw=(bulkPasteText||'').trim();
+    if(!raw) return app.toast.warn('الصق مجموعة الأسئلة أولاً');
+    const heading=/^(?=.*السؤال\s*(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر|\d+)).*$/gmu;
+    const starts=[...raw.matchAll(heading)].map(m=>m.index);
+    let blocks=[];
+    if(starts.length>1){blocks=starts.map((start,i)=>raw.slice(start,starts[i+1]??raw.length).trim()).filter(Boolean);}
+    else blocks=[raw];
+    const parsed=blocks.map(parseQuestionBlock).filter(Boolean);
+    if(!parsed.length) return app.toast.warn('ملقتش أسئلة مكتملة. تأكد إن كل سؤال فيه اختيارات وسطر الإجابة الصحيحة.');
+    setBulkForm(f=>({...f,questions:parsed}));
+    app.toast.ok(`✅ تم تجهيز ${parsed.length} سؤال. راجعهم قبل الحفظ`);
   };
   const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
   const save=async ()=>{
@@ -1063,7 +1138,7 @@ function QuestionsPage(){
     </div>
     {editing!==null&&<Modal title={editing==='new'?'سؤال جديد':'تعديل السؤال'} onClose={()=>setEditing(null)} wide>
       <Field label="الصق السؤال كاملًا هنا" hint="الصق النص بنفس التنسيق اللي بتجهزه: السؤال والاختيارات والإجابة الصحيحة والتعليل.">
-        <textarea className="input" rows="8" value={pasteQuestion} onChange={e=>setPasteQuestion(e.target.value)} placeholder={'🧪 السؤال الرابع | الخواص المغناطيسية\n\nأي الأيونات التالية يُتوقع أن يكون دايامغناطيسيًا؟\n\n🔵 Mn²⁺\n🟢 Fe³⁺\n🟡 Zn²⁺\n🔴 Cu²⁺\n\n✅ الإجابة الصحيحة: 🟡 Zn²⁺.\n\n💡 التعليل: اكتب سبب الإجابة هنا.'}/>
+        <textarea className="input" rows="8" value={pasteQuestion} onChange={e=>setPasteQuestion(e.target.value)} placeholder={'الصق نص السؤال هنا مع الاختيارات والإجابة الصحيحة والتعليل...'}/>
       </Field>
       <div className="flex g8 wrap center mb12">
         <button type="button" className="btn btn-p" onClick={autoFillFromText}>⚡ تعبئة تلقائية من النص</button>
@@ -1087,6 +1162,15 @@ function QuestionsPage(){
       <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
     </Modal>}
     {bulkMode&&<Modal title="📚 إضافة مجموعة أسئلة" onClose={()=>setBulkMode(false)} wide>
+      <Field label="الصق مجموعة الأسئلة كاملة" hint="الصق الأسئلة وراء بعضها بنفس التنسيق: عنوان السؤال، نصه، الاختيارات، الإجابة الصحيحة، والتعليل. لازم كل سؤال يبدأ بعنوان مثل: السؤال الأول أو السؤال 1.">
+        <textarea className="input" rows="8" value={bulkPasteText} onChange={e=>setBulkPasteText(e.target.value)} placeholder="الصق هنا مجموعة الأسئلة كاملة..." />
+      </Field>
+      <div className="flex g8 wrap center mb12">
+        <button type="button" className="btn btn-p" onClick={autoFillBulkFromText}>⚡ تعبئة المجموعة تلقائيًا</button>
+        <button type="button" className="btn btn-s" onClick={()=>setBulkPasteText('')}>مسح النص</button>
+        <span className="xs muted">بدون ذكاء اصطناعي — راجع الأسئلة قبل الحفظ.</span>
+      </div>
+      <div className="div mb12"/>
       <div className="grid g2 mb12">
         <Field label="الدرس المستهدف">
           <select className="input" value={bulkForm.lesson_id} onChange={e=>setBulkForm({...bulkForm,lesson_id:e.target.value})}>
@@ -1205,6 +1289,43 @@ function MissionsPage(){
   const [form,setForm]=useState({});
   const [busy,setBusy]=useState(false);
   const openNew=()=>{setForm({title:'',desc:'',subject_id:'',required_lessons:[],required_exam_id:'',xp:'',sort_order:''});setEditing('new');};
+  const parseQuestionBlock=(raw)=>{
+    const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+    const optionRegex=/^(?:[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]|[أبجدهـabcdABCD][)\.\-:：])\s*/u;
+    const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]/u.test(x));
+    const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
+    const optionLines=lines.filter(x=>optionRegex.test(x) && !/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
+    if(optionLines.length<2 || !answerLine) return null;
+    const cleanOption=x=>x.replace(optionRegex,'').replace(/[.。؛;]+$/u,'').trim();
+    const options=optionLines.slice(0,4).map(cleanOption);
+    while(options.length<4) options.push('');
+    const answerText=answerLine.replace(/^.*?(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]\s*/u,'').replace(/[.。]+$/u,'').trim();
+    const answerEmoji=(answerText.match(/^[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]/u)||[])[0]||'';
+    const answerClean=cleanOption(answerText);
+    let correct=options.findIndex(o=>o && (answerClean.includes(o)||o.includes(answerClean)));
+    if(correct<0 && answerEmoji){const target=optionLines.findIndex(x=>x.startsWith(answerEmoji));if(target>=0) correct=target;}
+    if(correct<0){const key=answerClean.replace(/\s/g,'').toLowerCase();correct=options.findIndex(o=>o.replace(/\s/g,'').toLowerCase()===key);}
+    if(correct<0) return null;
+    const optionStart=lines.findIndex(x=>optionRegex.test(x));
+    const titlePattern=/^.*?السؤال\s*(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر|\d+)\s*(?:[|｜\-–—:]\s*.*)?$/u;
+    const questionText=lines.slice(0,optionStart).filter(x=>!titlePattern.test(x)).join('\n').trim();
+    if(!questionText) return null;
+    const explanation=explanationLine?explanationLine.replace(/^.*?(?:التعليل|الشرح|السبب)\s*[:：]\s*/u,'').trim():'';
+    return {text:questionText,options,correct,explanation};
+  };
+  const autoFillBulkFromText=()=>{
+    const raw=(bulkPasteText||'').trim();
+    if(!raw) return app.toast.warn('الصق مجموعة الأسئلة أولاً');
+    const heading=/^(?=.*السؤال\s*(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر|\d+)).*$/gmu;
+    const starts=[...raw.matchAll(heading)].map(m=>m.index);
+    let blocks=[];
+    if(starts.length>1){blocks=starts.map((start,i)=>raw.slice(start,starts[i+1]??raw.length).trim()).filter(Boolean);}
+    else blocks=[raw];
+    const parsed=blocks.map(parseQuestionBlock).filter(Boolean);
+    if(!parsed.length) return app.toast.warn('ملقتش أسئلة مكتملة. تأكد إن كل سؤال فيه اختيارات وسطر الإجابة الصحيحة.');
+    setBulkForm(f=>({...f,questions:parsed}));
+    app.toast.ok(`✅ تم تجهيز ${parsed.length} سؤال. راجعهم قبل الحفظ`);
+  };
   const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
   const save=async ()=>{
     if(!form.title) return app.toast.warn('العنوان مطلوب');
