@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#04060e">
+<title>تحدي الأصدقاء | MISSION EDU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(47,125,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(139,92,246,.14),transparent 60%),#04060e;color:#e8eefc;min-height:100vh;line-height:1.7;overflow-x:hidden}
+.glass{background:linear-gradient(180deg,rgba(21,31,56,.72),rgba(11,17,34,.62));border:1px solid rgba(90,140,230,.16);border-radius:20px;backdrop-filter:blur(16px);box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:12px 22px;border-radius:13px;font-weight:700;font-size:15px;transition:.24s;border:none;cursor:pointer;font-family:inherit}
+.btn-p{background:linear-gradient(135deg,#2f7dff,#1f5fd6);color:#fff;box-shadow:0 10px 28px rgba(47,125,255,.36)}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 14px 38px rgba(47,125,255,.55)}
+.btn-g{background:rgba(47,125,255,.10);color:#5aa9ff;border:1px solid rgba(90,140,230,.32)}
+.btn-s{background:rgba(255,255,255,.05);color:#b7c6e4;border:1px solid rgba(90,140,230,.16)}
+.btn-ok{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff}
+.input{width:100%;padding:12px 16px;border-radius:12px;background:rgba(10,16,32,.72);border:1.5px solid rgba(90,140,230,.16);color:#fff;font-size:15px;outline:none;font-family:inherit}
+.input:focus{border-color:#2f7dff;box-shadow:0 0 0 4px rgba(47,125,255,.12)}
+.lbl{display:block;font-size:13px;font-weight:700;color:#b7c6e4;margin-bottom:6px}
+.container{max-width:800px;margin:0 auto;padding:20px;min-height:100vh;display:flex;flex-direction:column}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.header h1{font-size:24px;font-weight:900;color:#fff}
+.spinner{width:40px;height:40px;border:3px solid rgba(90,140,230,.2);border-top-color:#2f7dff;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tabs{display:flex;gap:10px;margin-bottom:20px;background:rgba(255,255,255,.03);padding:6px;border-radius:14px}
+.tab{flex:1;padding:12px;text-align:center;font-weight:800;border-radius:10px;cursor:pointer;color:#7f93b8;transition:.2s}
+.tab.active{background:linear-gradient(135deg,#2f7dff,#8b5cf6);color:#fff;box-shadow:0 4px 12px rgba(47,125,255,.3)}
+.form-group{margin-bottom:16px}
+.code-display{font-size:40px;font-weight:900;letter-spacing:8px;color:#fbbf24;text-align:center;margin:20px 0;text-shadow:0 0 20px rgba(251,191,36,.5)}
+.game-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.score-box{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.4);padding:8px 16px;border-radius:20px;border:1px solid rgba(255,255,255,.1)}
+.score-box.mine{border-color:#2f7dff}
+.score-box.theirs{border-color:#ef4444}
+.question-card{padding:30px;text-align:center;margin-bottom:20px}
+.question-text{font-size:22px;font-weight:800;line-height:1.6;margin-bottom:24px}
+.options{display:flex;flex-direction:column;gap:12px}
+.opt{padding:16px 20px;border-radius:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(90,140,230,.2);cursor:pointer;text-align:right;font-size:16px;font-weight:600;transition:.2s;display:flex;align-items:center;gap:14px}
+.opt:hover{background:rgba(47,125,255,.1);border-color:#2f7dff}
+.opt.correct{background:rgba(34,197,94,.2);border-color:#22c55e;color:#fff}
+.opt.wrong{background:rgba(239,68,68,.2);border-color:#ef4444;color:#fff}
+.opt-l{width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,.1);display:grid;place-items:center;font-weight:800}
+.timer{font-size:24px;font-weight:900;color:#fbbf24;background:rgba(251,191,36,.1);padding:8px 16px;border-radius:50px;border:1px solid rgba(251,191,36,.3)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:flex-end;justify-content:center}
+.chat-panel{width:100%;max-width:600px;background:#0b1122;border-radius:20px 20px 0 0;padding:20px;border:1px solid rgba(90,140,230,.3);transform:translateY(0);animation:slideUp .3s}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.msg-list{height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:16px;padding-right:10px}
+.msg{padding:10px 16px;border-radius:16px;max-width:80%;font-size:14px}
+.msg.mine{align-self:flex-start;background:#2f7dff;color:#fff;border-bottom-right-radius:4px}
+.msg.theirs{align-self:flex-end;background:rgba(255,255,255,.1);border-bottom-left-radius:4px}
+.emoji-bar{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px}
+.emoji-btn{font-size:24px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:8px;cursor:pointer;transition:.2s}
+.emoji-btn:hover{background:rgba(255,255,255,.15);transform:scale(1.1)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="/db.js"></script>
+<script type="text/babel">
+const {useState, useEffect} = React;
+const DB = window.MissionDB;
+const EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🔥', '👏', '💯'];
+
+function App() {
+  const [sb, setSb] = useState(null);
+  const [user, setUser] = useState(null);
+  const [view, setView] = useState('loading');
+  const [mode, setMode] = useState('create');
+  const [subjects, setSubjects] = useState([]);
+  const [units, setUnits] = useState([]);
+  const [lessons, setLessons] = useState([]);
+  const [selSubj, setSelSubj] = useState('');
+  const [selUnit, setSelUnit] = useState('');
+  const [selLesson, setSelLesson] = useState('');
+  const [joinCode, setJoinCode] = useState('');
+  const [challenge, setChallenge] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [qIndex, setQIndex] = useState(0);
+  const [hostScore, setHostScore] = useState(0);
+  const [guestScore, setGuestScore] = useState(0);
+  const [myAnswer, setMyAnswer] = useState(null);
+  const [timer, setTimer] = useState(20);
+  const [showChat, setShowChat] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [msgText, setMsgText] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      const client = await DB.getClient();
+      setSb(client);
+      const sid = DB.getSessionId();
+      if (!sid) { window.location.href = '/auth/login.html'; return; }
+      const u = await DB.getUser(sid);
+      if (!u) { window.location.href = '/auth/login.html'; return; }
+      setUser(u);
+      const { data: subs } = await client.from('subjects').select('*');
+      setSubjects(subs || []);
+      setView('lobby');
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (!sb || !selSubj) return;
+    sb.from('units').select('*').eq('subject_id', selSubj).then(({ data }) => setUnits(data || []));
+    setSelUnit(''); setSelLesson('');
+  }, [selSubj, sb]);
+
+  useEffect(() => {
+    if (!sb || !selUnit) return;
+    sb.from('lessons').select('*').eq('unit_id', selUnit).then(({ data }) => setLessons(data || []));
+    setSelLesson('');
+  }, [selUnit, sb]);
+
+  useEffect(() => {
+    if (!sb || !challenge) return;
+    const channel = sb.channel('sv_game_' + challenge.id)
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'sv_challenges', filter: `id=eq.${challenge.id}` }, payload => {
+        const newData = payload.new;
+        setChallenge(newData);
+        setHostScore(newData.host_score);
+        setGuestScore(newData.guest_score);
+        if (newData.status === 'playing' && view === 'waiting') setView('game');
+        if (newData.status === 'finished') setView('end');
+        if (newData.current_question > qIndex) {
+          setQIndex(newData.current_question);
+          setMyAnswer(null);
+          setTimer(20);
+        }
+      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'sv_messages', filter: `challenge_id=eq.${challenge.id}` }, payload => {
+        setMessages(prev => [...prev, payload.new]);
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'sv_challenges', filter: `id=eq.${challenge.id}` }, () => {
+        Swal.fire('انتهى التحدي', 'قام الخصم بإلغاء التحدي', 'info').then(() => window.location.href = '/student/index.html');
+      })
+      .subscribe();
+    return () => { sb.removeChannel(channel); };
+  }, [sb, challenge, view, qIndex]);
+
+  useEffect(() => {
+    if (view === 'game' && challenge && questions.length === 0) {
+      sb.from('questions').select('*').in('id', challenge.question_ids).then(({ data }) => {
+        const ordered = challenge.question_ids.map(id => data.find(q => q.id === id)).filter(Boolean);
+        setQuestions(ordered);
+      });
+    }
+  }, [view, challenge, questions, sb]);
+
+  useEffect(() => {
+    if (view !== 'game') return;
+    if (timer <= 0) {
+      if (challenge.host_id === user.id) checkAdvance(true);
+      return;
+    }
+    const t = setTimeout(() => setTimer(t => t - 1), 1000);
+    return () => clearTimeout(t);
+  }, [timer, view, challenge, user]);
+
+  const checkAdvance = async (force = false) => {
+    if (challenge.host_id !== user.id) return;
+    const { data: ans } = await sb.from('sv_answers').select('user_id').eq('challenge_id', challenge.id).eq('question_index', qIndex);
+    const hostAns = ans.some(a => a.user_id === challenge.host_id);
+    const guestAns = ans.some(a => a.user_id === challenge.guest_id);
+    if ((hostAns && guestAns) || force) {
+      const nextQ = qIndex + 1;
+      if (nextQ >= challenge.question_ids.length) await sb.from('sv_challenges').update({ status: 'finished', current_question: nextQ }).eq('id', challenge.id);
+      else await sb.from('sv_challenges').update({ current_question: nextQ }).eq('id', challenge.id);
+    }
+  };
+
+  const handleAnswer = async (optIdx) => {
+    if (myAnswer !== null) return;
+    setMyAnswer(optIdx);
+    const q = questions[qIndex];
+    if (!q) return;
+    const isCorrect = optIdx === q.correct[0];
+    const isHost = challenge.host_id === user.id;
+    const newScore = (isHost ? hostScore : guestScore) + (isCorrect ? 1 : 0);
+    await sb.from('sv_answers').insert([{ id: DB.uid('sva_'), challenge_id: challenge.id, user_id: user.id, question_index: qIndex, answer_index: optIdx, is_correct: isCorrect, created_at: Date.now() }]);
+    await sb.from('sv_challenges').update(isHost ? { host_score: newScore } : { guest_score: newScore }).eq('id', challenge.id);
+    if (isHost) setTimeout(() => checkAdvance(false), 500);
+  };
+
+  const createChallenge = async () => {
+    if (!selLesson) return Swal.fire('خطأ', 'اختر الدرس أولاً', 'warning');
+    const { data: qs } = await sb.from('questions').select('id').eq('lesson_id', selLesson);
+    if (!qs || qs.length < 5) return Swal.fire('خطأ', 'الأسئلة غير كافية (مطلوب 5 على الأقل)', 'warning');
+    const shuffled = qs.sort(() => 0.5 - Math.random()).slice(0, 10).map(q => q.id);
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const ch = { id: DB.uid('sv_'), code, host_id: user.id, lesson_id: selLesson, question_ids: shuffled, status: 'waiting', host_score: 0, guest_score: 0, current_question: 0, created_at: Date.now() };
+    await sb.from('sv_challenges').insert([ch]);
+    setChallenge(ch); setView('waiting');
+  };
+
+  const joinChallenge = async () => {
+    if (!joinCode || joinCode.length < 4) return Swal.fire('خطأ', 'أدخل كود صحيح', 'warning');
+    const { data: ch } = await sb.from('sv_challenges').select('*').eq('code', joinCode.toUpperCase()).eq('status', 'waiting').maybeSingle();
+    if (!ch) return Swal.fire('خطأ', 'الكود غير صحيح أو التحدي بدأ بالفعل', 'error');
+    await sb.from('sv_challenges').update({ guest_id: user.id, status: 'playing' }).eq('id', ch.id);
+    setChallenge({ ...ch, guest_id: user.id, status: 'playing' }); setView('game');
+  };
+
+  const sendMessage = async (text, emoji) => {
+    if (!text && !emoji) return;
+    await sb.from('sv_messages').insert([{ id: DB.uid('svm_'), challenge_id: challenge.id, user_id: user.id, user_name: user.name, text: text || null, emoji: emoji || null, created_at: Date.now() }]);
+    if (text) setMsgText('');
+  };
+
+  const exitGame = async () => {
+    if (challenge) {
+      await sb.from('sv_challenges').delete().eq('id', challenge.id);
+      await sb.from('sv_answers').delete().eq('challenge_id', challenge.id);
+      await sb.from('sv_messages').delete().eq('challenge_id', challenge.id);
+    }
+    window.location.href = '/student/index.html';
+  };
+
+  useEffect(() => {
+    if (view === 'end' && user && challenge) {
+      const isWinner = (challenge.host_id === user.id && hostScore > guestScore) || (challenge.guest_id === user.id && guestScore > hostScore);
+      if (isWinner) DB.updateUser(user.id, { xp: (user.xp || 0) + 50 }).then(() => { if (window.confetti) window.confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } }); });
+    }
+  }, [view, user, challenge, hostScore, guestScore]);
+
+  if (view === 'loading') return <div style={{minHeight: '100vh', display: 'grid', placeItems: 'center'}}><div className="spinner"></div></div>;
+
+  return (
+    <div className="container">
+      <div className="header">
+        <h1>⚔️ تحدي الأصدقاء</h1>
+        {view !== 'lobby' && view !== 'waiting' && <button className="btn btn-s" onClick={exitGame}>خروج</button>}
+        {view === 'lobby' && <button className="btn btn-s" onClick={() => window.location.href = '/student/index.html'}>رجوع</button>}
+      </div>
+
+      {view === 'lobby' && (
+        <div className="glass" style={{ padding: 30 }}>
+          <div className="tabs">
+            <div className={`tab ${mode === 'create' ? 'active' : ''}`} onClick={() => setMode('create')}>إنشاء تحدي</div>
+            <div className={`tab ${mode === 'join' ? 'active' : ''}`} onClick={() => setMode('join')}>الانضمام بكود</div>
+          </div>
+          {mode === 'create' ? (
+            <>
+              <div className="form-group">
+                <label className="lbl">المادة</label>
+                <select className="input" value={selSubj} onChange={e => setSelSubj(e.target.value)}>
+                  <option value="">-- اختر المادة --</option>
+                  {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="lbl">الوحدة</label>
+                <select className="input" value={selUnit} onChange={e => setSelUnit(e.target.value)} disabled={!selSubj}>
+                  <option value="">-- اختر الوحدة --</option>
+                  {units.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="lbl">الدرس</label>
+                <select className="input" value={selLesson} onChange={e => setSelLesson(e.target.value)} disabled={!selUnit}>
+                  <option value="">-- اختر الدرس --</option>
+                  {lessons.map(l => <option key={l.id} value={l.id}>{l.title}</option>)}
+                </select>
+              </div>
+              <button className="btn btn-p" style={{ width: '100%', marginTop: 10 }} onClick={createChallenge}>🚀 إنشاء التحدي</button>
+            </>
+          ) : (
+            <>
+              <div className="form-group">
+                <label className="lbl">أدخل كود التحدي (6 حروف)</label>
+                <input className="input" style={{ textAlign: 'center', fontSize: 24, letterSpacing: 4, fontWeight: 900 }} value={joinCode} onChange={e => setJoinCode(e.target.value.toUpperCase())} maxLength={6} placeholder="XXXXXX" />
+              </div>
+              <button className="btn btn-ok" style={{ width: '100%', marginTop: 10 }} onClick={joinChallenge}>انضمام للتحدي</button>
+            </>
+          )}
+        </div>
+      )}
+
+      {view === 'waiting' && (
+        <div className="glass" style={{ padding: 40, textAlign: 'center' }}>
+          <div className="spinner" style={{ marginBottom: 20 }}></div>
+          <h2 style={{ fontSize: 20, marginBottom: 10 }}>في انتظار انضمام صديقك...</h2>
+          <p style={{ color: '#7f93b8', marginBottom: 20 }}>أرسل هذا الكود لصديقك لينضم للتحدي</p>
+          <div className="code-display">{challenge?.code}</div>
+          <button className="btn btn-g" onClick={() => { navigator.clipboard.writeText(challenge?.code); Swal.fire('تم النسخ', 'تم نسخ الكود بنجاح', 'success'); }}>📋 نسخ الكود</button>
+        </div>
+      )}
+
+      {view === 'game' && questions.length > 0 && (
+        <>
+          <div className="game-header">
+            <div className={`score-box ${challenge.host_id === user.id ? 'mine' : 'theirs'}`}>
+              <span>أنت</span><b>{challenge.host_id === user.id ? hostScore : guestScore}</b>
+            </div>
+            <div className="timer">{timer}</div>
+            <div className={`score-box ${challenge.host_id !== user.id ? 'mine' : 'theirs'}`}>
+              <b>{challenge.host_id !== user.id ? hostScore : guestScore}</b><span>الخصم</span>
+            </div>
+          </div>
+
+          <div className="glass question-card">
+            <div style={{ color: '#7f93b8', marginBottom: 10, fontWeight: 700 }}>سؤال {qIndex + 1} من {challenge.question_ids.length}</div>
+            <div className="question-text">{questions[qIndex].text}</div>
+            <div className="options">
+              {questions[qIndex].options.map((opt, i) => {
+                let cls = 'opt';
+                if (myAnswer !== null) {
+                  if (i === questions[qIndex].correct[0]) cls += ' correct';
+                  else if (i === myAnswer) cls += ' wrong';
+                }
+                return (
+                  <div key={i} className={cls} onClick={() => handleAnswer(i)}>
+                    <div className="opt-l">{['أ','ب','ج','د'][i]}</div>
+                    <div>{opt}</div>
+                  </div>
+                );
+              })}
+            </div>
+            {myAnswer !== null && (
+              <div style={{ marginTop: 20, color: myAnswer === questions[qIndex].correct[0] ? '#22c55e' : '#ef4444', fontWeight: 800 }}>
+                {myAnswer === questions[qIndex].correct[0] ? '✅ إجابة صحيحة! بانتظار الخصم...' : '❌ إجابة خاطئة! بانتظار الخصم...'}
+              </div>
+            )}
+          </div>
+
+          <button className="btn btn-p" style={{ position: 'fixed', bottom: 20, left: 20, borderRadius: '50%', width: 60, height: 60, padding: 0 }} onClick={() => setShowChat(true)}>
+            💬
+          </button>
+
+          {showChat && (
+            <div className="overlay" onClick={() => setShowChat(false)}>
+              <div className="chat-panel" onClick={e => e.stopPropagation()}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+                  <h3 style={{ fontSize: 18 }}>الدردشة</h3>
+                  <button className="btn btn-s" style={{ padding: '4px 10px' }} onClick={() => setShowChat(false)}>✕</button>
+                </div>
+                <div className="msg-list">
+                  {messages.map(m => (
+                    <div key={m.id} className={`msg ${m.user_id === user.id ? 'mine' : 'theirs'}`}>
+                      {m.text && <div>{m.text}</div>}
+                      {m.emoji && <div style={{ fontSize: 32, background: 'transparent', padding: 0 }}>{m.emoji}</div>}
+                    </div>
+                  ))}
+                </div>
+                <div className="emoji-bar">
+                  {EMOJIS.map(e => <button key={e} className="emoji-btn" onClick={() => sendMessage(null, e)}>{e}</button>)}
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input className="input" value={msgText} onChange={e => setMsgText(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendMessage(msgText)} placeholder="اكتب رسالة..." />
+                  <button className="btn btn-p" onClick={() => sendMessage(msgText)}>إرسال</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {view === 'end' && (
+        <div className="glass" style={{ padding: 40, textAlign: 'center' }}>
+          <div style={{ fontSize: 80, marginBottom: 20 }}>🏆</div>
+          <h1 style={{ fontSize: 32, marginBottom: 10 }}>
+            {hostScore > guestScore ? (challenge.host_id === user.id ? 'أنت الفائز! 🎉' : 'الخصم فاز 💔') : hostScore < guestScore ? (challenge.guest_id === user.id ? 'أنت الفائز! 🎉' : 'الخصم فاز 💔') : 'تعادل! 🤝'}
+          </h1>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 20, fontSize: 24, fontWeight: 900, marginBottom: 30 }}>
+            <div style={{ color: '#2f7dff' }}>أنت: {challenge.host_id === user.id ? hostScore : guestScore}</div>
+            <div style={{ color: '#7f93b8' }}>|</div>
+            <div style={{ color: '#ef4444' }}>الخصم: {challenge.host_id !== user.id ? hostScore : guestScore}</div>
+          </div>
+          <button className="btn btn-p" style={{ width: '100%' }} onClick={exitGame}>العودة للرئيسية</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
