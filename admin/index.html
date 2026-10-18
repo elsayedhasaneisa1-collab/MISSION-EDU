@@ -602,60 +602,236 @@ function PollsPage(){
     </Modal>}
   </>;
 }
+
 function LessonsPage(){
   const app=useApp();
   const [editing,setEditing]=useState(null);const [form,setForm]=useState({});const [busy,setBusy]=useState(false);
   const [filterUnit,setFilterUnit]=useState('all');const [filterAccess,setFilterAccess]=useState('all');
-  const [lessonTestText,setLessonTestText]=useState('');const [lessonTestTitle,setLessonTestTitle]=useState('');
-  const [lessonTestDuration,setLessonTestDuration]=useState(15);const [lessonTestPassScore,setLessonTestPassScore]=useState(50);
-  const [lessonTestXp,setLessonTestXp]=useState(10);const [lessonTestFree,setLessonTestFree]=useState(true);
-  const [lessonTestBusy,setLessonTestBusy]=useState(false);const [jsonImporting,setJsonImporting]=useState(false);
-  const jsonFileRef=useRef(null);const [previewQs,setPreviewQs]=useState(null);const [editQ,setEditQ]=useState(null);const [editQBusy,setEditQBusy]=useState(false);
+  const [lessonTestText,setLessonTestText]=useState('');
+  const [lessonTestTitle,setLessonTestTitle]=useState('');
+  const [lessonTestDuration,setLessonTestDuration]=useState(15);
+  const [lessonTestPassScore,setLessonTestPassScore]=useState(50);
+  const [lessonTestXp,setLessonTestXp]=useState(10);
+  const [lessonTestFree,setLessonTestFree]=useState(true);
+  const [lessonTestBusy,setLessonTestBusy]=useState(false);
+  const [previewQs,setPreviewQs]=useState(null);
+
   const openNew=()=>{setForm({title:'',desc:'',summary:'',video:{type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true},pdf_url:'',duration:'',xp:'',sort_order:'',unit_id:'',published:true,key_points:[],examples:[],notes:''});setLessonTestText('');setLessonTestTitle('');setLessonTestDuration(15);setLessonTestPassScore(50);setLessonTestXp(10);setLessonTestFree(true);setEditing('new');};
+
   const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(!c.video)c.video={type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true};if(c.video.is_free===undefined)c.video.is_free=true;if(!c.key_points)c.key_points=[];if(!c.pdf_url)c.pdf_url='';setForm(c);setLessonTestText('');setLessonTestTitle(`اختبار ${c.title||'الدرس'}`);setLessonTestDuration(15);setLessonTestPassScore(50);setLessonTestXp(10);setLessonTestFree(true);setEditing(it.id);};
-  const parseLessonTestQuestion=raw=>{const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد](?:[)\.\-:：]\s*|\s+))|(?:[🔵🟢🟡🔴🟣🟠⚫⚪]\s*))/u;const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]/u.test(x));const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));const optionLines=lines.filter(x=>optionRegex.test(x)&&!/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));if(optionLines.length<4||!answerLine)return null;const cleanOption=x=>x.replace(optionRegex,'').replace(/[.。؛;]+$/u,'').trim();const options=optionLines.slice(0,4).map(cleanOption);const answerText=answerLine.replace(/^.*?(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]\s*/u,'').trim();const answerEmoji=(answerText.match(/^[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]/u)||[])[0]||'';const answerClean=cleanOption(answerText);let correct=options.findIndex(o=>o&&(answerClean.includes(o)||o.includes(answerClean)));if(correct<0&&answerEmoji){const target=optionLines.findIndex(x=>x.startsWith(answerEmoji));if(target>=0)correct=target;}if(correct<0)return null;const optionStart=lines.findIndex(x=>optionRegex.test(x));const questionText=lines.slice(0,optionStart).map((x,i)=>i===0?x.replace(/^\s*(?:🧪\s*)?السؤال\s*(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر|\d+)\s*(?:[:：|｜\-–—]\s*)?/u,'').trim():x).filter(Boolean).join('\n').trim();if(!questionText)return null;const explanation=explanationLine?explanationLine.replace(/^.*?(?:التعليل|الشرح|السبب)\s*[:：]\s*/u,'').trim():'';return {text:questionText,options,correct,explanation};};
-  const parseBlock=()=>{const raw=(lessonTestText||'').trim();if(!raw)return[];const heading=/^(?=.*السؤال)(?=.*(?:🧪|[|｜:—–-]|\d)).*$/gmu;const starts=[...raw.matchAll(heading)].map(m=>m.index);const blocks=starts.length>1?starts.map((start,i)=>raw.slice(start,starts[i+1]??raw.length).trim()).filter(Boolean):[raw];return blocks.map(parseLessonTestQuestion).filter(Boolean);};
-  const previewTest=()=>{const parsed=parseBlock();if(!parsed.length)return app.toast.warn('لا أسئلة');setPreviewQs(parsed);};
-  const createTestForLesson=async()=>{if(editing==='new'||!form.id)return app.toast.warn('احفظ الدرس أولاً');if(!lessonTestTitle.trim())return app.toast.warn('اكتب اسم الاختبار');const parsed=parseBlock();if(!parsed.length)return app.toast.warn('لم أتعرف على الأسئلة');const lesson=app.lesson(form.id)||form;const unit=app.unit(lesson.unit_id);const subjectId=unit?.subject_id||'';if(!subjectId)return app.toast.warn('الدرس لازم يكون مرتبط بوحدة');setLessonTestBusy(true);try{const questionIds=[];for(const q of parsed){const id=DB.uid('q_');await app.save('questions',{id,text:q.text,options:q.options,correct:[q.correct],explanation:q.explanation,lesson_id:lesson.id,unit_id:lesson.unit_id,subject_id:subjectId,difficulty:'medium',xp:Number(lessonTestXp)||0,type:'mcq'});questionIds.push(id);}const exam={id:DB.uid('exam_'),title:lessonTestTitle.trim(),subject_id:subjectId,unit_id:lesson.unit_id,lesson_ids:[lesson.id],question_ids:questionIds,duration:Number(lessonTestDuration)||15,pass_score:Number(lessonTestPassScore)||0,max_attempts:0,xp:Number(lessonTestXp)||0,published:true,sort_order:0,is_free:lessonTestFree};await app.save('exams',exam);app.toast.ok(`تم إنشاء اختبار بـ ${questionIds.length} سؤال`);setLessonTestText('');setPreviewQs(null);}catch(e){app.toast.err('فشل: '+(e.message||'خطأ'));}setLessonTestBusy(false);};
+
+  const parseLessonQuestionsJSON = (raw) => {
+    let parsed;
+    try { parsed = JSON.parse(raw); }
+    catch(e) { throw new Error('صيغة JSON غير صحيحة. راجع الأقواس والفواصل وعلامات التنصيص.'); }
+    const list = Array.isArray(parsed) ? parsed : (Array.isArray(parsed?.questions) ? parsed.questions : null);
+    if(!list || !list.length) throw new Error('لا توجد أسئلة. الصق مصفوفة أسئلة.');
+    return list.map((item, i) => {
+      if(!item || typeof item !== 'object') throw new Error(`السؤال رقم ${i+1} غير صالح.`);
+      const text = String(item.question ?? item.text ?? '').trim();
+      const source = item.options ?? item.choices;
+      let options;
+      if(Array.isArray(source)) options = source.map(v => String(v ?? '').trim());
+      else if(source && typeof source === 'object') options = ['A','B','C','D'].map(k => String(source[k] ?? source[k.toLowerCase()] ?? '').trim());
+      else options = [];
+      if(!text) throw new Error(`نص السؤال رقم ${i+1} فارغ.`);
+      if(options.length < 2 || options.some(v => !v)) throw new Error(`اختيارات السؤال رقم ${i+1} ناقصة.`);
+      if(options.length > 4) options = options.slice(0, 4);
+      const rawCorrect = item.correct ?? item.answer;
+      if(rawCorrect === undefined || rawCorrect === null || String(rawCorrect).trim() === '')
+        throw new Error(`الإجابة الصحيحة للسؤال رقم ${i+1} غير محددة.`);
+      let correct = -1;
+      if(typeof rawCorrect === 'number' || /^\d+$/.test(String(rawCorrect).trim())) {
+        const n = Number(rawCorrect);
+        correct = (n >= 0 && n < options.length) ? n : (n >= 1 && n <= options.length ? n - 1 : -1);
+      } else {
+        const key = String(rawCorrect).trim();
+        const letterMap = {'A':0,'B':1,'C':2,'D':3,'a':0,'b':1,'c':2,'d':3,'أ':0,'ب':1,'ج':2,'د':3};
+        if(Object.prototype.hasOwnProperty.call(letterMap, key)) correct = letterMap[key];
+        else correct = options.findIndex(o => o.toLowerCase() === key.toLowerCase());
+      }
+      if(correct < 0 || correct >= options.length)
+        throw new Error(`الإجابة الصحيحة للسؤال رقم ${i+1} لا تطابق أي اختيار.`);
+      return {
+        text, options, correct,
+        explanation: String(item.explanation ?? item.rationale ?? '').trim(),
+        difficulty: String(item.difficulty || 'medium'),
+        xp: Number(item.xp) || 0
+      };
+    });
+  };
+
+  const previewTest = () => {
+    try {
+      const parsed = parseLessonQuestionsJSON((lessonTestText || '').trim());
+      setPreviewQs(parsed);
+    } catch(e) {
+      app.toast.err(e.message, 'راجع JSON');
+    }
+  };
+
+  const createTestForLesson = async () => {
+    if(editing === 'new' || !form.id) return app.toast.warn('احفظ الدرس أولاً');
+    if(!lessonTestTitle.trim()) return app.toast.warn('اكتب اسم الاختبار');
+    let parsed;
+    try { parsed = parseLessonQuestionsJSON((lessonTestText || '').trim()); }
+    catch(e) { return app.toast.err(e.message, 'راجع JSON'); }
+    const lesson = app.lesson(form.id) || form;
+    const unit = app.unit(lesson.unit_id);
+    const subjectId = unit?.subject_id || '';
+    if(!subjectId) return app.toast.warn('الدرس لازم يكون مرتبط بوحدة');
+    setLessonTestBusy(true);
+    try {
+      const questionIds = [];
+      for(const q of parsed) {
+        const id = DB.uid('q_');
+        await app.save('questions', {
+          id, text: q.text, options: q.options, correct: [q.correct],
+          explanation: q.explanation, lesson_id: lesson.id,
+          unit_id: lesson.unit_id, subject_id: subjectId,
+          difficulty: q.difficulty, xp: Number(q.xp) || Number(lessonTestXp) || 0, type: 'mcq'
+        });
+        questionIds.push(id);
+      }
+      const exam = {
+        id: DB.uid('exam_'), title: lessonTestTitle.trim(),
+        subject_id: subjectId, unit_id: lesson.unit_id, lesson_ids: [lesson.id],
+        question_ids: questionIds, duration: Number(lessonTestDuration) || 15,
+        pass_score: Number(lessonTestPassScore) || 0, max_attempts: 0,
+        xp: Number(lessonTestXp) || 0, published: true, sort_order: 0,
+        is_free: lessonTestFree
+      };
+      await app.save('exams', exam);
+      app.toast.ok(`تم إنشاء اختبار بـ ${questionIds.length} سؤال`);
+      setLessonTestText(''); setPreviewQs(null);
+    } catch(e) {
+      app.toast.err('فشل: ' + (e.message || 'خطأ'));
+    }
+    setLessonTestBusy(false);
+  };
+
   const save=async()=>{if(!form.title)return app.toast.warn('العنوان مطلوب');if(!form.unit_id)return app.toast.warn('اختر الوحدة');setBusy(true);try{const saved=await app.save('lessons',form);if(editing==='new'){const lesson=saved||form;setForm(lesson);setEditing(lesson.id);setLessonTestTitle(`اختبار ${lesson.title||'الدرس'}`);app.toast.ok('تم حفظ الدرس. انزل لأسفل لإضافة أسئلة الاختبار.');}else{app.toast.ok('تم الحفظ');setEditing(null);}}catch(e){app.toast.err(e.message);}setBusy(false);};
+
   const del=async id=>{const r=await Swal.fire({title:'حذف الدرس؟',text:'لا يمكن التراجع',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{await app.remove('lessons',id);app.toast.warn('تم');}catch(e){app.toast.err(e.message);}};
+
   const getLessonExams=lessonId=>app.db.exams.filter(e=>(e.lesson_ids||[]).includes(lessonId));
+
   const sortedLessons=useMemo(()=>[...app.db.lessons].sort((a,b)=>{const ta=new Date(a.created_at||a.createdAt||0).getTime()||0;const tb=new Date(b.created_at||b.createdAt||0).getTime()||0;return ta-tb;}),[app.db.lessons]);
+
   const filteredLessons=useMemo(()=>{let list=sortedLessons;if(filterUnit!=='all')list=list.filter(l=>l.unit_id===filterUnit);if(filterAccess!=='all'){list=list.filter(l=>{const isFree=!l.video||!l.video.url||l.video.is_free!==false;return filterAccess==='free'?isFree:!isFree;});}return list;},[sortedLessons,filterUnit,filterAccess]);
+
   const currentLessonExams=editing&&editing!=='new'?getLessonExams(editing):[];
+
   return <>
     <div className="flex between center mb16 wrap g8"><div className="h2 grad">📖 إدارة الدروس</div><div className="flex g8"><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> درس جديد</button></div></div>
+
     <div className="glass mb16" style={{padding:14}}><div className="flex wrap g12"><div style={{flex:'1 1 240px'}}><label className="lbl">الوحدة</label><select className="input" value={filterUnit} onChange={e=>setFilterUnit(e.target.value)}><option value="all">كل الوحدات ({sortedLessons.length})</option>{app.db.units.map(u=><option key={u.id} value={u.id}>{app.subject(u.subject_id)?.name} — {u.name}</option>)}</select></div><div style={{flex:'1 1 240px'}}><label className="lbl">الوصول</label><select className="input" value={filterAccess} onChange={e=>setFilterAccess(e.target.value)}><option value="all">الكل</option><option value="free">🆓 مجاني</option><option value="paid">🔒 مدفوع</option></select></div></div></div>
-    <div className="glass" style={{padding:14}}>{filteredLessons.length===0?<Empty title="لا دروس"/>:<div className="sx"><table className="tbl"><thead><tr><th>الدرس</th><th>الوحدة</th><th>الوصول</th><th>XP</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>{filteredLessons.map(l=>{const isFree=!l.video||!l.video.url||l.video.is_free!==false;return <tr key={l.id}><td><b>{l.title}</b></td><td className="sm">{app.unit(l.unit_id)?.name||'—'}</td><td><AccessBadge value={isFree}/></td><td>{l.xp}</td><td>{l.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(l)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(l.id)}><Icon name="trash" size={13}/></button></div></td></tr>;})}</tbody></table></div>}</div>
+
+    <div className="glass" style={{padding:14}}>
+      {filteredLessons.length===0?<Empty title="لا دروس"/>:
+      <div className="sx"><table className="tbl"><thead><tr>
+        <th>الدرس</th>
+        <th>الوحدة</th>
+        <th>الوصول</th>
+        <th>اختبار</th>
+        <th>PDF</th>
+        <th>XP</th>
+        <th>الحالة</th>
+        <th>إجراءات</th>
+      </tr></thead><tbody>
+        {filteredLessons.map(l=>{
+          const isFree=!l.video||!l.video.url||l.video.is_free!==false;
+          const exams=getLessonExams(l.id);
+          const totalQs=exams.reduce((s,e)=>s+(e.question_ids||[]).length,0);
+          const hasPdf=!!l.pdf_url;
+          return <tr key={l.id}>
+            <td><b>{l.title}</b></td>
+            <td className="sm">{app.unit(l.unit_id)?.name||'—'}</td>
+            <td><AccessBadge value={isFree}/></td>
+            <td>{exams.length>0?<span className="pill pill-g">📝 {totalQs} سؤال</span>:<span className="pill pill-y">—</span>}</td>
+            <td>{hasPdf?<a href={l.pdf_url} target="_blank" rel="noreferrer" className="pill pill-b" style={{textDecoration:'none'}}>📄 PDF</a>:<span className="pill pill-y">—</span>}</td>
+            <td>{l.xp||'—'}</td>
+            <td>{l.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td>
+            <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(l)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(l.id)}><Icon name="trash" size={13}/></button></div></td>
+          </tr>;
+        })}
+      </tbody></table></div>}
+    </div>
+
     {editing!==null&&<Modal title={editing==='new'?'درس جديد':'تعديل الدرس'} onClose={()=>setEditing(null)} wide>
       <div className="section-title" style={{marginTop:0}}><span className="ico">📝</span> المعلومات</div>
-      <div className="grid g2"><Field label="العنوان"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field><Field label="الوحدة"><select className="input" value={form.unit_id||''} onChange={e=>setForm({...form,unit_id:e.target.value})}><option value="">— اختر —</option>{app.db.units.map(u=><option key={u.id} value={u.id}>{app.subject(u.subject_id)?.name} — {u.name}</option>)}</select></Field><Field label="المدة"><input type="number" className="input" value={form.duration??''} onChange={e=>setForm({...form,duration:e.target.value===''?'':+e.target.value})}/></Field><Field label="XP"><input type="number" className="input" value={form.xp??''} onChange={e=>setForm({...form,xp:e.target.value===''?'':+e.target.value})}/></Field><Field label="الترتيب"><input type="number" className="input" value={form.sort_order??''} onChange={e=>setForm({...form,sort_order:e.target.value===''?'':+e.target.value})}/></Field><Field label="الحالة"><select className="input" value={form.published!==false?'1':'0'} onChange={e=>setForm({...form,published:e.target.value==='1'})}><option value="1">منشور</option><option value="0">مخفي</option></select></Field></div>
+      <div className="grid g2">
+        <Field label="العنوان"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
+        <Field label="الوحدة"><select className="input" value={form.unit_id||''} onChange={e=>setForm({...form,unit_id:e.target.value})}><option value="">— اختر —</option>{app.db.units.map(u=><option key={u.id} value={u.id}>{app.subject(u.subject_id)?.name} — {u.name}</option>)}</select></Field>
+        <Field label="المدة"><input type="number" className="input" value={form.duration??''} onChange={e=>setForm({...form,duration:e.target.value===''?'':+e.target.value})}/></Field>
+        <Field label="XP"><input type="number" className="input" value={form.xp??''} onChange={e=>setForm({...form,xp:e.target.value===''?'':+e.target.value})}/></Field>
+        <Field label="الترتيب"><input type="number" className="input" value={form.sort_order??''} onChange={e=>setForm({...form,sort_order:e.target.value===''?'':+e.target.value})}/></Field>
+        <Field label="الحالة"><select className="input" value={form.published!==false?'1':'0'} onChange={e=>setForm({...form,published:e.target.value==='1'})}><option value="1">منشور</option><option value="0">مخفي</option></select></Field>
+      </div>
       <Field label="الوصف"><textarea className="input" value={form.desc||''} onChange={e=>setForm({...form,desc:e.target.value})}/></Field>
+
       <div className="section-title"><span className="ico">🎬</span> الفيديو</div>
       <div className="mb12"><VideoEditor value={form.video} onChange={v=>setForm({...form,video:v})}/></div>
+
       <div className="section-title"><span className="ico">📄</span> PDF</div>
       <Field label="رابط PDF"><input className="input" value={form.pdf_url||''} onChange={e=>setForm({...form,pdf_url:e.target.value})} placeholder="https://example.com/lesson.pdf"/></Field>
+
       <div className="section-title"><span className="ico">📚</span> المحتوى</div>
       <Field label="الملخص"><textarea className="input" value={form.summary||''} onChange={e=>setForm({...form,summary:e.target.value})}/></Field>
       <Field label="النقاط المهمة" hint="سطر لكل نقطة"><textarea className="input" value={(form.key_points||[]).join('\n')} onChange={e=>setForm({...form,key_points:e.target.value.split('\n').filter(Boolean)})}/></Field>
       <Field label="ملاحظات"><textarea className="input" value={form.notes||''} onChange={e=>setForm({...form,notes:e.target.value})}/></Field>
+
       <div className="section-title"><span className="ico">📝</span> اختبار الدرس</div>
       {editing==='new'?<div className="glass-s" style={{padding:12,marginBottom:12}}><div className="sm">احفظ الدرس أولاً</div></div>:<>
-        {currentLessonExams.length>0&&<div className="glass-s" style={{padding:14,marginBottom:12,borderColor:'rgba(34,197,94,.4)'}}><div className="flex between center mb12"><div className="sm" style={{fontWeight:800,color:'#6ee7a0'}}>✅ اختبارات ({currentLessonExams.length})</div></div>{currentLessonExams.map(e=><div key={e.id} className="flex between center mb6" style={{padding:'8px 12px',background:'rgba(34,197,94,.06)',borderRadius:10,border:'1px solid rgba(34,197,94,.20)'}}><div style={{flex:1,minWidth:0}}><div className="sm" style={{fontWeight:700}}>📋 {e.title}</div><div className="xs muted">⏱ {e.duration}د • 🎯 {e.pass_score}% • ❓ {(e.question_ids||[]).length}</div></div><button className="btn btn-dn btn-sm" onClick={async()=>{const r=await Swal.fire({title:'حذف؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;const qIds=e.question_ids||[];if(qIds.length>0)await DB.removeMany('questions',qIds);await DB.remove('exams',e.id);await app.reload();app.toast.ok('تم');}}><Icon name="trash" size={12}/></button></div>)}</div>}
-        <div className="grid g2"><Field label="اسم الاختبار"><input className="input" value={lessonTestTitle} onChange={e=>setLessonTestTitle(e.target.value)}/></Field><Field label="المدة"><input type="number" className="input" value={lessonTestDuration} onChange={e=>setLessonTestDuration(e.target.value===''?'':+e.target.value)}/></Field><Field label="درجة النجاح %"><input type="number" className="input" value={lessonTestPassScore} onChange={e=>setLessonTestPassScore(e.target.value===''?'':+e.target.value)}/></Field><Field label="XP"><input type="number" className="input" value={lessonTestXp} onChange={e=>setLessonTestXp(e.target.value===''?'':+e.target.value)}/></Field></div>
+        {currentLessonExams.length>0&&<div className="glass-s" style={{padding:14,marginBottom:12,borderColor:'rgba(34,197,94,.4)'}}>
+          <div className="flex between center mb12"><div className="sm" style={{fontWeight:800,color:'#6ee7a0'}}>✅ اختبارات ({currentLessonExams.length})</div></div>
+          {currentLessonExams.map(e=><div key={e.id} className="flex between center mb6" style={{padding:'8px 12px',background:'rgba(34,197,94,.06)',borderRadius:10,border:'1px solid rgba(34,197,94,.20)'}}>
+            <div style={{flex:1,minWidth:0}}><div className="sm" style={{fontWeight:700}}>📋 {e.title}</div><div className="xs muted">⏱ {e.duration}د • 🎯 {e.pass_score}% • ❓ {(e.question_ids||[]).length}</div></div>
+            <button className="btn btn-dn btn-sm" onClick={async()=>{const r=await Swal.fire({title:'حذف؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;const qIds=e.question_ids||[];if(qIds.length>0)await DB.removeMany('questions',qIds);await DB.remove('exams',e.id);await app.reload();app.toast.ok('تم');}}><Icon name="trash" size={12}/></button>
+          </div>)}
+        </div>}
+
+        <div className="grid g2">
+          <Field label="اسم الاختبار"><input className="input" value={lessonTestTitle} onChange={e=>setLessonTestTitle(e.target.value)}/></Field>
+          <Field label="المدة"><input type="number" className="input" value={lessonTestDuration} onChange={e=>setLessonTestDuration(e.target.value===''?'':+e.target.value)}/></Field>
+          <Field label="درجة النجاح %"><input type="number" className="input" value={lessonTestPassScore} onChange={e=>setLessonTestPassScore(e.target.value===''?'':+e.target.value)}/></Field>
+          <Field label="XP"><input type="number" className="input" value={lessonTestXp} onChange={e=>setLessonTestXp(e.target.value===''?'':+e.target.value)}/></Field>
+        </div>
         <Field label="نوع الاختبار"><AccessToggle value={lessonTestFree} onChange={setLessonTestFree}/></Field>
-        <Field label="إضافة أسئلة (الصق المجموعة)"><textarea className="input" rows="10" value={lessonTestText} onChange={e=>setLessonTestText(e.target.value)} placeholder="الصق الأسئلة..."/></Field>
-        <div className="flex g8 mb12"><button className="btn btn-s" onClick={previewTest} disabled={!lessonTestText.trim()} style={{flex:1}}>👁️ معاينة</button><button className="btn btn-p" onClick={createTestForLesson} disabled={lessonTestBusy} style={{flex:2}}>{lessonTestBusy?'جارٍ...':'⚡ إنشاء الاختبار'}</button></div>
+
+        <Field label="إضافة أسئلة (الصق كود JSON)">
+          <textarea className="input" rows="14" dir="ltr" value={lessonTestText} onChange={e=>setLessonTestText(e.target.value)}
+            placeholder={'[\n  {\n    "id": 1,\n    "question": "A person who takes care of patients in a hospital is usually a ______.",\n    "options": {\n      "A": "mechanic",\n      "B": "nurse",\n      "C": "architect",\n      "D": "pilot"\n    },\n    "correct": "B",\n    "explanation": "A nurse cares for patients and helps doctors provide medical treatment. (الممرض يعتني بالمرضى ويساعد الأطباء في تقديم العلاج الطبي)."\n  }\n]'}
+            style={{fontFamily:'monospace',fontSize:12,textAlign:'left',minHeight:220}}/>
+        </Field>
+
+        <div className="flex g8 mb12">
+          <button className="btn btn-s" onClick={previewTest} disabled={!lessonTestText.trim()} style={{flex:1}}>👁️ معاينة</button>
+          <button className="btn btn-p" onClick={createTestForLesson} disabled={lessonTestBusy} style={{flex:2}}>{lessonTestBusy?'جارٍ...':'⚡ إنشاء الاختبار'}</button>
+        </div>
       </>}
+
       <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
     </Modal>}
+
     {previewQs&&<Modal title={`👁️ معاينة (${previewQs.length})`} onClose={()=>setPreviewQs(null)} wide>
-      <div style={{maxHeight:'60vh',overflowY:'auto'}}>{previewQs.map((q,idx)=><div key={idx} className="glass-s mb12" style={{padding:14}}><div className="flex between center mb10"><span className="pill pill-b">سؤال {idx+1}</span></div><div className="sm mb10" style={{fontWeight:700,whiteSpace:'pre-wrap'}}>{q.text}</div><div className="flex col g6 mb10">{q.options.map((opt,oi)=>{const isCorrect=q.correct===oi;return <div key={oi} className="flex center g8" style={{padding:'6px 10px',borderRadius:8,background:isCorrect?'rgba(34,197,94,.10)':'rgba(255,255,255,.03)',border:`1px solid ${isCorrect?'rgba(34,197,94,.4)':'var(--border)'}`}}><span style={{width:24,height:24,borderRadius:'50%',display:'grid',placeItems:'center',background:isCorrect?'#22c55e':'rgba(255,255,255,.06)',fontWeight:800,fontSize:11,flexShrink:0}}>{['أ','ب','ج','د'][oi]}</span><span className="sm" style={{flex:1}}>{opt}</span></div>;})}</div></div>)}</div>
+      <div style={{maxHeight:'60vh',overflowY:'auto'}}>
+        {previewQs.map((q,idx)=><div key={idx} className="glass-s mb12" style={{padding:14}}>
+          <div className="flex between center mb10"><span className="pill pill-b">سؤال {idx+1}</span>{q.xp>0&&<span className="pill pill-g">+{q.xp} XP</span>}</div>
+          <div className="sm mb10" style={{fontWeight:700,whiteSpace:'pre-wrap'}}>{q.text}</div>
+          <div className="flex col g6 mb10">
+            {q.options.map((opt,oi)=>{const isCorrect=q.correct===oi;return <div key={oi} className="flex center g8" style={{padding:'6px 10px',borderRadius:8,background:isCorrect?'rgba(34,197,94,.10)':'rgba(255,255,255,.03)',border:`1px solid ${isCorrect?'rgba(34,197,94,.4)':'var(--border)'}`}}>
+              <span style={{width:24,height:24,borderRadius:'50%',display:'grid',placeItems:'center',background:isCorrect?'#22c55e':'rgba(255,255,255,.06)',fontWeight:800,fontSize:11,flexShrink:0}}>{['A','B','C','D'][oi]}</span>
+              <span className="sm" style={{flex:1}}>{opt}</span>
+            </div>;})}
+          </div>
+          {q.explanation&&<div className="xs" style={{background:'rgba(212,175,55,.08)',padding:8,borderRadius:8,borderInlineStart:'2px solid var(--gold)'}}>💡 {q.explanation}</div>}
+        </div>)}
+      </div>
       <button className="btn btn-p btn-block" onClick={()=>setPreviewQs(null)}>رجوع</button>
     </Modal>}
   </>;
 }
-
 function ExamsPage(){
   const app=useApp();
   const [editing,setEditing]=useState(null);const [form,setForm]=useState({});const [busy,setBusy]=useState(false);const [jsonText,setJsonText]=useState('');
