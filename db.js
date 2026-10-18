@@ -108,6 +108,9 @@ const sendToTelegram = async (message) => {
   } catch (e) { return false; }
 };
 
+const REPORTS_LIMIT = 3;
+const DAILY_REWARDS = [10, 20, 30, 40, 50, 75, 150];
+
 const API = {
   uid, today, daysBetween, fmt, pct,
   formatTime, formatDate, formatDateTime,
@@ -128,6 +131,7 @@ const API = {
     const valid = storedHash === hashed || storedHash === password;
     if (!valid) throw new Error("كلمة المرور غير صحيحة");
     if (data.active === false) throw new Error("الحساب موقوف. تواصل مع الإدارة.");
+    if (data.banned === true) throw new Error("⛔ حسابك محظور تلقائيًا بعد 3 بلاغات. تواصل مع الإدارة لفك الحظر.");
 
     const t = today();
     let streak = data.streak || 0;
@@ -144,9 +148,10 @@ const API = {
     return updated;
   },
 
-  async register({ name, phone, password, gradeId, countryCode = "+20", governorate = "" }) {
+  async register({ name, phone, password, gradeId, gender, countryCode = "+20", governorate = "" }) {
     if (!name || !phone || !password) throw new Error("يرجى تعبئة جميع الحقول");
     if (password.length < 6) throw new Error("كلمة المرور يجب أن تكون 6 أحرف على الأقل");
+    if (!gender || !["male", "female"].includes(gender)) throw new Error("يرجى اختيار النوع (ولد / بنت)");
 
     const cleanPhone = String(phone).replace(/\D/g, "");
     if (cleanPhone.length < 8) throw new Error("رقم الهاتف غير صالح");
@@ -162,18 +167,22 @@ const API = {
       id: uid("u_"), phone: cleanPhone, country_code: countryCode, governorate: governorate || null,
       email: null, password: hashed, password_hash: hashed, name: name.trim(),
       role: "student", role_id: roleRow ? roleRow.id : "role_student",
-      avatar: "🧑‍🎓", grade_id: gradeId || "",
+      avatar: gender === "female" ? "👩‍🎓" : "🧑‍🎓",
+      gender: gender,
+      grade_id: gradeId || "",
       xp: 0, streak: 1, last_active: today(),
       created_at: Date.now(), active: true,
       all_subjects: true, access_subjects: [], subscription: "free",
-      completed_lessons: [], completed_missions: [], achievements: []
+      completed_lessons: [], completed_missions: [], achievements: [],
+      banned: false, reports_count: 0,
+      study_partner_active: false, study_partner_id: null
     };
 
     const { data, error } = await sb.from("users").insert([u]).select().single();
     if (error) throw new Error(error.message);
 
     setSession(u.id);
-    API.trackActivity({ userId: u.id, userName: u.name, userRole: "student", type: "register", target: u.name, details: { role: "student", phone: cleanPhone, governorate } });
+    API.trackActivity({ userId: u.id, userName: u.name, userRole: "student", type: "register", target: u.name, details: { role: "student", phone: cleanPhone, gender, governorate } });
 
     return data;
   },
@@ -232,6 +241,38 @@ const API = {
     const sb = await getClient();
     const { error } = await sb.from(table).delete().eq("id", id);
     if (error) throw new Error(error.message);
+  },
+
+  async removeMany(table, ids) {
+    const sb = await getClient();
+    const { error } = await sb.from(table).delete().in("id", ids);
+    if (error) throw new Error(error.message);
+  },
+
+  async deleteQuestion(qId) {
+    const sb = await getClient();
+    const { data: exams } = await sb.from("exams").select("id, question_ids");
+    let examsUpdated = 0;
+    for (const ex of (exams || [])) {
+      const ids = ex.question_ids || [];
+      if (ids.includes(qId)) {
+        await sb.from("exams").update({ question_ids: ids.filter(x => x !== qId) }).eq("id", ex.id);
+        examsUpdated++;
+      }
+    }
+    await sb.from("questions").delete().eq("id", qId);
+    return { examsUpdated };
+  },
+
+  async changePassword(userId, oldHash, newHash) {
+    const sb = await getClient();
+    const { data } = await sb.from("users").select("password,password_hash").eq("id", userId).maybeSingle();
+    if (!data) return { success: false };
+    const stored = data.password_hash || data.password;
+    if (stored !== oldHash) return { success: false };
+    const { error } = await sb.from("users").update({ password: newHash, password_hash: newHash }).eq("id", userId);
+    if (error) throw new Error(error.message);
+    return { success: true };
   },
 
   async updateUser(id, patch) {
@@ -336,6 +377,185 @@ const API = {
       const { data } = await sb.from("notifications").select("*").or(`target.eq.all,target.eq.${userId}`).order("created_at", { ascending: false }).limit(20);
       return (data || []).filter(n => !(n.read_by || []).includes(userId));
     } catch (e) { return []; }
+  },
+
+  async reportUser({ reportedId, reportedName, reporterId, reporterName, reason, details }) {
+    if (!reportedId || !reporterId) throw new Error("بيانات البلاغ ناقصة");
+    if (reportedId === reporterId) throw new Error("مينفعش تبلغ عن نفسك");
+
+    const sb = await getClient();
+
+    const { data: existing } = await sb.from("user_reports").select("id").eq("reported_id", reportedId).eq("reporter_id", reporterId).maybeSingle();
+    if (existing) throw new Error("سبق أن بلغت عن هذا المستخدم");
+
+    const { error } = await sb.from("user_reports").insert([{ id: uid("urp_"), reported_id: reportedId, reporter_id: reporterId, reason, details: details || "", created_at: Date.now() }]);
+    if (error) throw new Error(error.message);
+
+    const { count } = await sb.from("user_reports").select("*", { count: "exact", head: true }).eq("reported_id", reportedId);
+
+    const total = count || 1;
+    const patch = { reports_count: total };
+    let banned = false;
+    if (total >= REPORTS_LIMIT) {
+      patch.banned = true;
+      patch.banned_at = Date.now();
+      patch.ban_reason = `حظر تلقائي بعد ${total} بلاغات`;
+      banned = true;
+    }
+    await sb.from("users").update(patch).eq("id", reportedId);
+
+    API.trackActivity({ userId: reporterId, userName: reporterName || "", userRole: "student", type: "report_user", target: reportedName || "", details: { reported_id: reportedId, reason, total_reports: total, banned } });
+
+    sendToTelegram(`🚨 <b>بلاغ جديد</b>\n👤 المُبلِّغ: ${reporterName || "—"}\n🎯 المُبلَّغ عنه: ${reportedName || "—"}\n📝 السبب: ${reason}\n📊 إجمالي بلاغاته: ${total}${banned ? "\n⛔ <b>تم حظره تلقائيًا</b>" : ""}`).catch(() => {});
+
+    return { total, banned };
+  },
+
+  async isUserBanned(userId) {
+    if (!userId) return false;
+    const sb = await getClient();
+    const { data } = await sb.from("users").select("banned").eq("id", userId).maybeSingle();
+    return data?.banned === true;
+  },
+
+  async unbanUser(userId) {
+    const sb = await getClient();
+    await sb.from("users").update({ banned: false, ban_reason: null, banned_at: null, reports_count: 0 }).eq("id", userId);
+    await sb.from("user_reports").delete().eq("reported_id", userId);
+    return true;
+  },
+
+  async getUserReports(userId) {
+    const sb = await getClient();
+    const { data } = await sb.from("user_reports").select("*").eq("reported_id", userId).order("created_at", { ascending: false });
+    return data || [];
+  },
+
+  async setStudyPartnerPrefs(userId, { active, subjectId, bio }) {
+    const sb = await getClient();
+    await sb.from("users").update({ study_partner_active: !!active, study_partner_subject_id: subjectId || null, study_partner_bio: bio || null }).eq("id", userId);
+    return true;
+  },
+
+  async listStudyPartners({ excludeId, gradeId, subjectId }) {
+    const sb = await getClient();
+    let q = sb.from("users").select("id,name,avatar,gender,grade_id,governorate,study_partner_subject_id,study_partner_bio,xp").eq("role", "student").eq("active", true).eq("banned", false).eq("study_partner_active", true).neq("id", excludeId).is("study_partner_id", null).limit(100);
+    if (gradeId) q = q.eq("grade_id", gradeId);
+    if (subjectId) q = q.eq("study_partner_subject_id", subjectId);
+    const { data } = await q;
+    return data || [];
+  },
+
+  async sendPartnerRequest({ fromId, toId }) {
+    const sb = await getClient();
+    const { data: existing } = await sb.from("partner_requests").select("id").eq("from_id", fromId).eq("to_id", toId).eq("status", "pending").maybeSingle();
+    if (existing) throw new Error("الطلب موجود بالفعل");
+    const { data: reverse } = await sb.from("partner_requests").select("id").eq("from_id", toId).eq("to_id", fromId).eq("status", "pending").maybeSingle();
+    if (reverse) throw new Error("هو بعتلك طلب بالفعل — روح تبويب الطلبات");
+
+    const { error } = await sb.from("partner_requests").insert([{ id: uid("pr_"), from_id: fromId, to_id: toId, status: "pending", created_at: Date.now() }]);
+    if (error) throw new Error(error.message);
+    return true;
+  },
+
+  async getPartnerRequestsForMe(userId) {
+    const sb = await getClient();
+    const { data } = await sb.from("partner_requests").select("*").eq("to_id", userId).eq("status", "pending").order("created_at", { ascending: false });
+    return data || [];
+  },
+
+  async getPartnerRequestSenders(userId) {
+    const sb = await getClient();
+    const { data: reqs } = await sb.from("partner_requests").select("*").eq("to_id", userId).eq("status", "pending").order("created_at", { ascending: false });
+    if (!reqs || reqs.length === 0) return [];
+    const ids = reqs.map(r => r.from_id);
+    const { data: users } = await sb.from("users").select("id,name,avatar,gender,grade_id,governorate,xp").in("id", ids);
+    const map = {};
+    (users || []).forEach(u => map[u.id] = u);
+    return reqs.map(r => ({ ...r, sender: map[r.from_id] || null }));
+  },
+
+  async respondPartnerRequest({ requestId, accept }) {
+    const sb = await getClient();
+    const { data: req } = await sb.from("partner_requests").select("*").eq("id", requestId).maybeSingle();
+    if (!req) throw new Error("الطلب مش موجود");
+    if (req.status !== "pending") throw new Error("تم الرد على الطلب بالفعل");
+
+    const status = accept ? "accepted" : "rejected";
+    await sb.from("partner_requests").update({ status, responded_at: Date.now() }).eq("id", requestId);
+
+    if (accept) {
+      await sb.from("users").update({ study_partner_id: req.to_id, study_partner_active: false }).eq("id", req.from_id);
+      await sb.from("users").update({ study_partner_id: req.from_id, study_partner_active: false }).eq("id", req.to_id);
+      await sb.from("partner_requests").update({ status: "rejected", responded_at: Date.now() }).eq("status", "pending").or(`from_id.eq.${req.from_id},to_id.eq.${req.from_id},from_id.eq.${req.to_id},to_id.eq.${req.to_id}`);
+    }
+    return { status };
+  },
+
+  async getMyPartner(userId) {
+    const sb = await getClient();
+    const { data: me } = await sb.from("users").select("study_partner_id").eq("id", userId).maybeSingle();
+    if (!me?.study_partner_id) return null;
+    const { data: partner } = await sb.from("users").select("id,name,avatar,gender,grade_id,governorate,phone,country_code,xp").eq("id", me.study_partner_id).maybeSingle();
+    return partner || null;
+  },
+
+  async unlinkPartner(userId) {
+    const sb = await getClient();
+    const { data: me } = await sb.from("users").select("study_partner_id").eq("id", userId).maybeSingle();
+    if (!me?.study_partner_id) return false;
+    await sb.from("users").update({ study_partner_id: null }).eq("id", me.study_partner_id);
+    await sb.from("users").update({ study_partner_id: null }).eq("id", userId);
+    return true;
+  },
+
+  async getDailyRewardStatus(userId) {
+    if (!userId) return { canClaim: false, currentDay: 1, claimedToday: false, history: [] };
+    const sb = await getClient();
+    const t = today();
+    const { data: claims } = await sb.from("daily_rewards").select("*").eq("user_id", userId).order("claim_date", { ascending: false }).limit(30);
+
+    const arr = claims || [];
+    const claimedToday = arr.some(c => c.claim_date === t);
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    const lastClaim = arr[0];
+    let currentDay = 1;
+
+    if (lastClaim) {
+      if (lastClaim.claim_date === t) {
+        currentDay = lastClaim.day_index;
+      } else if (lastClaim.claim_date === yesterday) {
+        currentDay = lastClaim.day_index >= 7 ? 1 : lastClaim.day_index + 1;
+      } else {
+        currentDay = 1;
+      }
+    }
+
+    return { canClaim: !claimedToday, currentDay, claimedToday, history: arr, rewards: DAILY_REWARDS };
+  },
+
+  async claimDailyReward(userId, userName) {
+    const sb = await getClient();
+    const t = today();
+
+    const { data: existing } = await sb.from("daily_rewards").select("id").eq("user_id", userId).eq("claim_date", t).maybeSingle();
+    if (existing) throw new Error("لقد استلمت مكافأة اليوم بالفعل ✅");
+
+    const status = await API.getDailyRewardStatus(userId);
+    const day = status.currentDay;
+    const xp = DAILY_REWARDS[day - 1];
+
+    const row = { id: uid("dr_"), user_id: userId, claim_date: t, day_index: day, xp, created_at: Date.now() };
+
+    const { error } = await sb.from("daily_rewards").insert([row]);
+    if (error) throw new Error(error.message);
+
+    const { data: u } = await sb.from("users").select("xp").eq("id", userId).maybeSingle();
+    await sb.from("users").update({ xp: (u?.xp || 0) + xp }).eq("id", userId);
+
+    API.trackActivity({ userId, userName: userName || "", userRole: "student", type: "daily_reward", target: `اليوم ${day} — ${xp} XP`, details: { xp, day } });
+
+    return { success: true, xp, day_index: day };
   },
 
   ytId(url) {
