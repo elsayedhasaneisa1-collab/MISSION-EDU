@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+<meta name="theme-color" content="#04060e" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="الدرس | MISSION EDU" />
+<meta property="og:description" content="منصة تعليمية متكاملة — تابع دروسك واختباراتك في مكان واحد" />
+<meta property="og:image" content="/logo.png" />
+<meta property="og:image:secure_url" content="/logo.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:site_name" content="MISSION EDU" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="الدرس | MISSION EDU" />
+<meta name="twitter:description" content="منصة تعليمية متكاملة — تابع دروسك واختباراتك في مكان واحد" />
+<meta name="twitter:image" content="/logo.png" />
+<title>الدرس | MISSION EDU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<link rel="icon" type="image/png" href="/logo.png">
+<link rel="apple-touch-icon" href="/logo.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MISSION EDU">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+:root{--bg:#04060e;--border:rgba(90,140,230,.16);--border2:rgba(90,140,230,.32);--blue:#2f7dff;--blue2:#5aa9ff;--txt:#e8eefc;--txt2:#b7c6e4;--muted:#7f93b8;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#8b5cf6;--gold:#fbbf24;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.45)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(47,125,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(139,92,246,.14),transparent 60%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;line-height:1.7}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:rgba(90,140,230,.25);border-radius:20px}
+button,input,select,textarea{font-family:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+a{color:inherit;text-decoration:none}
+ul{list-style:none}
+.glass{background:linear-gradient(180deg,rgba(21,31,56,.72),rgba(11,17,34,.62));border:1px solid var(--border);border-radius:var(--r);backdrop-filter:blur(16px);box-shadow:var(--sh)}
+.glass-s{background:rgba(21,31,56,.62);border:1px solid var(--border);border-radius:var(--rs)}
+.wrap{max-width:1200px;margin:0 auto;padding:20px 20px 100px}
+.h1{font-size:clamp(20px,3vw,28px);font-weight:900;letter-spacing:-.5px}
+.h2{font-size:clamp(17px,2.3vw,22px);font-weight:800}
+.h3{font-size:16px;font-weight:800}
+.h4{font-size:14.5px;font-weight:700}
+.sm{font-size:12.5px}.xs{font-size:11.5px}
+.muted{color:var(--muted)}.txt2{color:var(--txt2)}
+.flex{display:flex}.between{justify-content:space-between}.center{align-items:center}.col{flex-direction:column}.wrap-fl{flex-wrap:wrap}
+.g6{gap:6px}.g8{gap:8px}.g12{gap:12px}.g16{gap:16px}.g20{gap:20px}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}.mt24{margin-top:24px}
+.mb6{margin-bottom:6px}.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:12px 22px;border-radius:13px;font-weight:700;font-size:14.5px;transition:.24s;white-space:nowrap;color:var(--txt)}
+.btn-p{background:linear-gradient(135deg,#2f7dff,#1f5fd6);color:#fff;box-shadow:0 10px 28px rgba(47,125,255,.36)}
+.btn-p:hover{box-shadow:0 14px 38px rgba(47,125,255,.55);transform:translateY(-2px)}
+.btn-ok{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;box-shadow:0 10px 26px rgba(34,197,94,.28)}
+.btn-ok:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(34,197,94,.5)}
+.btn-wr{background:linear-gradient(135deg,#d97706,#f59e0b);color:#fff}
+.btn-wr:hover{transform:translateY(-2px)}
+.btn-s{background:rgba(255,255,255,.05);color:var(--txt2);border:1px solid var(--border)}
+.btn-s:hover{background:rgba(255,255,255,.09);color:var(--txt)}
+.btn-block{width:100%}
+.btn-lg{padding:15px 32px;font-size:16px;border-radius:16px}
+.btn:disabled{opacity:.42;cursor:not-allowed;transform:none!important}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:40px;font-size:11.5px;font-weight:700;border:1px solid transparent}
+.pill-b{background:rgba(47,125,255,.15);color:#7db6ff;border-color:rgba(47,125,255,.28)}
+.pill-g{background:rgba(34,197,94,.14);color:#6ee7a0;border-color:rgba(34,197,94,.28)}
+.pill-a{background:rgba(245,158,11,.14);color:#fcd34d;border-color:rgba(245,158,11,.28)}
+.pill-v{background:rgba(139,92,246,.15);color:#c4b5fd;border-color:rgba(139,92,246,.28)}
+.pill-r{background:rgba(239,68,68,.14);color:#fca5a5;border-color:rgba(239,68,68,.28)}
+.pill-y{background:rgba(255,255,255,.06);color:var(--muted);border-color:var(--border)}
+.pill-paid{background:linear-gradient(135deg,rgba(251,191,36,.25),rgba(251,191,36,.10));color:#fbbf24;border:1px solid rgba(251,191,36,.5);box-shadow:0 0 14px rgba(251,191,36,.22)}
+.pill-free{background:linear-gradient(135deg,rgba(34,197,94,.22),rgba(34,197,94,.10));color:#86efac;border:1px solid rgba(34,197,94,.42)}
+.pill-vip{background:linear-gradient(135deg,rgba(139,92,246,.28),rgba(139,92,246,.12));color:#c4b5fd;border:1px solid rgba(139,92,246,.5);box-shadow:0 0 14px rgba(139,92,246,.25)}
+.bar{height:9px;border-radius:20px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar-f{height:100%;border-radius:20px;transition:width .8s;background:linear-gradient(90deg,#2f7dff,#5aa9ff)}
+.div{height:1px;background:var(--border);margin:14px 0}
+.loading{display:grid;place-items:center;min-height:60vh;color:var(--muted);font-size:16px}
+.spinner{width:40px;height:40px;border:3px solid rgba(90,140,230,.2);border-top-color:var(--blue);border-radius:50%;animation:sp 1s linear infinite;margin-bottom:14px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pulsePlay{0%,100%{box-shadow:0 16px 50px rgba(47,125,255,.55),0 0 0 0 rgba(47,125,255,.5)}50%{box-shadow:0 16px 50px rgba(47,125,255,.55),0 0 0 24px rgba(47,125,255,0)}}
+@keyframes pu{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes noteBlink{0%,100%{opacity:1}50%{opacity:.55}}
+@keyframes lockPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 20px rgba(251,191,36,.5))}50%{transform:scale(1.08);filter:drop-shadow(0 0 35px rgba(251,191,36,.9))}}
+@keyframes crownFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-6px) rotate(3deg)}}
+@keyframes cancelledPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 20px rgba(239,68,68,.5))}50%{transform:scale(1.05);filter:drop-shadow(0 0 40px rgba(239,68,68,.85))}}
+.fade-in{animation:fu .5s}
+.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(6,9,20,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.back-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--txt2);font-size:13.5px;font-weight:700;transition:.2s;text-decoration:none}
+.back-btn:hover{background:rgba(47,125,255,.15);color:var(--txt);border-color:var(--border2)}
+.avatar{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:14px;background:linear-gradient(140deg,#2f7dff,#8b5cf6);color:#fff;flex-shrink:0}
+.grid-main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px}
+@media(max-width:900px){.grid-main{grid-template-columns:1fr}}
+.vid-shell{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#000;border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.6);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;isolation:isolate}
+.vp-error{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:'Tajawal','Cairo',sans-serif;text-align:center;padding:20px}
+.locked-shell{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,rgba(4,6,14,.96),rgba(11,18,38,.98));border:1px solid rgba(251,191,36,.35);box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 40px rgba(251,191,36,.12) inset;display:flex;align-items:center;justify-content:center;padding:16px}
+.lock-content{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:100%;max-width:420px}
+.lock-icon-wrap{position:relative;width:clamp(70px,18vw,110px);height:clamp(70px,18vw,110px);border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 30% 30%,rgba(251,191,36,.35),rgba(251,191,36,.08) 70%,transparent);border:2px solid rgba(251,191,36,.4);box-shadow:0 0 40px rgba(251,191,36,.3);margin-bottom:clamp(12px,3vw,20px);animation:lockPulse 3s ease-in-out infinite}
+.lock-icon-wrap i{font-size:clamp(28px,7vw,46px);color:#fbbf24;filter:drop-shadow(0 4px 10px rgba(0,0,0,.5))}
+.crown-badge{position:absolute;top:-8px;right:-8px;width:clamp(28px,7vw,40px);height:clamp(28px,7vw,40px);border-radius:50%;background:linear-gradient(135deg,#fbbf24,#f59e0b);display:grid;place-items:center;box-shadow:0 6px 20px rgba(251,191,36,.55),0 0 0 2px rgba(10,8,5,.9) inset;animation:crownFloat 2.5s ease-in-out infinite}
+.crown-badge i{font-size:clamp(13px,3.5vw,18px);color:#1a1206}
+.lock-title{font-size:clamp(15px,4vw,20px);font-weight:900;color:#fbbf24;margin-bottom:6px;text-shadow:0 2px 12px rgba(251,191,36,.4)}
+.lock-desc{font-size:clamp(11px,2.8vw,13.5px);color:#b7c6e4;margin-bottom:clamp(12px,3vw,18px);line-height:1.6;padding:0 10px}
+.lock-btn{display:inline-flex;align-items:center;gap:8px;padding:clamp(9px,2.5vw,12px) clamp(18px,4.5vw,26px);border-radius:12px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a1206;font-weight:900;font-size:clamp(12px,3vw,14px);box-shadow:0 10px 30px rgba(251,191,36,.45);transition:.24s;border:none;cursor:pointer;font-family:inherit}
+.lock-btn:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(251,191,36,.6)}
+.lock-btn i{font-size:clamp(12px,3vw,15px)}
+.lock-note{margin-top:clamp(10px,2.5vw,14px);font-size:clamp(9.5px,2.4vw,11px);color:#7f93b8;opacity:.8}
+.example{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px}
+.example-q{font-size:13px;font-weight:700;margin-bottom:6px;color:var(--txt2)}
+.example-a{font-size:13px;color:var(--muted)}
+.kp{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start}
+.kp-dot{color:var(--blue2);font-weight:800;flex-shrink:0}
+.exam-card{display:block;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-radius:14px;background:rgba(21,31,56,.62);border:1px solid var(--border);transition:.28s cubic-bezier(.2,.8,.3,1);position:relative}
+.exam-card:hover{transform:translateY(-3px);border-color:var(--border2);box-shadow:0 12px 30px rgba(47,125,255,.15)}
+.exam-card.locked-card{border-color:rgba(251,191,36,.35);background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(21,31,56,.62));cursor:pointer}
+.exam-card.locked-card:hover{border-color:rgba(251,191,36,.6);box-shadow:0 12px 30px rgba(251,191,36,.20)}
+.exam-lock-badge{position:absolute;top:10px;left:10px;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#fbbf24,#f59e0b);display:grid;place-items:center;box-shadow:0 4px 14px rgba(251,191,36,.5)}
+.exam-lock-badge i{font-size:12px;color:#1a1206}
+.notes-area{width:100%;min-height:130px;padding:12px 14px;border-radius:12px;background:rgba(10,16,32,.55);border:1.5px solid var(--border);color:var(--txt);font-size:13px;line-height:1.8;resize:vertical;outline:none;font-family:inherit;transition:.22s}
+.notes-area:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,125,255,.12);background:rgba(10,16,32,.78)}
+.notes-area::placeholder{color:var(--muted)}
+.note-status-saving{animation:noteBlink 1s infinite}
+.pdf-box{display:flex;align-items:center;gap:14px;padding:16px;border-radius:14px;background:linear-gradient(135deg,rgba(239,68,68,.10),rgba(239,68,68,.03));border:1px solid rgba(239,68,68,.28);transition:.28s;text-decoration:none;color:inherit;cursor:pointer;border-width:1px;width:100%;text-align:right;font-family:inherit}
+.pdf-box:hover{transform:translateY(-3px);border-color:rgba(239,68,68,.5);box-shadow:0 12px 30px rgba(239,68,68,.20)}
+.pdf-icon{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;font-size:11px;font-weight:900;flex-shrink:0;box-shadow:0 8px 20px rgba(239,68,68,.35);letter-spacing:.5px}
+.pdf-info{flex:1;min-width:0}
+.pdf-title{font-size:14.5px;font-weight:800;color:#e8eefc;margin-bottom:4px}
+.pdf-desc{font-size:11.5px;color:#7f93b8}
+.pdf-arrow{color:#fca5a5;flex-shrink:0;font-size:18px}
+.footer-dev{display:flex;justify-content:center;gap:10px;padding:24px 20px 16px;margin-top:40px;border-top:1px solid rgba(90,140,230,.12);flex-wrap:wrap}
+.dev-btn{display:inline-flex;align-items:center;gap:9px;padding:10px 20px;border-radius:50px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .3s;border:1px solid rgba(90,140,230,.3);background:linear-gradient(135deg,rgba(47,125,255,.15),rgba(139,92,246,.15));color:var(--txt);position:relative;overflow:hidden}
+.dev-btn:hover{background:linear-gradient(135deg,rgba(47,125,255,.28),rgba(139,92,246,.28));border-color:#2f7dff;transform:translateY(-2px);box-shadow:0 12px 32px rgba(47,125,255,.35)}
+.dev-name b{background:linear-gradient(90deg,#5aa9ff,#a78bfa,#22d3ee,#5aa9ff);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 3s linear infinite;font-weight:900}
+@keyframes shine{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+.swal-custom-popup{border:1px solid rgba(90,140,230,.3) !important;border-radius:22px !important;background:linear-gradient(180deg, #151f38, #0b1122) !important;color:#e8eefc !important;font-family:'Tajawal','Cairo',sans-serif !important}
+.swal-custom-title{color:#e8eefc !important;font-weight:800 !important;font-family:'Tajawal','Cairo',sans-serif !important}
+.swal-custom-input{background:rgba(10,16,32,.75) !important;border:1.5px solid rgba(90,140,230,.3) !important;color:#e8eefc !important;border-radius:12px !important}
+.exam-modal{position:fixed;inset:0;z-index:99999;background:rgba(3,5,12,.98);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:flex;align-items:flex-start;justify-content:center;padding:0;overflow-y:auto;animation:pu .3s;overscroll-behavior:contain;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none}
+.exam-modal *{user-select:none!important;-webkit-user-select:none!important;-webkit-touch-callout:none!important}
+.exam-modal::before{content:'🛡 محمي';position:fixed;top:12px;left:50%;transform:translateX(-50%);padding:4px 14px;border-radius:20px;background:rgba(239,68,68,.20);border:1px solid rgba(239,68,68,.5);color:#fca5a5;font-size:10.5px;font-weight:800;z-index:100000;letter-spacing:1px;pointer-events:none}
+.exam-box{width:100%;max-width:820px;min-height:100vh;background:linear-gradient(180deg,rgba(21,31,56,.98),rgba(11,17,34,.98));display:flex;flex-direction:column;position:relative}
+@media(min-width:900px){.exam-modal{padding:20px;align-items:center}.exam-box{min-height:0;max-height:92vh;border-radius:24px;border:1px solid var(--border);overflow:hidden}}
+.exam-modal:fullscreen .exam-box,.exam-modal:-webkit-full-screen .exam-box{max-width:100vw;width:100vw;height:100vh;max-height:100vh;border-radius:0;min-height:0}
+.exam-modal:fullscreen,.exam-modal:-webkit-full-screen{padding:0}
+.exam-header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:14px 18px;background:linear-gradient(180deg,rgba(11,17,34,.98),rgba(11,17,34,.94));border-bottom:1px solid var(--border);backdrop-filter:blur(20px)}
+.exam-title{flex:1;min-width:0;font-size:15px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exam-timer{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;background:rgba(47,125,255,.15);border:1px solid rgba(47,125,255,.35);font-size:14px;font-weight:900;font-variant-numeric:tabular-nums;color:#7db6ff;font-family:monospace}
+.exam-timer::before{content:'⏱';font-size:12px}
+.exam-close{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;font-size:16px;font-weight:900;flex-shrink:0;cursor:pointer;transition:.2s}
+.exam-close:hover{background:rgba(239,68,68,.25);color:#fff}
+.exam-body{flex:1;padding:16px;overflow-y:auto}
+.exam-q{padding:18px;margin-bottom:14px;border-radius:16px;background:linear-gradient(180deg,rgba(21,31,56,.72),rgba(11,17,34,.62));border:1px solid var(--border)}
+.exam-q-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.exam-q-num{padding:3px 11px;border-radius:20px;font-size:11px;font-weight:800;background:rgba(47,125,255,.15);color:#7db6ff;border:1px solid rgba(47,125,255,.28)}
+.exam-q-diff{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800;background:rgba(139,92,246,.15);color:#c4b5fd;border:1px solid rgba(139,92,246,.28)}
+.exam-q-text{font-size:15px;font-weight:700;line-height:1.7;margin-bottom:14px;white-space:pre-wrap;color:#e8eefc;pointer-events:none}
+.exam-options{display:flex;flex-direction:column;gap:8px}
+.exam-opt{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:12px;background:rgba(255,255,255,.03);border:1.5px solid var(--border);cursor:pointer;transition:.2s;text-align:right;font-family:inherit;color:inherit;width:100%;pointer-events:auto}
+.exam-opt:hover{background:rgba(47,125,255,.08);border-color:var(--border2)}
+.exam-opt.selected{background:linear-gradient(135deg,rgba(47,125,255,.20),rgba(47,125,255,.08));border-color:#2f7dff;box-shadow:0 0 20px rgba(47,125,255,.25)}
+.exam-opt-letter{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(47,125,255,.12);border:1.5px solid var(--border2);font-weight:800;font-size:13px;color:#7db6ff;flex-shrink:0}
+.exam-opt.selected .exam-opt-letter{background:#2f7dff;color:#fff;border-color:#2f7dff}
+.exam-opt-text{flex:1;font-size:14px;font-weight:600;line-height:1.5;pointer-events:none}
+.exam-footer{position:sticky;bottom:0;padding:14px 18px;background:linear-gradient(0deg,rgba(11,17,34,.98),rgba(11,17,34,.94));border-top:1px solid var(--border);backdrop-filter:blur(20px)}
+.exam-result{padding:40px 24px;text-align:center}
+.exam-result-icon{font-size:72px;line-height:1;margin-bottom:12px;filter:drop-shadow(0 8px 24px currentColor)}
+.exam-result-title{font-size:22px;font-weight:900;margin-bottom:8px}
+.exam-result-pct{font-size:64px;font-weight:900;letter-spacing:-3px;margin:12px 0;font-variant-numeric:tabular-nums;text-shadow:0 8px 24px currentColor}
+.exam-result-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0;padding:0 10px}
+@media(max-width:600px){.exam-result-stats{grid-template-columns:repeat(2,1fr)}}
+.exam-stat{padding:14px 8px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--border)}
+.exam-stat-n{font-size:20px;font-weight:900;line-height:1;margin-bottom:4px;font-variant-numeric:tabular-nums}
+.exam-stat-l{font-size:10.5px;color:#7f93b8;font-weight:700}
+.exam-xp{display:inline-block;padding:8px 22px;border-radius:20px;background:linear-gradient(135deg,rgba(34,197,94,.22),rgba(34,197,94,.10));border:1px solid rgba(34,197,94,.45);color:#6ee7a0;font-size:15px;font-weight:900;margin-top:8px;box-shadow:0 8px 24px rgba(34,197,94,.25)}
+.exam-cancelled{padding:48px 24px;text-align:center}
+.exam-cancelled-icon{font-size:80px;margin-bottom:16px;filter:drop-shadow(0 8px 24px rgba(239,68,68,.5))}
+.exam-cancelled-title{font-size:24px;font-weight:900;color:#fca5a5;margin-bottom:10px}
+.exam-cancelled-desc{font-size:14px;color:var(--txt2);line-height:1.8;max-width:420px;margin:0 auto 20px}
+.exam-block-overlay{position:fixed;inset:0;z-index:999999;background:rgba(10,5,5,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;padding:20px;pointer-events:all!important;cursor:not-allowed;animation:pu .15s ease-out}
+.exam-block-overlay .exam-block-msg{padding:24px 32px;border-radius:20px;background:linear-gradient(180deg,rgba(21,31,56,.98),rgba(11,17,34,.98));border:2px solid rgba(239,68,68,.6);color:#fca5a5;font-weight:900;font-size:16px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.85),0 0 40px rgba(239,68,68,.25);max-width:420px;line-height:1.7}
+.exam-block-overlay .exam-block-ico{font-size:52px;margin-bottom:12px;filter:drop-shadow(0 8px 20px rgba(239,68,68,.5));animation:cancelledPulse 1.5s ease-in-out infinite}
+.lesson-exam-card{padding:16px;margin-bottom:12px;border-radius:16px;background:linear-gradient(135deg,rgba(34,197,94,.06),rgba(21,31,56,.55));border:1px solid rgba(34,197,94,.30);position:relative;overflow:hidden}
+.lesson-exam-card.locked{background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(21,31,56,.55));border-color:rgba(251,191,36,.35)}
+.lesson-exam-title{font-size:15px;font-weight:800;color:#e8eefc;line-height:1.4}
+.lesson-exam-card .btn-block{margin-top:14px}
+.player-modal{position:fixed;inset:0;z-index:9999;background:rgba(3,5,12,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;padding:0;animation:pu .3s}
+.player-modal.open{display:flex}
+.player-box{position:relative;width:100%;max-width:1400px;background:#000;border-radius:0;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.9);display:flex;flex-direction:column;max-height:100vh}
+.player-header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:linear-gradient(180deg,rgba(21,31,56,.98),rgba(11,17,34,.98));border-bottom:1px solid var(--border);flex-shrink:0}
+.player-title{flex:1;min-width:0;font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:20px;font-size:10.5px;font-weight:700;background:rgba(34,197,94,.12);color:#6ee7a0;border:1px solid rgba(34,197,94,.28)}
+.player-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:pulse 2s infinite}
+.player-btn{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(47,125,255,.12);border:1px solid rgba(47,125,255,.3);color:#7db6ff;font-size:16px;transition:.2s;cursor:pointer;flex-shrink:0}
+.player-btn:hover{background:rgba(47,125,255,.25);color:#fff}
+.player-close{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;font-size:18px;font-weight:900;transition:.2s;cursor:pointer;flex-shrink:0}
+.player-close:hover{background:rgba(239,68,68,.25);color:#fff}
+.player-stage{position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;isolation:isolate;flex:1}
+.player-stage iframe,.player-stage video{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;pointer-events:auto}
+.watermark{position:absolute;z-index:100;font-size:15px;font-weight:900;font-family:'Cairo','Tajawal',sans-serif;color:rgba(255,60,60,.32);text-shadow:0 0 4px rgba(255,60,60,.15),1px 1px 1px rgba(0,0,0,.3);padding:0;background:transparent;border:none;outline:none;pointer-events:none;user-select:none;-webkit-user-select:none;white-space:nowrap;transition:top 1.8s cubic-bezier(.4,0,.2,1),left 1.8s cubic-bezier(.4,0,.2,1);letter-spacing:1px;direction:ltr}
+.yt-blocker-top{position:absolute;top:0;left:0;right:0;height:70px;z-index:90;background:transparent;cursor:default;pointer-events:auto}
+.yt-blocker-corner{position:absolute;top:0;inset-inline-end:0;width:140px;height:70px;z-index:91;background:transparent;cursor:default;pointer-events:auto}
+.yt-blocker-bottom{position:absolute;bottom:0;left:0;right:0;height:60px;z-index:90;background:transparent;cursor:default;pointer-events:auto}
+.yt-blocker-bottom-corner{position:absolute;bottom:0;inset-inline-end:0;width:180px;height:60px;z-index:91;background:transparent;cursor:default;pointer-events:auto}
+.shield-overlay{position:absolute;inset:0;z-index:80;pointer-events:none}
+.shield-overlay::before{content:'';position:absolute;top:0;left:0;right:0;height:60px;background:transparent;pointer-events:auto;cursor:default}
+.shield-overlay::after{content:'';position:absolute;bottom:0;left:0;right:0;height:80px;background:transparent;pointer-events:auto;cursor:default}
+.shield-side{position:absolute;top:60px;bottom:80px;width:50px;background:transparent;z-index:80;pointer-events:auto;cursor:default}
+.shield-side.right{right:0;left:auto}
+.shield-side.left{left:0;right:auto}
+.player-modal.fullscreen .player-box{max-width:100vw;width:100vw;height:100vh;max-height:100vh;border-radius:0}
+.player-modal.fullscreen .player-header{position:absolute;top:0;left:0;right:0;z-index:150;background:linear-gradient(180deg,rgba(0,0,0,.85),transparent);border:none;transition:opacity .3s}
+.player-modal.fullscreen .player-header:hover{opacity:1}
+.player-modal.fullscreen .player-stage{aspect-ratio:auto;height:100vh;flex:1}
+@media(max-width:900px) and (orientation:landscape){
+.player-modal{padding:0}
+.player-box{border-radius:0;max-width:100vw}
+.player-header{padding:6px 12px}
+.player-title{font-size:12px}
+.player-badge{display:none}
+.player-btn,.player-close{width:32px;height:32px;font-size:14px}
+.watermark{font-size:12px}
+}
+@media(max-width:640px){
+.player-modal{padding:0}
+.player-box{border-radius:0}
+.player-header{padding:8px 10px;gap:8px}
+.player-title{font-size:12px}
+.player-badge{display:none}
+.player-btn,.player-close{width:34px;height:34px;font-size:14px}
+.watermark{font-size:12px}
+.exam-header{padding:10px 12px;gap:8px}
+.exam-title{font-size:13px}
+.exam-timer{font-size:12px;padding:5px 10px}
+.exam-body{padding:12px}
+.exam-q{padding:14px}
+.exam-q-text{font-size:14px}
+.exam-opt{padding:11px 14px;gap:10px}
+.exam-opt-letter{width:26px;height:26px;font-size:12px}
+.exam-opt-text{font-size:13px}
+.exam-result-pct{font-size:52px}
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+<a href="/student/index.html" class="back-btn">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+رجوع
+</a>
+<div class="flex center g8" style="margin-inline-start:auto">
+<div id="userAvatar" class="avatar">👤</div>
+</div>
+</div>
+<div class="wrap" id="app">
+<div class="loading"><div class="spinner"></div>جارٍ تحميل الدرس...</div>
+</div>
+<div class="player-modal" id="playerModal">
+<div class="player-box">
+<div class="player-header">
+<div class="player-title" id="playerTitle">جارٍ التحميل...</div>
+<span class="player-badge">محمي</span>
+<button class="player-btn" id="playerFullscreen" title="ملء الشاشة">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+</svg>
+</button>
+<button class="player-close" id="playerClose" aria-label="إغلاق">✕</button>
+</div>
+<div class="player-stage" id="playerStage">
+<div class="shield-overlay"></div>
+<div class="yt-blocker-top"></div>
+<div class="yt-blocker-corner"></div>
+<div class="yt-blocker-bottom"></div>
+<div class="yt-blocker-bottom-corner"></div>
+<div class="shield-side left"></div>
+<div class="shield-side right"></div>
+<div class="watermark" id="watermark" style="top:20px;left:20px">MISSION EDU</div>
+<div id="playerContainer"></div>
+</div>
+</div>
+</div>
+<div class="footer-dev">
+<button class="dev-btn" onclick="openWhatsApp()">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+<span class="dev-name">Developed by <b>EL-sayed Hasan</b></span>
+</button>
+<button class="dev-btn" onclick="sendReport()">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+<span>بلاغ</span>
+</button>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="/db.js"></script>
+<script>
+(function(){
+"use strict";
+const DB = window.MissionDB;
+const params = new URLSearchParams(window.location.search);
+const lessonId = params.get("id");
+const app = document.getElementById("app");
+const userAvatar = document.getElementById("userAvatar");
+let state = {
+user: null, lesson: null, unit: null, subject: null,
+relatedExams: [], unitPct: 0, doneUnit: 0, totalUnit: 0,
+isDone: false, watermarkTimer: null, isFullscreen: false,
+note: '', noteId: null, noteTimer: null, noteSaving: false, noteDirty: false,
+hasVideoAccess: false, hasExamAccess: {}, debugReason: '',
+examSession: null, examSubmitting: false, examResult: null,
+examFullscreenActive: false, examVisibilityHandler: null,
+examBlurHandler: null, examContextMenuHandler: null,
+examKeyHandler: null, examBeforeUnloadHandler: null,
+examFsChangeHandler: null
+};
+function esc(str){
+return String(str||"").replace(/[&<>"']/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[s]);
+}
+function getYouTubeId(url){
+if(!url) return "";
+const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
+return m ? m[1] : "";
+}
+function parseVideo(v){
+if(!v) return null;
+if(typeof v === 'string'){
+try{ return JSON.parse(v); }catch(e){ return null; }
+}
+return v;
+}
+function isPaidContent(item){
+if(!item) return false;
+const checkFlag = (val)=>{
+if(val === false) return true;
+if(val === 'false') return true;
+if(val === 'paid') return true;
+if(val === 0) return true;
+return false;
+};
+if(checkFlag(item.is_free)) return true;
+const video = parseVideo(item.video);
+if(video && checkFlag(video.is_free)) return true;
+return false;
+}
+function hasSubscriptionAccess(user){
+if(!user) return false;
+if(user.subscription === 'vip' || user.subscription === 'VIP') return true;
+if(user.subscription === 'paid' || user.subscription === 'PAID'){
+if(!user.subscription_until) return true;
+const until = typeof user.subscription_until === 'number'
+? user.subscription_until
+: new Date(user.subscription_until).getTime();
+if(!isNaN(until) && until > Date.now()) return true;
+}
+return false;
+}
+function hasAccess(user, item){
+const paid = isPaidContent(item);
+if(!paid) return true;
+return hasSubscriptionAccess(user);
+}
+function showLockedMessage(){
+Swal.fire({
+icon: 'warning',
+title: '🔒 محتوى مدفوع',
+html: `
+<div style="text-align:right;line-height:2;font-size:14px">
+<p style="margin-bottom:10px">هذا المحتوى متاح <b style="color:#fbbf24">للمشتركين فقط</b>.</p>
+<p style="color:#b7c6e4;font-size:13px;margin-bottom:10px">للاشتراك والاستفادة من كل المحتوى المدفوع، تواصل معنا:</p>
+<div style="display:flex;align-items:center;gap:8px;background:rgba(37,211,102,.10);border:1px solid rgba(37,211,102,.3);border-radius:10px;padding:10px 14px;margin-top:8px">
+<i class="fa-brands fa-whatsapp" style="color:#25d366;font-size:20px"></i>
+<span style="color:#fff;font-weight:700">01128351702</span>
+</div>
+</div>`,
+background: 'linear-gradient(180deg, #151f38, #0b1122)',
+color: '#e8eefc',
+showCancelButton: true,
+confirmButtonText: '<i class="fa-brands fa-whatsapp"></i> تواصل واتساب',
+cancelButtonText: 'إلغاء',
+confirmButtonColor: '#25d366',
+cancelButtonColor: '#64748b',
+customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
+}).then(r=>{
+if(r.isConfirmed){
+window.open("https://wa.me/201128351702?text=" + encodeURIComponent("مرحبًا، أريد الاشتراك في منصة MISSION EDU للوصول للمحتوى المدفوع"), "_blank");
+}
+});
+}
+function getSubscriptionBadge(user){
+if(!user) return '';
+if(user.subscription === 'vip' || user.subscription === 'VIP') return '<span class="pill pill-vip"><i class="fa-solid fa-crown"></i> VIP</span>';
+if(user.subscription === 'paid' || user.subscription === 'PAID'){
+if(user.subscription_until){
+const until = typeof user.subscription_until === 'number' ? user.subscription_until : new Date(user.subscription_until).getTime();
+if(until > Date.now()){
+const days = Math.ceil((until - Date.now()) / 86400000);
+return `<span class="pill pill-paid"><i class="fa-solid fa-crown"></i> مشترك (${days} يوم)</span>`;
+}
+return '<span class="pill pill-r"><i class="fa-solid fa-circle-xmark"></i> اشتراك منتهي</span>';
+}
+return '<span class="pill pill-paid"><i class="fa-solid fa-crown"></i> مشترك</span>';
+}
+return '<span class="pill pill-free"><i class="fa-solid fa-user"></i> مجاني</span>';
+}
+async function downloadPdf(url, filename){
+try{
+const res = await fetch(url, { mode: 'cors' });
+if(!res.ok) throw new Error('HTTP ' + res.status);
+const blob = await res.blob();
+const blobUrl = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = blobUrl;
+a.download = filename || 'lesson.pdf';
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+setTimeout(()=>URL.revokeObjectURL(blobUrl), 1500);
+return true;
+}catch(e){
+console.warn('PDF download failed, opening in new tab:', e);
+window.open(url, '_blank');
+return false;
+}
+}
+async function loadNote(userId, lessonId){
+try{
+const sb = await DB.getClient();
+const { data } = await sb.from('notes').select('*').eq('user_id', userId).eq('lesson_id', lessonId).maybeSingle();
+if(data){
+state.note = data.text || '';
+state.noteId = data.id;
+}
+}catch(e){ console.warn('loadNote:', e); }
+}
+function updateNoteStatus(status){
+const el = document.getElementById('noteStatus');
+if(!el) return;
+el.classList.remove('note-status-saving');
+if(status === 'saving'){
+el.textContent = '⏳ جارٍ الحفظ...';
+el.className = 'pill pill-a note-status-saving';
+} else if(status === 'saved'){
+el.textContent = '✅ محفوظ';
+el.className = 'pill pill-g';
+} else if(status === 'error'){
+el.textContent = '❌ فشل الحفظ';
+el.className = 'pill pill-r';
+} else if(status === 'empty'){
+el.textContent = 'فارغ';
+el.className = 'pill pill-y';
+}
+}
+async function saveNote(silent){
+if(!state.user || !state.lesson) return;
+if(!state.noteDirty && silent) return;
+state.noteSaving = true;
+updateNoteStatus('saving');
+try{
+const sb = await DB.getClient();
+const now = Date.now();
+const text = state.note;
+if(!text.trim()){
+if(state.noteId){
+await sb.from('notes').delete().eq('id', state.noteId);
+state.noteId = null;
+}
+state.noteDirty = false;
+state.noteSaving = false;
+updateNoteStatus('empty');
+return;
+}
+if(state.noteId){
+await sb.from('notes').update({text, updated_at: now}).eq('id', state.noteId);
+} else {
+const id = DB.uid('note_');
+await sb.from('notes').insert([{
+id,
+user_id: state.user.id,
+lesson_id: state.lesson.id,
+text,
+created_at: now,
+updated_at: now
+}]);
+state.noteId = id;
+}
+state.noteDirty = false;
+state.noteSaving = false;
+updateNoteStatus('saved');
+if(!silent){
+DB.trackActivity({
+userId: state.user.id,
+userName: state.user.name,
+type: "note_save",
+target: state.lesson.title,
+details: { lesson: state.lesson.title }
+});
+}
+}catch(e){
+console.warn('saveNote:', e);
+state.noteSaving = false;
+updateNoteStatus('error');
+if(!silent){
+Swal.fire({
+icon: 'error',
+title: 'خطأ',
+text: 'فشل حفظ الملاحظة',
+background: 'linear-gradient(180deg, #151f38, #0b1122)',
+color: '#e8eefc',
+confirmButtonColor: '#2f7dff',
+customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
+});
+}
+}
+}
+function scheduleAutoSave(){
+if(state.noteTimer) clearTimeout(state.noteTimer);
+state.noteTimer = setTimeout(()=>{
+saveNote(true);
+}, 1500);
+}
+function openPlayer(lesson, user){
+if(!state.hasVideoAccess){
+showLockedMessage();
+return;
+}
+const video = parseVideo(lesson.video) || {};
+const url = video.url || "";
+const type = video.type || "youtube";
+if(!url){
+Swal.fire({
+icon: 'warning',
+title: 'لا يوجد فيديو',
+text: 'هذا الدرس لا يحتوي على فيديو',
+background: 'linear-gradient(180deg, #151f38, #0b1122)',
+color: '#e8eefc',
+confirmButtonColor: '#2f7dff',
+customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
+});
+return;
+}
+const playerTitle = document.getElementById('playerTitle');
+if(playerTitle) playerTitle.textContent = lesson.title || 'الدرس';
+const watermark = document.getElementById('watermark');
+if(watermark){
+const phone = (user.country_code || '') + (user.phone || '') || user.name || 'طالب';
+watermark.textContent = phone;
+}
+const container = document.getElementById('playerContainer');
+if(container){
+if(type === 'youtube'){
+const ytId = getYouTubeId(url);
+if(ytId){
+container.innerHTML = `<iframe
+src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&fs=1&autoplay=1&showinfo=0&controls=1&disablekb=0"
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+allowfullscreen
+referrerpolicy="strict-origin-when-cross-origin"
+title="فيديو الدرس"
+></iframe>`;
+} else {
+container.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#7f93b8;font-family:Tajawal,sans-serif">رابط YouTube غير صالح</div>`;
+}
+} else if(type === 'vimeo'){
+const vId = (url.match(/vimeo\.com\/(?:video\/)?(\d+)/) || [])[1];
+container.innerHTML = `<iframe
+src="https://player.vimeo.com/video/${vId}?byline=0&portrait=0&title=0&dnt=1&autoplay=1"
+allow="autoplay; fullscreen; picture-in-picture"
+allowfullscreen
+title="فيديو الدرس"
+></iframe>`;
+} else if(type === 'mp4'){
+container.innerHTML = `<video
+id="mp4Video"
+controls
+controlsList="nodownload noremoteplayback noplaybackrate"
+disablePictureInPicture
+playsinline
+autoplay
+style="position:absolute;inset:0;width:100%;height:100%;background:#000;object-fit:contain"
+>
+<source src="${esc(url)}" type="video/mp4"/>
+</video>`;
+} else {
+container.innerHTML = `<iframe
+src="${esc(url)}"
+allowfullscreen
+sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"
+title="فيديو الدرس"
+></iframe>`;
+}
+}
+const modal = document.getElementById('playerModal');
+if(modal){
+modal.classList.add('open');
+document.body.style.overflow = 'hidden';
+}
+setTimeout(()=>{
+enterFullscreenLandscape();
+}, 100);
+startWatermarkMotion();
+try{
+DB.trackActivity({
+userId: user.id, userName: user.name,
+type: "video_play", target: lesson.title,
+details: { lesson: lesson.title }
+});
+}catch(e){}
+}
+function closePlayer(){
+const modal = document.getElementById('playerModal');
+if(modal){
+modal.classList.remove('open');
+modal.classList.remove('fullscreen');
+}
+document.body.style.overflow = '';
+exitFullscreen();
+lockOrientation('portrait');
+const container = document.getElementById('playerContainer');
+if(container) container.innerHTML = '';
+stopWatermarkMotion();
+}
+async function enterFullscreenLandscape(){
+const modal = document.getElementById('playerModal');
+const box = modal?.querySelector('.player-box');
+try{
+if(box){
+if(box.requestFullscreen){
+await box.requestFullscreen();
+} else if(box.webkitRequestFullscreen){
+box.webkitRequestFullscreen();
+} else if(box.msRequestFullscreen){
+box.msRequestFullscreen();
+}
+}
+if(screen.orientation && screen.orientation.lock){
+try{
+await screen.orientation.lock('landscape');
+}catch(e){
+console.warn('Orientation lock failed:', e.message);
+}
+}
+modal.classList.add('fullscreen');
+state.isFullscreen = true;
+}catch(e){
+console.warn('Fullscreen failed:', e.message);
+modal.classList.add('fullscreen');
+state.isFullscreen = true;
+}
+}
+async function exitFullscreen(){
+try{
+if(document.fullscreenElement){
+if(document.exitFullscreen) await document.exitFullscreen();
+else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+else if(document.msExitFullscreen) document.msExitFullscreen();
+}
+}catch(e){}
+state.isFullscreen = false;
+if(screen.orientation && screen.orientation.unlock){
+try{ screen.orientation.unlock(); }catch(e){}
+}
+}
+async function lockOrientation(mode){
+if(screen.orientation && screen.orientation.lock){
+try{
+await screen.orientation.lock(mode);
+}catch(e){}
+}
+}
+function toggleFullscreen(){
+const modal = document.getElementById('playerModal');
+if(!modal) return;
+if(state.isFullscreen){
+exitFullscreen().then(()=>{
+modal.classList.remove('fullscreen');
+lockOrientation('portrait');
+});
+} else {
+enterFullscreenLandscape();
+}
+}
+function moveWatermark(){
+const wm = document.getElementById('watermark');
+const stage = document.getElementById('playerStage');
+if(!wm || !stage) return;
+const w = stage.offsetWidth;
+const h = stage.offsetHeight;
+const maxX = Math.max(20, w - 180);
+const maxY = Math.max(20, h - 50);
+const x = Math.floor(Math.random() * maxX) + 10;
+const y = Math.floor(Math.random() * maxY) + 10;
+wm.style.left = x + 'px';
+wm.style.top = y + 'px';
+wm.style.right = 'auto';
+wm.style.bottom = 'auto';
+}
+function startWatermarkMotion(){
+moveWatermark();
+state.watermarkTimer = setInterval(moveWatermark, 5000);
+}
+function stopWatermarkMotion(){
+if(state.watermarkTimer){
+clearInterval(state.watermarkTimer);
+state.watermarkTimer = null;
+}
+}
+function attachProtection(){
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+if(e.key === 'F12'){ e.preventDefault(); return false; }
+if(e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())){ e.preventDefault(); return false; }
+if(e.ctrlKey && e.key.toUpperCase() === 'U'){ e.preventDefault(); return false; }
+if(e.ctrlKey && e.key.toUpperCase() === 'S'){ e.preventDefault(); return false; }
+if(e.ctrlKey && e.key.toUpperCase() === 'P'){ e.preventDefault(); return false; }
+if(e.key === 'PrintScreen'){
+try{ navigator.clipboard.writeText(''); }catch(err){}
+}
+if(e.key === 'Escape'){
+const modal = document.getElementById('playerModal');
+if(modal && modal.classList.contains('open')) closePlayer();
+}
+});
+document.addEventListener('copy', e => {
+const t = e.target?.tagName?.toLowerCase();
+if(t !== 'input' && t !== 'textarea') e.preventDefault();
+});
+document.addEventListener('cut', e => {
+const t = e.target?.tagName?.toLowerCase();
+if(t !== 'input' && t !== 'textarea') e.preventDefault();
+});
+document.addEventListener('dragstart', e => e.preventDefault());
+document.addEventListener('selectstart', e => {
+const t = e.target?.tagName?.toLowerCase();
+if(t !== 'input' && t !== 'textarea') e.preventDefault();
+});
+document.addEventListener('dblclick', e => e.preventDefault());
+}
+function buildPlayerHTML(video, lessonTitle, hasAccess){
+const v = parseVideo(video);
+if(!v || !v.url){
+return `<div class="vid-shell"><div class="vp-error"><div style="font-size:48px;opacity:.35;margin-bottom:12px">🎬</div><div>لا يوجد فيديو لهذا الدرس</div></div></div>`;
+}
+if(!hasAccess){
+return `
+<div class="locked-shell">
+<div class="lock-content">
+<div class="lock-icon-wrap">
+<i class="fa-solid fa-lock"></i>
+<div class="crown-badge"><i class="fa-solid fa-crown"></i></div>
+</div>
+<div class="lock-title">هذا الفيديو مدفوع</div>
+<div class="lock-desc">اشترك للوصول إلى محتوى الدرس كامل</div>
+<button class="lock-btn" id="btnLockedSubscribe">
+<i class="fa-solid fa-crown"></i>
+اشترك الآن
+</button>
+<div class="lock-note">🔒 المحتوى متاح للمشتركين فقط</div>
+</div>
+</div>
+`;
+}
+return `
+<div class="vid-shell" id="vidShell">
+<div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(4,6,14,.92),rgba(11,18,38,.94));display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;z-index:2;">
+<button id="btnOpenPlayer" type="button" onclick="if(window._openLessonPlayer) window._openLessonPlayer()" ontouchend="event.preventDefault();if(window._openLessonPlayer) window._openLessonPlayer()" style="width:clamp(60px,15vw,90px);height:clamp(60px,15vw,90px);border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(140deg,#2f7dff,#8b5cf6);box-shadow:0 16px 50px rgba(47,125,255,.55);padding-right:5px;margin:0 0 clamp(10px,2.5vw,20px);cursor:pointer;animation:pulsePlay 2.5s ease-in-out infinite;border:none;flex-shrink:0;pointer-events:auto;">
+<svg width="clamp(24px,6vw,36px)" height="clamp(24px,6vw,36px)" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+</button>
+<div style="font-size:clamp(14px,3.5vw,20px);font-weight:900;color:#e8eefc;margin-bottom:8px;line-height:1.4;max-width:90%;">${esc(lessonTitle)}</div>
+<div style="font-size:clamp(11px,2.8vw,13px);color:#7f93b8;margin-bottom:clamp(8px,2vw,16px);line-height:1.4;">اضغط لتشغيل الفيديو في وضع ملء الشاشة</div>
+<div style="font-size:clamp(10px,2.4vw,11.5px);color:#7f93b8;opacity:.7;line-height:1.4;">🛡 المشاهدة محمية — لا يمكن التحميل أو النسخ</div>
+</div>
+</div>
+`;
+}
+function buildPdfHTML(pdfUrl, lessonTitle){
+if(!pdfUrl || !pdfUrl.trim()) return '';
+const fileName = (lessonTitle || 'lesson').replace(/[^\u0600-\u06FFa-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_') + '.pdf';
+return `
+<div class="glass mb20" style="padding:16px">
+<div class="h4 mb12" style="display:flex;align-items:center;gap:8px">
+<span style="font-size:18px">📄</span>
+ملف الشرح (PDF)
+</div>
+<button type="button" class="pdf-box" id="pdfLink" data-url="${esc(pdfUrl)}" data-filename="${esc(fileName)}">
+<div class="pdf-icon">PDF</div>
+<div class="pdf-info">
+<div class="pdf-title">اضغط لتحميل ملف الشرح</div>
+<div class="pdf-desc">ملف PDF يحتوي على شرح تفصيلي للدرس</div>
+</div>
+<div class="pdf-arrow"><i class="fa-solid fa-download"></i></div>
+</button>
+<div class="xs muted mt12" style="text-align:center">💡 يتحمّل تلقائيًا على جهازك</div>
+</div>
+`;
+}
+function buildRelatedExamsHTML(exams){
+if(!exams || exams.length === 0){
+return `
+<div class="glass" style="padding:16px">
+<div class="h4 mb12">📝 اختبارات مرتبطة</div>
+<div class="sm muted" style="text-align:center;padding:16px">لا توجد اختبارات مرتبطة بهذا الدرس</div>
+</div>
+`;
+}
+return `
+<div class="glass" style="padding:16px">
+<div className="h4 mb12">📝 اختبارات مرتبطة (${exams.length})</div>
+${exams.map(e=>{
+const paid = isPaidContent(e);
+const access = state.hasExamAccess[e.id] !== false;
+const locked = paid && !access;
+return `
+<a href="${locked ? 'javascript:void(0)' : '/student/exam.html?id='+e.id}"
+class="exam-card ${locked?'locked-card':''}"
+data-exam-id="${e.id}"
+data-locked="${locked}">
+${locked ? `<div class="exam-lock-badge"><i className="fa-solid fa-lock"></i></div>` : ''}
+<div class="flex between center mb6">
+<span class="pill ${paid?'pill-paid':'pill-free'}">
+<i class="fa-solid ${paid?'fa-lock':'fa-unlock'}"></i>
+${paid?'مدفوع':'مجاني'}
+</span>
+<span className="pill pill-v">+${e.xp} XP</span>
+</div>
+<div style="font-size:14px;font-weight:700;color:#e8eefc">${esc(e.title)}</div>
+<div style="font-size:11.5px;color:#7f93b8;margin-top:6px">⏱ ${e.duration}د • درجة النجاح: ${e.pass_score}%</div>
+${locked ? '<div class="pill pill-paid" style="margin-top:8px;font-size:10px"><i class="fa-solid fa-crown"></i> يتطلب اشتراك</div>' : ''}
+</a>
+`;
+}).join('')}
+</div>
+`;
+}
+function showExamBlockOverlay(){
+if(document.getElementById('examBlockOverlay')) return;
+if(!state.examSession || state.examSession.cancelled) return;
+const el = document.createElement('div');
+el.id = 'examBlockOverlay';
+el.className = 'exam-block-overlay';
+el.innerHTML = `
+<div class="exam-block-msg">
+<div class="exam-block-ico">⛔</div>
+<div>تم كشف خروج من وضع ملء الشاشة</div>
+<div style="font-size:13px;color:#7f93b8;margin-top:8px;font-weight:600">جاري إلغاء الاختبار...</div>
+</div>
+`;
+const blockAll = (e)=>{
+try{ e.stopPropagation(); e.stopImmediatePropagation(); e.preventDefault(); }catch(err){}
+return false;
+};
+el.addEventListener('click', blockAll, true);
+el.addEventListener('mousedown', blockAll, true);
+el.addEventListener('mouseup', blockAll, true);
+el.addEventListener('touchstart', blockAll, {capture:true, passive:false});
+el.addEventListener('touchend', blockAll, {capture:true, passive:false});
+el.addEventListener('touchmove', blockAll, {capture:true, passive:false});
+el.addEventListener('contextmenu', blockAll, true);
+document.body.appendChild(el);
+}
+function removeExamBlockOverlay(){
+const el = document.getElementById('examBlockOverlay');
+if(el) el.remove();
+}
+async function startLessonExam(exam){
+if(!state.user || !state.lesson) return;
+if(!state.hasExamAccess[exam.id]){
+showLockedMessage();
+return;
+}
+try{
+const sb = await DB.getClient();
+const { data: prevAttempts } = await sb.from('exam_attempts').select('id,status').eq('user_id', state.user.id).eq('exam_id', exam.id);
+const validAttempts = (prevAttempts||[]).filter(a=>a.status !== 'cancelled');
+const maxAtt = Number(exam.max_attempts) || 0;
+if(maxAtt > 0 && validAttempts.length >= maxAtt){
+Swal.fire({icon:'info',title:'لا يمكن المحاولة',text:`استنفذت عدد المحاولات المسموح بها (${maxAtt})`,background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',confirmButtonColor:'#2f7dff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+return;
+}
+const ids = exam.question_ids || [];
+if(ids.length === 0){
+Swal.fire({icon:'error',title:'لا توجد أسئلة',text:'هذا الاختبار لا يحتوي على أسئلة',background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',confirmButtonColor:'#2f7dff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+return;
+}
+const { data: qs } = await sb.from('questions').select('*').in('id', ids);
+const ordered = ids.map(id => (qs||[]).find(q => q.id === id)).filter(Boolean);
+if(ordered.length === 0){
+Swal.fire({icon:'error',title:'لا توجد أسئلة',text:'الأسئلة غير موجودة',background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',confirmButtonColor:'#2f7dff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+return;
+}
+state.examSession = {
+exam, questions: ordered, answers: {},
+startedAt: Date.now(),
+remaining: Math.max(60, (Number(exam.duration)||15)*60),
+timer: null, cancelled: false, fullscreenEntered: false
+};
+state.examResult = null;
+renderExamModal();
+startExamTimer();
+setupExamProtection();
+DB.trackActivity({userId:state.user.id,userName:state.user.name,type:'exam_start',target:exam.title,details:{exam_id:exam.id}});
+}catch(e){
+Swal.fire({icon:'error',title:'خطأ',text:e.message||'حدث خطأ',background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',confirmButtonColor:'#2f7dff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+}
+}
+async function enterExamFullscreen(){
+const modal = document.getElementById('examModal');
+if(!modal) return;
+try{
+if(modal.requestFullscreen){ await modal.requestFullscreen(); }
+else if(modal.webkitRequestFullscreen){ modal.webkitRequestFullscreen(); }
+else if(modal.msRequestFullscreen){ modal.msRequestFullscreen(); }
+if(screen.orientation && screen.orientation.lock){
+try{ await screen.orientation.lock('portrait'); }catch(e){}
+}
+state.examSession.fullscreenEntered = true;
+}catch(e){ console.warn('Exam fullscreen failed:', e); }
+}
+function setupExamProtection(){
+const modal = document.getElementById('examModal');
+if(!modal) return;
+document.body.classList.add('exam-active');
+const checkFs = ()=>{
+if(!state.examSession || state.examSession.cancelled) return;
+const isFs = document.fullscreenElement === modal || document.webkitFullscreenElement === modal || document.msFullscreenElement === modal;
+if(state.examSession.fullscreenEntered && !isFs){
+showExamBlockOverlay();
+setTimeout(()=>{ cancelExam('exit-fullscreen'); }, 50);
+}
+};
+state.examFsChangeHandler = checkFs;
+state.examVisibilityHandler = ()=>{
+if(document.hidden && state.examSession && !state.examSession.cancelled){
+showExamBlockOverlay();
+setTimeout(()=>{ cancelExam('visibility-hidden'); }, 50);
+}
+};
+state.examBlurHandler = ()=>{
+if(state.examSession && !state.examSession.cancelled && state.examSession.fullscreenEntered){
+setTimeout(()=>{
+if(document.hidden && state.examSession && !state.examSession.cancelled){
+showExamBlockOverlay();
+setTimeout(()=>{ cancelExam('window-blur'); }, 50);
+}
+}, 300);
+}
+};
+state.examContextMenuHandler = (e)=>{
+if(state.examSession && !state.examSession.cancelled){
+e.preventDefault();
+try{ navigator.clipboard.writeText(''); }catch(err){}
+}
+};
+state.examKeyHandler = (e)=>{
+if(!state.examSession || state.examSession.cancelled) return;
+if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())) || (e.ctrlKey && e.key.toUpperCase() === 'U') || (e.ctrlKey && e.key.toUpperCase() === 'S') || (e.ctrlKey && e.key.toUpperCase() === 'P')){ e.preventDefault(); return false; }
+if(e.ctrlKey && (e.key.toUpperCase() === 'C' || e.key.toUpperCase() === 'X' || e.key.toUpperCase() === 'A')){ e.preventDefault(); return false; }
+if(e.key === 'PrintScreen'){ try{ navigator.clipboard.writeText(''); }catch(err){} }
+};
+state.examBeforeUnloadHandler = (e)=>{
+if(state.examSession && !state.examSession.cancelled){
+e.preventDefault();
+e.returnValue = '';
+return '';
+}
+};
+document.addEventListener('fullscreenchange', state.examFsChangeHandler);
+document.addEventListener('webkitfullscreenchange', state.examFsChangeHandler);
+document.addEventListener('msfullscreenchange', state.examFsChangeHandler);
+document.addEventListener('visibilitychange', state.examVisibilityHandler);
+window.addEventListener('blur', state.examBlurHandler);
+modal.addEventListener('contextmenu', state.examContextMenuHandler);
+document.addEventListener('keydown', state.examKeyHandler);
+document.addEventListener('copy', state.examContextMenuHandler);
+document.addEventListener('cut', state.examContextMenuHandler);
+window.addEventListener('beforeunload', state.examBeforeUnloadHandler);
+setTimeout(()=>{ enterExamFullscreen(); }, 100);
+}
+function removeExamProtection(){
+document.body.classList.remove('exam-active');
+if(state.examFsChangeHandler){
+document.removeEventListener('fullscreenchange', state.examFsChangeHandler);
+document.removeEventListener('webkitfullscreenchange', state.examFsChangeHandler);
+document.removeEventListener('msfullscreenchange', state.examFsChangeHandler);
+}
+if(state.examVisibilityHandler) document.removeEventListener('visibilitychange', state.examVisibilityHandler);
+if(state.examBlurHandler) window.removeEventListener('blur', state.examBlurHandler);
+if(state.examKeyHandler) document.removeEventListener('keydown', state.examKeyHandler);
+if(state.examBeforeUnloadHandler) window.removeEventListener('beforeunload', state.examBeforeUnloadHandler);
+state.examFsChangeHandler = null;
+state.examVisibilityHandler = null;
+state.examBlurHandler = null;
+state.examKeyHandler = null;
+state.examBeforeUnloadHandler = null;
+}
+function startExamTimer(){
+if(state.examSession?.timer) clearInterval(state.examSession.timer);
+state.examSession.timer = setInterval(()=>{
+if(!state.examSession || state.examSession.cancelled) return;
+state.examSession.remaining = Math.max(0, state.examSession.remaining - 1);
+const timerEl = document.getElementById('examTimer');
+if(timerEl){
+const m = Math.floor(state.examSession.remaining/60);
+const s = state.examSession.remaining % 60;
+timerEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+if(state.examSession.remaining <= 60) timerEl.style.color = '#ef4444';
+}
+if(state.examSession.remaining <= 0){
+clearInterval(state.examSession.timer);
+submitLessonExam(true);
+}
+}, 1000);
+}
+function renderExamModal(){
+const old = document.getElementById('examModal');
+if(old) old.remove();
+const s = state.examSession;
+if(!s) return;
+const exam = s.exam;
+const m = Math.floor(s.remaining/60), sec = s.remaining%60;
+const html = `
+<div class="exam-modal" id="examModal">
+<div class="exam-box">
+<div class="exam-header">
+<div class="exam-title">${esc(exam.title)}</div>
+<div class="exam-timer" id="examTimer">${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}</div>
+<button class="exam-close" id="examClose" type="button">✕</button>
+</div>
+<div class="exam-body">
+${s.questions.map((q, idx) => {
+const given = s.answers[q.id];
+return `
+<div class="exam-q">
+<div class="exam-q-header">
+<span class="exam-q-num">سؤال ${idx+1} من ${s.questions.length}</span>
+<span class="exam-q-diff">+${q.xp || 0} XP</span>
+</div>
+<div class="exam-q-text">${esc(q.text)}</div>
+<div class="exam-options">
+${(q.options||[]).map((opt, oi) => `
+<button type="button" class="exam-opt ${given===oi?'selected':''}" data-qid="${q.id}" data-oi="${oi}">
+<span class="exam-opt-letter">${['أ','ب','ج','د'][oi]||'-'}</span>
+<span class="exam-opt-text">${esc(opt||'—')}</span>
+</button>
+`).join('')}
+</div>
+</div>
+`;
+}).join('')}
+</div>
+<div class="exam-footer">
+<button class="btn btn-p btn-block btn-lg" id="examSubmit" type="button">📤 تسليم الاختبار</button>
+</div>
+</div>
+</div>
+`;
+document.body.insertAdjacentHTML('beforeend', html);
+document.body.style.overflow = 'hidden';
+document.getElementById('examClose').addEventListener('click', ()=>{
+Swal.fire({
+title:'إلغاء الاختبار؟',
+text:'لو قفلت الاختبار هيتسجل (ملغي) في نتائج الاختبارات',
+icon:'warning',showCancelButton:true,confirmButtonText:'نعم، إلغاء',cancelButtonText:'كمّل الاختبار',
+confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',
+background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',
+customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+}).then(r=>{if(r.isConfirmed) cancelExam('user-closed');});
+});
+document.getElementById('examSubmit').addEventListener('click', ()=>submitLessonExam(false));
+document.querySelectorAll('.exam-opt').forEach(btn=>{
+btn.addEventListener('click', ()=>{
+const qid = btn.dataset.qid;
+const oi = +btn.dataset.oi;
+state.examSession.answers[qid] = oi;
+document.querySelectorAll(`.exam-opt[data-qid="${qid}"]`).forEach(b=>b.classList.remove('selected'));
+btn.classList.add('selected');
+});
+});
+}
+async function cancelExam(reason){
+if(!state.examSession || state.examSession.cancelled) return;
+state.examSession.cancelled = true;
+if(state.examSession.timer) clearInterval(state.examSession.timer);
+showExamBlockOverlay();
+removeExamProtection();
+const exam = state.examSession.exam;
+const durationSeconds = Math.max(0, Math.floor((Date.now() - state.examSession.startedAt)/1000));
+try{
+const sb = await DB.getClient();
+await sb.from('exam_attempts').insert([{
+id: DB.uid('att_'),
+user_id: state.user.id,
+exam_id: exam.id,
+score: 0,
+total: (exam.question_ids||[]).length,
+pct: 0,
+passed: false,
+answers: {},
+started_at: state.examSession.startedAt,
+duration_seconds: durationSeconds,
+status: 'cancelled',
+cancelled_at: Date.now(),
+cancel_reason: reason || 'unknown',
+at: Date.now(),
+created_at: Date.now()
+}]);
+DB.trackActivity({
+userId: state.user.id, userName: state.user.name,
+type: 'exam_cancelled', target: exam.title,
+details: { exam_id: exam.id, reason, duration_seconds: durationSeconds }
+});
+}catch(e){console.warn('Cancel error:', e);}
+try{
+if(document.fullscreenElement && document.exitFullscreen) await document.exitFullscreen();
+}catch(e){}
+setTimeout(()=>{ removeExamBlockOverlay(); }, 600);
+const modal = document.getElementById('examModal');
+if(modal) modal.remove();
+state.examSession = null;
+state.examResult = null;
+document.body.style.overflow = '';
+const cancelledHTML = `
+<div class="exam-modal" id="examModal">
+<div class="exam-box">
+<div class="exam-cancelled">
+<div class="exam-cancelled-icon">⛔</div>
+<div class="exam-cancelled-title">تم إلغاء الاختبار</div>
+<div class="exam-cancelled-desc">${
+reason === 'exit-fullscreen' ? 'خرجت من وضع ملء الشاشة، فتم إلغاء الاختبار تلقائيًا.' :
+reason === 'visibility-hidden' ? 'خرجت من الصفحة أو تصفحت تطبيق آخر، فتم إلغاء الاختبار تلقائيًا.' :
+reason === 'window-blur' ? 'فقدت الاتصال بالصفحة، فتم إلغاء الاختبار تلقائيًا.' :
+reason === 'user-closed' ? 'قمت بإلغاء الاختبار بنفسك.' :
+'تم إلغاء الاختبار.'
+}</div>
+<div class="glass-s" style="padding:14px;margin:0 auto 20px;max-width:340px">
+<div class="flex between center mb6"><span class="sm muted">النتيجة</span><span class="pill pill-r">ملغي</span></div>
+<div class="flex between center"><span className="sm muted">المدة</span><span className="sm" style="font-weight:700;color:#f59e0b">${Math.floor(durationSeconds/60)}د ${durationSeconds%60}ث</span></div>
+</div>
+<button class="btn btn-p btn-block btn-lg" id="examBack" type="button">↩ رجوع للدرس</button>
+</div>
+</div>
+</div>
+`;
+document.body.insertAdjacentHTML('beforeend', cancelledHTML);
+document.getElementById('examBack').addEventListener('click', ()=>{
+const modal = document.getElementById('examModal');
+if(modal) modal.remove();
+document.body.style.overflow = '';
+location.reload();
+});
+}
+async function submitLessonExam(autoSubmit){
+if(state.examSubmitting) return;
+if(!state.examSession || state.examSession.cancelled) return;
+if(!autoSubmit){
+const unanswered = state.examSession.questions.filter(q => state.examSession.answers[q.id] === undefined).length;
+const confirmRes = await Swal.fire({
+title:'تسليم الاختبار؟',
+html: unanswered > 0 ? `<div style="font-size:14px">عندك <b style="color:#fbbf24">${unanswered}</b> سؤال لم تجب عليه</div>` : `<div style="font-size:14px">متأكد من تسليم الاختبار؟</div>`,
+icon:'question',showCancelButton:true,confirmButtonText:'نعم، سلّم',cancelButtonText:'رجوع',
+confirmButtonColor:'#22c55e',cancelButtonColor:'#64748b',
+background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc',
+customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+});
+if(!confirmRes.isConfirmed) return;
+}
+state.examSubmitting = true;
+if(state.examSession.timer) clearInterval(state.examSession.timer);
+removeExamProtection();
+try{
+if(document.fullscreenElement && document.exitFullscreen) await document.exitFullscreen();
+}catch(e){}
+const exam = state.examSession.exam;
+const questions = state.examSession.questions;
+let correct = 0;
+const answers = {};
+const errorsToSave = [];
+questions.forEach(q=>{
+const given = state.examSession.answers[q.id];
+answers[q.id] = given === undefined ? null : given;
+const correctIdx = (q.correct||[])[0] ?? 0;
+if(given === correctIdx) correct++;
+else if(given !== undefined && given !== null){
+errorsToSave.push({q, given, correct: correctIdx});
+}
+});
+const total = questions.length;
+const pct = total ? Math.round((correct/total)*100) : 0;
+const passed = pct >= (Number(exam.pass_score)||0);
+const durationSeconds = Math.max(0, Math.floor((Date.now() - state.examSession.startedAt)/1000));
+try{
+const sb = await DB.getClient();
+const row = {
+id: DB.uid('att_'),
+user_id: state.user.id,
+exam_id: exam.id,
+score: correct,
+total,
+pct,
+passed,
+answers,
+started_at: state.examSession.startedAt,
+duration_seconds: durationSeconds,
+status: passed ? 'passed' : 'failed',
+at: Date.now(),
+created_at: Date.now()
+};
+await sb.from('exam_attempts').insert([row]);
+if(passed && (Number(exam.xp)||0) > 0){
+try{
+const { data: userRow } = await sb.from('users').select('xp').eq('id', state.user.id).maybeSingle();
+const curXp = Number(userRow?.xp)||0;
+await DB.updateUser(state.user.id, {xp: curXp + Number(exam.xp)});
+}catch(e){console.warn(e);}
+}
+for(const err of errorsToSave){
+try{
+const { data: exist } = await sb.from('user_errors').select('*').eq('user_id', state.user.id).eq('question_id', err.q.id).maybeSingle();
+if(exist){
+await sb.from('user_errors').update({given: err.given, correct: err.correct, count: (exist.count||1)+1, at: Date.now()}).eq('id', exist.id);
+} else {
+await sb.from('user_errors').insert([{
+id: DB.uid('err_'), user_id: state.user.id, question_id: err.q.id,
+lesson_id: state.lesson.id, given: err.given, correct: err.correct,
+count: 1, at: Date.now(), created_at: Date.now()
+}]);
+}
+}catch(e){console.warn(e);}
+}
+DB.trackActivity({
+userId: state.user.id, userName: state.user.name,
+type: 'exam_submit', target: exam.title,
+details: { exam_id: exam.id, score: correct, total, pct, passed, duration_seconds: durationSeconds, status: passed ? 'passed' : 'failed' }
+});
+}catch(e){console.warn('Submit error:', e);}
+state.examResult = { score: correct, total, pct, passed, durationSeconds, answers };
+state.examSubmitting = false;
+renderExamResult();
+}
+function renderExamResult(){
+const old = document.getElementById('examModal');
+if(old) old.remove();
+const res = state.examResult;
+const exam = state.examSession?.exam;
+if(!res || !exam) return;
+const m = Math.floor(res.durationSeconds/60), sec = res.durationSeconds%60;
+const durText = m > 0 ? `${m}د ${sec}ث` : `${sec} ث`;
+const html = `
+<div class="exam-modal" id="examModal">
+<div class="exam-box">
+<div class="exam-result">
+<div class="exam-result-icon" style="color:${res.passed?'#22c55e':'#ef4444'}">${res.passed?'🎉':'😔'}</div>
+<div class="exam-result-title" style="color:${res.passed?'#6ee7a0':'#fca5a5'}">${res.passed?'مبروك، نجحت!':'للأسف، لم تنجح'}</div>
+<div class="exam-result-pct" style="color:${res.passed?'#22c55e':'#ef4444'}">${res.pct}%</div>
+<div class="exam-result-stats">
+<div class="exam-stat"><div class="exam-stat-n" style="color:#6ee7a0">${res.score}</div><div class="exam-stat-l">صح</div></div>
+<div class="exam-stat"><div class="exam-stat-n" style="color:#fca5a5">${res.total-res.score}</div><div class="exam-stat-l">غلط</div></div>
+<div class="exam-stat"><div class="exam-stat-n" style="color:#fbbf24">${durText}</div><div class="exam-stat-l">المدة</div></div>
+<div class="exam-stat"><div class="exam-stat-n" style="color:#5aa9ff">${exam.pass_score||0}%</div><div class="exam-stat-l">النجاح</div></div>
+</div>
+${res.passed && exam.xp ? `<div class="exam-xp">+${exam.xp} XP 🎯</div>` : ''}
+<button class="btn btn-p btn-block btn-lg mt20" id="examBack" type="button">↩ رجوع للدرس</button>
+</div>
+</div>
+</div>
+`;
+document.body.insertAdjacentHTML('beforeend', html);
+document.getElementById('examBack').addEventListener('click', ()=>{
+const modal = document.getElementById('examModal');
+if(modal) modal.remove();
+document.body.style.overflow = '';
+location.reload();
+});
+}
+function closeExam(){
+if(state.examSession?.timer) clearInterval(state.examSession.timer);
+removeExamProtection();
+removeExamBlockOverlay();
+const modal = document.getElementById('examModal');
+if(modal) modal.remove();
+state.examSession = null;
+state.examResult = null;
+document.body.style.overflow = '';
+}
+function render(){
+const l = state.lesson;
+const u = state.user;
+app.innerHTML = `
+<div class="fade-in">
+<div class="flex between center wrap-fl g12 mb16">
+<div>
+<div class="flex wrap-fl g8 center mb6">
+<div class="h1">${esc(l.title)}</div>
+${isPaidContent(l) ? `<span class="pill pill-paid"><i class="fa-solid fa-lock"></i> مدفوع</span>` : `<span class="pill pill-free"><i class="fa-solid fa-unlock"></i> مجاني</span>`}
+</div>
+<div class="flex wrap-fl g8 xs muted">
+<span><i class="fa-solid fa-clock"></i> ${l.duration || 15} دقيقة</span>
+<span>•</span>
+<span>+${l.xp || 20} XP</span>
+${state.subject ? `<span>•</span><span>${esc(state.subject.name)}</span>` : ''}
+${state.unit ? `<span>•</span><span>${esc(state.unit.name)}</span>` : ''}
+</div>
+</div>
+<div class="flex g8 center wrap-fl">
+${getSubscriptionBadge(u)}
+${state.isDone ? '<span class="pill pill-g"><i class="fa-solid fa-check"></i> مكتمل</span>' : '<span class="pill pill-b"><i class="fa-solid fa-play"></i> لم يُكمل</span>'}
+</div>
+</div>
+<div class="grid-main">
+<div>
+<div class="glass" style="padding:20px">
+${l.desc ? `<div class="sm txt2 mb16">${esc(l.desc)}</div>` : ''}
+<div class="mb20" id="playerHost">
+${buildPlayerHTML(l.video, l.title, state.hasVideoAccess)}
+</div>
+${buildPdfHTML(l.pdf_url, l.title)}
+${l.summary ? `
+<div class="h4 mb8">📝 ملخص الدرس</div>
+<div class="sm txt2 mb16">${esc(l.summary)}</div>
+` : ''}
+${(l.key_points || []).length > 0 ? `
+<div class="h4 mb8">💡 النقاط المهمة</div>
+<div class="mb16">
+${(l.key_points || []).map(k => `
+<div class="kp"><span class="kp-dot">◆</span><span class="sm txt2">${esc(k)}</span></div>
+`).join('')}
+</div>
+` : ''}
+${(l.examples || []).length > 0 ? `
+<div class="h4 mb8">🧮 أمثلة محلولة</div>
+<div class="mb16">
+${(l.examples || []).map(ex => `
+<div class="example">
+<div class="example-q"><b>س:</b> ${esc(ex.q)}</div>
+<div class="example-a"><b>ج:</b> ${esc(ex.a)}</div>
+</div>
+`).join('')}
+</div>
+` : ''}
+${l.notes ? `
+<div class="h4 mb8">📌 ملاحظات المعلم</div>
+<div class="sm txt2 mb16">${esc(l.notes)}</div>
+` : ''}
+<div class="flex wrap-fl g8 mt20">
+<button class="btn btn-ok" id="btnDone" ${state.isDone || !state.hasVideoAccess ? 'disabled' : ''}>
+${state.isDone ? '<i class="fa-solid fa-check"></i> تم إكمال الدرس' : (state.hasVideoAccess ? '<i class="fa-solid fa-check"></i> فهمت الدرس' : '<i class="fa-solid fa-lock"></i> الدرس مدفوع')}
+</button>
+<button class="btn btn-wr" id="btnReview" ${!state.hasVideoAccess ? 'disabled' : ''}>
+<i class="fa-solid fa-rotate-left"></i> أحتاج مراجعة
+</button>
+</div>
+${state.relatedExams.length > 0 ? `
+<div class="div"></div>
+<div class="h4 mb12" style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">📝</span> اختبار الدرس</div>
+${state.relatedExams.map(e=>{
+const paid = isPaidContent(e);
+const allowed = state.hasExamAccess[e.id] !== false;
+const locked = paid && !allowed;
+return `
+<div class="lesson-exam-card ${locked?'locked':''}" data-exam-id="${e.id}">
+<div class="flex between center mb8 wrap-fl g8">
+<span class="pill ${paid?'pill-paid':'pill-free'}">
+<i class="fa-solid ${paid?'fa-lock':'fa-unlock'}"></i>
+${paid?'مدفوع':'مجاني'}
+</span>
+<span class="pill pill-v">+${e.xp||0} XP</span>
+</div>
+<div class="lesson-exam-title">${esc(e.title)}</div>
+<div class="flex wrap-fl g12 xs muted mt8">
+<span>⏱ ${e.duration||15} دقيقة</span>
+<span>❓ ${(e.question_ids||[]).length} سؤال</span>
+<span>🎯 نجاح: ${e.pass_score||0}%</span>
+</div>
+${locked 
+? `<button class="btn btn-s btn-block mt12" data-action="locked" type="button">🔒 يتطلب اشتراك</button>`
+: `<button class="btn btn-ok btn-block mt12" data-action="start" type="button">🚀 ابدأ الاختبار</button>`}
+</div>
+`;
+}).join('')}
+` : ''}
+</div>
+</div>
+<div>
+<div class="glass mb16" style="padding:16px">
+<div class="flex between center mb12">
+<div class="h4">📝 ملاحظاتي</div>
+<span class="pill pill-y" id="noteStatus">فارغ</span>
+</div>
+<textarea id="lessonNote" class="notes-area" placeholder="اكتب ملاحظاتك على الدرس هنا..."></textarea>
+<div class="flex g8 mt12">
+<button class="btn btn-p btn-sm" id="btnSaveNote" style="flex:1"><i class="fa-solid fa-floppy-disk"></i> حفظ</button>
+<button class="btn btn-s btn-sm" id="btnClearNote" title="مسح الملاحظة"><i className="fa-solid fa-trash"></i></button>
+</div>
+<div class="xs muted mt8" style="text-align:center"><i class="fa-solid fa-circle-info"></i> يتم الحفظ تلقائيًا أثناء الكتابة</div>
+</div>
+<div class="glass mb16" style="padding:16px">
+<div class="h4 mb12">📊 تقدمك في الوحدة</div>
+<div class="flex between center mb8">
+<span class="sm muted">${state.unit ? esc(state.unit.name) : ''}</span>
+<span class="sm" style="font-weight:700;color:var(--blue2)">${state.unitPct}%</span>
+</div>
+<div class="bar"><div class="bar-f" style="width:${state.unitPct}%"></div></div>
+<div class="xs muted mt8">${state.doneUnit} من ${state.totalUnit} دروس</div>
+</div>
+${buildRelatedExamsHTML(state.relatedExams)}
+</div>
+</div>
+</div>
+`;
+const lockedSubscribeBtn = document.getElementById('btnLockedSubscribe');
+if(lockedSubscribeBtn) lockedSubscribeBtn.addEventListener('click', showLockedMessage);
+window._openLessonPlayer = ()=>{
+try{
+openPlayer(l, u);
+}catch(err){
+console.error('Open player error:', err);
+}
+};
+const lockedExamCards = app.querySelectorAll('.exam-card[data-locked="true"]');
+lockedExamCards.forEach(card=>{
+card.addEventListener('click', (e)=>{
+e.preventDefault();
+e.stopPropagation();
+showLockedMessage();
+});
+});
+const pdfLink = document.getElementById('pdfLink');
+if(pdfLink){
+pdfLink.addEventListener('click', async ()=>{
+try{
+DB.trackActivity({
+userId: u.id, userName: u.name,
+type: "pdf_open", target: l.title,
+details: { lesson: l.title, pdf: l.pdf_url }
+});
+}catch(e){}
+const url = pdfLink.dataset.url;
+const fname = pdfLink.dataset.filename || 'lesson.pdf';
+await downloadPdf(url, fname);
+});
+}
+const btnDoneEl = document.getElementById("btnDone");
+if(btnDoneEl){
+btnDoneEl.addEventListener("click", async ()=>{
+if(state.isDone) return;
+if(!state.hasVideoAccess){
+showLockedMessage();
+return;
+}
+try{
+const sb = await DB.getClient();
+const { data: userData } = await sb.from("users").select("completed_lessons, xp").eq("id", u.id).maybeSingle();
+const completed = userData?.completed_lessons || [];
+const currentXp = userData?.xp || 0;
+const newCompleted = [...completed, l.id];
+const newXp = currentXp + (l.xp || 0);
+await DB.updateUser(u.id, { completed_lessons: newCompleted, xp: newXp });
+DB.trackActivity({userId:u.id,userName:u.name,type:"lesson_complete",target:l.title,details:{xp:l.xp}});
+let certificateEarned = null;
+try{
+const subjectId = state.subject?.id || state.unit?.subject_id;
+if(subjectId && hasSubscriptionAccess(u)){
+const { data: unitsInSubject } = await sb.from("units").select("id").eq("subject_id", subjectId);
+const unitIds = (unitsInSubject || []).map(x => x.id);
+if(unitIds.length > 0){
+const { data: allLessons } = await sb.from("lessons").select("id").in("unit_id", unitIds).eq("published", true);
+const allLessonIds = (allLessons || []).map(x => x.id);
+const allComplete = allLessonIds.length > 0 && allLessonIds.every(id => newCompleted.includes(id));
+if(allComplete){
+const { data: existingCert } = await sb.from("certificates").select("*").eq("user_id", u.id).eq("subject_id", subjectId).maybeSingle();
+if(!existingCert){
+const newCert = {
+id: DB.uid('cert_'),
+user_id: u.id,
+subject_id: subjectId,
+issued_at: Date.now(),
+created_at: Date.now(),
+auto_generated: true
+};
+const { data: insertedCert } = await sb.from("certificates").insert([newCert]).select().single();
+certificateEarned = insertedCert || newCert;
+DB.trackActivity({
+userId: u.id, userName: u.name,
+type: "certificate_earned",
+target: state.subject?.name || 'مادة',
+details: { subject: state.subject?.name, cert_id: newCert.id }
+});
+}
+}
+}
+}
+}catch(certErr){ console.warn("Auto cert error:", certErr); }
+await Swal.fire({
+icon: 'success',
+title: certificateEarned ? '🏆 مبروووك!' : 'أحسنت!',
+html: certificateEarned 
+? `
+<div style="text-align:center;">
+<div style="font-size:64px;margin-bottom:12px;">🎓</div>
+<p style="font-size:17px;margin-bottom:10px;font-weight:700;">خلصت مادة <b style="color:#fbbf24">${state.subject?.name || ''}</b> كاملة!</p>
+<p style="color:#b7c6e4;font-size:14px;margin-bottom:8px;">اتولدت لك <b style="color:#FFD700">شهادة إتمام</b> تلقائيًا 🎉</p>
+<div style="display:inline-block;padding:8px 20px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);border-radius:12px;margin-top:8px;">
+<span style="color:#fbbf24;font-weight:900;font-size:14px;">+${l.xp} XP</span>
+</div>
+</div>
+`
+: `<div style="text-align:center;"><div style="font-size:48px;margin-bottom:8px;">✨</div><div style="font-size:20px;font-weight:900;color:#6ee7a0;">+${l.xp} XP</div></div>`,
+background: 'linear-gradient(180deg, #151f38, #0b1122)',
+color: '#e8eefc',
+confirmButtonColor: certificateEarned ? '#fbbf24' : '#2f7dff',
+confirmButtonText: certificateEarned ? '🎓 روح لشهاداتي' : 'تمام',
+customClass: {popup:'swal-custom-popup', title:'swal-custom-title'},
+timer: certificateEarned ? undefined : 2000,
+showConfirmButton: certificateEarned ? true : false
+}).then(r=>{
+if(certificateEarned && r.isConfirmed){
+window.location.href = '/student/index.html';
+} else {
+location.reload();
+}
+});
+}catch(e){
+Swal.fire({icon:'error', title:'خطأ', text:e.message, background:'linear-gradient(180deg, #151f38, #0b1122)', color:'#e8eefc', confirmButtonColor:'#2f7dff', customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+}
+});
+}
+const btnReviewEl = document.getElementById("btnReview");
+if(btnReviewEl){
+btnReviewEl.addEventListener("click", ()=>{
+if(!state.hasVideoAccess){
+showLockedMessage();
+return;
+}
+Swal.fire({
+icon: 'info',
+title: 'تمت الإضافة',
+text: 'سجلنا هذا الدرس في قائمة المراجعة',
+background: 'linear-gradient(180deg, #151f38, #0b1122)',
+color: '#e8eefc',
+confirmButtonColor: '#2f7dff',
+customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
+});
+});
+}
+document.querySelectorAll('.lesson-exam-card').forEach(card=>{
+const examId = card.dataset.examId;
+const exam = state.relatedExams.find(e=>e.id===examId);
+if(!exam) return;
+card.querySelectorAll('button[data-action]').forEach(btn=>{
+btn.addEventListener('click', ()=>{
+const action = btn.dataset.action;
+if(action === 'locked'){ showLockedMessage(); return; }
+if(action === 'start'){ startLessonExam(exam); return; }
+});
+});
+});
+const noteEl = document.getElementById('lessonNote');
+if(noteEl){
+noteEl.value = state.note || '';
+if(state.note && state.note.trim()){
+updateNoteStatus('saved');
+} else {
+updateNoteStatus('empty');
+}
+noteEl.addEventListener('input', ()=>{
+state.note = noteEl.value;
+state.noteDirty = true;
+updateNoteStatus('saving');
+scheduleAutoSave();
+});
+noteEl.addEventListener('blur', ()=>{
+if(state.noteDirty) saveNote(true);
+});
+}
+const btnSave = document.getElementById('btnSaveNote');
+if(btnSave){
+btnSave.addEventListener('click', ()=>{
+state.noteDirty = true;
+saveNote(false);
+});
+}
+const btnClear = document.getElementById('btnClearNote');
+if(btnClear){
+btnClear.addEventListener('click', async ()=>{
+if(!state.note.trim() && !state.noteId) return;
+const r = await Swal.fire({
+title: 'مسح الملاحظة؟',
+text: 'سيتم حذف الملاحظة نهائيًا',
+icon: 'warning',
+showCancelButton: true,
+confirmButtonText: 'نعم، امسح',
+cancelButtonText: 'إلغاء',
+confirmButtonColor: '#ef4444',
+cancelButtonColor: '#64748b',
+background: 'linear-gradient(180deg, #151f38, #0b1122)',
+color: '#e8eefc',
+customClass: {popup:'swal-custom-popup', title:'swal-custom-title'}
+});
+if(!r.isConfirmed) return;
+const el = document.getElementById('lessonNote');
+if(el) el.value = '';
+state.note = '';
+state.noteDirty = true;
+await saveNote(false);
+});
+}
+}
+async function load(){
+if(!lessonId){
+app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
+<div class="h3 mb12">⚠️ لم يتم تحديد الدرس</div>
+<p class="sm muted mb16">يرجى فتح الدرس من داخل المنصة</p>
+<a href="/student/index.html" class="btn btn-p" style="text-decoration:none">العودة للرئيسية</a>
+</div>`;
+return;
+}
+const sid = DB.getSessionId();
+if(!sid){ window.location.replace("/auth/login.html"); return; }
+const user = await DB.getUser(sid);
+if(!user || user.active === false){ DB.clearSession(); window.location.replace("/auth/login.html"); return; }
+state.user = user;
+userAvatar.textContent = user.avatar || "🧑‍🎓";
+const sb = await DB.getClient();
+const { data: lesson, error } = await sb.from("lessons").select("*").eq("id", lessonId).maybeSingle();
+if(error || !lesson){
+app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
+<div class="h3 mb12">⚠️ الدرس غير موجود</div>
+<a href="/student/index.html" class="btn btn-p" style="text-decoration:none">العودة للرئيسية</a>
+</div>`;
+return;
+}
+state.lesson = lesson;
+DB.trackActivity({
+userId: user.id, userName: user.name,
+type: "lesson_view", target: lesson.title,
+details: { lesson: lesson.title }
+});
+const { data: unit } = await sb.from("units").select("*").eq("id", lesson.unit_id).maybeSingle();
+state.unit = unit;
+if(unit){
+const { data: subject } = await sb.from("subjects").select("*").eq("id", unit.subject_id).maybeSingle();
+state.subject = subject;
+}
+const { data: unitLessons } = await sb.from("lessons").select("id").eq("unit_id", lesson.unit_id).eq("published", true);
+const { data: userData } = await sb.from("users").select("completed_lessons").eq("id", user.id).maybeSingle();
+const completed = userData?.completed_lessons || [];
+state.totalUnit = unitLessons?.length || 1;
+state.doneUnit = (unitLessons || []).filter(l => completed.includes(l.id)).length;
+state.unitPct = Math.round((state.doneUnit / state.totalUnit) * 100);
+state.isDone = completed.includes(lesson.id);
+const { data: allExams } = await sb.from("exams").select("*").eq("published", true);
+state.relatedExams = (allExams || []).filter(e => {
+const lessonIds = Array.isArray(e.lesson_ids) ? e.lesson_ids : [];
+return lessonIds.includes(lesson.id);
+});
+state.hasVideoAccess = hasAccess(user, lesson);
+state.hasExamAccess = {};
+state.relatedExams.forEach(e=>{
+state.hasExamAccess[e.id] = hasAccess(user, e);
+});
+await loadNote(user.id, lesson.id);
+render();
+const closeBtn = document.getElementById('playerClose');
+if(closeBtn) closeBtn.addEventListener('click', closePlayer);
+const fsBtn = document.getElementById('playerFullscreen');
+if(fsBtn) fsBtn.addEventListener('click', toggleFullscreen);
+const modal = document.getElementById('playerModal');
+if(modal){
+modal.addEventListener('click', (e)=>{
+if(e.target === modal) closePlayer();
+});
+}
+attachProtection();
+window.addEventListener('beforeunload', ()=>{
+if(state.noteDirty){
+saveNote(true);
+}
+});
+try{
+localStorage.setItem('student_last_lesson', lessonId);
+}catch(e){}
+}
+window.openWhatsApp = ()=>{
+window.open("https://wa.me/201128351702?text=" + encodeURIComponent("مرحبًا، أريد الاستفسار عن منصة MISSION EDU"), "_blank");
+};
+window.sendReport = async ()=>{
+const user = state.user || await DB.getUser(DB.getSessionId());
+const { value: msg } = await Swal.fire({
+title: '🚨 بلاغ عن مشكلة',
+input: 'textarea',
+inputPlaceholder: 'اكتب رسالتك هنا...',
+showCancelButton: true,
+confirmButtonText: '📤 إرسال',
+cancelButtonText: 'إلغاء',
+confirmButtonColor: '#2f7dff',
+cancelButtonColor: '#64748b',
+inputValidator: v => { if(!v || v.trim().length < 5) return 'يرجى كتابة رسالة واضحة'; },
+customClass: {popup:'swal-custom-popup',title:'swal-custom-title',input:'swal-custom-input'}
+});
+if(msg){
+const sent = await DB.reportIssue({
+userName: user?.name || 'زائر',
+userPhone: (user?.country_code||'+20')+(user?.phone||'—'),
+message: msg
+});
+Swal.fire({icon: sent?'success':'error', title: sent?'✅ تم الإرسال':'❌ فشل', text: sent?'شكرًا لك':'حاول مرة أخرى', background:'linear-gradient(180deg, #151f38, #0b1122)', color:'#e8eefc', confirmButtonColor:'#2f7dff', customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+}
+};
+load();
+})();
+</script>
+</body>
+</html>
