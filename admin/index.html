@@ -602,7 +602,6 @@ function PollsPage(){
     </Modal>}
   </>;
 }
-
 function LessonsPage(){
   const app=useApp();
   const [editing,setEditing]=useState(null);const [form,setForm]=useState({});const [busy,setBusy]=useState(false);
@@ -839,7 +838,7 @@ function ExamsPage(){
   const [editingQ,setEditingQ]=useState(null);const [qForm,setQForm]=useState({text:'',options:['','','',''],correct:0,explanation:''});const [qBusy,setQBusy]=useState(false);
 
   const openNew=()=>{setForm({title:'',subject_id:'',unit_id:'',lesson_ids:[],question_ids:[],duration:'',pass_score:'',max_attempts:'',xp:'',published:true,sort_order:'',is_free:true});setJsonText('');setEditing('new');};
-  const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(c.is_free===undefined)c.is_free=true;setForm(c);setJsonText('');setEditing(it.id);};
+  const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(c.is_free===undefined)c.is_free=true;if(c.max_attempts===undefined)c.max_attempts='';setForm(c);setJsonText('');setEditing(it.id);};
 
   const parseQuestionJSON=raw=>{
     let parsed;try{parsed=JSON.parse(raw);}catch(e){throw new Error('صيغة JSON غير صحيحة. راجع الأقواس والفواصل وعلامات التنصيص.');}
@@ -884,7 +883,8 @@ function ExamsPage(){
         const id=DB.uid('q_');createdIds.push(id);
         await DB.save('questions',{id,text:q.text,options:q.options,correct:[q.correct],explanation:q.explanation,lesson_id:null,unit_id:form.unit_id||null,subject_id:form.subject_id,difficulty:q.difficulty,xp:q.xp,type:'mcq'});
       }
-      const exam={...form,title:String(form.title).trim(),question_ids:[...new Set([...(form.question_ids||[]),...createdIds])]};
+      const maxAttempts=form.max_attempts===''||form.max_attempts===null||form.max_attempts===undefined?0:Number(form.max_attempts)||0;
+      const exam={...form,title:String(form.title).trim(),max_attempts:maxAttempts,question_ids:[...new Set([...(form.question_ids||[]),...createdIds])]};
       await DB.save('exams',exam);
       await app.reload();
       app.toast.ok(`تم حفظ الاختبار${createdIds.length?` وإضافة ${createdIds.length} سؤالًا من JSON`:''}`);
@@ -932,14 +932,25 @@ function ExamsPage(){
 
   const availQ=form.unit_id?app.db.questions.filter(q=>q.unit_id===form.unit_id):app.db.questions;
   const currentQuestions=(form.question_ids||[]).map(id=>app.question(id)).filter(Boolean);
+  const attemptsLabel=e=>{const n=Number(e.max_attempts)||0;return n>0?`${n}`:'∞';};
 
   return <>
     <div className="flex between center mb16 wrap g8"><div className="h2 grad">📝 الاختبارات</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> جديد</button></div>
-    <div className="glass" style={{padding:14}}>{app.db.exams.length===0?<Empty title="لا اختبارات"/>:<div className="sx"><table className="tbl"><thead><tr><th>العنوان</th><th>المادة</th><th>الأسئلة</th><th>الوصول</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>{app.db.exams.map(e=><tr key={e.id}><td><b>{e.title}</b></td><td className="sm">{app.subject(e.subject_id)?.name||'—'}</td><td>{(e.question_ids||[]).length}</td><td><AccessBadge value={e.is_free}/></td><td>{e.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(e)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(e.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody></table></div>}</div>
+    <div className="glass" style={{padding:14}}>{app.db.exams.length===0?<Empty title="لا اختبارات"/>:<div className="sx"><table className="tbl"><thead><tr><th>العنوان</th><th>المادة</th><th>الأسئلة</th><th>المحاولات</th><th>الوصول</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>{app.db.exams.map(e=><tr key={e.id}><td><b>{e.title}</b></td><td className="sm">{app.subject(e.subject_id)?.name||'—'}</td><td>{(e.question_ids||[]).length}</td><td><span className="pill pill-b">{attemptsLabel(e)}</span></td><td><AccessBadge value={e.is_free}/></td><td>{e.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(e)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(e.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody></table></div>}</div>
 
     {editing!==null&&<Modal title={editing==='new'?'جديد':'تعديل'} onClose={()=>setEditing(null)} wide>
       <Field label="الاسم"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
-      <div className="grid g2"><Field label="المادة"><select className="input" value={form.subject_id||''} onChange={e=>setForm({...form,subject_id:e.target.value,unit_id:''})}><option value="">— اختر —</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field><Field label="الوحدة"><select className="input" value={form.unit_id||''} onChange={e=>setForm({...form,unit_id:e.target.value,question_ids:[]})}><option value="">— اختر —</option>{app.db.units.filter(u=>!form.subject_id||u.subject_id===form.subject_id).map(u=><option key={u.id} value={u.id}>{u.name}</option>)}</select></Field><Field label="المدة بالدقائق"><input type="number" className="input" value={form.duration??''} onChange={e=>setForm({...form,duration:e.target.value===''?'':+e.target.value})}/></Field><Field label="درجة النجاح %"><input type="number" className="input" value={form.pass_score??''} onChange={e=>setForm({...form,pass_score:e.target.value===''?'':+e.target.value})}/></Field><Field label="XP"><input type="number" className="input" value={form.xp??''} onChange={e=>setForm({...form,xp:e.target.value===''?'':+e.target.value})}/></Field><Field label="الحالة"><select className="input" value={form.published!==false?'1':'0'} onChange={e=>setForm({...form,published:e.target.value==='1'})}><option value="1">منشور</option><option value="0">مخفي</option></select></Field></div>
+      <div className="grid g2">
+        <Field label="المادة"><select className="input" value={form.subject_id||''} onChange={e=>setForm({...form,subject_id:e.target.value,unit_id:''})}><option value="">— اختر —</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field>
+        <Field label="الوحدة"><select className="input" value={form.unit_id||''} onChange={e=>setForm({...form,unit_id:e.target.value,question_ids:[]})}><option value="">— اختر —</option>{app.db.units.filter(u=>!form.subject_id||u.subject_id===form.subject_id).map(u=><option key={u.id} value={u.id}>{u.name}</option>)}</select></Field>
+        <Field label="المدة بالدقائق"><input type="number" className="input" value={form.duration??''} onChange={e=>setForm({...form,duration:e.target.value===''?'':+e.target.value})}/></Field>
+        <Field label="درجة النجاح %"><input type="number" className="input" value={form.pass_score??''} onChange={e=>setForm({...form,pass_score:e.target.value===''?'':+e.target.value})}/></Field>
+        <Field label="عدد المحاولات" hint="اتركه 0 أو فارغ = غير محدود">
+          <input type="number" min="0" className="input" value={form.max_attempts??''} onChange={e=>setForm({...form,max_attempts:e.target.value===''?'':+e.target.value})} placeholder="0 = غير محدود"/>
+        </Field>
+        <Field label="XP"><input type="number" className="input" value={form.xp??''} onChange={e=>setForm({...form,xp:e.target.value===''?'':+e.target.value})}/></Field>
+        <Field label="الحالة"><select className="input" value={form.published!==false?'1':'0'} onChange={e=>setForm({...form,published:e.target.value==='1'})}><option value="1">منشور</option><option value="0">مخفي</option></select></Field>
+      </div>
       <Field label="نوع الوصول"><AccessToggle value={form.is_free} onChange={v=>setForm({...form,is_free:v})}/></Field>
 
       <div className="glass-s mb12" style={{padding:14,borderColor:'var(--border2)'}}>
@@ -1003,7 +1014,6 @@ function ExamsPage(){
     </Modal>}
   </>;
 }
-
 function MissionsPage(){
   const app=useApp();
   const [editing,setEditing]=useState(null);const [form,setForm]=useState({});const [busy,setBusy]=useState(false);
