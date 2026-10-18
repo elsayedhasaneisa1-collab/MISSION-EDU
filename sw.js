@@ -14,6 +14,7 @@ const STATIC_ASSETS = [
   '/student/exam.html',
   '/student/profile.html',
   '/student/player.html',
+  '/student/pdf-viewer.html', 
   '/db.js',
   '/manifest.json',
   '/logo.png'
