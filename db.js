@@ -234,7 +234,17 @@ const API = {
   async save(table, item) {
     const sb = await getClient();
     const record = item.id ? { ...item } : { ...item, id: uid(table.slice(0, 3) + "_") };
-    if (!record.created_at) record.created_at = Date.now();
+    async save(table, item) {
+  const sb = await getClient();
+  const record = { ...item };
+  if (!record.id) record.id = uid(table.slice(0, 3) + "_");
+  if (!record.created_at || record.created_at === null || record.created_at === undefined) {
+    record.created_at = Date.now();
+  }
+  const { data, error } = await sb.from(table).upsert(record).select().single();
+  if (error) throw new Error(error.message);
+  return data;
+}
     const { data, error } = await sb.from(table).upsert(record).select().single();
     if (error) throw new Error(error.message);
     return data;
