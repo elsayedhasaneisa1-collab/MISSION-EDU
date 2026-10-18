@@ -763,38 +763,182 @@ function BannedUsersPage(){
 function XPShopPage(){
   const app=useApp();
   const items=app.db.xp_shop_items||[];
-  const [editing,setEditing]=useState(null);const [form,setForm]=useState({name:'',description:'',icon:'🎁',type:'reward',xp_cost:'',stock:'',active:true});const [busy,setBusy]=useState(false);
-  const openNew=()=>{setForm({name:'',description:'',icon:'🎁',type:'reward',xp_cost:'',stock:'',active:true});setEditing('new');};
-  const openEdit=it=>{setForm({...it});setEditing(it.id);};
+  const [editing,setEditing]=useState(null);
+  const [form,setForm]=useState({name:'',description:'',icon:'🎁',type:'reward',xp_cost:'',stock:'',active:true});
+  const [busy,setBusy]=useState(false);
+
+  const openNew=()=>{
+    setForm({name:'',description:'',icon:'🎁',type:'reward',xp_cost:'',stock:'',active:true});
+    setEditing('new');
+  };
+
+  const openEdit=it=>{
+    setForm({
+      ...it,
+      xp_cost: it.xp_cost ?? '',
+      stock: it.stock ?? ''
+    });
+    setEditing(it.id);
+  };
+
   const save=async()=>{
-  if(!form.name||!form.xp_cost)return app.toast.warn('الاسم والسعر مطلوبان');
-  setBusy(true);
-  try{
+    if(!form.name || !form.name.trim()) return app.toast.warn('الاسم مطلوب');
+    
+    const xpCost = form.xp_cost === '' || form.xp_cost === undefined || form.xp_cost === null ? null : Number(form.xp_cost);
+    if(!xpCost || xpCost <= 0) return app.toast.warn('السعر (XP) لازم يكون رقم أكبر من 0');
+    
+    const stock = form.stock === '' || form.stock === undefined || form.stock === null ? null : Number(form.stock);
+
     const payload = {
-      ...form,
+      name: form.name.trim(),
+      description: form.description || null,
+      icon: form.icon || '🎁',
+      type: form.type || 'reward',
+      xp_cost: xpCost,
+      stock: stock,
+      active: form.active !== false,
       created_at: form.created_at || Date.now()
     };
-    if(!payload.id) delete payload.id;
-    await app.save('xp_shop_items', payload);
-    app.toast.ok('تم');
-    setEditing(null);
-  }catch(e){
-    console.error('XP Shop save error:', e);
-    app.toast.err(e.message || 'خطأ غير متوقع');
-  }
-  setBusy(false);
-};
-  const del=async id=>{const r=await Swal.fire({title:'حذف؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{await app.remove('xp_shop_items',id);app.toast.warn('تم');}catch(e){app.toast.err(e.message);}};
+
+    if(editing !== 'new' && form.id) {
+      payload.id = form.id;
+    }
+
+    setBusy(true);
+    try{
+      await app.save('xp_shop_items', payload);
+      app.toast.ok('تم الحفظ بنجاح ✅');
+      setEditing(null);
+    }catch(e){
+      console.error('XP Shop error:', e);
+      app.toast.err(e.message || 'حدث خطأ غير متوقع');
+    }
+    setBusy(false);
+  };
+
+  const del=async id=>{
+    const r=await Swal.fire({
+      title:'حذف المنتج؟',
+      icon:'warning',
+      showCancelButton:true,
+      confirmButtonText:'نعم، احذف',
+      cancelButtonText:'إلغاء',
+      confirmButtonColor:'#ef4444',
+      cancelButtonColor:'#64748b',
+      background:'linear-gradient(180deg,#1c160c,#0f0c07)',
+      color:'#f7f0dd',
+      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+    });
+    if(!r.isConfirmed)return;
+    try{
+      await app.remove('xp_shop_items',id);
+      app.toast.warn('تم الحذف');
+    }catch(e){
+      app.toast.err(e.message);
+    }
+  };
+
   return <>
-    <div className="flex between center mb16"><div className="h2 grad">🛒 متجر XP</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> منتج جديد</button></div>
-    <div className="glass" style={{padding:14}}>{items.length===0?<Empty icon="🛒" title="لا منتجات"/>:<div className="sx"><table className="tbl"><thead><tr><th></th><th>الاسم</th><th>XP</th><th>المخزون</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>{items.map(it=><tr key={it.id}><td style={{fontSize:24}}>{it.icon||'🎁'}</td><td>{it.name}</td><td><b style={{color:'#FFD700'}}>⚡ {it.xp_cost}</b></td><td>{it.stock!=null?it.stock:'∞'}</td><td>{it.active?<span className="pill pill-g">نشط</span>:<span className="pill pill-y">معطّل</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(it)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(it.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody></table></div>}</div>
-    {editing!==null&&<Modal title={editing==='new'?'منتج جديد':'تعديل'} onClose={()=>setEditing(null)}>
-      <div className="grid g2"><Field label="الاسم"><input className="input" value={form.name||''} onChange={e=>setForm({...form,name:e.target.value})}/></Field><Field label="الأيقونة"><input className="input" value={form.icon||''} onChange={e=>setForm({...form,icon:e.target.value})}/></Field></div>
-      <Field label="الوصف"><textarea className="input" value={form.description||''} onChange={e=>setForm({...form,description:e.target.value})}/></Field>
-      <div className="grid g2"><Field label="السعر (XP)"><input type="number" className="input" value={form.xp_cost??''} onChange={e=>setForm({...form,xp_cost:e.target.value===''?'':+e.target.value})}/></Field><Field label="المخزون (اختياري)"><input type="number" className="input" value={form.stock??''} onChange={e=>setForm({...form,stock:e.target.value===''?null:+e.target.value})}/></Field></div>
-      <label className="flex center g8" style={{cursor:'pointer'}}><input type="checkbox" checked={form.active!==false} onChange={e=>setForm({...form,active:e.target.checked})}/><span className="sm">مفعّل</span></label>
-      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
-    </Modal>}
+    <div className="flex between center mb16">
+      <div className="h2 grad">🛒 متجر XP</div>
+      <button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> منتج جديد</button>
+    </div>
+
+    <div className="glass" style={{padding:14}}>
+      {items.length===0?
+        <Empty icon="🛒" title="لا منتجات" desc="اضغط على 'منتج جديد' لإضافة أول منتج"/>:
+        <div className="sx">
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th></th>
+                <th>الاسم</th>
+                <th>الوصف</th>
+                <th>السعر (XP)</th>
+                <th>المخزون</th>
+                <th>الحالة</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map(it=>(
+                <tr key={it.id}>
+                  <td style={{fontSize:24}}>{it.icon||'🎁'}</td>
+                  <td><b>{it.name}</b></td>
+                  <td className="sm muted">{it.description||'—'}</td>
+                  <td><b style={{color:'#FFD700'}}>⚡ {it.xp_cost}</b></td>
+                  <td>{it.stock!=null?it.stock:'∞'}</td>
+                  <td>{it.active?<span className="pill pill-g">نشط</span>:<span className="pill pill-y">معطّل</span>}</td>
+                  <td>
+                    <div className="flex g6">
+                      <button className="btn btn-s btn-sm" onClick={()=>openEdit(it)}><Icon name="edit" size={13}/></button>
+                      <button className="btn btn-dn btn-sm" onClick={()=>del(it.id)}><Icon name="trash" size={13}/></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    {editing!==null && (
+      <Modal title={editing==='new'?'منتج جديد':'تعديل المنتج'} onClose={()=>setEditing(null)}>
+        <div className="grid g2">
+          <Field label="اسم المنتج">
+            <input className="input" value={form.name||''} onChange={e=>setForm({...form,name:e.target.value})} placeholder="مثال: خصم 10%"/>
+          </Field>
+          <Field label="الأيقونة">
+            <input className="input" value={form.icon||''} onChange={e=>setForm({...form,icon:e.target.value})} placeholder="🎁"/>
+          </Field>
+        </div>
+
+        <Field label="الوصف">
+          <textarea className="input" rows="2" value={form.description||''} onChange={e=>setForm({...form,description:e.target.value})} placeholder="وصف قصير للمنتج..."/>
+        </Field>
+
+        <div className="grid g2">
+          <Field label="السعر (XP) *">
+            <input type="number" min="1" className="input" value={form.xp_cost??''} onChange={e=>setForm({...form,xp_cost:e.target.value})} placeholder="100"/>
+          </Field>
+          <Field label="المخزون (اختياري)">
+            <input type="number" min="0" className="input" value={form.stock??''} onChange={e=>setForm({...form,stock:e.target.value})} placeholder="اترك فارغ = بلا حدود"/>
+          </Field>
+        </div>
+
+        <Field label="النوع">
+          <select className="input" value={form.type||'reward'} onChange={e=>setForm({...form,type:e.target.value})}>
+            <option value="reward">🎁 مكافأة (شارة/ثيم/أفاتار)</option>
+            <option value="coupon">🎟️ كوبون خصم</option>
+            <option value="content">📚 محتوى مدفوع مجانًا</option>
+          </select>
+        </Field>
+
+        {form.type === 'coupon' && (
+          <div className="grid g2">
+            <Field label="نسبة الخصم %">
+              <input type="number" min="1" max="100" className="input" value={form.discount_value??''} onChange={e=>setForm({...form,discount_value:e.target.value})} placeholder="10"/>
+            </Field>
+            <Field label="كود الكوبون الأساسي">
+              <input className="input" value={form.coupon_code||''} onChange={e=>setForm({...form,coupon_code:e.target.value})} placeholder="XP-SHOP"/>
+            </Field>
+          </div>
+        )}
+
+        <label className="flex center g8 mt12" style={{cursor:'pointer'}}>
+          <input type="checkbox" checked={form.active!==false} onChange={e=>setForm({...form,active:e.target.checked})}/>
+          <span className="sm">مفعّل في المتجر</span>
+        </label>
+
+        <div className="flex g8 mt16">
+          <button className="btn btn-p" onClick={save} disabled={busy} style={{flex:1}}>
+            {busy?'جارٍ الحفظ...':'💾 حفظ المنتج'}
+          </button>
+          <button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button>
+        </div>
+      </Modal>
+    )}
   </>;
 }
 
