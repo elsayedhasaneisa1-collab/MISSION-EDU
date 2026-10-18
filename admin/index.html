@@ -209,6 +209,9 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 .access-btn .em{font-size:15px}
 .section-title{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;color:var(--gold);letter-spacing:.5px;text-transform:uppercase;margin:16px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
 .section-title .ico{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:rgba(212,175,55,.12);font-size:14px;color:var(--gold);flex-shrink:0}
+.qbank-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:700;background:rgba(212,175,55,.12);color:var(--gold-soft);border:1px solid var(--border)}
+.qbank-orphan{background:linear-gradient(135deg,rgba(239,68,68,.20),rgba(239,68,68,.08));color:#fca5a5;border:1px solid rgba(239,68,68,.35)}
+.qbank-used{background:linear-gradient(135deg,rgba(34,197,94,.20),rgba(34,197,94,.08));color:#86efac;border:1px solid rgba(34,197,94,.35)}
 @media(max-width:1080px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:860px){
   .sidebar{position:fixed;inset-inline-end:0;top:0;transform:translateX(-105%);transition:transform .34s;width:280px;max-width:85vw;box-shadow:-20px 0 60px rgba(0,0,0,.75);overflow-x:hidden}
@@ -246,7 +249,6 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 [data-theme="light"] .search input{color:var(--txt)}
 [data-theme="light"] .input,[data-theme="light"] select.input,[data-theme="light"] textarea.input{background:rgba(255,252,242,.92);border-color:var(--border);color:var(--txt)}
 [data-theme="light"] .input::placeholder{color:var(--muted)}
-[data-theme="light"] select.input{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238B6914' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat!important;background-position:left 14px center!important;background-size:14px 14px!important;appearance:none!important;-webkit-appearance:none!important}
 [data-theme="light"] .modal-bg{background:rgba(245,241,232,.88)}
 [data-theme="light"] .nav-i{color:var(--txt2)}
 [data-theme="light"] .nav-i:hover{background:rgba(212,175,55,.15);color:var(--txt)}
@@ -299,16 +301,19 @@ body{overscroll-behavior-x:none}
 <script type="text/babel" data-presets="react-classic">
 const {useState,useEffect,useMemo,useCallback,useRef,createContext,useContext}=React;
 const DB=window.MissionDB;
+
 let _audioCtx = null;
 function getAudioCtx(){if(!_audioCtx){try{_audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}}return _audioCtx;}
 function beep(frequency,duration,type='sine',volume=0.15){try{const ctx=getAudioCtx();if(!ctx)return;if(ctx.state==='suspended')ctx.resume();const osc=ctx.createOscillator();const gain=ctx.createGain();osc.type=type;osc.frequency.value=frequency;osc.connect(gain);gain.connect(ctx.destination);gain.gain.setValueAtTime(volume,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+duration/1000);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+duration/1000);}catch(e){}}
 function playSound(type='notify'){switch(type){case 'success':beep(523,100,'sine',0.18);setTimeout(()=>beep(659,100,'sine',0.18),100);setTimeout(()=>beep(784,200,'sine',0.18),200);break;case 'err':beep(392,120,'square',0.15);setTimeout(()=>beep(311,200,'square',0.15),120);break;case 'warn':beep(440,150,'triangle',0.18);setTimeout(()=>beep(440,150,'triangle',0.18),180);break;default:beep(880,100,'sine',0.15);setTimeout(()=>beep(1175,120,'sine',0.15),100);}}
+
 const ToastCtx=createContext(null);
 function ToastProvider({children}){const [items,setItems]=useState([]);const push=useCallback((msg,type='info',title,duration=3800)=>{const id=DB.uid('t_');const titles={ok:'تم بنجاح',err:'خطأ',warn:'تنبيه',info:'معلومة'};setItems(x=>[...x,{id,msg,type,title:title||titles[type]||'',duration}]);if(type==='ok')playSound('success');else if(type==='err')playSound('err');else if(type==='warn')playSound('warn');else playSound('notify');},[]);const remove=useCallback(id=>setItems(x=>x.filter(t=>t.id!==id)),[]);return <ToastCtx.Provider value={{ok:(m,t)=>push(m,'ok',t),err:(m,t)=>push(m,'err',t),warn:(m,t)=>push(m,'warn',t),info:(m,t)=>push(m,'info',t)}}>{children}<div className="toast-host">{items.map(t=><Toast key={t.id} data={t} onClose={()=>remove(t.id)}/>)}</div></ToastCtx.Provider>;}
 function Toast({data,onClose}){const [out,setOut]=useState(false);const [progress,setProgress]=useState(100);useEffect(()=>{const start=Date.now();const t=setInterval(()=>{const p=Math.max(0,100-((Date.now()-start)/data.duration)*100);setProgress(p);if(p<=0){clearInterval(t);setOut(true);setTimeout(onClose,280);}},40);return()=>clearInterval(t);},[]);const icons={ok:'✓',err:'✕',warn:'!',info:'i'};return <div className={`toast ${data.type} ${out?'out':''}`}><div className="toast-ico">{icons[data.type]}</div><div className="toast-body">{data.title&&<div className="toast-title">{data.title}</div>}<div className="toast-msg">{data.msg}</div></div><button className="toast-close" onClick={()=>{setOut(true);setTimeout(onClose,280);}}>✕</button><div className="toast-bar"><div className="toast-bar-f" style={{width:`${progress}%`,transitionDuration:'40ms'}}/></div></div>;}
 const useToast=()=>useContext(ToastCtx);
 const AppCtx=createContext(null);
 const useApp=()=>useContext(AppCtx);
+
 function AppProvider({children}){
   const [db,setDb]=useState({users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[],polls:[],poll_votes:[]});
   const [currentUser,setCurrentUser]=useState(null);
@@ -321,9 +326,11 @@ function AppProvider({children}){
   const logout=useCallback(()=>{Swal.fire({title:'تسجيل الخروج',text:'هل أنت متأكد؟',icon:'question',showCancelButton:true,confirmButtonText:'نعم، خروج',cancelButtonText:'إلغاء',confirmButtonColor:'#D4AF37',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}}).then(r=>{if(r.isConfirmed){DB.clearSession();window.location.replace('/auth/login.html');}});},[]);
   const save=useCallback(async (table,item)=>{const saved=await DB.save(table,item);await reload();return saved;},[reload]);
   const remove=useCallback(async (table,id)=>{await DB.remove(table,id);await reload();},[reload]);
+  const removeMany=useCallback(async (table,ids)=>{await DB.removeMany(table,ids);await reload();},[reload]);
   const getLevel=useCallback((xp)=>{const ls=[...db.levels].sort((a,b)=>a.xp-b.xp);if(ls.length===0)return {current:{level:1,name:'مبتدئ',xp:0},next:null};let cur=ls[0],next=null;for(let i=0;i<ls.length;i++){if(xp>=ls[i].xp){cur=ls[i];next=ls[i+1]||null;}}return {current:cur,next};},[db.levels]);
-  return <AppCtx.Provider value={{db,currentUser,loading,logout,reload,save,remove,getLevel,toast,playSound,subject:id=>db.subjects.find(s=>s.id===id),unit:id=>db.units.find(u=>u.id===id),lesson:id=>db.lessons.find(l=>l.id===id),exam:id=>db.exams.find(e=>e.id===id),question:id=>db.questions.find(q=>q.id===id),grade:id=>db.grades.find(g=>g.id===id)}}>{children}</AppCtx.Provider>;
+  return <AppCtx.Provider value={{db,currentUser,loading,logout,reload,save,remove,removeMany,getLevel,toast,playSound,subject:id=>db.subjects.find(s=>s.id===id),unit:id=>db.units.find(u=>u.id===id),lesson:id=>db.lessons.find(l=>l.id===id),exam:id=>db.exams.find(e=>e.id===id),question:id=>db.questions.find(q=>q.id===id),grade:id=>db.grades.find(g=>g.id===id)}}>{children}</AppCtx.Provider>;
 }
+
 const Icon=({name,size=18,color='currentColor'})=>{
   const p={width:size,height:size,viewBox:'0 0 24 24',fill:'none',stroke:color,strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round'};
   const paths={
@@ -363,16 +370,22 @@ const Icon=({name,size=18,color='currentColor'})=>{
     sun:<><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></>,
     moon:<><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></>,
     lock:<><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></>,
-    unlock:<><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></>
+    unlock:<><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></>,
+    database:<><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></>,
+    layers:<><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></>,
+    filter:<><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></>,
+    handshake:<><path d="M11 17l-3-3 4-4 3 3"/><path d="M14 14l4 4-3 3-4-4"/><path d="M3 9l4-4 4 3"/><path d="M21 9l-4-4-4 3"/></>
   };
   return <svg {...p}>{paths[name]||paths.help}</svg>;
 };
+
 function Modal({title,children,onClose,wide}){return <div className="modal-bg" onClick={e=>e.target===e.currentTarget&&onClose()}><div className={`glass modal ${wide?'wide':''}`}><div className="flex between center mb16"><div className="h3">{title}</div><button className="icon-btn" onClick={onClose}><Icon name="close" size={16}/></button></div>{children}</div></div>;}
 function Stat({label,value,icon,color='var(--gold)',sub}){return <div className="glass-s hv" style={{padding:16}}><div className="flex between center mb8"><div className="stat-l">{label}</div><div style={{color}}>{typeof icon==='string'?<Icon name={icon} size={20}/>:icon}</div></div><div className="stat-n" style={{color}}>{value}</div>{sub&&<div className="xs muted mt8">{sub}</div>}</div>;}
 function Field({label,children,hint}){return <div className="mb12"><label className="lbl">{label}</label>{children}{hint&&<div className="xs muted mt8">{hint}</div>}</div>;}
 function Empty({icon='📭',title,desc}){return <div className="empty"><div className="empty-ico">{icon}</div><div className="h4 txt2 mb8">{title}</div>{desc&&<div className="sm">{desc}</div>}</div>;}
 function AccessToggle({value,onChange}){const isFree=value!==false&&value!=='paid';return <div className="access-toggle"><button type="button" className={`access-btn access-btn-free ${isFree?'active':''}`} onClick={()=>onChange(true)}><span className="em">🆓</span> مجاني</button><button type="button" className={`access-btn access-btn-paid ${!isFree?'active':''}`} onClick={()=>onChange(false)}><span className="em">🔒</span> مدفوع</button></div>;}
 function AccessBadge({value}){const isFree=value!==false&&value!=='paid';if(isFree)return <span className="pill pill-free">🆓 مجاني</span>;return <span className="pill pill-paid">🔒 مدفوع</span>;}
+
 function VideoEditor({value,onChange}){
   const v=value||{type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true};
   const set=(k,val)=>onChange({...v,[k]:val});
@@ -388,7 +401,59 @@ function VideoEditor({value,onChange}){
     {v.url&&<div className="vid-preview">{v.type==='youtube'&&(()=>{const id=DB.ytId(v.url);return id?<iframe src={`https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1`} allowFullScreen/>:<div style={{color:'#666',display:'grid',placeItems:'center',height:'100%'}}>رابط غير صالح</div>;})()}{v.type==='vimeo'&&(()=>{const id=DB.vimeoId(v.url);return id?<iframe src={`https://player.vimeo.com/video/${id}?byline=0&portrait=0`} allowFullScreen/>:<div style={{color:'#666',display:'grid',placeItems:'center',height:'100%'}}>رابط غير صالح</div>;})()}{v.type==='mp4'&&<video src={v.url} poster={v.poster} controls playsInline/>}{v.type==='external'&&<iframe src={v.url} allowFullScreen/>}</div>}
   </div>;
 }
-function Sidebar({items,active,onNav,open,onClose,onLogout}){return <>{open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',zIndex:55}}/>}<aside className={`sidebar ${open?'open':''}`}><div className="brand"><div className="brand-logo"><Icon name="trophy" size={22} color="#1a1206"/></div><div><div className="brand-name">MISSION EDU</div><div className="brand-sub">لوحة الإدارة</div></div></div><div style={{flex:1,overflowY:'auto',overflowX:'hidden',display:'flex',flexDirection:'column',gap:'4px',marginInlineEnd:'-6px',paddingInlineEnd:'6px'}}>{items.map((g,gi)=><div key={gi}>{g.title&&<div className="nav-gt">{g.title}</div>}{g.items.map(it=><button key={it.id} className={`nav-i ${active===it.id?'on':''}`} onClick={()=>{onNav(it.id);onClose?.();}}><span className="nav-ico"><Icon name={it.icon} size={16}/></span><span>{it.label}</span></button>)}</div>)}</div><div style={{marginTop:'10px',paddingTop:'10px',borderTop:'1px solid var(--border)',flexShrink:0}}><button className="nav-i" onClick={onLogout} style={{color:'#fca5a5',width:'100%'}}><span className="nav-ico"><Icon name="logout" size={16}/></span><span>تسجيل الخروج</span></button></div></aside></>;}
+
+function Crud({title,collection,defaultItem,fields,columns}){
+  const app=useApp();
+  const [editing,setEditing]=useState(null);
+  const [form,setForm]=useState({});
+  const [busy,setBusy]=useState(false);
+  const rows=app.db[collection]||[];
+  const openNew=()=>{setForm(defaultItem());setEditing('new');};
+  const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
+  const save=async ()=>{
+    setBusy(true);
+    try{await app.save(collection,form);app.toast.ok('تم الحفظ');setEditing(null);}
+    catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
+  const del=async id=>{
+    const r=await Swal.fire({title:'حذف العنصر؟',text:'لا يمكن التراجع',icon:'warning',showCancelButton:true,confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+    if(!r.isConfirmed)return;
+    try{await app.remove(collection,id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}
+  };
+  return <>
+    <div className="flex between center mb16 wrap g8">
+      <div className="h2 grad">{title}</div>
+      <button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> جديد</button>
+    </div>
+    <div className="glass" style={{padding:14}}>
+      {rows.length===0?<Empty icon="📭" title="لا توجد عناصر" desc="ابدأ بإضافة عنصر جديد"/>:
+      <div className="sx"><table className="tbl">
+        <thead><tr>{columns.map((c,i)=><th key={i}>{c.label}</th>)}<th>إجراءات</th></tr></thead>
+        <tbody>{rows.map(it=><tr key={it.id}>{columns.map((c,i)=><td key={i}>{c.render?c.render(it):(it[c.key] ?? '—')}</td>)}<td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(it)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(it.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody>
+      </table></div>}
+    </div>
+    {editing!==null&&<Modal title={editing==='new'?`${title} — جديد`:`${title} — تعديل`} onClose={()=>setEditing(null)} wide>
+      {fields.map(f=>{
+        const val=form[f.key]??'';
+        if(f.type==='textarea'){
+          return <Field key={f.key} label={f.label}><textarea className="input" rows="4" value={val} onChange={e=>setForm({...form,[f.key]:e.target.value})}/></Field>;
+        }
+        if(f.type==='select'){
+          return <Field key={f.key} label={f.label}><select className="input" value={val} onChange={e=>setForm({...form,[f.key]:e.target.value})}>{(f.options||[]).map(o=><option key={o.value} value={o.value}>{o.label}</option>)}</select></Field>;
+        }
+        if(f.type==='number'){
+          return <Field key={f.key} label={f.label}><input type="number" className="input" value={val} onChange={e=>setForm({...form,[f.key]:e.target.value===''?'':+e.target.value})}/></Field>;
+        }
+        return <Field key={f.key} label={f.label}><input className="input" value={val} onChange={e=>setForm({...form,[f.key]:e.target.value})}/></Field>;
+      })}
+      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
+    </Modal>}
+  </>;
+}
+
+function Sidebar({items,active,onNav,open,onClose,onLogout}){return <>{open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',zIndex:55}}/>}<aside className={`sidebar ${open?'open':''}`}><div className="brand"><div className="brand-logo"><Icon name="trophy" size={22} color="#1a1206"/></div><div><div className="brand-name">MISSION EDU</div><div className="brand-sub">لوحة الإدارة</div></div></div><div style={{flex:1,overflowY:'auto',overflowX:'hidden',display:'flex',flexDirection:'column',gap:'4px',marginInlineEnd:'-6px',paddingInlineEnd:'6px'}}>{items.map((g,gi)=><div key={gi}>{g.title&&<div className="nav-gt">{g.title}</div>}{g.items.map(it=><button key={it.id} className={`nav-i ${active===it.id?'on':''}`} onClick={()=>{onNav(it.id);onClose?.();}}><span className="nav-ico"><Icon name={it.icon} size={16}/></span><span>{it.label}</span>{it.badge!=null&&<span className="pill pill-b" style={{marginInlineStart:'auto'}}>{it.badge}</span>}</button>)}</div>)}</div><div style={{marginTop:'10px',paddingTop:'10px',borderTop:'1px solid var(--border)',flexShrink:0}}><button className="nav-i" onClick={onLogout} style={{color:'#fca5a5',width:'100%'}}><span className="nav-ico"><Icon name="logout" size={16}/></span><span>تسجيل الخروج</span></button></div></aside></>;}
+
 function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick,theme,onToggleTheme,unreadNotifs=0,onOpenNotifications}){
   const [q,setQ]=useState('');
   const [open,setOpen]=useState(false);
@@ -431,14 +496,15 @@ function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick,theme
 function Dashboard(){
   const app=useApp();
   const students=app.db.users.filter(u=>u.role==='student');
-  const active=students.filter(s=>s.active!==false).length;
+  const active=students.filter(s=>s.active!==false&&s.banned!==true).length;
+  const banned=students.filter(s=>s.banned===true).length;
   const totalLessons=app.db.lessons.filter(l=>l.published!==false).length;
   let totalDone=0;
   students.forEach(s=>{totalDone+=(s.completed_lessons||[]).length;});
   const avgProgress=students.length&&totalLessons?Math.round((totalDone/(students.length*totalLessons))*100):0;
-  const top10=useMemo(()=>[...students].sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,10),[students]);
+  const top10=useMemo(()=>[...students].filter(s=>s.banned!==true).sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,10),[students]);
   const recentAct=(app.db.activity||[]).slice(0,8);
-  const actLabel={login:'تسجيل دخول',register:'تسجيل جديد',lesson_view:'فتح درس',lesson_complete:'أكمل درس',exam_start:'بدأ اختبار',exam_submit:'أنهى اختبار',video_play:'شاهد فيديو',video_25:'25%',video_50:'50%',video_75:'75%',video_complete:'أكمل الفيديو',mission_complete:'أكمل مهمة',achievement_unlock:'فتح إنجاز',poll_vote:'صوّت في استطلاع'};
+  const actLabel={login:'تسجيل دخول',register:'تسجيل جديد',lesson_view:'فتح درس',lesson_complete:'أكمل درس',exam_start:'بدأ اختبار',exam_submit:'أنهى اختبار',video_play:'شاهد فيديو',video_25:'25%',video_50:'50%',video_75:'75%',video_complete:'أكمل الفيديو',mission_complete:'أكمل مهمة',achievement_unlock:'فتح إنجاز',poll_vote:'صوّت في استطلاع',report_user:'بلاغ',daily_reward:'مكافأة يومية'};
   const chart1Ref=useRef(null);
   const chart2Ref=useRef(null);
   const chart3Ref=useRef(null);
@@ -477,8 +543,8 @@ function Dashboard(){
     return ()=>{if(chart3Instance.current)chart3Instance.current.destroy();};
   },[students]);
   const exportToCSV=()=>{
-    const headers=["الاسم","الهاتف","المحافظة","البريد","XP","المستوى","سلسلة الأيام","الحالة","دروس مكتملة"];
-    const rows=students.map(s=>{const {current}=app.getLevel(s.xp||0);return [s.name,(s.country_code||"+20")+(s.phone||""),s.governorate||"—",s.email||"—",s.xp||0,`Lv ${current.level} - ${current.name}`,s.streak||0,s.active===false?"موقوف":"نشط",(s.completed_lessons||[]).length];});
+    const headers=["الاسم","الهاتف","المحافظة","الجنس","البريد","XP","المستوى","سلسلة الأيام","الحالة","دروس مكتملة","بلاغات"];
+    const rows=students.map(s=>{const {current}=app.getLevel(s.xp||0);return [s.name,(s.country_code||"+20")+(s.phone||""),s.governorate||"—",s.gender==='female'?'بنت':s.gender==='male'?'ولد':'—',s.email||"—",s.xp||0,`Lv ${current.level} - ${current.name}`,s.streak||0,s.banned?"محظور":s.active===false?"موقوف":"نشط",(s.completed_lessons||[]).length,s.reports_count||0];});
     const csv=[headers,...rows].map(row=>row.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(",")).join("\n");
     const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});
     const url=URL.createObjectURL(blob);
@@ -504,6 +570,7 @@ function Dashboard(){
     <div className="grid g4 mb16">
       <Stat label="إجمالي الطلاب" value={DB.fmt(students.length)} icon="users" color="#FFD700"/>
       <Stat label="الطلاب النشطون" value={DB.fmt(active)} icon="check" color="#22c55e"/>
+      <Stat label="المحظورون" value={DB.fmt(banned)} icon="lock" color="#ef4444" sub={banned>0?"راجع صفحة المحظورين":undefined}/>
       <Stat label="عدد المواد" value={DB.fmt(app.db.subjects.length)} icon="book" color="#D4AF37"/>
       <Stat label="عدد الدروس" value={DB.fmt(app.db.lessons.length)} icon="file" color="#B8860B"/>
       <Stat label="الوحدات" value={DB.fmt(app.db.units.length)} icon="folder" color="#FFED4E"/>
@@ -548,16 +615,17 @@ function Dashboard(){
     </div>
   </>;
 }
+
 function ActivityLog(){
   const app=useApp();
   const [filter,setFilter]=useState('all');
   const [studentFilter,setStudentFilter]=useState('all');
   const students=app.db.users.filter(u=>u.role==='student');
-  const typeFilters=[{id:'all',label:'الكل'},{id:'lesson_view',label:'دروس'},{id:'video_play',label:'فيديو'},{id:'video_complete',label:'إكمال فيديو'},{id:'exam_start',label:'بدء اختبار'},{id:'exam_submit',label:'إنهاء اختبار'},{id:'mission_complete',label:'مهام'},{id:'poll_vote',label:'استطلاعات'},{id:'login',label:'دخول'}];
+  const typeFilters=[{id:'all',label:'الكل'},{id:'lesson_view',label:'دروس'},{id:'video_play',label:'فيديو'},{id:'video_complete',label:'إكمال فيديو'},{id:'exam_start',label:'بدء اختبار'},{id:'exam_submit',label:'إنهاء اختبار'},{id:'mission_complete',label:'مهام'},{id:'poll_vote',label:'استطلاعات'},{id:'report_user',label:'بلاغات'},{id:'daily_reward',label:'مكافآت يومية'},{id:'login',label:'دخول'}];
   let list=[...(app.db.activity||[])];
   if(filter!=='all') list=list.filter(a=>a.type===filter);
   if(studentFilter!=='all') list=list.filter(a=>a.user_id===studentFilter);
-  const actLabel={login:'تسجيل دخول',register:'تسجيل جديد',lesson_view:'فتح درس',lesson_complete:'أكمل درس',exam_start:'بدأ اختبار',exam_submit:'أنهى اختبار',video_play:'شاهد فيديو',video_25:'25%',video_50:'50%',video_75:'75%',video_complete:'أكمل الفيديو',mission_complete:'أكمل مهمة',achievement_unlock:'فتح إنجاز',poll_vote:'صوّت في استطلاع'};
+  const actLabel={login:'تسجيل دخول',register:'تسجيل جديد',lesson_view:'فتح درس',lesson_complete:'أكمل درس',exam_start:'بدأ اختبار',exam_submit:'أنهى اختبار',video_play:'شاهد فيديو',video_25:'25%',video_50:'50%',video_75:'75%',video_complete:'أكمل الفيديو',mission_complete:'أكمل مهمة',achievement_unlock:'فتح إنجاز',poll_vote:'صوّت في استطلاع',report_user:'بلاغ',daily_reward:'مكافأة يومية'};
   return <>
     <div className="flex between center mb16 wrap g8">
       <div className="h2 grad">سجل النشاط</div>
@@ -577,6 +645,7 @@ function ActivityLog(){
     </div>
   </>;
 }
+
 function ExamResultsPage(){
   const app=useApp();
   const [loading,setLoading]=useState(true);
@@ -609,8 +678,8 @@ function ExamResultsPage(){
     if(filterStudent !== 'all') list = list.filter(x=>x.user_id === filterStudent);
     if(filterStatus !== 'all'){
       if(filterStatus === 'passed') list = list.filter(x=>x.status === 'passed' || (x.passed && x.status !== 'cancelled'));
-else if(filterStatus === 'failed') list = list.filter(x=>x.status === 'failed' || (!x.passed && x.status !== 'cancelled'));
-else if(filterStatus === 'cancelled') list = list.filter(x=>x.status === 'cancelled');
+      else if(filterStatus === 'failed') list = list.filter(x=>x.status === 'failed' || (!x.passed && x.status !== 'cancelled'));
+      else if(filterStatus === 'cancelled') list = list.filter(x=>x.status === 'cancelled');
     }
     if(q.trim()){
       const lc = q.toLowerCase();
@@ -672,11 +741,11 @@ else if(filterStatus === 'cancelled') list = list.filter(x=>x.status === 'cancel
         <div><label className="lbl">الاختبار</label><select className="input" value={filterExam} onChange={e=>setFilterExam(e.target.value)}><option value="all">كل الاختبارات ({uniqueExams.length})</option>{uniqueExams.map(e=><option key={e.id} value={e.id}>{e.title}</option>)}</select></div>
         <div><label className="lbl">الطالب</label><select className="input" value={filterStudent} onChange={e=>setFilterStudent(e.target.value)}><option value="all">كل الطلاب ({uniqueStudents.length})</option>{uniqueStudents.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></div>
         <div><label className="lbl">الحالة</label><select className="input" value={filterStatus} onChange={e=>setFilterStatus(e.target.value)}>
-<option value="all">الكل</option>
-<option value="passed">✓ ناجح فقط</option>
-<option value="failed">✗ راسب فقط</option>
-<option value="cancelled">⛔ ملغي فقط</option>
-</select></div>
+          <option value="all">الكل</option>
+          <option value="passed">✓ ناجح فقط</option>
+          <option value="failed">✗ راسب فقط</option>
+          <option value="cancelled">⛔ ملغي فقط</option>
+        </select></div>
         <div><label className="lbl">الترتيب حسب</label><select className="input" value={sortBy} onChange={e=>setSortBy(e.target.value)}><option value="recent">الأحدث أولاً</option><option value="oldest">الأقدم أولاً</option><option value="highest">أعلى نسبة</option><option value="lowest">أقل نسبة</option><option value="fastest">أسرع وقت</option><option value="slowest">أطول وقت</option></select></div>
       </div>
       <div className="mt12"><input className="input" placeholder="🔍 ابحث باسم الطالب أو الاختبار..." value={q} onChange={e=>setQ(e.target.value)}/></div>
@@ -708,804 +777,7 @@ else if(filterStatus === 'cancelled') list = list.filter(x=>x.status === 'cancel
     </div>
   </>;
 }
-function Crud({title,collection,defaultItem,fields,columns}){
-  const app=useApp();
-  const [editing,setEditing]=useState(null);
-  const [form,setForm]=useState({});
-  const [busy,setBusy]=useState(false);
-  const items=[...(app.db[collection]||[])].sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
-  const openNew=()=>{setForm(defaultItem());setEditing('new');};
-  const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
-  const save=async ()=>{setBusy(true);try{await app.save(collection,form);app.toast.ok(editing==='new'?'تمت الإضافة':'تم الحفظ');setEditing(null);}catch(e){app.toast.err(e.message);}setBusy(false);};
-  const del=async id=>{const r=await Swal.fire({title:'تأكيد الحذف',text:'سيتم حذف هذا العنصر نهائيًا',icon:'warning',showCancelButton:true,confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed) return;try{await app.remove(collection,id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
-  return <>
-    <div className="flex between center mb16"><div className="h2 grad">{title}</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> إضافة</button></div>
-    <div className="glass" style={{padding:14}}>
-      {items.length===0?<Empty title="لا توجد بيانات"/>:<div className="sx"><table className="tbl"><thead><tr>{columns.map((c,i)=><th key={i}>{c.label}</th>)}<th>إجراءات</th></tr></thead><tbody>{items.map(it=><tr key={it.id}>{columns.map((c,i)=><td key={i}>{c.render?c.render(it,app):it[c.key]}</td>)}<td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(it)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(it.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody></table></div>}
-    </div>
-    {editing!==null&&<Modal title={editing==='new'?'إضافة':'تعديل'} onClose={()=>setEditing(null)} wide>
-      <div className="grid g2">
-        {fields.map(f=><div key={f.key} style={{gridColumn:f.full?'span 2':'span 1'}}>
-          <Field label={f.label} hint={f.hint}>
-            {f.type==='textarea'?<textarea className="input" value={form[f.key]||''} onChange={e=>setForm({...form,[f.key]:e.target.value})}/>:
-             f.type==='number'?<input type="number" className="input" value={form[f.key]??''} onChange={e=>setForm({...form,[f.key]: e.target.value === '' ? '' : +e.target.value})}/>:
-             f.type==='select'?<select className="input" value={form[f.key]||''} onChange={e=>setForm({...form,[f.key]:e.target.value})}><option value="">— اختر —</option>{(typeof f.options==='function'?f.options(app):f.options).map(o=><option key={o.value} value={o.value}>{o.label}</option>)}</select>:
-             f.type==='list'?<textarea className="input" placeholder="سطر لكل عنصر" value={(form[f.key]||[]).join('\n')} onChange={e=>setForm({...form,[f.key]:e.target.value.split('\n').filter(Boolean)})}/>:
-             f.type==='bool'?<label className="flex center g8" style={{cursor:'pointer'}}><input type="checkbox" checked={!!form[f.key]} onChange={e=>setForm({...form,[f.key]:e.target.checked})}/><span className="sm">{form[f.key]?'مفعّل':'معطّل'}</span></label>:
-             <input className="input" value={form[f.key]||''} onChange={e=>setForm({...form,[f.key]:e.target.value})}/>}
-          </Field>
-        </div>)}
-      </div>
-      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
-    </Modal>}
-  </>;
-}
-function GradesPage(){return <Crud title="🏫 إدارة الصفوف" collection="grades" defaultItem={()=>({name:'',desc:''})} fields={[{key:'name',label:'اسم الصف'},{key:'desc',label:'الوصف',type:'textarea',full:true}]} columns={[{key:'name',label:'الاسم'},{key:'desc',label:'الوصف'}]}/>;}
-function SubjectsPage(){const app=useApp();return <Crud title="📚 إدارة المواد" collection="subjects" defaultItem={()=>({name:'',desc:'',icon:'📚',color:'#D4AF37',sort_order:'',grade_id:''})} fields={[{key:'name',label:'اسم المادة'},{key:'icon',label:'الأيقونة'},{key:'color',label:'اللون'},{key:'sort_order',label:'الترتيب',type:'number'},{key:'grade_id',label:'الصف',type:'select',options:a=>a.db.grades.map(g=>({value:g.id,label:g.name}))},{key:'desc',label:'الوصف',type:'textarea',full:true}]} columns={[{label:'',render:s=><span style={{fontSize:20}}>{s.icon}</span>},{key:'name',label:'الاسم'},{key:'sort_order',label:'الترتيب'},{label:'الصف',render:(s,a)=>a.grade(s.grade_id)?.name||'—'}]}/>;}
-function UnitsPage(){const app=useApp();return <Crud title="🗂 إدارة الوحدات" collection="units" defaultItem={()=>({name:'',desc:'',sort_order:'',subject_id:''})} fields={[{key:'name',label:'اسم الوحدة'},{key:'sort_order',label:'الترتيب',type:'number'},{key:'subject_id',label:'المادة',type:'select',options:a=>a.db.subjects.map(s=>({value:s.id,label:s.name}))},{key:'desc',label:'الوصف',type:'textarea',full:true}]} columns={[{key:'name',label:'الاسم'},{label:'المادة',render:u=>app.subject(u.subject_id)?.name||'—'},{key:'sort_order',label:'الترتيب'}]}/>;}
-function LessonsPage(){
-  const app=useApp();
-  const [editing,setEditing]=useState(null);
-  const [form,setForm]=useState({});
-  const [busy,setBusy]=useState(false);
-  const [filterUnit,setFilterUnit]=useState('all');
-  const [filterAccess,setFilterAccess]=useState('all');
-  const [lessonTestText,setLessonTestText]=useState('');
-  const [lessonTestTitle,setLessonTestTitle]=useState('');
-  const [lessonTestDuration,setLessonTestDuration]=useState(15);
-  const [lessonTestPassScore,setLessonTestPassScore]=useState(50);
-  const [lessonTestXp,setLessonTestXp]=useState(10);
-  const [lessonTestFree,setLessonTestFree]=useState(true);
-  const [lessonTestBusy,setLessonTestBusy]=useState(false);
-  const [jsonImporting,setJsonImporting]=useState(false);
-  const jsonFileRef=useRef(null);
-  const [previewQs,setPreviewQs]=useState(null);
-  const [editQ,setEditQ]=useState(null);
-  const [editQBusy,setEditQBusy]=useState(false);
-  const openNew=()=>{setForm({title:'',desc:'',summary:'',video:{type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true},pdf_url:'',duration:'',xp:'',sort_order:'',unit_id:'',published:true,key_points:[],examples:[],notes:''});setLessonTestText('');setLessonTestTitle('');setLessonTestDuration(15);setLessonTestPassScore(50);setLessonTestXp(10);setLessonTestFree(true);setEditing('new');};
-  const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(!c.video)c.video={type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true};if(c.video.is_free===undefined)c.video.is_free=true;if(!c.key_points)c.key_points=[];if(!c.pdf_url)c.pdf_url='';setForm(c);setLessonTestText('');setLessonTestTitle(`اختبار ${c.title||'الدرس'}`);setLessonTestDuration(15);setLessonTestPassScore(50);setLessonTestXp(10);setLessonTestFree(true);setEditing(it.id);};
-  const parseLessonTestQuestion=(raw)=>{
-    const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد](?:[)\.\-:：]\s*|\s+))|(?:[🔵🟢🟡🔴🟣🟠⚫⚪]\s*))/u;
-    const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]/u.test(x));
-    const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
-    const optionLines=lines.filter(x=>optionRegex.test(x)&&!/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
-    if(optionLines.length<4||!answerLine)return null;
-    const cleanOption=x=>x.replace(optionRegex,'').replace(/[.。؛;]+$/u,'').trim();
-    const options=optionLines.slice(0,4).map(cleanOption);
-    const answerText=answerLine.replace(/^.*?(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]\s*/u,'').trim();
-    const answerEmoji=(answerText.match(/^[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]/u)||[])[0]||'';
-    const answerClean=cleanOption(answerText);
-    let correct=options.findIndex(o=>o&&(answerClean.includes(o)||o.includes(answerClean)));
-    if(correct<0&&answerEmoji){const target=optionLines.findIndex(x=>x.startsWith(answerEmoji));if(target>=0)correct=target;}
-    if(correct<0)return null;
-    const optionStart=lines.findIndex(x=>optionRegex.test(x));
-    const questionText=lines.slice(0,optionStart).map((x,i)=>i===0?x.replace(/^\s*(?:🧪\s*)?السؤال\s*(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر|\d+)\s*(?:[:：|｜\-–—]\s*)?/u,'').trim():x).filter(Boolean).join('\n').trim();
-    if(!questionText)return null;
-    const explanation=explanationLine?explanationLine.replace(/^.*?(?:التعليل|الشرح|السبب)\s*[:：]\s*/u,'').trim():'';
-    return {text:questionText,options,correct,explanation};
-  };
-  const parseBlock=()=>{
-    const raw=(lessonTestText||'').trim();
-    if(!raw)return [];
-    const heading=/^(?=.*السؤال)(?=.*(?:🧪|[|｜:—–-]|\d)).*$/gmu;
-    const starts=[...raw.matchAll(heading)].map(m=>m.index);
-    const blocks=starts.length>1?starts.map((start,i)=>raw.slice(start,starts[i+1]??raw.length).trim()).filter(Boolean):[raw];
-    return blocks.map(parseLessonTestQuestion).filter(Boolean);
-  };
-  const importQuestionsJSON=async(file)=>{
-    if(!file)return;
-    if(!/\.json$/i.test(file.name)){app.toast.warn('ارفع ملف JSON بامتداد .json');return;}
-    if(editing==='new'||!form.id){app.toast.warn('احفظ الدرس أولًا، ثم افتحه للتعديل وارفع ملف JSON لإنشاء الاختبار تلقائيًا');if(jsonFileRef.current)jsonFileRef.current.value='';return;}
-    setJsonImporting(true);
-    setLessonTestBusy(true);
-    try{
-      // Read as UTF-8 and remove a possible BOM to preserve Arabic and other Unicode text.
-      const raw=(await file.text()).replace(/^\uFEFF/u,'');
-      const parsed=JSON.parse(raw);
-      const data=Array.isArray(parsed)?parsed:(Array.isArray(parsed.questions)?parsed.questions:(Array.isArray(parsed.data)?parsed.data:null));
-      if(!data)throw new Error('صيغة JSON غير صحيحة. استخدم مصفوفة أسئلة أو كائنًا يحتوي على questions أو data.');
-      const getText=v=>{
-        if(v===null||v===undefined)return '';
-        if(typeof v==='object')return String(v.text??v.label??v.value??'').trim();
-        return String(v).trim();
-      };
-      const norm=v=>String(v??'').trim().toLowerCase().replace(/[\s_\-ـ]/gu,'');
-      const normalized=[];
-      let skipped=0;
-      data.forEach(item=>{
-        if(!item||typeof item!=='object'){skipped++;return;}
-        const question=getText(item.question??item.Question??item.text??item.title??item.prompt);
-        const rawOptions=item.options??item.choices??item.answers??item.alternatives;
-        let options=[];
-        if(Array.isArray(rawOptions)) options=rawOptions.map(getText);
-        else if(rawOptions&&typeof rawOptions==='object') options=['A','B','C','D'].map(k=>getText(rawOptions[k]??rawOptions[k.toLowerCase()]));
-        else options=[item.optionA??item.option1??item.a,item.optionB??item.option2??item.b,item.optionC??item.option3??item.c,item.optionD??item.option4??item.d].map(getText);
-        if(!question||options.length<4||options.slice(0,4).some(o=>!o)){skipped++;return;}
-        options=options.slice(0,4);
-        const answer=item.correct??item.correctAnswer??item.correct_answer??item.answer??item.answerKey??item.correctOption;
-        const answerIndexRaw=item.correctIndex??item.correct_index;
-        let correctIndex=-1;
-        if(answerIndexRaw!==undefined&&answerIndexRaw!==null&&String(answerIndexRaw).trim()!==''){
-          const n=Number(answerIndexRaw);
-          if(Number.isInteger(n)&&n>=0&&n<4)correctIndex=n;
-        }
-        if(correctIndex<0&&answer!==undefined&&answer!==null){
-          const answerText=getText(answer);
-          correctIndex=options.findIndex(o=>norm(o)===norm(answerText));
-          if(correctIndex<0){
-            const m=answerText.match(/^(?:option|choice|الخيار|الاختيار)?\s*([1-4]|[a-d]|[أبجد])$/iu);
-            if(m){const token=m[1].toLowerCase();correctIndex=/^[1-4]$/u.test(token)?Number(token)-1:(['a','b','c','d'].indexOf(token)>=0?['a','b','c','d'].indexOf(token):['أ','ب','ج','د'].indexOf(token));}
-          }
-        }
-        if(correctIndex<0||correctIndex>3){skipped++;return;}
-        normalized.push({text:question,options,correct:correctIndex,explanation:getText(item.explanation??item.reason??item.rationale??item.feedback)||'لا يوجد تعليل'});
-      });
-      if(!normalized.length)throw new Error('لم أجد أسئلة صالحة. تأكد أن كل سؤال يحتوي على question و4 اختيارات داخل options وcorrect.');
-      const lesson=app.lesson(form.id)||form;
-      const unit=app.unit(lesson.unit_id);
-      const subjectId=unit?.subject_id||'';
-      if(!subjectId)throw new Error('لازم يكون الدرس مرتبطًا بوحدة ومادة قبل إنشاء الاختبار');
-      const fileTitle=(parsed&&!Array.isArray(parsed)&&typeof parsed.title==='string')?parsed.title.trim():'';
-      const examTitle=(fileTitle||lessonTestTitle||`اختبار ${lesson.title||'الدرس'}`).trim();
-      const questionIds=[];
-      for(const q of normalized){
-        const id=DB.uid('q_');
-        await app.save('questions',{id,text:q.text,options:q.options,correct:[q.correct],explanation:q.explanation,lesson_id:lesson.id,unit_id:lesson.unit_id,subject_id:subjectId,difficulty:'medium',xp:Number(lessonTestXp)||0,type:'mcq'});
-        questionIds.push(id);
-      }
-      const exam={id:DB.uid('exam_'),title:examTitle,subject_id:subjectId,unit_id:lesson.unit_id,lesson_ids:[lesson.id],question_ids:questionIds,duration:Number(lessonTestDuration)||15,pass_score:Number(lessonTestPassScore)||0,max_attempts:0,xp:Number(lessonTestXp)||0,published:true,sort_order:0,is_free:lessonTestFree};
-      await app.save('exams',exam);
-      setLessonTestTitle(examTitle);
-      setLessonTestText('');
-      setPreviewQs(null);
-      app.toast.ok(`تم إنشاء الاختبار تلقائيًا وربطه بالدرس، بعدد ${questionIds.length} سؤال${skipped?`، وتم تجاهل ${skipped} سؤال غير صالح`:''}`);
-    }catch(e){app.toast.err(e instanceof SyntaxError?'ملف JSON غير صالح. تأكد من علامات الاقتباس والفواصل وصحة التنسيق.':(e.message||'تعذر قراءة الملف أو إنشاء الاختبار'));}
-    finally{setJsonImporting(false);setLessonTestBusy(false);if(jsonFileRef.current)jsonFileRef.current.value='';}
-  };
-  const previewTest=()=>{
-    const parsed=parseBlock();
-    if(!parsed.length)return app.toast.warn('لا توجد أسئلة صالحة للمعاينة');
-    setPreviewQs(parsed);
-  };
-  const createTestForLesson=async()=>{
-    if(editing==='new'||!form.id)return app.toast.warn('احفظ الدرس أولًا، ثم افتحه للتعديل لإضافة الاختبار');
-    if(!lessonTestTitle.trim())return app.toast.warn('اكتب اسم الاختبار');
-    const parsed=parseBlock();
-    if(!parsed.length)return app.toast.warn('لم أتعرف على الأسئلة. تأكد أن كل سؤال يحتوي 4 اختيارات والإجابة الصحيحة والتعليل.');
-    const lesson=app.lesson(form.id)||form;const unit=app.unit(lesson.unit_id);const subjectId=unit?.subject_id||'';
-    if(!subjectId)return app.toast.warn('لازم يكون الدرس مرتبطًا بوحدة ومادة قبل إنشاء الاختبار');
-    setLessonTestBusy(true);
-    try{
-      const questionIds=[];
-      for(const q of parsed){
-        const id=DB.uid('q_');
-        await app.save('questions',{id,text:q.text,options:q.options,correct:[q.correct],explanation:q.explanation,lesson_id:lesson.id,unit_id:lesson.unit_id,subject_id:subjectId,difficulty:'medium',xp:Number(lessonTestXp)||0,type:'mcq'});
-        questionIds.push(id);
-      }
-      const exam={id:DB.uid('exam_'),title:lessonTestTitle.trim(),subject_id:subjectId,unit_id:lesson.unit_id,lesson_ids:[lesson.id],question_ids:questionIds,duration:Number(lessonTestDuration)||15,pass_score:Number(lessonTestPassScore)||0,max_attempts:0,xp:Number(lessonTestXp)||0,published:true,sort_order:0,is_free:lessonTestFree};
-      await app.save('exams',exam);
-      app.toast.ok(`تم إنشاء الاختبار وربطه بالدرس، بعدد ${questionIds.length} سؤال`);
-      setLessonTestText('');
-      setPreviewQs(null);
-    }catch(e){app.toast.err('تعذر إنشاء الاختبار: '+(e.message||'حدث خطأ'));}
-    setLessonTestBusy(false);
-  };
-  const getLessonQuestions=(lessonId)=>app.db.questions.filter(q=>q.lesson_id===lessonId);
-  const getLessonExams=(lessonId)=>app.db.exams.filter(e=>(e.lesson_ids||[]).includes(lessonId));
-  const saveEditedQuestion=async()=>{
-    if(!editQ) return;
-    if(!editQ.text||!editQ.text.trim()) return app.toast.warn('نص السؤال مطلوب');
-    if(!editQ.options||editQ.options.filter(o=>o&&o.trim()).length < 2) return app.toast.warn('لازم خيارين على الأقل');
-    setEditQBusy(true);
-    try{
-      await app.save('questions',{
-        id: editQ.id,
-        text: editQ.text.trim(),
-        options: (editQ.options||[]).map(o=>(o||'').trim()),
-        correct: [editQ.correct],
-        explanation: (editQ.explanation||'').trim(),
-        lesson_id: editQ.lesson_id,
-        unit_id: editQ.unit_id,
-        subject_id: editQ.subject_id,
-        difficulty: editQ.difficulty||'medium',
-        xp: Number(editQ.xp)||0,
-        type: 'mcq'
-      });
-      app.toast.ok('تم حفظ تعديل السؤال');
-      setEditQ(null);
-    }catch(e){app.toast.err(e.message||'فشل الحفظ');}
-    setEditQBusy(false);
-  };
-  const deleteLessonQuestion=async(qId)=>{
-    const r=await Swal.fire({title:'حذف السؤال؟',text:'هيتشال من الدرس نهائيًا',icon:'warning',showCancelButton:true,confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
-    if(!r.isConfirmed)return;
-    try{
-      const examsUsingIt=(app.db.exams||[]).filter(e=>(e.question_ids||[]).includes(qId));
-      for(const ex of examsUsingIt){
-        await app.save('exams',{...ex,question_ids:(ex.question_ids||[]).filter(x=>x!==qId)});
-      }
-      await app.remove('questions',qId);
-      app.toast.warn('تم حذف السؤال');
-    }catch(e){app.toast.err(e.message);}
-  };
-  const deleteLessonExam=async(examId)=>{
-    const r=await Swal.fire({title:'حذف الاختبار كامل؟',text:'هيتشال الاختبار وكل أسئلته من الدرس',icon:'warning',showCancelButton:true,confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
-    if(!r.isConfirmed)return;
-    try{
-      const exam=(app.db.exams||[]).find(e=>e.id===examId);
-      if(exam){
-        for(const qId of (exam.question_ids||[])){
-          await app.remove('questions',qId);
-        }
-        await app.remove('exams',examId);
-      }
-      app.toast.warn('تم حذف الاختبار وأسئلته');
-    }catch(e){app.toast.err(e.message);}
-  };
-  const save=async ()=>{
-    if(!form.title) return app.toast.warn('العنوان مطلوب');
-    if(!form.unit_id) return app.toast.warn('اختر الوحدة');
-    setBusy(true);
-    try{
-      const saved=await app.save('lessons',form);
-      if(editing==='new'){
-        const lesson=saved||form;
-        setForm(lesson);
-        setEditing(lesson.id);
-        setLessonTestTitle(`اختبار ${lesson.title||'الدرس'}`);
-        app.toast.ok('تم حفظ الدرس. انزل لأسفل وستجد قسم إضافة أسئلة الاختبار.');
-      }else{
-        app.toast.ok('تم الحفظ');
-        setEditing(null);
-      }
-    }catch(e){app.toast.err(e.message);}
-    setBusy(false);
-  };
-  const del=async id=>{
-    const r=await Swal.fire({title:'حذف الدرس؟',text:'لا يمكن التراجع',icon:'warning',showCancelButton:true,confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
-    if(!r.isConfirmed) return;
-    try{await app.remove('lessons',id);app.toast.warn('تم الحذف');}
-    catch(e){app.toast.err(e.message);}
-  };
-  const sortedLessons = useMemo(()=>{return [...app.db.lessons].sort((a,b)=>{const ta = new Date(a.created_at || a.createdAt || 0).getTime() || 0;const tb = new Date(b.created_at || b.createdAt || 0).getTime() || 0;if(ta !== tb) return ta - tb;const sa = Number(a.sort_order) || 0;const sb = Number(b.sort_order) || 0;return sa - sb;});},[app.db.lessons]);
-  const filteredLessons = useMemo(()=>{let list = sortedLessons;if(filterUnit !== 'all') list = list.filter(l=>l.unit_id === filterUnit);if(filterAccess !== 'all'){list = list.filter(l=>{const isFree = !l.video || !l.video.url || l.video.is_free !== false;return filterAccess === 'free' ? isFree : !isFree;});}return list;},[sortedLessons, filterUnit, filterAccess]);
-  const freeCount = sortedLessons.filter(l=>!l.video || !l.video.url || l.video.is_free !== false).length;
-  const paidCount = sortedLessons.length - freeCount;
-  const currentLessonQuestions = editing && editing!=='new' ? getLessonQuestions(editing) : [];
-  const currentLessonExams = editing && editing!=='new' ? getLessonExams(editing) : [];
-  return <>
-    <div className="flex between center mb16 wrap g8">
-      <div className="h2 grad">📖 إدارة الدروس</div>
-      <div className="flex g8">
-        <span className="pill pill-free">🆓 {freeCount} مجاني</span>
-        <span className="pill pill-paid">🔒 {paidCount} مدفوع</span>
-        <button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> درس جديد</button>
-      </div>
-    </div>
-    <div className="glass mb16" style={{padding:14}}>
-      <div className="flex wrap g12">
-        <div style={{flex:'1 1 240px'}}>
-          <label className="lbl">تصفية حسب الوحدة</label>
-          <select className="input" value={filterUnit} onChange={e=>setFilterUnit(e.target.value)}>
-            <option value="all">كل الوحدات ({sortedLessons.length})</option>
-            {app.db.units.map(u=><option key={u.id} value={u.id}>{app.subject(u.subject_id)?.name} — {u.name}</option>)}
-          </select>
-        </div>
-        <div style={{flex:'1 1 240px'}}>
-          <label className="lbl">تصفية حسب الوصول</label>
-          <select className="input" value={filterAccess} onChange={e=>setFilterAccess(e.target.value)}>
-            <option value="all">الكل</option>
-            <option value="free">🆓 مجاني فقط</option>
-            <option value="paid">🔒 مدفوع فقط</option>
-          </select>
-        </div>
-      </div>
-    </div>
-    <div className="glass" style={{padding:14}}>
-      {filteredLessons.length===0?<Empty title="لا توجد دروس"/>:<div className="sx"><table className="tbl">
-        <thead><tr><th>الدرس</th><th>الوحدة</th><th>الفيديو</th><th>الوصول</th><th>اختبار</th><th>XP</th><th>الحالة</th><th>إجراءات</th></tr></thead>
-        <tbody>{filteredLessons.map(l=>{const isFree = !l.video || !l.video.url || l.video.is_free !== false;const badge = !l.video || !l.video.url ? <span className="pill pill-y">لا فيديو</span> : (()=>{const map={youtube:'📺 YouTube',vimeo:'🎬 Vimeo',mp4:'🎥 MP4',external:'🔗 خارجي'};return <span className="pill pill-b">{map[l.video.type]||l.video.type}</span>;})();const examCount=getLessonExams(l.id).length;return <tr key={l.id}><td><b>{l.title}</b></td><td className="sm">{app.unit(l.unit_id)?.name||'—'}</td><td>{badge}</td><td><AccessBadge value={isFree}/></td><td>{examCount>0?<span className="pill pill-g">✓ {examCount}</span>:<span className="xs muted">—</span>}</td><td>{l.xp}</td><td>{l.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(l)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(l.id)}><Icon name="trash" size={13}/></button></div></td></tr>;})}</tbody>
-      </table></div>}
-    </div>
-    {editing!==null&&<Modal title={editing==='new'?'درس جديد':'تعديل الدرس'} onClose={()=>setEditing(null)} wide>
-      <div className="section-title" style={{marginTop:0}}><span className="ico">📝</span> المعلومات الأساسية</div>
-      <div className="grid g2">
-        <Field label="عنوان الدرس"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
-        <Field label="الوحدة"><select className="input" value={form.unit_id||''} onChange={e=>setForm({...form,unit_id:e.target.value})}><option value="">— اختر —</option>{app.db.units.map(u=><option key={u.id} value={u.id}>{app.subject(u.subject_id)?.name} — {u.name}</option>)}</select></Field>
-        <Field label="المدة (دقيقة)"><input type="number" className="input" value={form.duration ?? ''} onChange={e=>setForm({...form,duration: e.target.value === '' ? '' : +e.target.value})}/></Field>
-        <Field label="XP"><input type="number" className="input" value={form.xp ?? ''} onChange={e=>setForm({...form,xp: e.target.value === '' ? '' : +e.target.value})}/></Field>
-        <Field label="الترتيب"><input type="number" className="input" value={form.sort_order ?? ''} onChange={e=>setForm({...form,sort_order: e.target.value === '' ? '' : +e.target.value})}/></Field>
-        <Field label="الحالة"><select className="input" value={form.published!==false?'1':'0'} onChange={e=>setForm({...form,published:e.target.value==='1'})}><option value="1">منشور</option><option value="0">مخفي</option></select></Field>
-        <Field label="وصف الدرس" full><textarea className="input" value={form.desc||''} onChange={e=>setForm({...form,desc:e.target.value})}/></Field>
-      </div>
-      <div className="section-title"><span className="ico">🎬</span> الفيديو</div>
-      <div className="mb12"><VideoEditor value={form.video} onChange={v=>setForm({...form,video:v})}/></div>
-      <div className="section-title"><span className="ico">📄</span> ملف الشرح (اختياري)</div>
-      <Field label="رابط PDF" hint="اتركه فارغًا لو مفيش ملف PDF">
-        <input className="input" value={form.pdf_url||''} onChange={e=>setForm({...form,pdf_url:e.target.value})} placeholder="https://example.com/lesson1.pdf"/>
-      </Field>
-      <div className="section-title"><span className="ico">📚</span> محتوى الدرس</div>
-      <Field label="ملخص الدرس" full><textarea className="input" value={form.summary||''} onChange={e=>setForm({...form,summary:e.target.value})}/></Field>
-      <Field label="النقاط المهمة" full hint="سطر لكل نقطة"><textarea className="input" value={(form.key_points||[]).join('\n')} onChange={e=>setForm({...form,key_points:e.target.value.split('\n').filter(Boolean)})}/></Field>
-      <Field label="ملاحظات" full><textarea className="input" value={form.notes||''} onChange={e=>setForm({...form,notes:e.target.value})}/></Field>
-      <div className="section-title"><span className="ico">📝</span> اختبار الدرس — يظهر بعد الدرس مباشرة</div>
-      {editing==='new'?<div className="glass-s" style={{padding:12,marginBottom:12}}><div className="sm">احفظ الدرس أولًا، وسيظهر قسم إضافة أسئلة الاختبار هنا مباشرة دون إغلاق النافذة.</div></div>:<>
-        {currentLessonExams.length>0 && (<div className="glass-s" style={{padding:14,marginBottom:12,borderColor:'rgba(34,197,94,.4)'}}>
-          <div className="flex between center mb12">
-            <div className="sm" style={{fontWeight:800,color:'#6ee7a0'}}>✅ اختبارات مرتبطة بهذا الدرس ({currentLessonExams.length})</div>
-          </div>
-          {currentLessonExams.map(e=>(
-            <div key={e.id} className="flex between center mb6" style={{padding:'8px 12px',background:'rgba(34,197,94,.06)',borderRadius:10,border:'1px solid rgba(34,197,94,.20)'}}>
-              <div style={{flex:1,minWidth:0}}>
-                <div className="sm" style={{fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>📋 {e.title}</div>
-                <div className="xs muted">⏱ {e.duration}د • 🎯 {e.pass_score}% • ❓ {(e.question_ids||[]).length} سؤال</div>
-              </div>
-              <button className="btn btn-dn btn-sm" onClick={()=>deleteLessonExam(e.id)} style={{flexShrink:0}}>
-                <Icon name="trash" size={12}/> حذف كامل
-              </button>
-            </div>
-          ))}
-        </div>)}
-        {currentLessonQuestions.length>0 && (<div className="glass-s" style={{padding:14,marginBottom:12,maxHeight:340,overflowY:'auto'}}>
-          <div className="flex between center mb12">
-            <div className="sm" style={{fontWeight:800,color:'#FFD700'}}>❓ الأسئلة الحالية ({currentLessonQuestions.length})</div>
-          </div>
-          {currentLessonQuestions.map((q,idx)=>(
-            <div key={q.id} style={{padding:'10px 12px',background:'rgba(212,175,55,.05)',borderRadius:10,border:'1px solid var(--border)',marginBottom:6}}>
-              <div className="flex between center mb6" style={{gap:8}}>
-                <span className="pill pill-b" style={{fontSize:10,flexShrink:0}}>س {idx+1}</span>
-                <div className="sm" style={{flex:1,fontWeight:600,lineHeight:1.5}}>{q.text.length>100?q.text.slice(0,100)+'...':q.text}</div>
-                <div className="flex g6" style={{flexShrink:0}}>
-                  <button className="btn btn-s btn-sm" onClick={()=>setEditQ(JSON.parse(JSON.stringify(q)))} title="تعديل السؤال">
-                    <Icon name="edit" size={11}/>
-                  </button>
-                  <button className="btn btn-dn btn-sm" onClick={()=>deleteLessonQuestion(q.id)} title="حذف السؤال">
-                    <Icon name="trash" size={11}/>
-                  </button>
-                </div>
-              </div>
-              <div className="xs muted" style={{paddingInlineStart:34}}>✅ الإجابة: {(q.options||[])[q.correct?.[0]||0]}</div>
-            </div>
-          ))}
-        </div>)}
-        <div className="grid g2">
-          <Field label="اسم الاختبار"><input className="input" value={lessonTestTitle} onChange={e=>setLessonTestTitle(e.target.value)} placeholder={`اختبار ${form.title||'الدرس'}`}/></Field>
-          <Field label="المدة بالدقائق"><input type="number" className="input" min="1" value={lessonTestDuration} onChange={e=>setLessonTestDuration(e.target.value===''?'':+e.target.value)}/></Field>
-          <Field label="درجة النجاح %"><input type="number" className="input" min="0" max="100" value={lessonTestPassScore} onChange={e=>setLessonTestPassScore(e.target.value===''?'':+e.target.value)}/></Field>
-          <Field label="XP لكل سؤال"><input type="number" className="input" min="0" value={lessonTestXp} onChange={e=>setLessonTestXp(e.target.value===''?'':+e.target.value)}/></Field>
-        </div>
-        <Field label="نوع الاختبار"><AccessToggle value={lessonTestFree} onChange={setLessonTestFree}/></Field>
-        <div className="glass-s mb12" style={{padding:14}}>
-          <div className="flex between center wrap g8 mb8">
-            <div style={{fontWeight:800,color:'#FFD700'}}>🧩 رفع ملف JSON — إنشاء الاختبار تلقائيًا</div>
-            <label className="btn btn-s btn-sm" style={{cursor:'pointer',margin:0}}>
-              {jsonImporting?'جارٍ قراءة الملف...':'📤 رفع JSON وإنشاء الاختبار'}
-              <input ref={jsonFileRef} type="file" accept=".json,application/json" style={{display:'none'}} disabled={jsonImporting} onChange={e=>importQuestionsJSON(e.target.files?.[0])}/>
-            </label>
-          </div>
-          <div className="xs muted" style={{lineHeight:1.8}}>ارفع ملف .json بترميز UTF-8 للحفاظ على العربي والرموز. يدعم مصفوفة أسئلة مباشرة أو كائنًا يحتوي على questions، والاختيارات سواء كائن A/B/C/D أو مصفوفة. بعد رفع الملف يتم حفظ الأسئلة وإنشاء الاختبار وربطه بالدرس تلقائيًا، من غير ملء خانة الأسئلة.</div>
-        </div>
-        <Field label="إضافة أسئلة الاختبار — الصق المجموعة كاملة" hint="كل سؤال يحتوي على اختيارات، وسطر الإجابة الصحيحة، والتعليل."><textarea className="input" rows="10" value={lessonTestText} onChange={e=>setLessonTestText(e.target.value)} placeholder="الصق كل الأسئلة هنا مرة واحدة أو ارفع ملف JSON بالأعلى..."/></Field>
-        <div className="flex g8 mb12" style={{flexWrap:'wrap'}}>
-          <button type="button" className="btn btn-s" onClick={previewTest} disabled={!lessonTestText.trim()} style={{flex:'1 1 auto'}}>👁️ معاينة الأسئلة</button>
-          <button type="button" className="btn btn-p" onClick={createTestForLesson} disabled={lessonTestBusy} style={{flex:'2 1 auto'}}>{lessonTestBusy?'جارٍ إنشاء الاختبار...':'⚡ إضافة الأسئلة وإنشاء الاختبار'}</button>
-          <button type="button" className="btn btn-s" onClick={()=>setLessonTestText('')}>مسح النص</button>
-        </div>
-      </>}
-      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ الدرس'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
-    </Modal>}
-    {editQ && (
-      <Modal title="✏️ تعديل السؤال" onClose={()=>setEditQ(null)} wide>
-        <div className="glass-s mb12" style={{padding:12}}>
-          <div className="sm" style={{color:'#FFD700',fontWeight:800}}>عدّل السؤال أو الخيارات أو الإجابة، ثم اضغط حفظ</div>
-        </div>
-        <Field label="نص السؤال">
-          <textarea className="input" rows="3" value={editQ.text||''} onChange={e=>setEditQ({...editQ,text:e.target.value})}/>
-        </Field>
-        <Field label="الخيارات — اضغط على الحرف لتحديد الإجابة الصحيحة">
-          
-          {(()=>{const correctIdx = Array.isArray(editQ.correct) ? editQ.correct[0] : (editQ.correct ?? 0);return (editQ.options||['','','','']).map((op,oi)=>(
-  <div key={oi} className="flex g8 mb6 center">
-    <button type="button" className={`btn btn-sm ${correctIdx===oi?'btn-ok':'btn-s'}`} onClick={()=>setEditQ({...editQ,correct:[oi]})} style={{minWidth:44}}>
-      {['أ','ب','ج','د'][oi]}
-    </button>
-    <input className="input" value={op} onChange={e=>{const opts=[...(editQ.options||['','','',''])];opts[oi]=e.target.value;setEditQ({...editQ,options:opts});}} placeholder={`الخيار ${['أ','ب','ج','د'][oi]}`}/>
-  </div>
-));})()}
-        </Field>
-        <Field label="شرح الإجابة (اختياري)">
-          <textarea className="input" rows="2" value={editQ.explanation||''} onChange={e=>setEditQ({...editQ,explanation:e.target.value})} placeholder="اشرح سبب الإجابة الصحيحة..."/>
-        </Field>
-        <div className="grid g2">
-          <Field label="الصعوبة">
-            <select className="input" value={editQ.difficulty||'medium'} onChange={e=>setEditQ({...editQ,difficulty:e.target.value})}>
-              <option value="easy">سهل</option>
-              <option value="medium">متوسط</option>
-              <option value="hard">صعب</option>
-            </select>
-          </Field>
-          <Field label="XP">
-            <input type="number" className="input" value={editQ.xp ?? ''} onChange={e=>setEditQ({...editQ,xp: e.target.value==='' ? '' : +e.target.value})}/>
-          </Field>
-        </div>
-        <div className="flex g8 mt16">
-          <button className="btn btn-p" onClick={saveEditedQuestion} disabled={editQBusy} style={{flex:1}}>
-            {editQBusy?'جارٍ الحفظ...':'💾 حفظ التعديلات'}
-          </button>
-          <button className="btn btn-s" onClick={()=>setEditQ(null)}>إلغاء</button>
-        </div>
-      </Modal>
-    )}
-    {previewQs && (<Modal title={`👁️ معاينة الأسئلة (${previewQs.length})`} onClose={()=>setPreviewQs(null)} wide>
-      <div className="glass-s mb12" style={{padding:12}}>
-        <div className="sm" style={{color:'#FFD700',fontWeight:800}}>راجع الأسئلة دي قبل ما تحفظها للاختبار</div>
-        <div className="xs muted mt6">لو كل حاجة تمام، اقفل النافذة دي واضغط "⚡ إضافة الأسئلة وإنشاء الاختبار"</div>
-      </div>
-      <div style={{maxHeight:'60vh',overflowY:'auto',paddingInlineEnd:6}}>
-        {previewQs.map((q,idx)=>(
-          <div key={idx} className="glass-s mb12" style={{padding:14,borderColor:'rgba(255,215,0,.35)'}}>
-            <div className="flex between center mb10">
-              <span className="pill pill-b" style={{fontWeight:800}}>سؤال {idx+1}</span>
-              <span className="pill pill-v" style={{fontSize:10}}>+{lessonTestXp} XP</span>
-            </div>
-            <div className="sm mb10" style={{fontWeight:700,lineHeight:1.7,whiteSpace:'pre-wrap'}}>{q.text}</div>
-            <div className="flex col g6 mb10">
-              {q.options.map((opt,oi)=>{const isCorrect=q.correct===oi;return <div key={oi} className="flex center g8" style={{padding:'6px 10px',borderRadius:8,background:isCorrect?'rgba(34,197,94,.10)':'rgba(255,255,255,.03)',border:`1px solid ${isCorrect?'rgba(34,197,94,.4)':'var(--border)'}`}}>
-                <span style={{width:24,height:24,borderRadius:'50%',display:'grid',placeItems:'center',background:isCorrect?'#22c55e':'rgba(255,255,255,.06)',color:isCorrect?'#fff':'var(--txt2)',fontWeight:800,fontSize:11,flexShrink:0}}>{['أ','ب','ج','د'][oi]}</span>
-                <span className="sm" style={{flex:1,color:isCorrect?'#6ee7a0':'var(--txt)'}}>{opt||'—'}</span>
-                {isCorrect && <span className="pill pill-g" style={{fontSize:9}}>✓ صح</span>}
-              </div>;})}
-            </div>
-            {q.explanation && (<div className="xs muted" style={{padding:'8px 10px',background:'rgba(0,0,0,.20)',borderRadius:8,borderInlineStart:'2px solid var(--gold)',whiteSpace:'pre-wrap'}}>💡 {q.explanation}</div>)}
-          </div>
-        ))}
-      </div>
-      <div className="flex g8 mt16">
-        <button className="btn btn-p btn-block" onClick={()=>setPreviewQs(null)}>تمام، رجعت للفورم</button>
-      </div>
-    </Modal>)}
-  </>;
-}
-function ExamsPage(){
-  const app=useApp();
-  const [editing,setEditing]=useState(null);
-  const [form,setForm]=useState({});
-  const [busy,setBusy]=useState(false);
-  const [filterAccess,setFilterAccess]=useState('all');
-  const openNew=()=>{setForm({title:'',subject_id:'',unit_id:'',lesson_ids:[],question_ids:[],duration:'',pass_score:'',max_attempts:'',xp:'',published:true,sort_order:'',is_free:true});setEditing('new');};
-  const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(c.is_free===undefined)c.is_free=true;setForm(c);setEditing(it.id);};
-  const save=async ()=>{
-    if(!form.title||!form.subject_id) return app.toast.warn('العنوان والمادة مطلوبان');
-    if(!form.question_ids||form.question_ids.length===0) return app.toast.warn('اختر سؤالاً على الأقل');
-    setBusy(true);
-    try{await app.save('exams',form);app.toast.ok('تم الحفظ');setEditing(null);}
-    catch(e){app.toast.err(e.message);}
-    setBusy(false);
-  };
-  const del=async id=>{const r=await Swal.fire({title:'حذف الاختبار؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed) return;try{await app.remove('exams',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
-  const availQ=form.unit_id?app.db.questions.filter(q=>q.unit_id===form.unit_id):app.db.questions;
-  const sortedExams = useMemo(()=>{return [...app.db.exams].sort((a,b)=>{const ta = new Date(a.created_at || a.createdAt || 0).getTime() || 0;const tb = new Date(b.created_at || b.createdAt || 0).getTime() || 0;return ta - tb;});},[app.db.exams]);
-  const filteredExams = useMemo(()=>{if(filterAccess === 'all') return sortedExams;return sortedExams.filter(e=>{const isFree = e.is_free !== false;return filterAccess === 'free' ? isFree : !isFree;});},[sortedExams, filterAccess]);
-  const freeCount = sortedExams.filter(e=>e.is_free !== false).length;
-  const paidCount = sortedExams.length - freeCount;
-  return <>
-    <div className="flex between center mb16 wrap g8">
-      <div className="h2 grad">📝 إدارة الاختبارات</div>
-      <div className="flex g8">
-        <span className="pill pill-free">🆓 {freeCount} مجاني</span>
-        <span className="pill pill-paid">🔒 {paidCount} مدفوع</span>
-        <button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> اختبار جديد</button>
-      </div>
-    </div>
-    <div className="glass mb16" style={{padding:14}}>
-      <div style={{flex:'1 1 240px',maxWidth:280}}>
-        <label className="lbl">تصفية حسب الوصول</label>
-        <select className="input" value={filterAccess} onChange={e=>setFilterAccess(e.target.value)}>
-          <option value="all">الكل ({sortedExams.length})</option>
-          <option value="free">🆓 مجاني فقط</option>
-          <option value="paid">🔒 مدفوع فقط</option>
-        </select>
-      </div>
-    </div>
-    <div className="glass" style={{padding:14}}>
-      {filteredExams.length===0?<Empty title="لا توجد اختبارات"/>:<div className="sx"><table className="tbl">
-        <thead><tr><th>العنوان</th><th>المادة</th><th>الأسئلة</th><th>الوصول</th><th>النجاح</th><th>الحالة</th><th>إجراءات</th></tr></thead>
-        <tbody>{filteredExams.map(e=><tr key={e.id}><td><b>{e.title}</b></td><td className="sm">{app.subject(e.subject_id)?.name||'—'}</td><td>{(e.question_ids||[]).length}</td><td><AccessBadge value={e.is_free}/></td><td>{e.pass_score}%</td><td>{e.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(e)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(e.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody>
-      </table></div>}
-    </div>
-    {editing!==null&&<Modal title={editing==='new'?'اختبار جديد':'تعديل الاختبار'} onClose={()=>setEditing(null)} wide>
-      <div className="section-title" style={{marginTop:0}}><span className="ico">📋</span> المعلومات الأساسية</div>
-      <Field label="اسم الاختبار"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
-      <div className="grid g2">
-        <Field label="المادة"><select className="input" value={form.subject_id||''} onChange={e=>setForm({...form,subject_id:e.target.value,unit_id:''})}><option value="">— اختر —</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field>
-        <Field label="الوحدة"><select className="input" value={form.unit_id||''} onChange={e=>setForm({...form,unit_id:e.target.value,question_ids:[]})}><option value="">— اختر —</option>{app.db.units.filter(u=>!form.subject_id||u.subject_id===form.subject_id).map(u=><option key={u.id} value={u.id}>{u.name}</option>)}</select></Field>
-        <Field label="المدة (دقيقة)"><input type="number" className="input" value={form.duration ?? ''} onChange={e=>setForm({...form,duration: e.target.value === '' ? '' : +e.target.value})}/></Field>
-        <Field label="درجة النجاح %"><input type="number" className="input" value={form.pass_score ?? ''} onChange={e=>setForm({...form,pass_score: e.target.value === '' ? '' : +e.target.value})}/></Field>
-        <Field label="عدد المحاولات"><input type="number" className="input" value={form.max_attempts ?? ''} onChange={e=>setForm({...form,max_attempts: e.target.value === '' ? '' : +e.target.value})}/></Field>
-        <Field label="XP"><input type="number" className="input" value={form.xp ?? ''} onChange={e=>setForm({...form,xp: e.target.value === '' ? '' : +e.target.value})}/></Field>
-        <Field label="الترتيب"><input type="number" className="input" value={form.sort_order ?? ''} onChange={e=>setForm({...form,sort_order: e.target.value === '' ? '' : +e.target.value})}/></Field>
-        <Field label="الحالة"><select className="input" value={form.published!==false?'1':'0'} onChange={e=>setForm({...form,published:e.target.value==='1'})}><option value="1">منشور</option><option value="0">مخفي</option></select></Field>
-      </div>
-      <div className="section-title"><span className="ico">🔐</span> نوع الوصول</div>
-      <Field label="الاختبار المجاني متاح لجميع الطلاب • الاختبار المدفوع يتطلب اشتراك">
-        <AccessToggle value={form.is_free} onChange={(isFree)=>setForm({...form,is_free:isFree})}/>
-      </Field>
-      <div className="section-title"><span className="ico">❓</span> الأسئلة</div>
-      <Field label={`الأسئلة المختارة (${(form.question_ids||[]).length})`}>
-        <div className="glass-s" style={{padding:10,maxHeight:260,overflowY:'auto'}}>
-          {availQ.length===0?<div className="sm muted">لا توجد أسئلة</div>:availQ.map(q=>{const on=(form.question_ids||[]).includes(q.id);return <label key={q.id} className="flex center g8 mb6" style={{padding:6,cursor:'pointer'}}><input type="checkbox" checked={on} onChange={()=>setForm({...form,question_ids:on?(form.question_ids||[]).filter(x=>x!==q.id):[...(form.question_ids||[]),q.id]})}/><span className="sm" style={{flex:1}}>{q.text.slice(0,80)}</span></label>;})}
-        </div>
-      </Field>
-      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
-    </Modal>}
-  </>;
-}
-function MissionsPage(){
-  const app=useApp();
-  const [editing,setEditing]=useState(null);
-  const [form,setForm]=useState({});
-  const [busy,setBusy]=useState(false);
-  const openNew=()=>{setForm({title:'',desc:'',subject_id:'',required_lessons:[],required_exam_id:'',xp:'',sort_order:''});setEditing('new');};
-  const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
-  const save=async ()=>{
-    if(!form.title) return app.toast.warn('العنوان مطلوب');
-    if(!form.subject_id) return app.toast.warn('اختر المادة');
-    setBusy(true);
-    try{await app.save('missions',form);app.toast.ok('تم الحفظ');setEditing(null);}
-    catch(e){app.toast.err(e.message);}
-    setBusy(false);
-  };
-  const del=async id=>{const r=await Swal.fire({title:'حذف المهمة؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed) return;try{await app.remove('missions',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
-  return <>
-    <div className="flex between center mb16"><div className="h2 grad">🎯 إدارة المهام</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> مهمة جديدة</button></div>
-    <div className="glass" style={{padding:14}}>
-      {app.db.missions.length===0?<Empty title="لا توجد مهام"/>:<div className="sx"><table className="tbl">
-        <thead><tr><th>العنوان</th><th>المادة</th><th>XP</th><th>إجراءات</th></tr></thead>
-        <tbody>{app.db.missions.map(m=><tr key={m.id}><td>{m.title}</td><td className="sm">{app.subject(m.subject_id)?.name||'—'}</td><td>{m.xp}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(m)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(m.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody>
-      </table></div>}
-    </div>
-    {editing!==null&&<Modal title={editing==='new'?'مهمة جديدة':'تعديل المهمة'} onClose={()=>setEditing(null)} wide>
-      <Field label="عنوان المهمة"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
-      <Field label="الوصف"><textarea className="input" value={form.desc||''} onChange={e=>setForm({...form,desc:e.target.value})}/></Field>
-      <div className="grid g2">
-        <Field label="المادة"><select className="input" value={form.subject_id||''} onChange={e=>setForm({...form,subject_id:e.target.value})}><option value="">— اختر —</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field>
-        <Field label="XP"><input type="number" className="input" value={form.xp ?? ''} onChange={e=>setForm({...form,xp: e.target.value === '' ? '' : +e.target.value})}/></Field>
-        <Field label="الترتيب"><input type="number" className="input" value={form.sort_order ?? ''} onChange={e=>setForm({...form,sort_order: e.target.value === '' ? '' : +e.target.value})}/></Field>
-        <Field label="الاختبار المطلوب"><select className="input" value={form.required_exam_id||''} onChange={e=>setForm({...form,required_exam_id:e.target.value||null})}><option value="">— بدون —</option>{app.db.exams.filter(e=>!form.subject_id||e.subject_id===form.subject_id).map(e=><option key={e.id} value={e.id}>{e.title}</option>)}</select></Field>
-      </div>
-      <Field label="الدروس المطلوبة">
-        <div className="glass-s" style={{padding:10,maxHeight:220,overflowY:'auto'}}>
-          {app.db.lessons.filter(l=>{const un=app.unit(l.unit_id);return !form.subject_id||un?.subject_id===form.subject_id;}).map(l=>{const on=(form.required_lessons||[]).includes(l.id);return <label key={l.id} className="flex center g8 mb6" style={{cursor:'pointer'}}><input type="checkbox" checked={on} onChange={()=>setForm({...form,required_lessons:on?(form.required_lessons||[]).filter(x=>x!==l.id):[...(form.required_lessons||[]),l.id]})}/><span className="sm">{l.title}</span></label>;})}
-        </div>
-      </Field>
-      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
-    </Modal>}
-  </>;
-}
-function AchievementsPage(){
-  return <Crud title="🏆 إدارة الإنجازات" collection="achievements" defaultItem={()=>({title:'',desc:'',icon:'🏆',type:'lessons',threshold:''})} fields={[
-    {key:'title',label:'الاسم'},{key:'icon',label:'الأيقونة'},
-    {key:'type',label:'النوع',type:'select',options:[{value:'lessons',label:'عدد الدروس'},{value:'exams',label:'عدد الاختبارات'},{value:'mission',label:'عدد المهام'},{value:'streak',label:'سلسلة الأيام'},{value:'xp',label:'مجموع XP'},{value:'highScore',label:'أعلى نسبة'}]},
-    {key:'threshold',label:'القيمة',type:'number'},{key:'desc',label:'الوصف',type:'textarea',full:true}
-  ]} columns={[
-    {label:'',render:a=><span style={{fontSize:20}}>{a.icon}</span>},{key:'title',label:'الاسم'},{key:'type',label:'النوع'},{key:'threshold',label:'القيمة'}
-  ]}/>;
-}
-function LevelsPage(){
-  return <Crud title="📈 إدارة المستويات" collection="levels" defaultItem={()=>({level:'',name:'',xp:'',reward:''})} fields={[
-    {key:'level',label:'رقم المستوى',type:'number'},{key:'name',label:'الاسم'},{key:'xp',label:'XP المطلوب',type:'number'},{key:'reward',label:'المكافأة'}
-  ]} columns={[
-    {key:'level',label:'المستوى'},{key:'name',label:'الاسم'},{key:'xp',label:'XP'},{key:'reward',label:'المكافأة'}
-  ]}/>;
-}
-function StudentsPage(){
-  const app=useApp();
-  const [editing,setEditing]=useState(null);
-  const [form,setForm]=useState({});
-  const [q,setQ]=useState('');
-  const [govFilter,setGovFilter]=useState('all');
-  const [busy,setBusy]=useState(false);
-  const GOVERNORATES = ["القاهرة", "الجيزة", "الإسكندرية", "الدقهلية", "الشرقية", "المنوفية","القليوبية", "البحيرة", "الغربية", "بورسعيد", "دمياط", "الإسماعيلية","السويس", "كفر الشيخ", "الفيوم", "بني سويف", "المنيا", "أسيوط","سوهاج", "قنا", "الأقصر", "أسوان", "البحر الأحمر", "الوادي الجديد","مطروح", "شمال سيناء", "جنوب سيناء"];
-  const allStudents = app.db.users.filter(u => u.role === 'student');
-  const list = allStudents.filter(u => {
-    const matchesSearch = u.name.toLowerCase().includes(q.toLowerCase()) || (u.phone||'').includes(q);
-    let matchesGov = true;
-    if (govFilter === 'all') matchesGov = true;
-    else if (govFilter === 'none') matchesGov = !u.governorate;
-    else matchesGov = u.governorate === govFilter;
-    return matchesSearch && matchesGov;
-  });
-  const open = s => { setForm(JSON.parse(JSON.stringify(s))); setEditing(s.id); };
-  const save = async () => {
-    setBusy(true);
-    try {
-      await DB.updateUser(editing, {name: form.name,phone: form.phone,xp: form.xp,grade_id: form.grade_id,governorate: form.governorate || null,all_subjects: form.all_subjects,access_subjects: form.access_subjects || [],subscription: form.subscription || 'free',subscription_until: form.subscription_until || null});
-      await app.reload();
-      app.toast.ok('تم الحفظ');
-      setEditing(null);
-    } catch(e) { app.toast.err(e.message); }
-    setBusy(false);
-  };
-  const toggle = async s => {
-    const action = s.active !== false ? 'إيقاف' : 'تفعيل';
-    const r = await Swal.fire({title: `${action} الحساب؟`,text: `هل تريد ${action} حساب ${s.name}؟`,icon: 'question',showCancelButton: true,confirmButtonText: `نعم، ${action}`,cancelButtonText: 'إلغاء',confirmButtonColor: s.active !== false ? '#ef4444' : '#D4AF37',cancelButtonColor: '#64748b',background: 'linear-gradient(180deg, #1c160c, #0f0c07)',color: '#f7f0dd',customClass: { popup: 'swal-custom-popup', title: 'swal-custom-title' }});
-    if (!r.isConfirmed) return;
-    try { await DB.updateUser(s.id, { active: !s.active }); await app.reload(); app.toast.warn(s.active !== false ? 'تم الإيقاف' : 'تم التفعيل'); } catch(e) { app.toast.err(e.message); }
-  };
-  const govCounts = {};
-  allStudents.forEach(u => { if (u.governorate) { govCounts[u.governorate] = (govCounts[u.governorate] || 0) + 1; } });
-  return <>
-    <div className="flex between center mb16 wrap g8">
-      <div className="h2 grad">إدارة الطلاب</div>
-      <div className="flex g8 wrap">
-        <input className="input" style={{maxWidth:200}} placeholder="🔍 بحث..." value={q} onChange={e=>setQ(e.target.value)}/>
-        <select className="input" style={{maxWidth:220}} value={govFilter} onChange={e=>setGovFilter(e.target.value)}>
-          <option value="all">كل المحافظات ({allStudents.length})</option>
-          {GOVERNORATES.map(gov => {const count = govCounts[gov] || 0;if (count === 0) return null;return <option key={gov} value={gov}>{gov} ({count})</option>;})}
-          <option value="none">— بدون محافظة ({allStudents.filter(u=>!u.governorate).length}) —</option>
-        </select>
-      </div>
-    </div>
-    <div className="glass" style={{padding:14}}>
-      <div className="sx">
-        <table className="tbl">
-          <thead><tr><th>الطالب</th><th>الهاتف</th><th>📍 المحافظة</th><th>XP</th><th>💳 الاشتراك</th><th>الحالة</th><th>إجراءات</th></tr></thead>
-          <tbody>
-            {list.map(s => (<tr key={s.id}>
-              <td><div className="flex center g8"><div className="avatar" style={{width:30,height:30,fontSize:14}}>{s.avatar||'👤'}</div><span>{s.name}</span></div></td>
-              <td className="sm muted" dir="ltr">{(s.country_code||'+20')}{s.phone||''}</td>
-              <td>{s.governorate ? <span className="pill pill-b" style={{fontSize:11}}>📍 {s.governorate}</span> : <span className="xs muted">—</span>}</td>
-              <td><b style={{color:'var(--gold)'}}>{DB.fmt(s.xp||0)}</b></td>
-              <td>{s.subscription === 'vip' ? <span className="pill pill-v">💎 VIP</span> : s.subscription === 'paid' ? <span className="pill pill-g">💳 مدفوع</span> : <span className="pill pill-y">🆓 مجاني</span>}</td>
-              <td>{s.active!==false ? <span className="pill pill-g">نشط</span> : <span className="pill pill-r">موقوف</span>}</td>
-              <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>open(s)}><Icon name="edit" size={13}/></button><button className={`btn btn-sm ${s.active!==false?'btn-dn':'btn-ok'}`} onClick={()=>toggle(s)}>{s.active!==false?'إيقاف':'تفعيل'}</button></div></td>
-            </tr>))}
-          </tbody>
-        </table>
-        {list.length === 0 && (<div className="empty" style={{padding:'40px 20px',textAlign:'center'}}><div className="empty-ico">🔍</div><div className="h4 txt2 mb8">لا يوجد طلاب مطابقين للبحث</div></div>)}
-      </div>
-    </div>
-    {editing && (
-      <Modal title={`تعديل: ${form.name}`} onClose={()=>setEditing(null)} wide>
-        <div className="section-title" style={{marginTop:0}}><span className="ico">👤</span> المعلومات الأساسية</div>
-        <div className="grid g2">
-          <Field label="الاسم"><input className="input" value={form.name||''} onChange={e=>setForm({...form,name:e.target.value})}/></Field>
-          <Field label="الهاتف"><input className="input" value={form.phone||''} onChange={e=>setForm({...form,phone:e.target.value})}/></Field>
-          <Field label="XP"><input type="number" className="input" value={form.xp ?? ''} onChange={e=>setForm({...form,xp: e.target.value === '' ? '' : +e.target.value})}/></Field>
-          <Field label="الصف"><select className="input" value={form.grade_id||''} onChange={e=>setForm({...form,grade_id:e.target.value})}><option value="">— اختر —</option>{app.db.grades.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></Field>
-          <Field label="📍 المحافظة"><select className="input" value={form.governorate||''} onChange={e=>setForm({...form,governorate:e.target.value})}><option value="">— بدون —</option>{GOVERNORATES.map(gov=><option key={gov} value={gov}>{gov}</option>)}</select></Field>
-        </div>
-        <div className="section-title"><span className="ico">💳</span> الاشتراك</div>
-        <div className="grid g2">
-          <Field label="نوع الاشتراك">
-            <select className="input" value={form.subscription || 'free'} onChange={e=>setForm({...form, subscription:e.target.value})}>
-              <option value="free">🆓 مجاني</option>
-              <option value="paid">💳 مدفوع</option>
-              <option value="vip">💎 VIP</option>
-            </select>
-          </Field>
-          <Field label="تاريخ انتهاء الاشتراك"><input type="date" className="input" value={form.subscription_until || ''} onChange={e=>setForm({...form, subscription_until:e.target.value})}/></Field>
-        </div>
-        <div className="section-title"><span className="ico">🔐</span> صلاحيات الوصول</div>
-        <Field label="المواد المسموح بها">
-          <label className="flex center g8 mb12" style={{cursor:'pointer'}}><input type="checkbox" checked={!!form.all_subjects} onChange={e=>setForm({...form,all_subjects:e.target.checked})}/><span className="sm">جميع المواد</span></label>
-          {!form.all_subjects && (<div className="flex wrap g6">
-            {app.db.subjects.map(s => {const on = (form.access_subjects||[]).includes(s.id);return (<button key={s.id} type="button" onClick={()=>{const cur = form.access_subjects || [];setForm({...form,access_subjects: on ? cur.filter(x=>x!==s.id) : [...cur,s.id]});}} style={{padding:'8px 14px',borderRadius:30,background: on ? 'rgba(212,175,55,.20)' : 'rgba(212,175,55,.05)',border: `1px solid ${on?'var(--gold)':'var(--border)'}`,fontSize:12.5,fontWeight:700,color: on ? '#FFD700' : 'var(--txt)',cursor:'pointer'}}>{s.icon} {s.name}</button>);})}
-          </div>)}
-        </Field>
-        <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
-      </Modal>
-    )}
-  </>;
-}
-function NotificationsPage(){
-  const app=useApp();
-  const [form,setForm]=useState({title:'',body:'',target:'all'});
-  const [busy,setBusy]=useState(false);
-  const send=async ()=>{
-    if(!form.title||!form.body) return app.toast.warn('أدخل العنوان والنص');
-    setBusy(true);
-    try{await app.save('notifications',{...form,read_by:[]});app.toast.ok('تم الإرسال');app.playSound && app.playSound('success');setForm({title:'',body:'',target:'all'});}
-    catch(e){app.toast.err(e.message);}
-    setBusy(false);
-  };
-  const del=async id=>{const r=await Swal.fire({title:'حذف الإشعار؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed) return;try{await app.remove('notifications',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
-  return <>
-    <div className="h2 mb16 grad">الإشعارات</div>
-    <div className="grid g2">
-      <div className="glass" style={{padding:20}}>
-        <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8,color:'var(--gold)'}}><Icon name="bell" size={16}/> إرسال إشعار</div>
-        <Field label="العنوان"><input className="input" value={form.title} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
-        <Field label="النص"><textarea className="input" value={form.body} onChange={e=>setForm({...form,body:e.target.value})}/></Field>
-        <Field label="المستهدفون"><select className="input" value={form.target} onChange={e=>setForm({...form,target:e.target.value})}><option value="all">كل الطلاب</option>{app.db.users.filter(u=>u.role==='student').map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field>
-        <button className="btn btn-p btn-block" onClick={send} disabled={busy}>{busy?'جارٍ...':'📤 إرسال'}</button>
-      </div>
-      <div className="glass" style={{padding:20}}>
-        <div className="h4 mb12" style={{color:'var(--gold)'}}>آخر الإشعارات</div>
-        {app.db.notifications.slice(0,10).map(n=><div key={n.id} className="glass-s mb8" style={{padding:12,display:'flex',gap:10,alignItems:'flex-start'}}>
-          <div style={{flex:1}}>
-            <div className="h4" style={{fontSize:14}}>{n.title}</div>
-            <div className="xs muted">{n.body}</div>
-            <div className="flex between center mt6"><div className="xs" style={{color:'var(--gold)'}}>← {n.target==='all'?'كل الطلاب':app.db.users.find(u=>u.id===n.target)?.name||'—'}</div><div className="xs muted">{DB.formatDate(n.created_at)}</div></div>
-          </div>
-          <button className="btn btn-dn btn-sm" onClick={()=>del(n.id)}><Icon name="trash" size={13}/></button>
-        </div>)}
-      </div>
-    </div>
-  </>;
-}
-function ReportsPage(){
-  const [reports,setReports]=useState([]);
-  const [loading,setLoading]=useState(true);
-  useEffect(()=>{(async ()=>{try{const sb=await DB.getClient();const {data}=await sb.from('reports').select('*').order('created_at',{ascending:false}).limit(50);setReports(data||[]);}catch(e){}setLoading(false);})();},[]);
-  return <>
-    <div className="h2 mb16 grad">📨 البلاغات المستلمة</div>
-    <div className="glass" style={{padding:20}}>
-      {loading?<div style={{textAlign:'center',padding:20}}><div className="spinner" style={{margin:'0 auto 14px'}}></div>جارٍ التحميل...</div>:
-        reports.length===0?<Empty icon="📨" title="لا توجد بلاغات"/>:
-        <div className="flex col g8">
-          {reports.map(r=><div key={r.id} className="glass-s" style={{padding:14}}>
-            <div className="flex between center mb8"><div className="h4">{r.user_name}</div><span className="xs muted">{DB.formatDateTime(r.created_at)}</span></div>
-            <div className="xs muted mb8" dir="ltr">📱 {r.user_phone}</div>
-            <div className="sm txt2" style={{background:'rgba(0,0,0,.25)',padding:10,borderRadius:10,borderInlineStart:'2px solid var(--gold)'}}>{r.message}</div>
-          </div>)}
-        </div>
-      }
-    </div>
-  </>;
-}
-function SettingsPage(){
-  const app=useApp();
-  const [loading,setLoading]=useState(true);
-  const [busy,setBusy]=useState(false);
-  const [form,setForm]=useState({about_title:'عن المنصة',about_text:'',social_links:[]});
-  useEffect(()=>{(async ()=>{try{const sb=await DB.getClient();const {data}=await sb.from('settings').select('*').eq('id','site').maybeSingle();if(data){setForm({about_title: data.about_title || 'عن المنصة',about_text: data.about_text || '',social_links: Array.isArray(data.social_links) ? data.social_links : []});}}catch(e){console.warn(e);}setLoading(false);})();},[]);
-  const save=async ()=>{setBusy(true);try{const sb=await DB.getClient();const {error}=await sb.from('settings').upsert({id:'site',about_title: form.about_title,about_text: form.about_text,social_links: form.social_links,updated_at: Date.now()});if(error) throw new Error(error.message);app.toast.ok('تم الحفظ');}catch(e){app.toast.err(e.message);}setBusy(false);};
-  const addLink=()=>{setForm(f=>({...f,social_links:[...f.social_links,{id:DB.uid('lnk_'),platform:'facebook',label:'',url:''}]}));};
-  const updLink=(id,patch)=>setForm(f=>({...f,social_links:f.social_links.map(l=>l.id===id?{...l,...patch}:l)}));
-  const delLink=(id)=>setForm(f=>({...f,social_links:f.social_links.filter(l=>l.id!==id)}));
-  const platforms=[{id:'facebook',label:'فيسبوك'},{id:'tiktok',label:'تيك توك'},{id:'instagram',label:'إنستجرام'},{id:'whatsapp_channel',label:'قناة واتساب'},{id:'whatsapp_group',label:'جروب واتساب'},{id:'custom',label:'رابط مخصص'}];
-  if(loading) return <div className="glass" style={{padding:40,textAlign:'center'}}><div className="spinner" style={{margin:'0 auto 14px'}}></div>جارٍ التحميل...</div>;
-  return <>
-    <div className="h2 mb16 grad">⚙️ الإعدادات</div>
-    <div className="glass mb16" style={{padding:20}}>
-      <div className="section-title" style={{marginTop:0}}><span className="ico">📖</span> عن المنصة</div>
-      <Field label="عنوان القسم"><input className="input" value={form.about_title} onChange={e=>setForm({...form,about_title:e.target.value})}/></Field>
-      <Field label="نص عن المنصة"><textarea className="input" rows="6" value={form.about_text} onChange={e=>setForm({...form,about_text:e.target.value})} placeholder="اكتب نبذة عن المنصة..."/></Field>
-    </div>
-    <div className="glass mb16" style={{padding:20}}>
-      <div className="flex between center mb16">
-        <div className="section-title" style={{margin:0,border:0,paddingBottom:0}}><span className="ico">🔗</span> لينكات السوشيال</div>
-        <button className="btn btn-p btn-sm" onClick={addLink}><Icon name="plus" size={13}/> إضافة لينك</button>
-      </div>
-      {form.social_links.length===0?(<div className="sm muted" style={{textAlign:'center',padding:20}}>لا توجد لينكات بعد — اضغط "إضافة لينك"</div>):(
-        <div className="flex col g12">
-          {form.social_links.map((link)=>(
-            <div key={link.id} className="glass-s" style={{padding:14,display:'flex',gap:12,alignItems:'center',flexWrap:'wrap'}}>
-              <div style={{flex:'1 1 160px',minWidth:140}}>
-                <label className="lbl">المنصة</label>
-                <select className="input" value={link.platform} onChange={e=>updLink(link.id,{platform:e.target.value})}>
-                  {platforms.map(p=><option key={p.id} value={p.id}>{p.label}</option>)}
-                </select>
-              </div>
-              <div style={{flex:'1 1 160px',minWidth:140}}>
-                <label className="lbl">الاسم (اختياري)</label>
-                <input className="input" value={link.label||''} onChange={e=>updLink(link.id,{label:e.target.value})} placeholder="مثال: صفحتنا الرسمية"/>
-              </div>
-              <div style={{flex:'2 1 260px',minWidth:200}}>
-                <label className="lbl">الرابط</label>
-                <input className="input" value={link.url||''} onChange={e=>updLink(link.id,{url:e.target.value})} placeholder="https://..." dir="ltr"/>
-              </div>
-              <button className="btn btn-dn btn-sm" onClick={()=>delLink(link.id)} style={{flexShrink:0}}><Icon name="trash" size={13}/></button>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-    <button className="btn btn-p btn-block" onClick={save} disabled={busy}>{busy?'جارٍ الحفظ...':'💾 حفظ الإعدادات'}</button>
-  </>;
-}
+
 function ErrorsAnalyticsPage(){
   const app=useApp();
   const [filterSubject,setFilterSubject]=useState('all');
@@ -1576,6 +848,7 @@ function ErrorsAnalyticsPage(){
     </div>
   </>;
 }
+
 function NotesPage(){
   const app=useApp();
   const [loading,setLoading]=useState(true);
@@ -1616,6 +889,7 @@ function NotesPage(){
     </div>
   </>;
 }
+
 function CertificatesPage(){
   const app=useApp();
   const [loading,setLoading]=useState(true);
@@ -1789,6 +1063,7 @@ function CertificatesPage(){
     </div>
   </>;
 }
+
 function CouponsPage(){
   const app=useApp();
   const [loading,setLoading]=useState(true);
@@ -1817,10 +1092,10 @@ function CouponsPage(){
   const del = async id => {
     const r = await Swal.fire({title:'حذف الكوبون؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
     if(!r.isConfirmed) return;
-    try{const sb = await DB.getClient();await sb.from('coupons').delete().eq('id',id);setCoupons(x=>x.filter(c=>c.id!==id));app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}
+    try{const sb=await DB.getClient();await sb.from('coupons').delete().eq('id',id);setCoupons(x=>x.filter(c=>c.id!==id));app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}
   };
   const toggleActive = async (c) => {
-    try{const sb = await DB.getClient();await sb.from('coupons').update({active:!c.active}).eq('id',c.id);setCoupons(x=>x.map(x=>x.id===c.id?{...x,active:!c.active}:x));app.toast.ok(c.active?'تم التعطيل':'تم التفعيل');}catch(e){app.toast.err(e.message);}
+    try{const sb=await DB.getClient();await sb.from('coupons').update({active:!c.active}).eq('id',c.id);setCoupons(x=>x.map(x=>x.id===c.id?{...x,active:!c.active}:x));app.toast.ok(c.active?'تم التعطيل':'تم التفعيل');}catch(e){app.toast.err(e.message);}
   };
   const copyCode = (code) => { try{navigator.clipboard.writeText(code);app.toast.ok('تم نسخ الكود');}catch(e){app.toast.err('فشل النسخ');} };
   return <>
@@ -1863,6 +1138,7 @@ function CouponsPage(){
     </Modal>}
   </>;
 }
+
 function ReferralsPage(){
   const app=useApp();
   const [loading,setLoading]=useState(true);
@@ -1926,6 +1202,7 @@ function ReferralsPage(){
     </div>
   </>;
 }
+
 function PollsPage(){
   const app=useApp();
   const [loading,setLoading]=useState(true);
@@ -2042,6 +1319,1405 @@ function PollsPage(){
     )}
   </>;
 }
+function GradesPage(){
+  return <Crud title="🏫 إدارة الصفوف" collection="grades" defaultItem={()=>({name:'',sort_order:''})} fields={[
+    {key:'name',label:'اسم الصف'},
+    {key:'sort_order',label:'الترتيب',type:'number'}
+  ]} columns={[
+    {key:'name',label:'الاسم'},
+    {key:'sort_order',label:'الترتيب'}
+  ]}/>;
+}
+
+function SubjectsPage(){
+  return <Crud title="📚 إدارة المواد" collection="subjects" defaultItem={()=>({name:'',icon:'📚',desc:'',sort_order:''})} fields={[
+    {key:'name',label:'اسم المادة'},
+    {key:'icon',label:'الأيقونة (إيموجي)'},
+    {key:'desc',label:'الوصف',type:'textarea',full:true},
+    {key:'sort_order',label:'الترتيب',type:'number'}
+  ]} columns={[
+    {render:s=><span style={{fontSize:20}}>{s.icon}</span>,label:''},
+    {key:'name',label:'الاسم'},
+    {key:'desc',label:'الوصف'},
+    {key:'sort_order',label:'الترتيب'}
+  ]}/>;
+}
+
+function UnitsPage(){
+  const app=useApp();
+  return <Crud title="📁 إدارة الوحدات" collection="units" defaultItem={()=>({name:'',desc:'',subject_id:'',sort_order:''})} fields={[
+    {key:'name',label:'اسم الوحدة'},
+    {key:'subject_id',label:'المادة',type:'select',options:app.db.subjects.map(s=>({value:s.id,label:`${s.icon} ${s.name}`}))},
+    {key:'desc',label:'الوصف',type:'textarea',full:true},
+    {key:'sort_order',label:'الترتيب',type:'number'}
+  ]} columns={[
+    {key:'name',label:'الاسم'},
+    {render:u=>app.subject(u.subject_id)?.name||'—',label:'المادة'},
+    {key:'sort_order',label:'الترتيب'}
+  ]}/>;
+}
+
+function LessonsPage(){
+  const app=useApp();
+  const [editing,setEditing]=useState(null);
+  const [form,setForm]=useState({});
+  const [busy,setBusy]=useState(false);
+  const [filterUnit,setFilterUnit]=useState('all');
+  const [filterAccess,setFilterAccess]=useState('all');
+  const [lessonTestText,setLessonTestText]=useState('');
+  const [lessonTestTitle,setLessonTestTitle]=useState('');
+  const [lessonTestDuration,setLessonTestDuration]=useState(15);
+  const [lessonTestPassScore,setLessonTestPassScore]=useState(50);
+  const [lessonTestXp,setLessonTestXp]=useState(10);
+  const [lessonTestFree,setLessonTestFree]=useState(true);
+  const [lessonTestBusy,setLessonTestBusy]=useState(false);
+  const [jsonImporting,setJsonImporting]=useState(false);
+  const jsonFileRef=useRef(null);
+  const [previewQs,setPreviewQs]=useState(null);
+  const [editQ,setEditQ]=useState(null);
+  const [editQBusy,setEditQBusy]=useState(false);
+
+  const openNew=()=>{setForm({title:'',desc:'',summary:'',video:{type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true},pdf_url:'',duration:'',xp:'',sort_order:'',unit_id:'',published:true,key_points:[],examples:[],notes:''});setLessonTestText('');setLessonTestTitle('');setLessonTestDuration(15);setLessonTestPassScore(50);setLessonTestXp(10);setLessonTestFree(true);setEditing('new');};
+  const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(!c.video)c.video={type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true};if(c.video.is_free===undefined)c.video.is_free=true;if(!c.key_points)c.key_points=[];if(!c.pdf_url)c.pdf_url='';setForm(c);setLessonTestText('');setLessonTestTitle(`اختبار ${c.title||'الدرس'}`);setLessonTestDuration(15);setLessonTestPassScore(50);setLessonTestXp(10);setLessonTestFree(true);setEditing(it.id);};
+
+  const parseLessonTestQuestion=(raw)=>{
+    const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+    const optionRegex=/^(?:(?:🔹|🔸|▪️|•)\s*)?(?:(?:🅰️|🅱️|🅲|🅳|[A-Da-dأبجد](?:[)\.\-:：]\s*|\s+))|(?:[🔵🟢🟡🔴🟣🟠⚫⚪]\s*))/u;
+    const answerLine=lines.find(x=>/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]/u.test(x));
+    const explanationLine=lines.find(x=>/(?:💡\s*)?(?:التعليل|الشرح|السبب)\s*[:：]/u.test(x));
+    const optionLines=lines.filter(x=>optionRegex.test(x)&&!/(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)/u.test(x));
+    if(optionLines.length<4||!answerLine)return null;
+    const cleanOption=x=>x.replace(optionRegex,'').replace(/[.。؛;]+$/u,'').trim();
+    const options=optionLines.slice(0,4).map(cleanOption);
+    const answerText=answerLine.replace(/^.*?(?:الإجابة\s*الصحيحة|الاجابة\s*الصحيحة)\s*[:：]\s*/u,'').trim();
+    const answerEmoji=(answerText.match(/^[🔵🟢🟡🔴🟣🟠⚫⚪🅰️🅱️🆎🅾️✅☑️🔹🔸]/u)||[])[0]||'';
+    const answerClean=cleanOption(answerText);
+    let correct=options.findIndex(o=>o&&(answerClean.includes(o)||o.includes(answerClean)));
+    if(correct<0&&answerEmoji){const target=optionLines.findIndex(x=>x.startsWith(answerEmoji));if(target>=0)correct=target;}
+    if(correct<0)return null;
+    const optionStart=lines.findIndex(x=>optionRegex.test(x));
+    const questionText=lines.slice(0,optionStart).map((x,i)=>i===0?x.replace(/^\s*(?:🧪\s*)?السؤال\s*(?:الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر|\d+)\s*(?:[:：|｜\-–—]\s*)?/u,'').trim():x).filter(Boolean).join('\n').trim();
+    if(!questionText)return null;
+    const explanation=explanationLine?explanationLine.replace(/^.*?(?:التعليل|الشرح|السبب)\s*[:：]\s*/u,'').trim():'';
+    return {text:questionText,options,correct,explanation};
+  };
+
+  const parseBlock=()=>{
+    const raw=(lessonTestText||'').trim();
+    if(!raw)return [];
+    const heading=/^(?=.*السؤال)(?=.*(?:🧪|[|｜:—–-]|\d)).*$/gmu;
+    const starts=[...raw.matchAll(heading)].map(m=>m.index);
+    const blocks=starts.length>1?starts.map((start,i)=>raw.slice(start,starts[i+1]??raw.length).trim()).filter(Boolean):[raw];
+    return blocks.map(parseLessonTestQuestion).filter(Boolean);
+  };
+
+  const importQuestionsJSON=async(file)=>{
+    if(!file)return;
+    if(!/\.json$/i.test(file.name)){app.toast.warn('ارفع ملف JSON بامتداد .json');return;}
+    if(editing==='new'||!form.id){app.toast.warn('احفظ الدرس أولًا، ثم افتحه للتعديل وارفع ملف JSON لإنشاء الاختبار تلقائيًا');if(jsonFileRef.current)jsonFileRef.current.value='';return;}
+    setJsonImporting(true);
+    setLessonTestBusy(true);
+    try{
+      const raw=(await file.text()).replace(/^\uFEFF/u,'');
+      const parsed=JSON.parse(raw);
+      const data=Array.isArray(parsed)?parsed:(Array.isArray(parsed.questions)?parsed.questions:(Array.isArray(parsed.data)?parsed.data:null));
+      if(!data)throw new Error('صيغة JSON غير صحيحة. استخدم مصفوفة أسئلة أو كائنًا يحتوي على questions أو data.');
+      const getText=v=>{if(v===null||v===undefined)return '';if(typeof v==='object')return String(v.text??v.label??v.value??'').trim();return String(v).trim();};
+      const norm=v=>String(v??'').trim().toLowerCase().replace(/[\s_\-ـ]/gu,'');
+      const normalized=[];
+      let skipped=0;
+      data.forEach(item=>{
+        if(!item||typeof item!=='object'){skipped++;return;}
+        const question=getText(item.question??item.Question??item.text??item.title??item.prompt);
+        const rawOptions=item.options??item.choices??item.answers??item.alternatives;
+        let options=[];
+        if(Array.isArray(rawOptions)) options=rawOptions.map(getText);
+        else if(rawOptions&&typeof rawOptions==='object') options=['A','B','C','D'].map(k=>getText(rawOptions[k]??rawOptions[k.toLowerCase()]));
+        else options=[item.optionA??item.option1??item.a,item.optionB??item.option2??item.b,item.optionC??item.option3??item.c,item.optionD??item.option4??item.d].map(getText);
+        if(!question||options.length<4||options.slice(0,4).some(o=>!o)){skipped++;return;}
+        options=options.slice(0,4);
+        const answer=item.correct??item.correctAnswer??item.correct_answer??item.answer??item.answerKey??item.correctOption;
+        const answerIndexRaw=item.correctIndex??item.correct_index;
+        let correctIndex=-1;
+        if(answerIndexRaw!==undefined&&answerIndexRaw!==null&&String(answerIndexRaw).trim()!==''){
+          const n=Number(answerIndexRaw);
+          if(Number.isInteger(n)&&n>=0&&n<4)correctIndex=n;
+        }
+        if(correctIndex<0&&answer!==undefined&&answer!==null){
+          const answerText=getText(answer);
+          correctIndex=options.findIndex(o=>norm(o)===norm(answerText));
+          if(correctIndex<0){
+            const m=answerText.match(/^(?:option|choice|الخيار|الاختيار)?\s*([1-4]|[a-d]|[أبجد])$/iu);
+            if(m){const token=m[1].toLowerCase();correctIndex=/^[1-4]$/u.test(token)?Number(token)-1:(['a','b','c','d'].indexOf(token)>=0?['a','b','c','d'].indexOf(token):['أ','ب','ج','د'].indexOf(token));}
+          }
+        }
+        if(correctIndex<0||correctIndex>3){skipped++;return;}
+        normalized.push({text:question,options,correct:correctIndex,explanation:getText(item.explanation??item.reason??item.rationale??item.feedback)||'لا يوجد تعليل'});
+      });
+      if(!normalized.length)throw new Error('لم أجد أسئلة صالحة. تأكد أن كل سؤال يحتوي على question و4 اختيارات داخل options وcorrect.');
+      const lesson=app.lesson(form.id)||form;
+      const unit=app.unit(lesson.unit_id);
+      const subjectId=unit?.subject_id||'';
+      if(!subjectId)throw new Error('لازم يكون الدرس مرتبطًا بوحدة ومادة قبل إنشاء الاختبار');
+      const fileTitle=(parsed&&!Array.isArray(parsed)&&typeof parsed.title==='string')?parsed.title.trim():'';
+      const examTitle=(fileTitle||lessonTestTitle||`اختبار ${lesson.title||'الدرس'}`).trim();
+      const questionIds=[];
+      for(const q of normalized){
+        const id=DB.uid('q_');
+        await app.save('questions',{id,text:q.text,options:q.options,correct:[q.correct],explanation:q.explanation,lesson_id:lesson.id,unit_id:lesson.unit_id,subject_id:subjectId,difficulty:'medium',xp:Number(lessonTestXp)||0,type:'mcq'});
+        questionIds.push(id);
+      }
+      const exam={id:DB.uid('exam_'),title:examTitle,subject_id:subjectId,unit_id:lesson.unit_id,lesson_ids:[lesson.id],question_ids:questionIds,duration:Number(lessonTestDuration)||15,pass_score:Number(lessonTestPassScore)||0,max_attempts:0,xp:Number(lessonTestXp)||0,published:true,sort_order:0,is_free:lessonTestFree};
+      await app.save('exams',exam);
+      setLessonTestTitle(examTitle);
+      setLessonTestText('');
+      setPreviewQs(null);
+      app.toast.ok(`تم إنشاء الاختبار تلقائيًا وربطه بالدرس، بعدد ${questionIds.length} سؤال${skipped?`، وتم تجاهل ${skipped} سؤال غير صالح`:''}`);
+    }catch(e){app.toast.err(e instanceof SyntaxError?'ملف JSON غير صالح. تأكد من علامات الاقتباس والفواصل وصحة التنسيق.':(e.message||'تعذر قراءة الملف أو إنشاء الاختبار'));}
+    finally{setJsonImporting(false);setLessonTestBusy(false);if(jsonFileRef.current)jsonFileRef.current.value='';}
+  };
+
+  const previewTest=()=>{const parsed=parseBlock();if(!parsed.length)return app.toast.warn('لا توجد أسئلة صالحة للمعاينة');setPreviewQs(parsed);};
+
+  const createTestForLesson=async()=>{
+    if(editing==='new'||!form.id)return app.toast.warn('احفظ الدرس أولًا، ثم افتحه للتعديل لإضافة الاختبار');
+    if(!lessonTestTitle.trim())return app.toast.warn('اكتب اسم الاختبار');
+    const parsed=parseBlock();
+    if(!parsed.length)return app.toast.warn('لم أتعرف على الأسئلة. تأكد أن كل سؤال يحتوي 4 اختيارات والإجابة الصحيحة والتعليل.');
+    const lesson=app.lesson(form.id)||form;const unit=app.unit(lesson.unit_id);const subjectId=unit?.subject_id||'';
+    if(!subjectId)return app.toast.warn('لازم يكون الدرس مرتبطًا بوحدة ومادة قبل إنشاء الاختبار');
+    setLessonTestBusy(true);
+    try{
+      const questionIds=[];
+      for(const q of parsed){
+        const id=DB.uid('q_');
+        await app.save('questions',{id,text:q.text,options:q.options,correct:[q.correct],explanation:q.explanation,lesson_id:lesson.id,unit_id:lesson.unit_id,subject_id:subjectId,difficulty:'medium',xp:Number(lessonTestXp)||0,type:'mcq'});
+        questionIds.push(id);
+      }
+      const exam={id:DB.uid('exam_'),title:lessonTestTitle.trim(),subject_id:subjectId,unit_id:lesson.unit_id,lesson_ids:[lesson.id],question_ids:questionIds,duration:Number(lessonTestDuration)||15,pass_score:Number(lessonTestPassScore)||0,max_attempts:0,xp:Number(lessonTestXp)||0,published:true,sort_order:0,is_free:lessonTestFree};
+      await app.save('exams',exam);
+      app.toast.ok(`تم إنشاء الاختبار وربطه بالدرس، بعدد ${questionIds.length} سؤال`);
+      setLessonTestText('');
+      setPreviewQs(null);
+    }catch(e){app.toast.err('تعذر إنشاء الاختبار: '+(e.message||'حدث خطأ'));}
+    setLessonTestBusy(false);
+  };
+
+  const getLessonQuestions=(lessonId)=>app.db.questions.filter(q=>q.lesson_id===lessonId);
+  const getLessonExams=(lessonId)=>app.db.exams.filter(e=>(e.lesson_ids||[]).includes(lessonId));
+
+  const saveEditedQuestion=async()=>{
+    if(!editQ) return;
+    if(!editQ.text||!editQ.text.trim()) return app.toast.warn('نص السؤال مطلوب');
+    if(!editQ.options||editQ.options.filter(o=>o&&o.trim()).length < 2) return app.toast.warn('لازم خيارين على الأقل');
+    setEditQBusy(true);
+    try{
+      await app.save('questions',{
+        id: editQ.id,
+        text: editQ.text.trim(),
+        options: (editQ.options||[]).map(o=>(o||'').trim()),
+        correct: [editQ.correct],
+        explanation: (editQ.explanation||'').trim(),
+        lesson_id: editQ.lesson_id,
+        unit_id: editQ.unit_id,
+        subject_id: editQ.subject_id,
+        difficulty: editQ.difficulty||'medium',
+        xp: Number(editQ.xp)||0,
+        type: 'mcq'
+      });
+      app.toast.ok('تم حفظ تعديل السؤال');
+      setEditQ(null);
+    }catch(e){app.toast.err(e.message||'فشل الحفظ');}
+    setEditQBusy(false);
+  };
+
+  const deleteLessonQuestion=async(qId)=>{
+    const r=await Swal.fire({title:'حذف السؤال؟',text:'هيتشال من الدرس نهائيًا',icon:'warning',showCancelButton:true,confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+    if(!r.isConfirmed)return;
+    try{const result = await DB.deleteQuestion(qId);await app.reload();app.toast.warn(`تم حذف السؤال${result.examsUpdated ? ` وتحديث ${result.examsUpdated} امتحان` : ''}`);}catch(e){app.toast.err(e.message);}
+  };
+
+  const deleteLessonExam = async (examId) => {
+    const exam = (app.db.exams || []).find(e => e.id === examId);
+    if (!exam) return app.toast.err('الاختبار مش موجود');
+    const qCount = (exam.question_ids || []).length;
+    const r = await Swal.fire({
+      title: 'حذف الاختبار كامل؟',
+      html: qCount > 0 ? `هيتم حذف الاختبار و <b style="color:#fca5a5">${qCount} سؤال</b> مرتبط بيه نهائيًا من بنك الأسئلة` : 'هيتم حذف الاختبار نهائيًا',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'نعم، احذف الكل',
+      cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      background: 'linear-gradient(180deg, #1c160c, #0f0c07)',
+      color: '#f7f0dd',
+      customClass: { popup: 'swal-custom-popup', title: 'swal-custom-title' }
+    });
+    if (!r.isConfirmed) return;
+    try {
+      const qIds = exam.question_ids || [];
+      if (qIds.length > 0) await DB.removeMany('questions', qIds);
+      await DB.remove('exams', examId);
+      await app.reload();
+      app.toast.ok(`تم حذف الاختبار${qIds.length ? ` و ${qIds.length} سؤال` : ''}`);
+    } catch (e) { app.toast.err(e.message || 'فشل الحذف'); }
+  };
+
+  const save=async ()=>{
+    if(!form.title) return app.toast.warn('العنوان مطلوب');
+    if(!form.unit_id) return app.toast.warn('اختر الوحدة');
+    setBusy(true);
+    try{
+      const saved=await app.save('lessons',form);
+      if(editing==='new'){
+        const lesson=saved||form;
+        setForm(lesson);
+        setEditing(lesson.id);
+        setLessonTestTitle(`اختبار ${lesson.title||'الدرس'}`);
+        app.toast.ok('تم حفظ الدرس. انزل لأسفل وستجد قسم إضافة أسئلة الاختبار.');
+      }else{app.toast.ok('تم الحفظ');setEditing(null);}
+    }catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
+
+  const del=async id=>{
+    const r=await Swal.fire({title:'حذف الدرس؟',text:'لا يمكن التراجع',icon:'warning',showCancelButton:true,confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+    if(!r.isConfirmed) return;
+    try{await app.remove('lessons',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}
+  };
+
+  const sortedLessons = useMemo(()=>{return [...app.db.lessons].sort((a,b)=>{const ta = new Date(a.created_at || a.createdAt || 0).getTime() || 0;const tb = new Date(b.created_at || b.createdAt || 0).getTime() || 0;if(ta !== tb) return ta - tb;const sa = Number(a.sort_order) || 0;const sb = Number(b.sort_order) || 0;return sa - sb;});},[app.db.lessons]);
+  const filteredLessons = useMemo(()=>{let list = sortedLessons;if(filterUnit !== 'all') list = list.filter(l=>l.unit_id === filterUnit);if(filterAccess !== 'all'){list = list.filter(l=>{const isFree = !l.video || !l.video.url || l.video.is_free !== false;return filterAccess === 'free' ? isFree : !isFree;});}return list;},[sortedLessons, filterUnit, filterAccess]);
+  const freeCount = sortedLessons.filter(l=>!l.video || !l.video.url || l.video.is_free !== false).length;
+  const paidCount = sortedLessons.length - freeCount;
+  const currentLessonQuestions = editing && editing!=='new' ? getLessonQuestions(editing) : [];
+  const currentLessonExams = editing && editing!=='new' ? getLessonExams(editing) : [];
+
+  return <>
+    <div className="flex between center mb16 wrap g8">
+      <div className="h2 grad">📖 إدارة الدروس</div>
+      <div className="flex g8">
+        <span className="pill pill-free">🆓 {freeCount} مجاني</span>
+        <span className="pill pill-paid">🔒 {paidCount} مدفوع</span>
+        <button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> درس جديد</button>
+      </div>
+    </div>
+    <div className="glass mb16" style={{padding:14}}>
+      <div className="flex wrap g12">
+        <div style={{flex:'1 1 240px'}}>
+          <label className="lbl">تصفية حسب الوحدة</label>
+          <select className="input" value={filterUnit} onChange={e=>setFilterUnit(e.target.value)}>
+            <option value="all">كل الوحدات ({sortedLessons.length})</option>
+            {app.db.units.map(u=><option key={u.id} value={u.id}>{app.subject(u.subject_id)?.name} — {u.name}</option>)}
+          </select>
+        </div>
+        <div style={{flex:'1 1 240px'}}>
+          <label className="lbl">تصفية حسب الوصول</label>
+          <select className="input" value={filterAccess} onChange={e=>setFilterAccess(e.target.value)}>
+            <option value="all">الكل</option>
+            <option value="free">🆓 مجاني فقط</option>
+            <option value="paid">🔒 مدفوع فقط</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div className="glass" style={{padding:14}}>
+      {filteredLessons.length===0?<Empty title="لا توجد دروس"/>:<div className="sx"><table className="tbl">
+        <thead><tr><th>الدرس</th><th>الوحدة</th><th>الفيديو</th><th>الوصول</th><th>اختبار</th><th>XP</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+        <tbody>{filteredLessons.map(l=>{const isFree = !l.video || !l.video.url || l.video.is_free !== false;const badge = !l.video || !l.video.url ? <span className="pill pill-y">لا فيديو</span> : (()=>{const map={youtube:'📺 YouTube',vimeo:'🎬 Vimeo',mp4:'🎥 MP4',external:'🔗 خارجي'};return <span className="pill pill-b">{map[l.video.type]||l.video.type}</span>;})();const examCount=getLessonExams(l.id).length;return <tr key={l.id}><td><b>{l.title}</b></td><td className="sm">{app.unit(l.unit_id)?.name||'—'}</td><td>{badge}</td><td><AccessBadge value={isFree}/></td><td>{examCount>0?<span className="pill pill-g">✓ {examCount}</span>:<span className="xs muted">—</span>}</td><td>{l.xp}</td><td>{l.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(l)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(l.id)}><Icon name="trash" size={13}/></button></div></td></tr>;})}</tbody>
+      </table></div>}
+    </div>
+    {editing!==null&&<Modal title={editing==='new'?'درس جديد':'تعديل الدرس'} onClose={()=>setEditing(null)} wide>
+      <div className="section-title" style={{marginTop:0}}><span className="ico">📝</span> المعلومات الأساسية</div>
+      <div className="grid g2">
+        <Field label="عنوان الدرس"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
+        <Field label="الوحدة"><select className="input" value={form.unit_id||''} onChange={e=>setForm({...form,unit_id:e.target.value})}><option value="">— اختر —</option>{app.db.units.map(u=><option key={u.id} value={u.id}>{app.subject(u.subject_id)?.name} — {u.name}</option>)}</select></Field>
+        <Field label="المدة (دقيقة)"><input type="number" className="input" value={form.duration ?? ''} onChange={e=>setForm({...form,duration: e.target.value === '' ? '' : +e.target.value})}/></Field>
+        <Field label="XP"><input type="number" className="input" value={form.xp ?? ''} onChange={e=>setForm({...form,xp: e.target.value === '' ? '' : +e.target.value})}/></Field>
+        <Field label="الترتيب"><input type="number" className="input" value={form.sort_order ?? ''} onChange={e=>setForm({...form,sort_order: e.target.value === '' ? '' : +e.target.value})}/></Field>
+        <Field label="الحالة"><select className="input" value={form.published!==false?'1':'0'} onChange={e=>setForm({...form,published:e.target.value==='1'})}><option value="1">منشور</option><option value="0">مخفي</option></select></Field>
+        <Field label="وصف الدرس" full><textarea className="input" value={form.desc||''} onChange={e=>setForm({...form,desc:e.target.value})}/></Field>
+      </div>
+      <div className="section-title"><span className="ico">🎬</span> الفيديو</div>
+      <div className="mb12"><VideoEditor value={form.video} onChange={v=>setForm({...form,video:v})}/></div>
+      <div className="section-title"><span className="ico">📄</span> ملف الشرح (اختياري)</div>
+      <Field label="رابط PDF" hint="اتركه فارغًا لو مفيش ملف PDF"><input className="input" value={form.pdf_url||''} onChange={e=>setForm({...form,pdf_url:e.target.value})} placeholder="https://example.com/lesson1.pdf"/></Field>
+      <div className="section-title"><span className="ico">📚</span> محتوى الدرس</div>
+      <Field label="ملخص الدرس" full><textarea className="input" value={form.summary||''} onChange={e=>setForm({...form,summary:e.target.value})}/></Field>
+      <Field label="النقاط المهمة" full hint="سطر لكل نقطة"><textarea className="input" value={(form.key_points||[]).join('\n')} onChange={e=>setForm({...form,key_points:e.target.value.split('\n').filter(Boolean)})}/></Field>
+      <Field label="ملاحظات" full><textarea className="input" value={form.notes||''} onChange={e=>setForm({...form,notes:e.target.value})}/></Field>
+      <div className="section-title"><span className="ico">📝</span> اختبار الدرس — يظهر بعد الدرس مباشرة</div>
+      {editing==='new'?<div className="glass-s" style={{padding:12,marginBottom:12}}><div className="sm">احفظ الدرس أولًا، وسيظهر قسم إضافة أسئلة الاختبار هنا مباشرة دون إغلاق النافذة.</div></div>:<>
+        {currentLessonExams.length>0 && (<div className="glass-s" style={{padding:14,marginBottom:12,borderColor:'rgba(34,197,94,.4)'}}>
+          <div className="flex between center mb12"><div className="sm" style={{fontWeight:800,color:'#6ee7a0'}}>✅ اختبارات مرتبطة بهذا الدرس ({currentLessonExams.length})</div></div>
+          {currentLessonExams.map(e=>(<div key={e.id} className="flex between center mb6" style={{padding:'8px 12px',background:'rgba(34,197,94,.06)',borderRadius:10,border:'1px solid rgba(34,197,94,.20)'}}>
+            <div style={{flex:1,minWidth:0}}><div className="sm" style={{fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>📋 {e.title}</div><div className="xs muted">⏱ {e.duration}د • 🎯 {e.pass_score}% • ❓ {(e.question_ids||[]).length} سؤال</div></div>
+            <button className="btn btn-dn btn-sm" onClick={()=>deleteLessonExam(e.id)} style={{flexShrink:0}}><Icon name="trash" size={12}/> حذف كامل</button>
+          </div>))}
+        </div>)}
+        {currentLessonQuestions.length>0 && (<div className="glass-s" style={{padding:14,marginBottom:12,maxHeight:340,overflowY:'auto'}}>
+          <div className="flex between center mb12"><div className="sm" style={{fontWeight:800,color:'#FFD700'}}>❓ الأسئلة الحالية ({currentLessonQuestions.length})</div></div>
+          {currentLessonQuestions.map((q,idx)=>(<div key={q.id} style={{padding:'10px 12px',background:'rgba(212,175,55,.05)',borderRadius:10,border:'1px solid var(--border)',marginBottom:6}}>
+            <div className="flex between center mb6" style={{gap:8}}>
+              <span className="pill pill-b" style={{fontSize:10,flexShrink:0}}>س {idx+1}</span>
+              <div className="sm" style={{flex:1,fontWeight:600,lineHeight:1.5}}>{q.text.length>100?q.text.slice(0,100)+'...':q.text}</div>
+              <div className="flex g6" style={{flexShrink:0}}>
+                <button className="btn btn-s btn-sm" onClick={()=>setEditQ(JSON.parse(JSON.stringify(q)))} title="تعديل السؤال"><Icon name="edit" size={11}/></button>
+                <button className="btn btn-dn btn-sm" onClick={()=>deleteLessonQuestion(q.id)} title="حذف السؤال"><Icon name="trash" size={11}/></button>
+              </div>
+            </div>
+            <div className="xs muted" style={{paddingInlineStart:34}}>✅ الإجابة: {(q.options||[])[q.correct?.[0]||0]}</div>
+          </div>))}
+        </div>)}
+        <div className="grid g2">
+          <Field label="اسم الاختبار"><input className="input" value={lessonTestTitle} onChange={e=>setLessonTestTitle(e.target.value)} placeholder={`اختبار ${form.title||'الدرس'}`}/></Field>
+          <Field label="المدة بالدقائق"><input type="number" className="input" min="1" value={lessonTestDuration} onChange={e=>setLessonTestDuration(e.target.value===''?'':+e.target.value)}/></Field>
+          <Field label="درجة النجاح %"><input type="number" className="input" min="0" max="100" value={lessonTestPassScore} onChange={e=>setLessonTestPassScore(e.target.value===''?'':+e.target.value)}/></Field>
+          <Field label="XP لكل سؤال"><input type="number" className="input" min="0" value={lessonTestXp} onChange={e=>setLessonTestXp(e.target.value===''?'':+e.target.value)}/></Field>
+        </div>
+        <Field label="نوع الاختبار"><AccessToggle value={lessonTestFree} onChange={setLessonTestFree}/></Field>
+        <div className="glass-s mb12" style={{padding:14}}>
+          <div className="flex between center wrap g8 mb8">
+            <div style={{fontWeight:800,color:'#FFD700'}}>🧩 رفع ملف JSON — إنشاء الاختبار تلقائيًا</div>
+            <label className="btn btn-s btn-sm" style={{cursor:'pointer',margin:0}}>
+              {jsonImporting?'جارٍ قراءة الملف...':'📤 رفع JSON وإنشاء الاختبار'}
+              <input ref={jsonFileRef} type="file" accept=".json,application/json" style={{display:'none'}} disabled={jsonImporting} onChange={e=>importQuestionsJSON(e.target.files?.[0])}/>
+            </label>
+          </div>
+          <div className="xs muted" style={{lineHeight:1.8}}>ارفع ملف .json بترميز UTF-8 للحفاظ على العربي والرموز. يدعم مصفوفة أسئلة مباشرة أو كائنًا يحتوي على questions، والاختيارات سواء كائن A/B/C/D أو مصفوفة.</div>
+        </div>
+        <Field label="إضافة أسئلة الاختبار — الصق المجموعة كاملة" hint="كل سؤال يحتوي على اختيارات، وسطر الإجابة الصحيحة، والتعليل."><textarea className="input" rows="10" value={lessonTestText} onChange={e=>setLessonTestText(e.target.value)} placeholder="الصق كل الأسئلة هنا مرة واحدة أو ارفع ملف JSON بالأعلى..."/></Field>
+        <div className="flex g8 mb12" style={{flexWrap:'wrap'}}>
+          <button type="button" className="btn btn-s" onClick={previewTest} disabled={!lessonTestText.trim()} style={{flex:'1 1 auto'}}>👁️ معاينة الأسئلة</button>
+          <button type="button" className="btn btn-p" onClick={createTestForLesson} disabled={lessonTestBusy} style={{flex:'2 1 auto'}}>{lessonTestBusy?'جارٍ إنشاء الاختبار...':'⚡ إضافة الأسئلة وإنشاء الاختبار'}</button>
+          <button type="button" className="btn btn-s" onClick={()=>setLessonTestText('')}>مسح النص</button>
+        </div>
+      </>}
+      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ الدرس'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
+    </Modal>}
+    {editQ && (
+      <Modal title="✏️ تعديل السؤال" onClose={()=>setEditQ(null)} wide>
+        <div className="glass-s mb12" style={{padding:12}}><div className="sm" style={{color:'#FFD700',fontWeight:800}}>عدّل السؤال أو الخيارات أو الإجابة، ثم اضغط حفظ</div></div>
+        <Field label="نص السؤال"><textarea className="input" rows="3" value={editQ.text||''} onChange={e=>setEditQ({...editQ,text:e.target.value})}/></Field>
+        <Field label="الخيارات — اضغط على الحرف لتحديد الإجابة الصحيحة">
+          {(()=>{const correctIdx = Array.isArray(editQ.correct) ? editQ.correct[0] : (editQ.correct ?? 0);return (editQ.options||['','','','']).map((op,oi)=>(
+            <div key={oi} className="flex g8 mb6 center">
+              <button type="button" className={`btn btn-sm ${correctIdx===oi?'btn-ok':'btn-s'}`} onClick={()=>setEditQ({...editQ,correct:[oi]})} style={{minWidth:44}}>{['أ','ب','ج','د'][oi]}</button>
+              <input className="input" value={op} onChange={e=>{const opts=[...(editQ.options||['','','',''])];opts[oi]=e.target.value;setEditQ({...editQ,options:opts});}} placeholder={`الخيار ${['أ','ب','ج','د'][oi]}`}/>
+            </div>
+          ));})()}
+        </Field>
+        <Field label="شرح الإجابة (اختياري)"><textarea className="input" rows="2" value={editQ.explanation||''} onChange={e=>setEditQ({...editQ,explanation:e.target.value})} placeholder="اشرح سبب الإجابة الصحيحة..."/></Field>
+        <div className="grid g2">
+          <Field label="الصعوبة"><select className="input" value={editQ.difficulty||'medium'} onChange={e=>setEditQ({...editQ,difficulty:e.target.value})}><option value="easy">سهل</option><option value="medium">متوسط</option><option value="hard">صعب</option></select></Field>
+          <Field label="XP"><input type="number" className="input" value={editQ.xp ?? ''} onChange={e=>setEditQ({...editQ,xp: e.target.value==='' ? '' : +e.target.value})}/></Field>
+        </div>
+        <div className="flex g8 mt16">
+          <button className="btn btn-p" onClick={saveEditedQuestion} disabled={editQBusy} style={{flex:1}}>{editQBusy?'جارٍ الحفظ...':'💾 حفظ التعديلات'}</button>
+          <button className="btn btn-s" onClick={()=>setEditQ(null)}>إلغاء</button>
+        </div>
+      </Modal>
+    )}
+    {previewQs && (<Modal title={`👁️ معاينة الأسئلة (${previewQs.length})`} onClose={()=>setPreviewQs(null)} wide>
+      <div className="glass-s mb12" style={{padding:12}}>
+        <div className="sm" style={{color:'#FFD700',fontWeight:800}}>راجع الأسئلة دي قبل ما تحفظها للاختبار</div>
+        <div className="xs muted mt6">لو كل حاجة تمام، اقفل النافذة دي واضغط "⚡ إضافة الأسئلة وإنشاء الاختبار"</div>
+      </div>
+      <div style={{maxHeight:'60vh',overflowY:'auto',paddingInlineEnd:6}}>
+        {previewQs.map((q,idx)=>(
+          <div key={idx} className="glass-s mb12" style={{padding:14,borderColor:'rgba(255,215,0,.35)'}}>
+            <div className="flex between center mb10">
+              <span className="pill pill-b" style={{fontWeight:800}}>سؤال {idx+1}</span>
+              <span className="pill pill-v" style={{fontSize:10}}>+{lessonTestXp} XP</span>
+            </div>
+            <div className="sm mb10" style={{fontWeight:700,lineHeight:1.7,whiteSpace:'pre-wrap'}}>{q.text}</div>
+            <div className="flex col g6 mb10">
+              {q.options.map((opt,oi)=>{const isCorrect=q.correct===oi;return <div key={oi} className="flex center g8" style={{padding:'6px 10px',borderRadius:8,background:isCorrect?'rgba(34,197,94,.10)':'rgba(255,255,255,.03)',border:`1px solid ${isCorrect?'rgba(34,197,94,.4)':'var(--border)'}`}}>
+                <span style={{width:24,height:24,borderRadius:'50%',display:'grid',placeItems:'center',background:isCorrect?'#22c55e':'rgba(255,255,255,.06)',color:isCorrect?'#fff':'var(--txt2)',fontWeight:800,fontSize:11,flexShrink:0}}>{['أ','ب','ج','د'][oi]}</span>
+                <span className="sm" style={{flex:1,color:isCorrect?'#6ee7a0':'var(--txt)'}}>{opt||'—'}</span>
+                {isCorrect && <span className="pill pill-g" style={{fontSize:9}}>✓ صح</span>}
+              </div>;})}
+            </div>
+            {q.explanation && (<div className="xs muted" style={{padding:'8px 10px',background:'rgba(0,0,0,.20)',borderRadius:8,borderInlineStart:'2px solid var(--gold)',whiteSpace:'pre-wrap'}}>💡 {q.explanation}</div>)}
+          </div>
+        ))}
+      </div>
+      <div className="flex g8 mt16"><button className="btn btn-p btn-block" onClick={()=>setPreviewQs(null)}>تمام، رجعت للفورم</button></div>
+    </Modal>)}
+  </>;
+}
+
+function ExamsPage(){
+  const app=useApp();
+  const [editing,setEditing]=useState(null);
+  const [form,setForm]=useState({});
+  const [busy,setBusy]=useState(false);
+  const [filterAccess,setFilterAccess]=useState('all');
+  const openNew=()=>{setForm({title:'',subject_id:'',unit_id:'',lesson_ids:[],question_ids:[],duration:'',pass_score:'',max_attempts:'',xp:'',published:true,sort_order:'',is_free:true});setEditing('new');};
+  const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(c.is_free===undefined)c.is_free=true;setForm(c);setEditing(it.id);};
+  const save=async ()=>{
+    if(!form.title||!form.subject_id) return app.toast.warn('العنوان والمادة مطلوبان');
+    if(!form.question_ids||form.question_ids.length===0) return app.toast.warn('اختر سؤالاً على الأقل');
+    setBusy(true);
+    try{await app.save('exams',form);app.toast.ok('تم الحفظ');setEditing(null);}
+    catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
+  const del = async (id) => {
+    const exam = app.db.exams.find(e => e.id === id);
+    if (!exam) return app.toast.err('الاختبار مش موجود');
+    const qCount = (exam.question_ids || []).length;
+    const r = await Swal.fire({
+      title: 'تأكيد الحذف',
+      html: qCount > 0 ? `هيتم حذف الاختبار و <b style="color:#fca5a5">${qCount} سؤال</b> مرتبط بيه نهائيًا من بنك الأسئلة` : 'هيتم حذف الاختبار نهائيًا',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'نعم، احذف الكل',
+      cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      background: 'linear-gradient(180deg, #1c160c, #0f0c07)',
+      color: '#f7f0dd',
+      customClass: { popup: 'swal-custom-popup', title: 'swal-custom-title' }
+    });
+    if (!r.isConfirmed) return;
+    try {
+      const qIds = exam.question_ids || [];
+      if (qIds.length > 0) await DB.removeMany('questions', qIds);
+      await DB.remove('exams', id);
+      await app.reload();
+      app.toast.ok(`تم حذف الاختبار${qIds.length ? ` و ${qIds.length} سؤال` : ''}`);
+    } catch (e) { app.toast.err(e.message || 'فشل الحذف'); }
+  };
+  const availQ=form.unit_id?app.db.questions.filter(q=>q.unit_id===form.unit_id):app.db.questions;
+  const sortedExams = useMemo(()=>{return [...app.db.exams].sort((a,b)=>{const ta = new Date(a.created_at || a.createdAt || 0).getTime() || 0;const tb = new Date(b.created_at || b.createdAt || 0).getTime() || 0;return ta - tb;});},[app.db.exams]);
+  const filteredExams = useMemo(()=>{if(filterAccess === 'all') return sortedExams;return sortedExams.filter(e=>{const isFree = e.is_free !== false;return filterAccess === 'free' ? isFree : !isFree;});},[sortedExams, filterAccess]);
+  const freeCount = sortedExams.filter(e=>e.is_free !== false).length;
+  const paidCount = sortedExams.length - freeCount;
+  return <>
+    <div className="flex between center mb16 wrap g8">
+      <div className="h2 grad">📝 إدارة الاختبارات</div>
+      <div className="flex g8">
+        <span className="pill pill-free">🆓 {freeCount} مجاني</span>
+        <span className="pill pill-paid">🔒 {paidCount} مدفوع</span>
+        <button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> اختبار جديد</button>
+      </div>
+    </div>
+    <div className="glass mb16" style={{padding:14}}>
+      <div style={{flex:'1 1 240px',maxWidth:280}}>
+        <label className="lbl">تصفية حسب الوصول</label>
+        <select className="input" value={filterAccess} onChange={e=>setFilterAccess(e.target.value)}>
+          <option value="all">الكل ({sortedExams.length})</option>
+          <option value="free">🆓 مجاني فقط</option>
+          <option value="paid">🔒 مدفوع فقط</option>
+        </select>
+      </div>
+    </div>
+    <div className="glass" style={{padding:14}}>
+      {filteredExams.length===0?<Empty title="لا توجد اختبارات"/>:<div className="sx"><table className="tbl">
+        <thead><tr><th>العنوان</th><th>المادة</th><th>الأسئلة</th><th>الوصول</th><th>النجاح</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+        <tbody>{filteredExams.map(e=><tr key={e.id}><td><b>{e.title}</b></td><td className="sm">{app.subject(e.subject_id)?.name||'—'}</td><td>{(e.question_ids||[]).length}</td><td><AccessBadge value={e.is_free}/></td><td>{e.pass_score}%</td><td>{e.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(e)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(e.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody>
+      </table></div>}
+    </div>
+    {editing!==null&&<Modal title={editing==='new'?'اختبار جديد':'تعديل الاختبار'} onClose={()=>setEditing(null)} wide>
+      <div className="section-title" style={{marginTop:0}}><span className="ico">📋</span> المعلومات الأساسية</div>
+      <Field label="اسم الاختبار"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
+      <div className="grid g2">
+        <Field label="المادة"><select className="input" value={form.subject_id||''} onChange={e=>setForm({...form,subject_id:e.target.value,unit_id:''})}><option value="">— اختر —</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field>
+        <Field label="الوحدة"><select className="input" value={form.unit_id||''} onChange={e=>setForm({...form,unit_id:e.target.value,question_ids:[]})}><option value="">— اختر —</option>{app.db.units.filter(u=>!form.subject_id||u.subject_id===form.subject_id).map(u=><option key={u.id} value={u.id}>{u.name}</option>)}</select></Field>
+        <Field label="المدة (دقيقة)"><input type="number" className="input" value={form.duration ?? ''} onChange={e=>setForm({...form,duration: e.target.value === '' ? '' : +e.target.value})}/></Field>
+        <Field label="درجة النجاح %"><input type="number" className="input" value={form.pass_score ?? ''} onChange={e=>setForm({...form,pass_score: e.target.value === '' ? '' : +e.target.value})}/></Field>
+        <Field label="عدد المحاولات"><input type="number" className="input" value={form.max_attempts ?? ''} onChange={e=>setForm({...form,max_attempts: e.target.value === '' ? '' : +e.target.value})}/></Field>
+        <Field label="XP"><input type="number" className="input" value={form.xp ?? ''} onChange={e=>setForm({...form,xp: e.target.value === '' ? '' : +e.target.value})}/></Field>
+        <Field label="الترتيب"><input type="number" className="input" value={form.sort_order ?? ''} onChange={e=>setForm({...form,sort_order: e.target.value === '' ? '' : +e.target.value})}/></Field>
+        <Field label="الحالة"><select className="input" value={form.published!==false?'1':'0'} onChange={e=>setForm({...form,published:e.target.value==='1'})}><option value="1">منشور</option><option value="0">مخفي</option></select></Field>
+      </div>
+      <div className="section-title"><span className="ico">🔐</span> نوع الوصول</div>
+      <Field label="الاختبار المجاني متاح لجميع الطلاب • الاختبار المدفوع يتطلب اشتراك">
+        <AccessToggle value={form.is_free} onChange={(isFree)=>setForm({...form,is_free:isFree})}/>
+      </Field>
+      <div className="section-title"><span className="ico">❓</span> الأسئلة</div>
+      <Field label={`الأسئلة المختارة (${(form.question_ids||[]).length})`}>
+        <div className="glass-s" style={{padding:10,maxHeight:260,overflowY:'auto'}}>
+          {availQ.length===0?<div className="sm muted">لا توجد أسئلة</div>:availQ.map(q=>{const on=(form.question_ids||[]).includes(q.id);return <label key={q.id} className="flex center g8 mb6" style={{padding:6,cursor:'pointer'}}><input type="checkbox" checked={on} onChange={()=>setForm({...form,question_ids:on?(form.question_ids||[]).filter(x=>x!==q.id):[...(form.question_ids||[]),q.id]})}/><span className="sm" style={{flex:1}}>{q.text.slice(0,80)}</span></label>;})}
+        </div>
+      </Field>
+      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
+    </Modal>}
+  </>;
+}
+
+function MissionsPage(){
+  const app=useApp();
+  const [editing,setEditing]=useState(null);
+  const [form,setForm]=useState({});
+  const [busy,setBusy]=useState(false);
+  const openNew=()=>{setForm({title:'',desc:'',subject_id:'',required_lessons:[],required_exam_id:'',xp:'',sort_order:''});setEditing('new');};
+  const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
+  const save=async ()=>{
+    if(!form.title) return app.toast.warn('العنوان مطلوب');
+    if(!form.subject_id) return app.toast.warn('اختر المادة');
+    setBusy(true);
+    try{await app.save('missions',form);app.toast.ok('تم الحفظ');setEditing(null);}
+    catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
+  const del=async id=>{const r=await Swal.fire({title:'حذف المهمة؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed) return;try{await app.remove('missions',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
+  return <>
+    <div className="flex between center mb16"><div className="h2 grad">🎯 إدارة المهام</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> مهمة جديدة</button></div>
+    <div className="glass" style={{padding:14}}>
+      {app.db.missions.length===0?<Empty title="لا توجد مهام"/>:<div className="sx"><table className="tbl">
+        <thead><tr><th>العنوان</th><th>المادة</th><th>XP</th><th>إجراءات</th></tr></thead>
+        <tbody>{app.db.missions.map(m=><tr key={m.id}><td>{m.title}</td><td className="sm">{app.subject(m.subject_id)?.name||'—'}</td><td>{m.xp}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(m)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(m.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody>
+      </table></div>}
+    </div>
+    {editing!==null&&<Modal title={editing==='new'?'مهمة جديدة':'تعديل المهمة'} onClose={()=>setEditing(null)} wide>
+      <Field label="عنوان المهمة"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
+      <Field label="الوصف"><textarea className="input" value={form.desc||''} onChange={e=>setForm({...form,desc:e.target.value})}/></Field>
+      <div className="grid g2">
+        <Field label="المادة"><select className="input" value={form.subject_id||''} onChange={e=>setForm({...form,subject_id:e.target.value})}><option value="">— اختر —</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field>
+        <Field label="XP"><input type="number" className="input" value={form.xp ?? ''} onChange={e=>setForm({...form,xp: e.target.value === '' ? '' : +e.target.value})}/></Field>
+        <Field label="الترتيب"><input type="number" className="input" value={form.sort_order ?? ''} onChange={e=>setForm({...form,sort_order: e.target.value === '' ? '' : +e.target.value})}/></Field>
+        <Field label="الاختبار المطلوب"><select className="input" value={form.required_exam_id||''} onChange={e=>setForm({...form,required_exam_id:e.target.value||null})}><option value="">— بدون —</option>{app.db.exams.filter(e=>!form.subject_id||e.subject_id===form.subject_id).map(e=><option key={e.id} value={e.id}>{e.title}</option>)}</select></Field>
+      </div>
+      <Field label="الدروس المطلوبة">
+        <div className="glass-s" style={{padding:10,maxHeight:220,overflowY:'auto'}}>
+          {app.db.lessons.filter(l=>{const un=app.unit(l.unit_id);return !form.subject_id||un?.subject_id===form.subject_id;}).map(l=>{const on=(form.required_lessons||[]).includes(l.id);return <label key={l.id} className="flex center g8 mb6" style={{cursor:'pointer'}}><input type="checkbox" checked={on} onChange={()=>setForm({...form,required_lessons:on?(form.required_lessons||[]).filter(x=>x!==l.id):[...(form.required_lessons||[]),l.id]})}/><span className="sm">{l.title}</span></label>;})}
+        </div>
+      </Field>
+      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
+    </Modal>}
+  </>;
+}
+
+function AchievementsPage(){
+  return <Crud title="🏆 إدارة الإنجازات" collection="achievements" defaultItem={()=>({title:'',desc:'',icon:'🏆',type:'lessons',threshold:''})} fields={[
+    {key:'title',label:'الاسم'},
+    {key:'icon',label:'الأيقونة'},
+    {key:'type',label:'النوع',type:'select',options:[{value:'lessons',label:'عدد الدروس'},{value:'exams',label:'عدد الاختبارات'},{value:'mission',label:'عدد المهام'},{value:'streak',label:'سلسلة الأيام'},{value:'xp',label:'مجموع XP'},{value:'highScore',label:'أعلى نسبة'}]},
+    {key:'threshold',label:'القيمة',type:'number'},
+    {key:'desc',label:'الوصف',type:'textarea',full:true}
+  ]} columns={[
+    {label:'',render:a=><span style={{fontSize:20}}>{a.icon}</span>},
+    {key:'title',label:'الاسم'},
+    {key:'type',label:'النوع'},
+    {key:'threshold',label:'القيمة'}
+  ]}/>;
+}
+
+function LevelsPage(){
+  return <Crud title="📈 إدارة المستويات" collection="levels" defaultItem={()=>({level:'',name:'',xp:'',reward:''})} fields={[
+    {key:'level',label:'رقم المستوى',type:'number'},
+    {key:'name',label:'الاسم'},
+    {key:'xp',label:'XP المطلوب',type:'number'},
+    {key:'reward',label:'المكافأة'}
+  ]} columns={[
+    {key:'level',label:'المستوى'},
+    {key:'name',label:'الاسم'},
+    {key:'xp',label:'XP'},
+    {key:'reward',label:'المكافأة'}
+  ]}/>;
+}
+
+function StudentsPage(){
+  const app=useApp();
+  const [editing,setEditing]=useState(null);
+  const [form,setForm]=useState({});
+  const [q,setQ]=useState('');
+  const [govFilter,setGovFilter]=useState('all');
+  const [filterState,setFilterState]=useState('all');
+  const [busy,setBusy]=useState(false);
+  const GOVERNORATES = ["القاهرة", "الجيزة", "الإسكندرية", "الدقهلية", "الشرقية", "المنوفية","القليوبية", "البحيرة", "الغربية", "بورسعيد", "دمياط", "الإسماعيلية","السويس", "كفر الشيخ", "الفيوم", "بني سويف", "المنيا", "أسيوط","سوهاج", "قنا", "الأقصر", "أسوان", "البحر الأحمر", "الوادي الجديد","مطروح", "شمال سيناء", "جنوب سيناء"];
+  const allStudents = app.db.users.filter(u => u.role === 'student');
+  const list = allStudents.filter(u => {
+    const matchesSearch = u.name.toLowerCase().includes(q.toLowerCase()) || (u.phone||'').includes(q);
+    let matchesGov = true;
+    if (govFilter === 'all') matchesGov = true;
+    else if (govFilter === 'none') matchesGov = !u.governorate;
+    else matchesGov = u.governorate === govFilter;
+    let matchesState = true;
+    if (filterState === 'banned') matchesState = u.banned === true;
+    else if (filterState === 'active') matchesState = u.active !== false && u.banned !== true;
+    else if (filterState === 'inactive') matchesState = u.active === false && u.banned !== true;
+    return matchesSearch && matchesGov && matchesState;
+  });
+  const open = s => { setForm(JSON.parse(JSON.stringify(s))); setEditing(s.id); };
+  const save = async () => {
+    setBusy(true);
+    try {
+      await DB.updateUser(editing, {
+        name: form.name,
+        phone: form.phone,
+        xp: form.xp,
+        grade_id: form.grade_id,
+        governorate: form.governorate || null,
+        gender: form.gender || null,
+        all_subjects: form.all_subjects,
+        access_subjects: form.access_subjects || [],
+        subscription: form.subscription || 'free',
+        subscription_until: form.subscription_until || null
+      });
+      await app.reload();
+      app.toast.ok('تم الحفظ');
+      setEditing(null);
+    } catch(e) { app.toast.err(e.message); }
+    setBusy(false);
+  };
+  const toggle = async s => {
+    const action = s.active !== false ? 'إيقاف' : 'تفعيل';
+    const r = await Swal.fire({title: `${action} الحساب؟`,text: `هل تريد ${action} حساب ${s.name}؟`,icon: 'question',showCancelButton: true,confirmButtonText: `نعم، ${action}`,cancelButtonText: 'إلغاء',confirmButtonColor: s.active !== false ? '#ef4444' : '#D4AF37',cancelButtonColor: '#64748b',background: 'linear-gradient(180deg, #1c160c, #0f0c07)',color: '#f7f0dd',customClass: { popup: 'swal-custom-popup', title: 'swal-custom-title' }});
+    if (!r.isConfirmed) return;
+    try { await DB.updateUser(s.id, { active: !s.active }); await app.reload(); app.toast.warn(s.active !== false ? 'تم الإيقاف' : 'تم التفعيل'); } catch(e) { app.toast.err(e.message); }
+  };
+  const govCounts = {};
+  allStudents.forEach(u => { if (u.governorate) { govCounts[u.governorate] = (govCounts[u.governorate] || 0) + 1; } });
+  return <>
+    <div className="flex between center mb16 wrap g8">
+      <div className="h2 grad">إدارة الطلاب</div>
+      <div className="flex g8 wrap">
+        <input className="input" style={{maxWidth:200}} placeholder="🔍 بحث..." value={q} onChange={e=>setQ(e.target.value)}/>
+        <select className="input" style={{maxWidth:180}} value={filterState} onChange={e=>setFilterState(e.target.value)}>
+          <option value="all">كل الحالات</option>
+          <option value="active">نشط</option>
+          <option value="inactive">موقوف</option>
+          <option value="banned">محظور</option>
+        </select>
+        <select className="input" style={{maxWidth:220}} value={govFilter} onChange={e=>setGovFilter(e.target.value)}>
+          <option value="all">كل المحافظات ({allStudents.length})</option>
+          {GOVERNORATES.map(gov => {const count = govCounts[gov] || 0;if (count === 0) return null;return <option key={gov} value={gov}>{gov} ({count})</option>;})}
+          <option value="none">— بدون محافظة ({allStudents.filter(u=>!u.governorate).length}) —</option>
+        </select>
+      </div>
+    </div>
+    <div className="glass" style={{padding:14}}>
+      <div className="sx">
+        <table className="tbl">
+          <thead><tr><th>الطالب</th><th>النوع</th><th>الهاتف</th><th>📍 المحافظة</th><th>XP</th><th>💳 الاشتراك</th><th>🚨 بلاغات</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+          <tbody>
+            {list.map(s => (<tr key={s.id}>
+              <td><div className="flex center g8"><div className="avatar" style={{width:30,height:30,fontSize:14}}>{s.avatar||'👤'}</div><span>{s.name}</span></div></td>
+              <td>{s.gender==='female'?<span className="pill" style={{background:'rgba(236,72,153,.15)',color:'#f9a8d4',borderColor:'rgba(236,72,153,.3)',border:'1px solid'}}>👧 بنت</span>:s.gender==='male'?<span className="pill pill-b">👦 ولد</span>:<span className="xs muted">—</span>}</td>
+              <td className="sm muted" dir="ltr">{(s.country_code||'+20')}{s.phone||''}</td>
+              <td>{s.governorate ? <span className="pill pill-b" style={{fontSize:11}}>📍 {s.governorate}</span> : <span className="xs muted">—</span>}</td>
+              <td><b style={{color:'var(--gold)'}}>{DB.fmt(s.xp||0)}</b></td>
+              <td>{s.subscription === 'vip' ? <span className="pill pill-v">💎 VIP</span> : s.subscription === 'paid' ? <span className="pill pill-g">💳 مدفوع</span> : <span className="pill pill-y">🆓 مجاني</span>}</td>
+              <td>{(s.reports_count||0) >= 3 ? <span className="pill pill-r" style={{fontWeight:800}}>🚨 {s.reports_count}</span> : (s.reports_count||0) > 0 ? <span className="pill pill-a">{s.reports_count}</span> : <span className="xs muted">0</span>}</td>
+              <td>{s.banned ? <span className="pill pill-r">⛔ محظور</span> : s.active!==false ? <span className="pill pill-g">نشط</span> : <span className="pill pill-y">موقوف</span>}</td>
+              <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>open(s)}><Icon name="edit" size={13}/></button>{!s.banned&&<button className={`btn btn-sm ${s.active!==false?'btn-dn':'btn-ok'}`} onClick={()=>toggle(s)}>{s.active!==false?'إيقاف':'تفعيل'}</button>}</div></td>
+            </tr>))}
+          </tbody>
+        </table>
+        {list.length === 0 && (<div className="empty" style={{padding:'40px 20px',textAlign:'center'}}><div className="empty-ico">🔍</div><div className="h4 txt2 mb8">لا يوجد طلاب مطابقين للبحث</div></div>)}
+      </div>
+    </div>
+    {editing && (
+      <Modal title={`تعديل: ${form.name}`} onClose={()=>setEditing(null)} wide>
+        <div className="section-title" style={{marginTop:0}}><span className="ico">👤</span> المعلومات الأساسية</div>
+        <div className="grid g2">
+          <Field label="الاسم"><input className="input" value={form.name||''} onChange={e=>setForm({...form,name:e.target.value})}/></Field>
+          <Field label="الهاتف"><input className="input" value={form.phone||''} onChange={e=>setForm({...form,phone:e.target.value})}/></Field>
+          <Field label="النوع">
+            <select className="input" value={form.gender||''} onChange={e=>setForm({...form,gender:e.target.value||null})}>
+              <option value="">— غير محدد —</option>
+              <option value="male">👦 ولد</option>
+              <option value="female">👧 بنت</option>
+            </select>
+          </Field>
+          <Field label="XP"><input type="number" className="input" value={form.xp ?? ''} onChange={e=>setForm({...form,xp: e.target.value === '' ? '' : +e.target.value})}/></Field>
+          <Field label="الصف"><select className="input" value={form.grade_id||''} onChange={e=>setForm({...form,grade_id:e.target.value})}><option value="">— اختر —</option>{app.db.grades.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></Field>
+          <Field label="📍 المحافظة"><select className="input" value={form.governorate||''} onChange={e=>setForm({...form,governorate:e.target.value})}><option value="">— بدون —</option>{GOVERNORATES.map(gov=><option key={gov} value={gov}>{gov}</option>)}</select></Field>
+        </div>
+        <div className="section-title"><span className="ico">💳</span> الاشتراك</div>
+        <div className="grid g2">
+          <Field label="نوع الاشتراك">
+            <select className="input" value={form.subscription || 'free'} onChange={e=>setForm({...form, subscription:e.target.value})}>
+              <option value="free">🆓 مجاني</option>
+              <option value="paid">💳 مدفوع</option>
+              <option value="vip">💎 VIP</option>
+            </select>
+          </Field>
+          <Field label="تاريخ انتهاء الاشتراك"><input type="date" className="input" value={form.subscription_until || ''} onChange={e=>setForm({...form, subscription_until:e.target.value})}/></Field>
+        </div>
+        <div className="section-title"><span className="ico">🔐</span> صلاحيات الوصول</div>
+        <Field label="المواد المسموح بها">
+          <label className="flex center g8 mb12" style={{cursor:'pointer'}}><input type="checkbox" checked={!!form.all_subjects} onChange={e=>setForm({...form,all_subjects:e.target.checked})}/><span className="sm">جميع المواد</span></label>
+          {!form.all_subjects && (<div className="flex wrap g6">
+            {app.db.subjects.map(s => {const on = (form.access_subjects||[]).includes(s.id);return (<button key={s.id} type="button" onClick={()=>{const cur = form.access_subjects || [];setForm({...form,access_subjects: on ? cur.filter(x=>x!==s.id) : [...cur,s.id]});}} style={{padding:'8px 14px',borderRadius:30,background: on ? 'rgba(212,175,55,.20)' : 'rgba(212,175,55,.05)',border: `1px solid ${on?'var(--gold)':'var(--border)'}`,fontSize:12.5,fontWeight:700,color: on ? '#FFD700' : 'var(--txt)',cursor:'pointer'}}>{s.icon} {s.name}</button>);})}
+          </div>)}
+        </Field>
+        <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
+      </Modal>
+    )}
+  </>;
+}
+
+function BannedUsersPage(){
+  const app=useApp();
+  const [loading,setLoading]=useState(true);
+  const [banned,setBanned]=useState([]);
+  const [reports,setReports]=useState({});
+  const [expanded,setExpanded]=useState(null);
+  const [busy,setBusy]=useState(false);
+
+  const load=useCallback(async()=>{
+    setLoading(true);
+    try{
+      const sb=await DB.getClient();
+      const {data}=await sb.from('users').select('*').eq('banned',true).order('banned_at',{ascending:false});
+      setBanned(data||[]);
+    }catch(e){console.warn(e);}
+    setLoading(false);
+  },[]);
+  useEffect(()=>{load();},[load]);
+
+  const showReports=async(userId)=>{
+    if(expanded===userId){setExpanded(null);return;}
+    try{
+      const list=await DB.getUserReports(userId);
+      setReports(prev=>({...prev,[userId]:list}));
+      setExpanded(userId);
+    }catch(e){app.toast.err(e.message);}
+  };
+
+  const unban=async(u)=>{
+    const r=await Swal.fire({
+      title:`فك حظر ${u.name}؟`,
+      text:'هيتم حذف كل البلاغات وإعادة تفعيل الحساب',
+      icon:'question',
+      showCancelButton:true,
+      confirmButtonText:'نعم، افك الحظر',
+      cancelButtonText:'إلغاء',
+      confirmButtonColor:'#22c55e',
+      cancelButtonColor:'#64748b',
+      background:'linear-gradient(180deg,#1c160c,#0f0c07)',
+      color:'#f7f0dd',
+      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+    });
+    if(!r.isConfirmed)return;
+    setBusy(true);
+    try{
+      await DB.unbanUser(u.id);
+      app.toast.ok('✅ تم فك الحظر');
+      await load();
+      await app.reload();
+    }catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
+
+  return <>
+    <div className="flex between center mb16 wrap g8">
+      <div>
+        <div className="h2 grad">⛔ الحسابات المحظورة</div>
+        <div className="sm muted mt6">حظر تلقائي بعد 3 بلاغات — يمكنك فك الحظر يدويًا</div>
+      </div>
+      <div className="flex g8">
+        <span className="pill pill-r">{banned.length} محظور</span>
+        <button className="btn btn-s" onClick={load}>🔄 تحديث</button>
+      </div>
+    </div>
+
+    {loading ? (
+      <div className="glass" style={{padding:40,textAlign:'center'}}>
+        <div className="spinner" style={{margin:'0 auto 14px'}}></div>جارٍ التحميل...
+      </div>
+    ) : banned.length===0 ? (
+      <div className="glass" style={{padding:40}}>
+        <Empty icon="✅" title="لا يوجد محظورون" desc="كل الحسابات سليمة"/>
+      </div>
+    ) : (
+      <div className="flex col g12">
+        {banned.map(u=>{
+          const isExpanded = expanded===u.id;
+          const userReports = reports[u.id]||[];
+          return (
+            <div key={u.id} className="glass" style={{padding:16,borderColor:'rgba(239,68,68,.35)'}}>
+              <div className="flex between center wrap g8 mb12">
+                <div className="flex center g12">
+                  <div className="avatar" style={{width:44,height:44,fontSize:18}}>{u.avatar||'👤'}</div>
+                  <div>
+                    <div className="h4">{u.name}</div>
+                    <div className="xs muted" dir="ltr">{(u.country_code||'+20')}{u.phone}</div>
+                  </div>
+                </div>
+                <div className="flex g6 wrap">
+                  <span className="pill pill-r">{u.reports_count||0} بلاغ</span>
+                  {u.governorate&&<span className="pill pill-b" style={{fontSize:10}}>📍 {u.governorate}</span>}
+                  {u.gender==='female'?<span className="pill" style={{fontSize:10,background:'rgba(236,72,153,.15)',color:'#f9a8d4',border:'1px solid rgba(236,72,153,.3)'}}>👧</span>:u.gender==='male'?<span className="pill pill-b" style={{fontSize:10}}>👦</span>:null}
+                </div>
+              </div>
+              <div className="xs muted mb12">
+                🔒 {u.ban_reason||'حظر تلقائي'} • {u.banned_at?DB.formatDateTime(u.banned_at):'—'}
+              </div>
+              <div className="flex g8 wrap">
+                <button className="btn btn-s btn-sm" onClick={()=>showReports(u.id)}>
+                  {isExpanded?'إخفاء البلاغات':'📋 عرض البلاغات'}
+                </button>
+                <button className="btn btn-ok btn-sm" onClick={()=>unban(u)} disabled={busy}>
+                  ✅ فك الحظر
+                </button>
+                <a href={`https://wa.me/${(u.country_code||'+20').replace('+','')}${u.phone}`} target="_blank" className="btn btn-s btn-sm">
+                  📱 واتساب
+                </a>
+              </div>
+              {isExpanded&&(
+                <div className="mt12">
+                  {userReports.length===0 ? (
+                    <div className="sm muted" style={{textAlign:'center',padding:12}}>لا توجد بلاغات مسجلة</div>
+                  ) : userReports.map(r=>(
+                    <div key={r.id} className="glass-s mb8" style={{padding:12,borderColor:'rgba(239,68,68,.25)'}}>
+                      <div className="flex between center mb6">
+                        <span className="pill pill-r" style={{fontSize:10}}>🚨 {r.reason}</span>
+                        <span className="xs muted">{DB.formatDateTime(r.created_at)}</span>
+                      </div>
+                      {r.details&&<div className="xs muted" style={{marginTop:6}}>"{r.details}"</div>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    )}
+  </>;
+}
+
+function NotificationsPage(){
+  const app=useApp();
+  const [form,setForm]=useState({title:'',body:'',target:'all'});
+  const [busy,setBusy]=useState(false);
+  const send=async ()=>{
+    if(!form.title||!form.body) return app.toast.warn('أدخل العنوان والنص');
+    setBusy(true);
+    try{await app.save('notifications',{...form,read_by:[]});app.toast.ok('تم الإرسال');app.playSound && app.playSound('success');setForm({title:'',body:'',target:'all'});}
+    catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
+  const del=async id=>{const r=await Swal.fire({title:'حذف الإشعار؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed) return;try{await app.remove('notifications',id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
+  return <>
+    <div className="h2 mb16 grad">الإشعارات</div>
+    <div className="grid g2">
+      <div className="glass" style={{padding:20}}>
+        <div className="h4 mb12" style={{display:'flex',alignItems:'center',gap:8,color:'var(--gold)'}}><Icon name="bell" size={16}/> إرسال إشعار</div>
+        <Field label="العنوان"><input className="input" value={form.title} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
+        <Field label="النص"><textarea className="input" value={form.body} onChange={e=>setForm({...form,body:e.target.value})}/></Field>
+        <Field label="المستهدفون"><select className="input" value={form.target} onChange={e=>setForm({...form,target:e.target.value})}><option value="all">كل الطلاب</option>{app.db.users.filter(u=>u.role==='student').map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field>
+        <button className="btn btn-p btn-block" onClick={send} disabled={busy}>{busy?'جارٍ...':'📤 إرسال'}</button>
+      </div>
+      <div className="glass" style={{padding:20}}>
+        <div className="h4 mb12" style={{color:'var(--gold)'}}>آخر الإشعارات</div>
+        {app.db.notifications.slice(0,10).map(n=><div key={n.id} className="glass-s mb8" style={{padding:12,display:'flex',gap:10,alignItems:'flex-start'}}>
+          <div style={{flex:1}}>
+            <div className="h4" style={{fontSize:14}}>{n.title}</div>
+            <div className="xs muted">{n.body}</div>
+            <div className="flex between center mt6"><div className="xs" style={{color:'var(--gold)'}}>← {n.target==='all'?'كل الطلاب':app.db.users.find(u=>u.id===n.target)?.name||'—'}</div><div className="xs muted">{DB.formatDate(n.created_at)}</div></div>
+          </div>
+          <button className="btn btn-dn btn-sm" onClick={()=>del(n.id)}><Icon name="trash" size={13}/></button>
+        </div>)}
+      </div>
+    </div>
+  </>;
+}
+
+function ReportsPage(){
+  const [reports,setReports]=useState([]);
+  const [loading,setLoading]=useState(true);
+  useEffect(()=>{(async ()=>{try{const sb=await DB.getClient();const {data}=await sb.from('reports').select('*').order('created_at',{ascending:false}).limit(50);setReports(data||[]);}catch(e){}setLoading(false);})();},[]);
+  return <>
+    <div className="h2 mb16 grad">📨 البلاغات المستلمة</div>
+    <div className="glass" style={{padding:20}}>
+      {loading?<div style={{textAlign:'center',padding:20}}><div className="spinner" style={{margin:'0 auto 14px'}}></div>جارٍ التحميل...</div>:
+        reports.length===0?<Empty icon="📨" title="لا توجد بلاغات"/>:
+        <div className="flex col g8">
+          {reports.map(r=><div key={r.id} className="glass-s" style={{padding:14}}>
+            <div className="flex between center mb8"><div className="h4">{r.user_name}</div><span className="xs muted">{DB.formatDateTime(r.created_at)}</span></div>
+            <div className="xs muted mb8" dir="ltr">📱 {r.user_phone}</div>
+            <div className="sm txt2" style={{background:'rgba(0,0,0,.25)',padding:10,borderRadius:10,borderInlineStart:'2px solid var(--gold)'}}>{r.message}</div>
+          </div>)}
+        </div>
+      }
+    </div>
+  </>;
+}
+
+function SettingsPage(){
+  const app=useApp();
+  const [loading,setLoading]=useState(true);
+  const [busy,setBusy]=useState(false);
+  const [form,setForm]=useState({about_title:'عن المنصة',about_text:'',social_links:[]});
+  useEffect(()=>{(async ()=>{try{const sb=await DB.getClient();const {data}=await sb.from('settings').select('*').eq('id','site').maybeSingle();if(data){setForm({about_title: data.about_title || 'عن المنصة',about_text: data.about_text || '',social_links: Array.isArray(data.social_links) ? data.social_links : []});}}catch(e){console.warn(e);}setLoading(false);})();},[]);
+  const save=async ()=>{setBusy(true);try{const sb=await DB.getClient();const {error}=await sb.from('settings').upsert({id:'site',about_title: form.about_title,about_text: form.about_text,social_links: form.social_links,updated_at: Date.now()});if(error) throw new Error(error.message);app.toast.ok('تم الحفظ');}catch(e){app.toast.err(e.message);}setBusy(false);};
+  const addLink=()=>{setForm(f=>({...f,social_links:[...f.social_links,{id:DB.uid('lnk_'),platform:'facebook',label:'',url:''}]}));};
+  const updLink=(id,patch)=>setForm(f=>({...f,social_links:f.social_links.map(l=>l.id===id?{...l,...patch}:l)}));
+  const delLink=(id)=>setForm(f=>({...f,social_links:f.social_links.filter(l=>l.id!==id)}));
+  const platforms=[{id:'facebook',label:'فيسبوك'},{id:'tiktok',label:'تيك توك'},{id:'instagram',label:'إنستجرام'},{id:'whatsapp_channel',label:'قناة واتساب'},{id:'whatsapp_group',label:'جروب واتساب'},{id:'custom',label:'رابط مخصص'}];
+  if(loading) return <div className="glass" style={{padding:40,textAlign:'center'}}><div className="spinner" style={{margin:'0 auto 14px'}}></div>جارٍ التحميل...</div>;
+  return <>
+    <div className="h2 mb16 grad">⚙️ الإعدادات</div>
+    <div className="glass mb16" style={{padding:20}}>
+      <div className="section-title" style={{marginTop:0}}><span className="ico">📖</span> عن المنصة</div>
+      <Field label="عنوان القسم"><input className="input" value={form.about_title} onChange={e=>setForm({...form,about_title:e.target.value})}/></Field>
+      <Field label="نص عن المنصة"><textarea className="input" rows="6" value={form.about_text} onChange={e=>setForm({...form,about_text:e.target.value})} placeholder="اكتب نبذة عن المنصة..."/></Field>
+    </div>
+    <div className="glass mb16" style={{padding:20}}>
+      <div className="flex between center mb16">
+        <div className="section-title" style={{margin:0,border:0,paddingBottom:0}}><span className="ico">🔗</span> لينكات السوشيال</div>
+        <button className="btn btn-p btn-sm" onClick={addLink}><Icon name="plus" size={13}/> إضافة لينك</button>
+      </div>
+      {form.social_links.length===0?(<div className="sm muted" style={{textAlign:'center',padding:20}}>لا توجد لينكات بعد — اضغط "إضافة لينك"</div>):(
+        <div className="flex col g12">
+          {form.social_links.map((link)=>(
+            <div key={link.id} className="glass-s" style={{padding:14,display:'flex',gap:12,alignItems:'center',flexWrap:'wrap'}}>
+              <div style={{flex:'1 1 160px',minWidth:140}}>
+                <label className="lbl">المنصة</label>
+                <select className="input" value={link.platform} onChange={e=>updLink(link.id,{platform:e.target.value})}>
+                  {platforms.map(p=><option key={p.id} value={p.id}>{p.label}</option>)}
+                </select>
+              </div>
+              <div style={{flex:'1 1 160px',minWidth:140}}>
+                <label className="lbl">الاسم (اختياري)</label>
+                <input className="input" value={link.label||''} onChange={e=>updLink(link.id,{label:e.target.value})} placeholder="مثال: صفحتنا الرسمية"/>
+              </div>
+              <div style={{flex:'2 1 260px',minWidth:200}}>
+                <label className="lbl">الرابط</label>
+                <input className="input" value={link.url||''} onChange={e=>updLink(link.id,{url:e.target.value})} placeholder="https://..." dir="ltr"/>
+              </div>
+              <button className="btn btn-dn btn-sm" onClick={()=>delLink(link.id)} style={{flexShrink:0}}><Icon name="trash" size={13}/></button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+    <button className="btn btn-p btn-block" onClick={save} disabled={busy}>{busy?'جارٍ الحفظ...':'💾 حفظ الإعدادات'}</button>
+  </>;
+}
+
+function QuestionsBankPage(){
+  const app=useApp();
+  const [filterSubject,setFilterSubject]=useState('all');
+  const [filterUnit,setFilterUnit]=useState('all');
+  const [filterLesson,setFilterLesson]=useState('all');
+  const [filterDifficulty,setFilterDifficulty]=useState('all');
+  const [filterType,setFilterType]=useState('all');
+  const [q,setQ]=useState('');
+  const [selected,setSelected]=useState([]);
+  const [editing,setEditing]=useState(null);
+  const [busy,setBusy]=useState(false);
+  const [page,setPage]=useState(1);
+  const perPage=50;
+
+  const usageMap = useMemo(()=>{
+    const map={};
+    (app.db.exams||[]).forEach(ex=>{
+      (ex.question_ids||[]).forEach(qid=>{
+        if(!map[qid]) map[qid]=[];
+        map[qid].push({id:ex.id,title:ex.title});
+      });
+    });
+    return map;
+  },[app.db.exams]);
+
+  const enriched = useMemo(()=>{
+    return (app.db.questions||[]).map(q=>{
+      const lesson = q.lesson_id ? app.lesson(q.lesson_id) : null;
+      const unit = q.unit_id ? app.unit(q.unit_id) : (lesson ? app.unit(lesson.unit_id) : null);
+      const subject = q.subject_id ? app.subject(q.subject_id) : (unit ? app.subject(unit.subject_id) : null);
+      const usedIn = usageMap[q.id]||[];
+      return {...q, lesson, unit, subject, usedIn, isOrphan: usedIn.length===0};
+    });
+  },[app.db.questions, app.db.lessons, app.db.units, app.db.subjects, usageMap]);
+
+  const filtered = useMemo(()=>{
+    let list=[...enriched];
+    if(filterSubject!=='all') list=list.filter(x=>x.subject?.id===filterSubject);
+    if(filterUnit!=='all') list=list.filter(x=>x.unit?.id===filterUnit);
+    if(filterLesson!=='all') list=list.filter(x=>x.lesson?.id===filterLesson);
+    if(filterDifficulty!=='all') list=list.filter(x=>x.difficulty===filterDifficulty);
+    if(filterType==='used') list=list.filter(x=>!x.isOrphan);
+    if(filterType==='orphan') list=list.filter(x=>x.isOrphan);
+    if(q.trim()){
+      const lc=q.toLowerCase();
+      list=list.filter(x=>(x.text||'').toLowerCase().includes(lc)||(x.explanation||'').toLowerCase().includes(lc));
+    }
+    return list;
+  },[enriched, filterSubject, filterUnit, filterLesson, filterDifficulty, filterType, q]);
+
+  const totalPages = Math.ceil(filtered.length/perPage)||1;
+  const paginated = filtered.slice((page-1)*perPage, page*perPage);
+
+  const stats = useMemo(()=>{
+    const total = enriched.length;
+    const orphan = enriched.filter(x=>x.isOrphan).length;
+    const used = total - orphan;
+    const byDifficulty = {
+      easy: enriched.filter(x=>x.difficulty==='easy').length,
+      medium: enriched.filter(x=>x.difficulty==='medium').length,
+      hard: enriched.filter(x=>x.difficulty==='hard').length
+    };
+    return {total, orphan, used, byDifficulty};
+  },[enriched]);
+
+  const availableUnits = useMemo(()=>{
+    if(filterSubject==='all') return app.db.units;
+    return app.db.units.filter(u=>u.subject_id===filterSubject);
+  },[filterSubject, app.db.units]);
+
+  const availableLessons = useMemo(()=>{
+    let list=app.db.lessons;
+    if(filterSubject!=='all'){
+      list=list.filter(l=>{const u=app.unit(l.unit_id);return u?.subject_id===filterSubject;});
+    }
+    if(filterUnit!=='all'){
+      list=list.filter(l=>l.unit_id===filterUnit);
+    }
+    return list;
+  },[filterSubject, filterUnit, app.db.lessons, app.db.units]);
+
+  const toggleSelectAll = ()=>{
+    if(selected.length===paginated.length && paginated.length>0){setSelected([]);}
+    else{setSelected(paginated.map(x=>x.id));}
+  };
+
+  const toggleSelect=(id)=>{setSelected(s=>s.includes(id)?s.filter(x=>x!==id):[...s,id]);};
+
+  const deleteOne = async (id) => {
+    const question = enriched.find(x=>x.id===id);
+    if(!question) return;
+    const usedMsg = question.usedIn.length > 0 ? `⚠️ السؤال ده مستخدم في ${question.usedIn.length} امتحان: ${question.usedIn.map(e=>e.title).join('، ')}` : '';
+    const r = await Swal.fire({
+      title:'حذف السؤال؟',
+      html:`هيتم حذف السؤال نهائيًا${usedMsg?`<br><small style="color:#fca5a5">${usedMsg}</small><br><small>هيتم إزالته من هذه الامتحانات كمان</small>`:''}`,
+      icon:'warning',
+      showCancelButton:true,
+      confirmButtonText:'نعم، احذف',
+      cancelButtonText:'إلغاء',
+      confirmButtonColor:'#ef4444',
+      cancelButtonColor:'#64748b',
+      background:'linear-gradient(180deg, #1c160c, #0f0c07)',
+      color:'#f7f0dd',
+      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+    });
+    if(!r.isConfirmed) return;
+    try{
+      const result = await DB.deleteQuestion(id);
+      await app.reload();
+      app.toast.ok(`تم حذف السؤال${result.examsUpdated?` وتحديث ${result.examsUpdated} امتحان`:''}`);
+    }catch(e){app.toast.err(e.message);}
+  };
+
+  const deleteSelected = async () => {
+    if(selected.length===0) return app.toast.warn('اختر أسئلة الأول');
+    const r = await Swal.fire({
+      title:`حذف ${selected.length} سؤال؟`,
+      html:'هيتم حذفهم نهائيًا وإزالتهم من كل الامتحانات المرتبطة',
+      icon:'warning',
+      showCancelButton:true,
+      confirmButtonText:'نعم، احذف الكل',
+      cancelButtonText:'إلغاء',
+      confirmButtonColor:'#ef4444',
+      cancelButtonColor:'#64748b',
+      background:'linear-gradient(180deg, #1c160c, #0f0c07)',
+      color:'#f7f0dd',
+      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+    });
+    if(!r.isConfirmed) return;
+    setBusy(true);
+    try{
+      let ok=0, fail=0;
+      for(const id of selected){
+        try{await DB.deleteQuestion(id);ok++;}catch(e){console.warn('فشل حذف', id, e);fail++;}
+      }
+      await app.reload();
+      setSelected([]);
+      app.toast.ok(`تم حذف ${ok} سؤال${fail?` وفشل ${fail}`:''}`);
+    }catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
+
+  const deleteAllOrphans = async () => {
+    const orphans = enriched.filter(x=>x.isOrphan);
+    if(orphans.length===0) return app.toast.info('لا توجد أسئلة يتيمة');
+    const r = await Swal.fire({
+      title:`حذف ${orphans.length} سؤال يتيم؟`,
+      html:'الأسئلة اليتيمة هي أسئلة مش مربوطة بأي امتحان<br><small>هيتم حذفها نهائيًا</small>',
+      icon:'warning',
+      showCancelButton:true,
+      confirmButtonText:'نعم، احذف الكل',
+      cancelButtonText:'إلغاء',
+      confirmButtonColor:'#ef4444',
+      cancelButtonColor:'#64748b',
+      background:'linear-gradient(180deg, #1c160c, #0f0c07)',
+      color:'#f7f0dd',
+      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+    });
+    if(!r.isConfirmed) return;
+    setBusy(true);
+    try{
+      const ids=orphans.map(x=>x.id);
+      await DB.removeMany('questions', ids);
+      await app.reload();
+      app.toast.ok(`تم حذف ${ids.length} سؤال يتيم`);
+    }catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
+
+  const saveEdit = async () => {
+    if(!editing) return;
+    if(!editing.text||!editing.text.trim()) return app.toast.warn('نص السؤال مطلوب');
+    if(!editing.options||editing.options.filter(o=>o&&o.trim()).length<2) return app.toast.warn('لازم خيارين على الأقل');
+    setBusy(true);
+    try{
+      const correctIdx = Array.isArray(editing.correct) ? editing.correct[0] : (editing.correct ?? 0);
+      const record = {
+        id: editing.id,
+        text: editing.text.trim(),
+        options: (editing.options||[]).map(o=>(o||'').trim()),
+        correct: [correctIdx],
+        explanation: (editing.explanation||'').trim(),
+        lesson_id: editing.lesson_id || null,
+        unit_id: editing.unit_id || null,
+        subject_id: editing.subject_id || null,
+        difficulty: editing.difficulty || 'medium',
+        xp: Number(editing.xp) || 0,
+        type: editing.type || 'mcq',
+        created_at: editing.created_at || Date.now()
+      };
+      await app.save('questions', record);
+      app.toast.ok('تم حفظ التعديل');
+      setEditing(null);
+    }catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
+
+  const exportCSV = () => {
+    if(filtered.length===0) return app.toast.warn('مفيش أسئلة للتصدير');
+    const headers=['السؤال','الخيار أ','الخيار ب','الخيار ج','الخيار د','الإجابة الصحيحة','التعليل','المادة','الوحدة','الدرس','الصعوبة','XP','مستخدمة في'];
+    const rows=filtered.map(x=>{
+      const correctIdx = Array.isArray(x.correct)?x.correct[0]:(x.correct??0);
+      return [x.text,(x.options||[])[0]||'',(x.options||[])[1]||'',(x.options||[])[2]||'',(x.options||[])[3]||'',['أ','ب','ج','د'][correctIdx]||'',x.explanation||'',x.subject?.name||'—',x.unit?.name||'—',x.lesson?.title||'—',x.difficulty||'medium',x.xp||0,x.usedIn.length>0?x.usedIn.map(e=>e.title).join('، '):'—'];
+    });
+    const csv=[headers,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download=`questions_bank_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    app.toast.ok('تم تصدير بنك الأسئلة');
+  };
+
+  const difficultyLabel={easy:'🟢 سهل',medium:'🟡 متوسط',hard:'🔴 صعب'};
+  const difficultyPill={easy:'pill-g',medium:'pill-a',hard:'pill-r'};
+
+  return <>
+    <div className="flex between center mb16 wrap g8">
+      <div>
+        <div className="h2 grad">🗃️ بنك الأسئلة</div>
+        <div className="sm muted mt6">كل الأسئلة في مكان واحد — فلترة، تعديل، حذف</div>
+      </div>
+      <div className="flex g8 wrap">
+        <button className="btn btn-s" onClick={exportCSV} disabled={filtered.length===0}>
+          <Icon name="download" size={14}/> تصدير CSV
+        </button>
+        {stats.orphan>0 && (
+          <button className="btn btn-dn" onClick={deleteAllOrphans} disabled={busy}>
+            🧹 حذف اليتيمة ({stats.orphan})
+          </button>
+        )}
+      </div>
+    </div>
+    <div className="grid g4 mb16">
+      <Stat label="إجمالي الأسئلة" value={DB.fmt(stats.total)} icon="help" color="#FFD700"/>
+      <Stat label="أسئلة مستخدمة" value={DB.fmt(stats.used)} icon="check" color="#22c55e" sub="مربوطة بامتحانات"/>
+      <Stat label="أسئلة يتيمة" value={DB.fmt(stats.orphan)} icon="alert" color="#ef4444" sub="مش مربوطة بأي امتحان"/>
+      <Stat label="التوزيع" value={`${stats.byDifficulty.easy}/${stats.byDifficulty.medium}/${stats.byDifficulty.hard}`} icon="trend" color="#B8860B" sub="سهل/متوسط/صعب"/>
+    </div>
+    <div className="glass mb16" style={{padding:14}}>
+      <div className="grid g4" style={{gap:10}}>
+        <div><label className="lbl">المادة</label>
+          <select className="input" value={filterSubject} onChange={e=>{setFilterSubject(e.target.value);setFilterUnit('all');setFilterLesson('all');setPage(1);}}>
+            <option value="all">كل المواد</option>
+            {app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.icon} {s.name}</option>)}
+          </select>
+        </div>
+        <div><label className="lbl">الوحدة</label>
+          <select className="input" value={filterUnit} onChange={e=>{setFilterUnit(e.target.value);setFilterLesson('all');setPage(1);}}>
+            <option value="all">كل الوحدات</option>
+            {availableUnits.map(u=><option key={u.id} value={u.id}>{u.name}</option>)}
+          </select>
+        </div>
+        <div><label className="lbl">الدرس</label>
+          <select className="input" value={filterLesson} onChange={e=>{setFilterLesson(e.target.value);setPage(1);}}>
+            <option value="all">كل الدروس</option>
+            {availableLessons.map(l=><option key={l.id} value={l.id}>{l.title}</option>)}
+          </select>
+        </div>
+        <div><label className="lbl">الصعوبة</label>
+          <select className="input" value={filterDifficulty} onChange={e=>{setFilterDifficulty(e.target.value);setPage(1);}}>
+            <option value="all">كل المستويات</option>
+            <option value="easy">🟢 سهل</option>
+            <option value="medium">🟡 متوسط</option>
+            <option value="hard">🔴 صعب</option>
+          </select>
+        </div>
+      </div>
+      <div className="flex wrap g12 mt12 center">
+        <div style={{flex:'1 1 240px'}}>
+          <label className="lbl">النوع</label>
+          <div className="flex wrap g6">
+            {[{id:'all',label:`الكل (${stats.total})`},{id:'used',label:`✓ مستخدمة (${stats.used})`},{id:'orphan',label:`⚠️ يتيمة (${stats.orphan})`}].map(t=>(
+              <button key={t.id} onClick={()=>{setFilterType(t.id);setPage(1);}} style={{padding:'8px 14px',borderRadius:30,background:filterType===t.id?'rgba(212,175,55,.20)':'rgba(212,175,55,.05)',border:`1px solid ${filterType===t.id?'var(--gold)':'var(--border)'}`,fontSize:12.5,fontWeight:700,color:filterType===t.id?'#FFD700':'var(--txt)',cursor:'pointer'}}>{t.label}</button>
+            ))}
+          </div>
+        </div>
+        <div style={{flex:'1 1 280px'}}>
+          <label className="lbl">بحث</label>
+          <input className="input" placeholder="🔍 ابحث في نص السؤال أو التعليل..." value={q} onChange={e=>{setQ(e.target.value);setPage(1);}}/>
+        </div>
+      </div>
+    </div>
+    {selected.length>0 && (
+      <div className="glass mb16" style={{padding:12,borderColor:'rgba(239,68,68,.4)'}}>
+        <div className="flex between center wrap g8">
+          <div className="flex center g8">
+            <span className="pill pill-r" style={{fontWeight:800}}>{selected.length} سؤال مختار</span>
+            <button className="btn btn-s btn-sm" onClick={()=>setSelected([])}>إلغاء التحديد</button>
+          </div>
+          <button className="btn btn-dn" onClick={deleteSelected} disabled={busy}>
+            <Icon name="trash" size={14}/> حذف المختار
+          </button>
+        </div>
+      </div>
+    )}
+    <div className="glass" style={{padding:14}}>
+      {filtered.length===0 ? (
+        <Empty icon="🗃️" title="لا توجد أسئلة مطابقة" desc="جرّب تغيير الفلاتر أو ابحث بكلمة تانية"/>
+      ) : (
+        <>
+          <div className="flex between center mb12 wrap g8">
+            <div className="flex center g8">
+              <label className="flex center g8" style={{cursor:'pointer'}}>
+                <input type="checkbox" checked={selected.length===paginated.length && paginated.length>0} onChange={toggleSelectAll}/>
+                <span className="sm">تحديد الكل في الصفحة</span>
+              </label>
+            </div>
+            <span className="pill pill-b">{filtered.length} سؤال — صفحة {page} من {totalPages}</span>
+          </div>
+          <div className="sx">
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th style={{width:40}}><input type="checkbox" checked={selected.length===paginated.length && paginated.length>0} onChange={toggleSelectAll}/></th>
+                  <th>السؤال</th>
+                  <th>المادة</th>
+                  <th>الدرس</th>
+                  <th>الصعوبة</th>
+                  <th>الحالة</th>
+                  <th>إجراءات</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginated.map(x=>{
+                  const isSelected=selected.includes(x.id);
+                  const correctIdx=Array.isArray(x.correct)?x.correct[0]:(x.correct??0);
+                  return <tr key={x.id} style={{background:isSelected?'rgba(212,175,55,.10)':undefined}}>
+                    <td><input type="checkbox" checked={isSelected} onChange={()=>toggleSelect(x.id)}/></td>
+                    <td style={{maxWidth:420}}>
+                      <div className="sm" style={{fontWeight:700,lineHeight:1.5}}>{x.text.length>120?x.text.slice(0,120)+'...':x.text}</div>
+                      <div className="xs muted mt6">✅ {(x.options||[])[correctIdx]||'—'}</div>
+                    </td>
+                    <td>{x.subject ? <span className="pill pill-b" style={{fontSize:11}}>{x.subject.icon} {x.subject.name}</span> : <span className="xs muted">—</span>}</td>
+                    <td className="sm">{x.lesson?.title || <span className="xs muted">—</span>}</td>
+                    <td><span className={`pill ${difficultyPill[x.difficulty]||'pill-y'}`} style={{fontSize:11}}>{difficultyLabel[x.difficulty]||'🟡 متوسط'}</span></td>
+                    <td>
+                      {x.usedIn.length>0
+                        ? <span className="pill qbank-used" title={x.usedIn.map(e=>e.title).join('، ')}>✓ في {x.usedIn.length} امتحان</span>
+                        : <span className="pill qbank-orphan">⚠️ يتيم</span>
+                      }
+                    </td>
+                    <td>
+                      <div className="flex g6">
+                        <button className="btn btn-s btn-sm" onClick={()=>setEditing(JSON.parse(JSON.stringify(x)))} title="تعديل">
+                          <Icon name="edit" size={12}/>
+                        </button>
+                        <button className="btn btn-dn btn-sm" onClick={()=>deleteOne(x.id)} title="حذف">
+                          <Icon name="trash" size={12}/>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>;
+                })}
+              </tbody>
+            </table>
+          </div>
+          {totalPages>1 && (
+            <div className="flex between center mt16 wrap g8">
+              <button className="btn btn-s btn-sm" onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page===1}>← السابق</button>
+              <div className="flex center g6">
+                <span className="sm muted">صفحة</span>
+                <input type="number" min="1" max={totalPages} value={page} onChange={e=>{const n=Math.max(1,Math.min(totalPages,+e.target.value||1));setPage(n);}} className="input" style={{width:70,textAlign:'center',padding:'6px 10px'}}/>
+                <span className="sm muted">من {totalPages}</span>
+              </div>
+              <button className="btn btn-s btn-sm" onClick={()=>setPage(p=>Math.min(totalPages,p+1))} disabled={page===totalPages}>التالي →</button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+    {editing && (
+      <Modal title="✏️ تعديل السؤال" onClose={()=>setEditing(null)} wide>
+        <div className="glass-s mb12" style={{padding:12}}>
+          <div className="sm" style={{color:'#FFD700',fontWeight:800}}>عدّل السؤال أو الخيارات أو الإجابة، ثم اضغط حفظ</div>
+          {editing.usedIn && editing.usedIn.length>0 && (
+            <div className="xs muted mt6">⚠️ السؤال ده مستخدم في: {editing.usedIn.map(e=>e.title).join('، ')}</div>
+          )}
+        </div>
+        <Field label="نص السؤال">
+          <textarea className="input" rows="3" value={editing.text||''} onChange={e=>setEditing({...editing,text:e.target.value})}/>
+        </Field>
+        <Field label="الخيارات — اضغط على الحرف لتحديد الإجابة الصحيحة">
+          {(()=>{const correctIdx=Array.isArray(editing.correct)?editing.correct[0]:(editing.correct??0);return (editing.options||['','','','']).map((op,oi)=>(
+            <div key={oi} className="flex g8 mb6 center">
+              <button type="button" className={`btn btn-sm ${correctIdx===oi?'btn-ok':'btn-s'}`} onClick={()=>setEditing({...editing,correct:[oi]})} style={{minWidth:44}}>
+                {['أ','ب','ج','د'][oi]}
+              </button>
+              <input className="input" value={op} onChange={e=>{const opts=[...(editing.options||['','','',''])];opts[oi]=e.target.value;setEditing({...editing,options:opts});}} placeholder={`الخيار ${['أ','ب','ج','د'][oi]}`}/>
+            </div>
+          ));})()}
+        </Field>
+        <Field label="شرح الإجابة (اختياري)">
+          <textarea className="input" rows="2" value={editing.explanation||''} onChange={e=>setEditing({...editing,explanation:e.target.value})} placeholder="اشرح سبب الإجابة الصحيحة..."/>
+        </Field>
+        <div className="grid g3">
+          <Field label="الصعوبة">
+            <select className="input" value={editing.difficulty||'medium'} onChange={e=>setEditing({...editing,difficulty:e.target.value})}>
+              <option value="easy">🟢 سهل</option>
+              <option value="medium">🟡 متوسط</option>
+              <option value="hard">🔴 صعب</option>
+            </select>
+          </Field>
+          <Field label="XP">
+            <input type="number" className="input" value={editing.xp ?? ''} onChange={e=>setEditing({...editing,xp: e.target.value==='' ? '' : +e.target.value})}/>
+          </Field>
+          <Field label="النوع">
+            <select className="input" value={editing.type||'mcq'} onChange={e=>setEditing({...editing,type:e.target.value})}>
+              <option value="mcq">اختيار متعدد</option>
+            </select>
+          </Field>
+        </div>
+        <div className="flex g8 mt16">
+          <button className="btn btn-p" onClick={saveEdit} disabled={busy} style={{flex:1}}>
+            {busy?'جارٍ الحفظ...':'💾 حفظ التعديلات'}
+          </button>
+          <button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button>
+        </div>
+      </Modal>
+    )}
+  </>;
+}
+
 function Footer(){
   const app=useApp();
   const user=app.currentUser;
@@ -2064,6 +2740,7 @@ function Footer(){
     </button>
   </div>;
 }
+
 function AdminApp(){
   const app=useApp();
   const [tab,setTab]=useState(()=>{try{ return localStorage.getItem('admin_tab') || 'dashboard'; }catch(e){ return 'dashboard'; }});
@@ -2076,11 +2753,12 @@ function AdminApp(){
   const unreadNotifs = useMemo(()=>{return (app.db.notifications||[]).filter(n => {if(!n.created_at) return false;const created = new Date(n.created_at).getTime();const lastSeen = Number(localStorage.getItem('admin_last_notif_seen') || 0);return created > lastSeen;}).length;},[app.db.notifications]);
   useEffect(()=>{const baseTitle = 'MISSION EDU — لوحة الإدارة';document.title = unreadNotifs > 0 ? `(${unreadNotifs}) ${baseTitle}` : baseTitle;},[unreadNotifs]);
   useEffect(()=>{if(tab === 'notifications'){try{ localStorage.setItem('admin_last_notif_seen', Date.now().toString()); }catch(e){}}},[tab]);
+  const bannedCount = (app.db.users||[]).filter(u=>u.role==='student'&&u.banned===true).length;
   const items=[
     {title:'الرئيسية',items:[{id:'dashboard',icon:'dashboard',label:'لوحة التحكم'},{id:'activity',icon:'activity',label:'سجل النشاط'},{id:'exam-results',icon:'clipboard',label:'نتايج الاختبارات'},{id:'errors',icon:'alert',label:'تحليل الأخطاء'}]},
-    {title:'المحتوى',items:[{id:'grades',icon:'school',label:'الصفوف'},{id:'subjects',icon:'book',label:'المواد'},{id:'units',icon:'folder',label:'الوحدات'},{id:'lessons',icon:'file',label:'الدروس'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'missions',icon:'target',label:'المهام'}]},
+    {title:'المحتوى',items:[{id:'grades',icon:'school',label:'الصفوف'},{id:'subjects',icon:'book',label:'المواد'},{id:'units',icon:'folder',label:'الوحدات'},{id:'lessons',icon:'file',label:'الدروس'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'questions-bank',icon:'database',label:'بنك الأسئلة'},{id:'missions',icon:'target',label:'المهام'}]},
     {title:'التحفيز',items:[{id:'achievements',icon:'trophy',label:'الإنجازات'},{id:'levels',icon:'trend',label:'المستويات'},{id:'certificates',icon:'award',label:'الشهادات'}]},
-    {title:'المستخدمون',items:[{id:'students',icon:'users',label:'الطلاب'},{id:'notes',icon:'note',label:'ملاحظات الطلاب'},{id:'notifications',icon:'bell',label:'الإشعارات',badge:unreadNotifs||null},{id:'reports',icon:'link',label:'البلاغات'}]},
+    {title:'المستخدمون',items:[{id:'students',icon:'users',label:'الطلاب'},{id:'banned',icon:'lock',label:'المحظورون',badge:bannedCount||null},{id:'notes',icon:'note',label:'ملاحظات الطلاب'},{id:'notifications',icon:'bell',label:'الإشعارات',badge:unreadNotifs||null},{id:'reports',icon:'link',label:'البلاغات'}]},
     {title:'النمو',items:[{id:'coupons',icon:'coupon',label:'الكوبونات'},{id:'referrals',icon:'share',label:'الإحالات'},{id:'polls',icon:'activity',label:'الاستطلاعات'}]},
     {title:'النظام',items:[{id:'settings',icon:'settings',label:'الإعدادات'}]}
   ];
@@ -2090,6 +2768,7 @@ function AdminApp(){
     app.db.subjects.filter(s=>s.name.toLowerCase().includes(lc)).forEach(s=>res.push({type:'مادة',icon:s.icon||'📚',title:s.name,nav:'subjects'}));
     app.db.lessons.filter(l=>l.title.toLowerCase().includes(lc)).slice(0,5).forEach(l=>res.push({type:'درس',icon:<Icon name="file" size={16}/>,title:l.title,nav:'lessons'}));
     app.db.exams.filter(e=>e.title.toLowerCase().includes(lc)).slice(0,5).forEach(e=>res.push({type:'اختبار',icon:<Icon name="clipboard" size={16}/>,title:e.title,nav:'exams'}));
+    app.db.questions.filter(qq=>(qq.text||'').toLowerCase().includes(lc)).slice(0,5).forEach(qq=>res.push({type:'سؤال',icon:<Icon name="help" size={16}/>,title:qq.text.slice(0,60),nav:'questions-bank'}));
     setSearchResults(res);
   };
   return <div className="app">
@@ -2106,11 +2785,13 @@ function AdminApp(){
         {tab==='units'&&<UnitsPage/>}
         {tab==='lessons'&&<LessonsPage/>}
         {tab==='exams'&&<ExamsPage/>}
+        {tab==='questions-bank'&&<QuestionsBankPage/>}
         {tab==='missions'&&<MissionsPage/>}
         {tab==='achievements'&&<AchievementsPage/>}
         {tab==='levels'&&<LevelsPage/>}
         {tab==='certificates'&&<CertificatesPage/>}
         {tab==='students'&&<StudentsPage/>}
+        {tab==='banned'&&<BannedUsersPage/>}
         {tab==='notes'&&<NotesPage/>}
         {tab==='notifications'&&<NotificationsPage/>}
         {tab==='reports'&&<ReportsPage/>}
@@ -2123,6 +2804,7 @@ function AdminApp(){
     </div>
   </div>;
 }
+
 function Root(){
   const app=useApp();
   if(app.loading) return <div className="loading"><div className="spinner"></div>جارٍ التحميل...</div>;
@@ -2130,6 +2812,7 @@ function Root(){
   if(app.currentUser.role!=='admin') return null;
   return <AdminApp/>;
 }
+
 function App(){return <ToastProvider><AppProvider><Root/></AppProvider></ToastProvider>;}
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
