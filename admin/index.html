@@ -832,11 +832,15 @@ function LessonsPage(){
     </Modal>}
   </>;
 }
+
 function ExamsPage(){
   const app=useApp();
   const [editing,setEditing]=useState(null);const [form,setForm]=useState({});const [busy,setBusy]=useState(false);const [jsonText,setJsonText]=useState('');
+  const [editingQ,setEditingQ]=useState(null);const [qForm,setQForm]=useState({text:'',options:['','','',''],correct:0,explanation:''});const [qBusy,setQBusy]=useState(false);
+
   const openNew=()=>{setForm({title:'',subject_id:'',unit_id:'',lesson_ids:[],question_ids:[],duration:'',pass_score:'',max_attempts:'',xp:'',published:true,sort_order:'',is_free:true});setJsonText('');setEditing('new');};
   const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(c.is_free===undefined)c.is_free=true;setForm(c);setJsonText('');setEditing(it.id);};
+
   const parseQuestionJSON=raw=>{
     let parsed;try{parsed=JSON.parse(raw);}catch(e){throw new Error('صيغة JSON غير صحيحة. راجع الأقواس والفواصل وعلامات التنصيص.');}
     const list=Array.isArray(parsed)?parsed:(Array.isArray(parsed?.questions)?parsed.questions:(Array.isArray(parsed?.data)?parsed.data:null));
@@ -868,6 +872,7 @@ function ExamsPage(){
       return {text,options,correct,explanation:String(item.explanation??item.rationale??item.feedback??'').trim(),difficulty:String(item.difficulty||'medium'),xp:Number(item.xp)||0};
     });
   };
+
   const save=async()=>{
     if(!String(form.title||'').trim()||!form.subject_id)return app.toast.warn('العنوان والمادة مطلوبان');
     let parsedQuestions=[];
@@ -889,23 +894,112 @@ function ExamsPage(){
       await app.reload();app.toast.err(e.message||'تعذر حفظ الاختبار');
     }finally{setBusy(false);}
   };
+
   const del=async id=>{const exam=app.db.exams.find(e=>e.id===id);if(!exam)return;const qCount=(exam.question_ids||[]).length;const r=await Swal.fire({title:'حذف؟',html:`سيتم حذف الاختبار و ${qCount} سؤال`,icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{const qIds=exam.question_ids||[];if(qIds.length>0)await DB.removeMany('questions',qIds);await DB.remove('exams',id);await app.reload();app.toast.ok('تم');}catch(e){app.toast.err(e.message);}};
+
+  const openEditQ=q=>{
+    const correctRaw=Array.isArray(q.correct)?q.correct[0]:(typeof q.correct==='number'?q.correct:0);
+    const opts=Array.isArray(q.options)?[...q.options]:['','','',''];
+    while(opts.length<4)opts.push('');
+    setQForm({text:q.text||q.question||'',options:opts.slice(0,4),correct:Number(correctRaw)||0,explanation:q.explanation||''});
+    setEditingQ(q.id);
+  };
+
+  const saveQ=async()=>{
+    if(!qForm.text.trim())return app.toast.warn('نص السؤال مطلوب');
+    if(qForm.options.some(o=>!String(o).trim()))return app.toast.warn('جميع الاختيارات مطلوبة');
+    setQBusy(true);
+    try{
+      const existing=app.question(editingQ)||{};
+      await app.save('questions',{...existing,text:qForm.text.trim(),options:qForm.options.map(o=>String(o).trim()),correct:[Number(qForm.correct)],explanation:(qForm.explanation||'').trim()});
+      app.toast.ok('تم تحديث السؤال');
+      setEditingQ(null);
+    }catch(e){app.toast.err(e.message);}
+    setQBusy(false);
+  };
+
+  const removeQFromExam=async qId=>{
+    const r=await Swal.fire({title:'حذف السؤال من الاختبار؟',text:'هل تريد حذفه أيضاً من بنك الأسئلة؟',icon:'warning',showCancelButton:true,showDenyButton:true,confirmButtonText:'حذف نهائي',denyButtonText:'إزالة فقط',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',denyButtonColor:'#D4AF37',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+    if(!r.isConfirmed&&!r.isDenied)return;
+    try{
+      const updatedIds=(form.question_ids||[]).filter(id=>id!==qId);
+      await app.save('exams',{...form,question_ids:updatedIds});
+      setForm(f=>({...f,question_ids:updatedIds}));
+      if(r.isConfirmed)await app.remove('questions',qId);
+      app.toast.ok('تم');
+    }catch(e){app.toast.err(e.message);}
+  };
+
   const availQ=form.unit_id?app.db.questions.filter(q=>q.unit_id===form.unit_id):app.db.questions;
+  const currentQuestions=(form.question_ids||[]).map(id=>app.question(id)).filter(Boolean);
+
   return <>
     <div className="flex between center mb16 wrap g8"><div className="h2 grad">📝 الاختبارات</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> جديد</button></div>
     <div className="glass" style={{padding:14}}>{app.db.exams.length===0?<Empty title="لا اختبارات"/>:<div className="sx"><table className="tbl"><thead><tr><th>العنوان</th><th>المادة</th><th>الأسئلة</th><th>الوصول</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>{app.db.exams.map(e=><tr key={e.id}><td><b>{e.title}</b></td><td className="sm">{app.subject(e.subject_id)?.name||'—'}</td><td>{(e.question_ids||[]).length}</td><td><AccessBadge value={e.is_free}/></td><td>{e.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(e)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(e.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody></table></div>}</div>
+
     {editing!==null&&<Modal title={editing==='new'?'جديد':'تعديل'} onClose={()=>setEditing(null)} wide>
       <Field label="الاسم"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
       <div className="grid g2"><Field label="المادة"><select className="input" value={form.subject_id||''} onChange={e=>setForm({...form,subject_id:e.target.value,unit_id:''})}><option value="">— اختر —</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field><Field label="الوحدة"><select className="input" value={form.unit_id||''} onChange={e=>setForm({...form,unit_id:e.target.value,question_ids:[]})}><option value="">— اختر —</option>{app.db.units.filter(u=>!form.subject_id||u.subject_id===form.subject_id).map(u=><option key={u.id} value={u.id}>{u.name}</option>)}</select></Field><Field label="المدة بالدقائق"><input type="number" className="input" value={form.duration??''} onChange={e=>setForm({...form,duration:e.target.value===''?'':+e.target.value})}/></Field><Field label="درجة النجاح %"><input type="number" className="input" value={form.pass_score??''} onChange={e=>setForm({...form,pass_score:e.target.value===''?'':+e.target.value})}/></Field><Field label="XP"><input type="number" className="input" value={form.xp??''} onChange={e=>setForm({...form,xp:e.target.value===''?'':+e.target.value})}/></Field><Field label="الحالة"><select className="input" value={form.published!==false?'1':'0'} onChange={e=>setForm({...form,published:e.target.value==='1'})}><option value="1">منشور</option><option value="0">مخفي</option></select></Field></div>
       <Field label="نوع الوصول"><AccessToggle value={form.is_free} onChange={v=>setForm({...form,is_free:v})}/></Field>
+
       <div className="glass-s mb12" style={{padding:14,borderColor:'var(--border2)'}}>
         <div className="h4 mb8">⚡ إضافة أسئلة مباشرة بكود JSON</div>
-        <div className="sm muted mb8">الصق كود JSON هنا — بدون رفع ملفات. الأسئلة هتتضاف تلقائيًا للاختبار عند الحفظ، مع حفظ الإجابة الصحيحة والشرح.</div>
+        <div className="sm muted mb8">الصق كود JSON هنا — الأسئلة هتتضاف تلقائيًا للاختبار عند الحفظ.</div>
         <textarea className="input" rows="9" dir="ltr" value={jsonText} onChange={e=>setJsonText(e.target.value)} placeholder={'[\n  {\n    "question": "ما ناتج 2 + 2؟",\n    "options": { "A": "3", "B": "4", "C": "5", "D": "6" },\n    "correct": "B",\n    "explanation": "لأن 2 + 2 = 4"\n  }\n]'} style={{fontFamily:'monospace',fontSize:12,textAlign:'left',minHeight:180}}/>
         {jsonText.trim()&&<div className="xs muted mt8">سيتم تحليل JSON قبل الحفظ والتحقق من السؤال والاختيارات والإجابة الصحيحة.</div>}
       </div>
-      <Field label={`الأسئلة الحالية (${(form.question_ids||[]).length})`}><div className="glass-s" style={{padding:10,maxHeight:260,overflowY:'auto'}}>{availQ.length===0?<div className="sm muted">لا أسئلة محفوظة في هذه الوحدة — يمكنك لصق JSON أعلاه.</div>:availQ.map(q=>{const on=(form.question_ids||[]).includes(q.id);return <label key={q.id} className="flex center g8 mb6" style={{padding:6,cursor:'pointer'}}><input type="checkbox" checked={on} onChange={()=>setForm({...form,question_ids:on?(form.question_ids||[]).filter(x=>x!==q.id):[...(form.question_ids||[]),q.id]})}/><span className="sm" style={{flex:1}}>{String(q.text||q.question||'').slice(0,80)}</span></label>;})}</div></Field>
+
+      <Field label={`الأسئلة الحالية (${currentQuestions.length})`}>
+        <div className="glass-s" style={{padding:10,maxHeight:400,overflowY:'auto'}}>
+          {currentQuestions.length===0?<div className="sm muted">لا أسئلة بعد.</div>:
+          currentQuestions.map((q,idx)=>{
+            const correctArr=Array.isArray(q.correct)?q.correct:[q.correct];
+            const correctIdx=Number(correctArr[0])||0;
+            return <div key={q.id} style={{padding:10,borderBottom:'1px solid rgba(212,175,55,.08)'}}>
+              <div className="flex between center mb6">
+                <span className="pill pill-b" style={{fontSize:10}}>{idx+1}</span>
+                <div className="flex g6">
+                  <button className="btn btn-s btn-sm" onClick={()=>openEditQ(q)}><Icon name="edit" size={12}/></button>
+                  <button className="btn btn-dn btn-sm" onClick={()=>removeQFromExam(q.id)}><Icon name="trash" size={12}/></button>
+                </div>
+              </div>
+              <div className="sm" style={{fontWeight:700,marginBottom:6}}>{String(q.text||'').slice(0,100)}</div>
+              <div className="flex wrap g6">{(q.options||[]).map((opt,oi)=><span key={oi} className="xs" style={{padding:'2px 8px',borderRadius:20,background:oi===correctIdx?'rgba(34,197,94,.18)':'rgba(255,255,255,.04)',color:oi===correctIdx?'#6ee7a0':'var(--muted)',border:`1px solid ${oi===correctIdx?'rgba(34,197,94,.4)':'var(--border)'}`}}>{['A','B','C','D'][oi]}. {String(opt).slice(0,30)}</span>)}</div>
+              {q.explanation&&<div className="xs muted mt6">💡 {String(q.explanation).slice(0,120)}</div>}
+            </div>;
+          })}
+        </div>
+      </Field>
+
+      <Field label={`إضافة من البنك (${availQ.filter(q=>!(form.question_ids||[]).includes(q.id)).length} متاح)`}>
+        <div className="glass-s" style={{padding:10,maxHeight:260,overflowY:'auto'}}>
+          {availQ.filter(q=>!(form.question_ids||[]).includes(q.id)).length===0?<div className="sm muted">لا أسئلة إضافية في هذه الوحدة.</div>:
+          availQ.filter(q=>!(form.question_ids||[]).includes(q.id)).map(q=>(
+            <label key={q.id} className="flex center g8 mb6" style={{padding:6,cursor:'pointer'}}>
+              <input type="checkbox" checked={false} onChange={()=>setForm({...form,question_ids:[...(form.question_ids||[]),q.id]})}/>
+              <span className="sm" style={{flex:1}}>{String(q.text||'').slice(0,80)}</span>
+            </label>
+          ))}
+        </div>
+      </Field>
+
       <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ الحفظ...':'💾 حفظ الاختبار'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
+    </Modal>}
+
+    {editingQ&&<Modal title="✏️ تعديل السؤال" onClose={()=>setEditingQ(null)} wide>
+      <Field label="نص السؤال"><textarea className="input" rows="3" value={qForm.text} onChange={e=>setQForm({...qForm,text:e.target.value})}/></Field>
+      <div className="grid g2">
+        {['A','B','C','D'].map((letter,i)=>(
+          <Field key={letter} label={`الاختيار ${letter}`}>
+            <div className="flex center g8">
+              <input type="radio" name="correct_option" checked={qForm.correct===i} onChange={()=>setQForm({...qForm,correct:i})} style={{width:18,height:18,accentColor:'#D4AF37'}}/>
+              <input className="input" value={qForm.options[i]||''} onChange={e=>setQForm({...qForm,options:qForm.options.map((o,oi)=>oi===i?e.target.value:o)})}/>
+            </div>
+          </Field>
+        ))}
+      </div>
+      <Field label="الشرح (اختياري)"><textarea className="input" rows="3" value={qForm.explanation||''} onChange={e=>setQForm({...qForm,explanation:e.target.value})}/></Field>
+      <div className="flex g8 mt16"><button className="btn btn-p" onClick={saveQ} disabled={qBusy}>{qBusy?'جارٍ...':'💾 حفظ التعديل'}</button><button className="btn btn-s" onClick={()=>setEditingQ(null)}>إلغاء</button></div>
     </Modal>}
   </>;
 }
