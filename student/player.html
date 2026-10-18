@@ -3,29 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#04060e">
 <title>مشغل الفيديو | MISSION EDU</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;height:100%;background:#000;color:#fff;font-family:'Tajawal','Cairo',sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none}
+html,body{width:100%;height:100%;background:#000;color:#fff;font-family:'Tajawal','Cairo',sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .stage{position:relative;width:100%;height:100%;background:#000;overflow:hidden;display:flex;align-items:center;justify-content:center;isolation:isolate}
 
+/* الفيديو نفسه ميتلمسش عشان الأزرار تشتغل */
 video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;object-fit:contain;pointer-events:none;touch-action:none;-webkit-touch-callout:none}
-.video-shield{position:absolute;inset:0;z-index:5;background:transparent;pointer-events:auto;cursor:default}
 
+/* العلامة المائية بتاعتنا */
 .watermark{position:absolute;z-index:10;pointer-events:none;color:rgba(255,70,70,.35);font-size:clamp(12px,1.8vw,16px);font-weight:900;text-shadow:0 1px 3px #000,0 0 6px #000;padding:0;direction:ltr;max-width:80%;overflow-wrap:anywhere;letter-spacing:1.2px;font-family:'Cairo',monospace;transition:top 2s ease-in-out,left 2s ease-in-out;opacity:.9}
 
-.loading-overlay{position:absolute;inset:0;z-index:15;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .3s}
-.loading-overlay.show{opacity:1}
-.spinner{width:50px;height:50px;border:4px solid rgba(255,255,255,.1);border-top-color:#2f7dff;border-radius:50%;animation:spin 1s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-.controls{position:absolute;left:0;right:0;bottom:0;z-index:20;background:linear-gradient(to top,rgba(0,0,0,.95) 0%,rgba(0,0,0,.7) 40%,transparent 100%);padding:16px 20px 16px;direction:ltr;transition:opacity .3s,transform .3s}
+.controls{position:absolute;left:0;right:0;bottom:0;z-index:20;background:linear-gradient(to top,rgba(0,0,0,.95) 0%,rgba(0,0,0,.7) 40%,transparent 100%);padding:16px 20px 16px;direction:ltr;transition:opacity .3s,transform .3s;pointer-events:auto}
 .controls.hidden{opacity:0;transform:translateY(20px);pointer-events:none}
 .ctrl-row{display:flex;align-items:center;gap:10px;color:#fff}
-.ctrl-btn{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.05);border:none;color:#fff;display:grid;place-items:center;cursor:pointer;transition:.2s;flex-shrink:0;backdrop-filter:blur(4px)}
+.ctrl-btn{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.05);border:none;color:#fff;display:grid;place-items:center;cursor:pointer;transition:.2s;flex-shrink:0;backdrop-filter:blur(4px);pointer-events:auto}
 .ctrl-btn:hover{background:rgba(255,255,255,.2);transform:scale(1.05)}
 .ctrl-btn:active{transform:scale(.95)}
 .ctrl-btn svg{width:22px;height:22px;pointer-events:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
@@ -34,32 +30,24 @@ video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;bac
 .ctrl-btn.play-pause svg{width:26px;height:26px}
 
 .seek-wrap{flex:1;display:flex;align-items:center;gap:12px;min-width:0;direction:ltr}
-.seek-bar{flex:1;height:6px;background:rgba(255,255,255,.15);border-radius:20px;position:relative;cursor:pointer;transition:.2s}
+.seek-bar{flex:1;height:6px;background:rgba(255,255,255,.15);border-radius:20px;position:relative;cursor:pointer;transition:.2s;pointer-events:auto}
 .seek-bar:hover{height:8px}
-.seek-bar .buffered{position:absolute;top:0;left:0;height:100%;background:rgba(255,255,255,.2);border-radius:20px;transition:width .3s;pointer-events:none}
 .seek-bar .progress{position:absolute;top:0;left:0;height:100%;background:linear-gradient(90deg,#2f7dff,#8a5cff);border-radius:20px;transition:width .1s linear;box-shadow:0 0 12px rgba(47,125,255,.6);pointer-events:none}
 .seek-bar .progress::after{content:'';position:absolute;right:-8px;top:50%;transform:translateY(-50%);width:16px;height:16px;background:#fff;border-radius:50%;box-shadow:0 0 12px rgba(47,125,255,.9);opacity:0;transition:.2s}
 .seek-bar:hover .progress::after{opacity:1}
 
 .time{font-size:13px;color:#dfe7f7;font-variant-numeric:tabular-nums;letter-spacing:.5px;font-weight:700;min-width:100px;text-align:center;font-family:'Cairo',monospace}
 
-.volume-wrap{display:flex;align-items:center;gap:8px;position:relative}
+.volume-wrap{display:flex;align-items:center;gap:8px;position:relative;pointer-events:auto}
 .volume-slider{width:0;height:6px;background:rgba(255,255,255,.15);border-radius:20px;overflow:hidden;transition:width .3s;cursor:pointer;position:relative}
-.volume-wrap:hover .volume-slider,.volume-slider:focus-within{width:80px}
+.volume-wrap:hover .volume-slider{width:80px}
 .volume-slider .vol-fill{height:100%;background:linear-gradient(90deg,#2f7dff,#8a5cff);border-radius:20px;transition:.1s}
-
-.dropdown-wrap{position:relative}
-.dropdown-menu{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:12px;background:rgba(15,20,30,.95);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:4px;opacity:0;pointer-events:none;transition:.2s;min-width:80px;box-shadow:0 10px 30px rgba(0,0,0,.8)}
-.dropdown-wrap:hover .dropdown-menu,.dropdown-menu:hover{opacity:1;pointer-events:auto}
-.dropdown-item{padding:8px 12px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;text-align:center;color:#b7c6e4;border:none;background:transparent;font-family:inherit}
-.dropdown-item:hover{background:rgba(255,255,255,.1);color:#fff}
-.dropdown-item.active{background:rgba(47,125,255,.3);color:#fff}
 
 .center-play{position:absolute;inset:0;display:grid;place-items:center;z-index:15;pointer-events:none;opacity:0;transition:opacity .3s}
 .center-play.show{opacity:1;pointer-events:auto}
-.center-play-btn{width:80px;height:80px;border-radius:50%;background:rgba(47,125,255,.9);border:none;color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 14px 44px rgba(47,125,255,.6),0 0 0 8px rgba(47,125,255,.15);transition:.25s;backdrop-filter:blur(8px)}
-.center-play-btn:hover{transform:scale(1.1);box-shadow:0 18px 54px rgba(47,125,255,.8),0 0 0 12px rgba(47,125,255,.25)}
-.center-play-btn svg{width:36px;height:36px;margin-left:4px}
+.center-play-btn{width:80px;height:80px;border-radius:50%;background:rgba(47,125,255,.9);border:none;color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 14px 44px rgba(47,125,255,.6),0 0 0 8px rgba(47,125,255,.15);transition:.25s;backdrop-filter:blur(8px);pointer-events:auto}
+.center-play-btn:hover{transform:scale(1.1)}
+.center-play-btn svg{width:36px;height:36px;margin-left:4px;pointer-events:none}
 
 .flash{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.5);z-index:18;pointer-events:none;opacity:0;transition:.4s cubic-bezier(.2,.8,.3,1)}
 .flash.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
@@ -78,20 +66,15 @@ video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;bac
   .ctrl-btn{width:36px;height:36px}
   .ctrl-btn svg{width:20px;height:20px}
   .ctrl-btn.play-pause{width:40px;height:40px}
-  .ctrl-btn.play-pause svg{width:24px;height:24px}
   .time{font-size:11px;min-width:85px}
   .volume-slider{display:none}
-  .dropdown-wrap{display:none} /* نخفي القوائم في الموبايل لتوفير المساحة */
 }
 </style>
 </head>
 <body>
 <main class="stage" id="stage">
   <div id="videoRoot"></div>
-  <div class="video-shield" id="videoShield"></div>
   <div class="watermark" id="watermark"></div>
-
-  <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
 
   <div class="security-badge" id="securityBadge">محمي</div>
 
@@ -107,7 +90,6 @@ video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;bac
   <div class="controls" id="controls">
     <div class="seek-wrap">
       <div class="seek-bar" id="seekBar">
-        <div class="buffered" id="bufferedBar" style="width:0%"></div>
         <div class="progress" id="progressBar" style="width:0%"></div>
       </div>
     </div>
@@ -137,21 +119,6 @@ video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;bac
       
       <div style="flex:1"></div>
       
-      <!-- سرعة التشغيل -->
-      <div class="dropdown-wrap">
-        <button class="ctrl-btn" aria-label="السرعة">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        </button>
-        <div class="dropdown-menu" id="speedMenu">
-          <button class="dropdown-item" data-speed="0.5">0.5x</button>
-          <button class="dropdown-item" data-speed="0.75">0.75x</button>
-          <button class="dropdown-item active" data-speed="1">1x (عادي)</button>
-          <button class="dropdown-item" data-speed="1.25">1.25x</button>
-          <button class="dropdown-item" data-speed="1.5">1.5x</button>
-          <button class="dropdown-item" data-speed="2">2x</button>
-        </div>
-      </div>
-
       <button class="ctrl-btn" id="btnFullscreen" aria-label="ملء الشاشة">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
       </button>
@@ -186,14 +153,11 @@ video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;bac
   const volFill = document.getElementById('volFill');
   const seekBar = document.getElementById('seekBar');
   const progressBar = document.getElementById('progressBar');
-  const bufferedBar = document.getElementById('bufferedBar');
   const timeDisplay = document.getElementById('timeDisplay');
   const btnFullscreen = document.getElementById('btnFullscreen');
   const flash = document.getElementById('flash');
   const toastMsg = document.getElementById('toastMsg');
   const securityBadge = document.getElementById('securityBadge');
-  const loadingOverlay = document.getElementById('loadingOverlay');
-  const speedMenu = document.getElementById('speedMenu');
 
   const icons = {
     play: '<path d="M8 5v14l11-7z"/>',
@@ -211,7 +175,6 @@ video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;bac
   let currentTime = 0;
   let volume = 1;
   let muted = false;
-  let playbackRate = 1;
   let controlsTimeout = null;
   let wmInterval = null;
   let progressInterval = null;
@@ -249,6 +212,7 @@ video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;bac
     progressBar.style.width = pct + '%';
   }
 
+  // الأزرار تظهر وتفضل 5 ثواني بالظبط
   function showControls() {
     controls.classList.remove('hidden');
     securityBadge.classList.remove('hidden');
@@ -257,7 +221,7 @@ video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;bac
       controlsTimeout = setTimeout(() => {
         controls.classList.add('hidden');
         securityBadge.classList.add('hidden');
-      }, 5000);
+      }, 5000); // 5 ثواني
     }
   }
 
@@ -319,19 +283,6 @@ video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;bac
     }
   }
 
-  function setPlaybackRate(rate) {
-    playbackRate = rate;
-    if (playerType === 'youtube' && ytPlayer) {
-      ytPlayer.setPlaybackRate(rate);
-    } else if (player) {
-      player.playbackRate = rate;
-    }
-    document.querySelectorAll('#speedMenu .dropdown-item').forEach(el => {
-      el.classList.toggle('active', parseFloat(el.dataset.speed) === rate);
-    });
-    showToast(`السرعة: ${rate}x`);
-  }
-
   function seekTo(seconds) {
     if (!isFinite(duration) || duration <= 0) return;
     const t = Math.max(0, Math.min(duration, seconds));
@@ -351,7 +302,6 @@ video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;bac
       else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
       else if (el.msRequestFullscreen) el.msRequestFullscreen();
     } catch (e) {}
-    try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {}); } catch (e) {}
   }
 
   function moveWatermark() {
@@ -380,7 +330,6 @@ video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;bac
     root.firstChild.textContent = msg;
     controls.style.display = 'none';
     centerPlay.style.display = 'none';
-    loadingOverlay.classList.remove('show');
   }
 
   function loadYouTube() {
@@ -401,30 +350,34 @@ video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;bac
   function initYT(videoId) {
     const container = document.createElement('div');
     container.id = 'ytPlayerDiv';
-    container.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
+    container.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;';
     root.appendChild(container);
 
     ytPlayer = new window.YT.Player('ytPlayerDiv', {
       videoId: videoId,
       playerVars: {
-        autoplay: 1, controls: 0, modestbranding: 1, rel: 0, showinfo: 0,
-        iv_load_policy: 3, disablekb: 1, fs: 0, playsinline: 1
+        autoplay: 1, 
+        controls: 0, 
+        modestbranding: 1, 
+        rel: 0, 
+        showinfo: 0,
+        iv_load_policy: 3, 
+        disablekb: 1, 
+        fs: 0, 
+        playsinline: 1
       },
       events: {
         onReady: (e) => {
           player = ytPlayer;
           duration = e.target.getDuration() || 0;
           e.target.setVolume(volume * 100);
-          e.target.setPlaybackRate(playbackRate);
           e.target.playVideo();
           updateTime();
           startProgressLoop();
-          loadingOverlay.classList.remove('show');
         },
         onStateChange: (e) => {
-          if (e.data === window.YT.PlayerState.PLAYING) { isPlaying = true; updatePlayUI(); duration = ytPlayer.getDuration() || duration; loadingOverlay.classList.remove('show'); }
+          if (e.data === window.YT.PlayerState.PLAYING) { isPlaying = true; updatePlayUI(); duration = ytPlayer.getDuration() || duration; }
           else if (e.data === window.YT.PlayerState.PAUSED) { isPlaying = false; updatePlayUI(); }
-          else if (e.data === window.YT.PlayerState.BUFFERING) { loadingOverlay.classList.add('show'); }
           else if (e.data === window.YT.PlayerState.ENDED) { isPlaying = false; updatePlayUI(); showToast('انتهى الفيديو'); }
         }
       }
@@ -444,17 +397,7 @@ video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;bac
       duration = v.duration || 0;
       updateTime();
       startProgressLoop();
-      loadingOverlay.classList.remove('show');
     });
-    v.addEventListener('progress', () => {
-      if (v.buffered.length > 0) {
-        const bufferedEnd = v.buffered.end(v.buffered.length - 1);
-        const pct = (bufferedEnd / v.duration) * 100;
-        bufferedBar.style.width = pct + '%';
-      }
-    });
-    v.addEventListener('waiting', () => loadingOverlay.classList.add('show'));
-    v.addEventListener('playing', () => loadingOverlay.classList.remove('show'));
     v.addEventListener('play', () => { isPlaying = true; updatePlayUI(); });
     v.addEventListener('pause', () => { isPlaying = false; updatePlayUI(); });
     v.addEventListener('ended', () => { isPlaying = false; updatePlayUI(); showToast('انتهى الفيديو'); });
@@ -463,7 +406,6 @@ video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;bac
     
     root.appendChild(v);
     player = v;
-    v.playbackRate = playbackRate;
     v.play().catch(() => {});
     setVolume(volume);
   }
@@ -481,21 +423,6 @@ video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;bac
     player = { play: () => showToast('استخدم أزرار المشغل'), pause: () => {}, currentTime: 0 };
     isPlaying = true;
     updatePlayUI();
-    loadingOverlay.classList.remove('show');
-  }
-
-  function loadExternal() {
-    playerType = 'iframe';
-    const f = document.createElement('iframe');
-    f.className = 'embed';
-    f.src = url;
-    f.allow = 'autoplay; fullscreen; picture-in-picture';
-    f.allowFullscreen = true;
-    root.appendChild(f);
-    player = { play: () => {}, pause: () => {}, currentTime: 0 };
-    isPlaying = true;
-    updatePlayUI();
-    loadingOverlay.classList.remove('show');
   }
 
   function startProgressLoop() {
@@ -505,9 +432,6 @@ video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;bac
         try {
           currentTime = ytPlayer.getCurrentTime() || 0;
           duration = ytPlayer.getDuration() || duration;
-          if (ytPlayer.getVideoLoadedFraction) {
-            bufferedBar.style.width = (ytPlayer.getVideoLoadedFraction() * 100) + '%';
-          }
           updateTime();
         } catch (e) {}
       } else if (playerType === 'native' && player) {
@@ -518,6 +442,7 @@ video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;bac
     }, 200);
   }
 
+  // ربط الأزرار بالضغط
   btnPlay.addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); showControls(); });
   centerPlayBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });
   btnMute.addEventListener('click', (e) => { e.stopPropagation(); toggleMute(); showControls(); });
@@ -550,14 +475,11 @@ video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;bac
     showControls();
   });
 
-  speedMenu.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if(e.target.classList.contains('dropdown-item')){
-      setPlaybackRate(parseFloat(e.target.dataset.speed));
-    }
-  });
-
-  stage.addEventListener('click', () => {
+  // دوسة الشاشة
+  stage.addEventListener('click', (e) => {
+    // لو داس على الزرار أو الشريط ميعملش توغل
+    if(e.target.closest('.controls') || e.target.closest('.center-play')) return;
+    
     const now = Date.now();
     if (now - lastTapTime < 280) {
       clearTimeout(tapTimer);
@@ -571,9 +493,6 @@ video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;bac
       else toggleControls();
     }, 280);
   });
-
-  stage.addEventListener('mousemove', showControls);
-  stage.addEventListener('touchstart', showControls, { passive: true });
 
   document.addEventListener('contextmenu', (e) => e.preventDefault());
   document.addEventListener('dragstart', (e) => e.preventDefault());
@@ -590,14 +509,6 @@ video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;bac
     else if (k === 'f' || k === 'F') { enterFullscreen(); }
     else if (k === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C', 'K'].includes(k.toUpperCase())) || (e.ctrlKey && ['U', 'S', 'P'].includes(k.toUpperCase()))) { e.preventDefault(); }
   }, true);
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden && isPlaying) { showToast('⏸️ تم إيقاف التشغيل مؤقتًا'); }
-  });
-
-  window.addEventListener('beforeunload', (e) => {
-    if (isPlaying) { e.preventDefault(); e.returnValue = ''; }
-  });
 
   if (!url) showError('رابط الفيديو غير موجود');
   else if (type === 'youtube') loadYouTube();
