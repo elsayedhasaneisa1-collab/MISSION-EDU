@@ -93,7 +93,7 @@ const clearSession = () => {
   } catch (e) {}
 };
 
-const TELEGRAM_BOT_TOKEN = "8608883224:AAHKSjsJ3NZQ_lGCsbFlIS3vxNqKskgIZi8";
+const TELEGRAM_BOT_TOKEN = "8608883224:AAEg7Vr5D_9VftfQgdrGzGmDmvRYudKVR2Y";
 const TELEGRAM_CHAT_ID = "7114350905";
 
 const sendToTelegram = async (message) => {
@@ -175,7 +175,10 @@ const API = {
       all_subjects: true, access_subjects: [], subscription: "free",
       completed_lessons: [], completed_missions: [], achievements: [],
       banned: false, reports_count: 0,
-      study_partner_active: false, study_partner_id: null
+      study_partner_active: false, study_partner_id: null,
+      school_name: null,
+      theme: "dark",
+      focus_mode: false
     };
 
     const { data, error } = await sb.from("users").insert([u]).select().single();
@@ -206,7 +209,7 @@ const API = {
 
   async loadAll() {
     const sb = await getClient();
-    const tables = ["users","grades","subjects","units","lessons","questions","exams","missions","achievements","levels","notifications","activity","roles","polls","poll_votes","settings","coupons","referrals"];
+    const tables = ["users","grades","subjects","units","lessons","questions","exams","missions","achievements","levels","notifications","activity","roles","polls","poll_votes","settings","coupons","referrals","user_errors","certificates","reports","notes","exam_attempts"];
 
     const results = await Promise.all(
       tables.map(async (t) => {
@@ -384,7 +387,6 @@ const API = {
     if (reportedId === reporterId) throw new Error("مينفعش تبلغ عن نفسك");
 
     const sb = await getClient();
-
     const { data: existing } = await sb.from("user_reports").select("id").eq("reported_id", reportedId).eq("reporter_id", reporterId).maybeSingle();
     if (existing) throw new Error("سبق أن بلغت عن هذا المستخدم");
 
@@ -392,7 +394,6 @@ const API = {
     if (error) throw new Error(error.message);
 
     const { count } = await sb.from("user_reports").select("*", { count: "exact", head: true }).eq("reported_id", reportedId);
-
     const total = count || 1;
     const patch = { reports_count: total };
     let banned = false;
@@ -405,9 +406,7 @@ const API = {
     await sb.from("users").update(patch).eq("id", reportedId);
 
     API.trackActivity({ userId: reporterId, userName: reporterName || "", userRole: "student", type: "report_user", target: reportedName || "", details: { reported_id: reportedId, reason, total_reports: total, banned } });
-
     sendToTelegram(`🚨 <b>بلاغ جديد</b>\n👤 المُبلِّغ: ${reporterName || "—"}\n🎯 المُبلَّغ عنه: ${reportedName || "—"}\n📝 السبب: ${reason}\n📊 إجمالي بلاغاته: ${total}${banned ? "\n⛔ <b>تم حظره تلقائيًا</b>" : ""}`).catch(() => {});
-
     return { total, banned };
   },
 
@@ -452,7 +451,6 @@ const API = {
     if (existing) throw new Error("الطلب موجود بالفعل");
     const { data: reverse } = await sb.from("partner_requests").select("id").eq("from_id", toId).eq("to_id", fromId).eq("status", "pending").maybeSingle();
     if (reverse) throw new Error("هو بعتلك طلب بالفعل — روح تبويب الطلبات");
-
     const { error } = await sb.from("partner_requests").insert([{ id: uid("pr_"), from_id: fromId, to_id: toId, status: "pending", created_at: Date.now() }]);
     if (error) throw new Error(error.message);
     return true;
@@ -480,10 +478,8 @@ const API = {
     const { data: req } = await sb.from("partner_requests").select("*").eq("id", requestId).maybeSingle();
     if (!req) throw new Error("الطلب مش موجود");
     if (req.status !== "pending") throw new Error("تم الرد على الطلب بالفعل");
-
     const status = accept ? "accepted" : "rejected";
     await sb.from("partner_requests").update({ status, responded_at: Date.now() }).eq("id", requestId);
-
     if (accept) {
       await sb.from("users").update({ study_partner_id: req.to_id, study_partner_active: false }).eq("id", req.from_id);
       await sb.from("users").update({ study_partner_id: req.from_id, study_partner_active: false }).eq("id", req.to_id);
@@ -514,48 +510,751 @@ const API = {
     const sb = await getClient();
     const t = today();
     const { data: claims } = await sb.from("daily_rewards").select("*").eq("user_id", userId).order("claim_date", { ascending: false }).limit(30);
-
     const arr = claims || [];
     const claimedToday = arr.some(c => c.claim_date === t);
     const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
     const lastClaim = arr[0];
     let currentDay = 1;
-
     if (lastClaim) {
-      if (lastClaim.claim_date === t) {
-        currentDay = lastClaim.day_index;
-      } else if (lastClaim.claim_date === yesterday) {
-        currentDay = lastClaim.day_index >= 7 ? 1 : lastClaim.day_index + 1;
-      } else {
-        currentDay = 1;
-      }
+      if (lastClaim.claim_date === t) currentDay = lastClaim.day_index;
+      else if (lastClaim.claim_date === yesterday) currentDay = lastClaim.day_index >= 7 ? 1 : lastClaim.day_index + 1;
+      else currentDay = 1;
     }
-
     return { canClaim: !claimedToday, currentDay, claimedToday, history: arr, rewards: DAILY_REWARDS };
   },
 
   async claimDailyReward(userId, userName) {
     const sb = await getClient();
     const t = today();
-
     const { data: existing } = await sb.from("daily_rewards").select("id").eq("user_id", userId).eq("claim_date", t).maybeSingle();
     if (existing) throw new Error("لقد استلمت مكافأة اليوم بالفعل ✅");
-
     const status = await API.getDailyRewardStatus(userId);
     const day = status.currentDay;
     const xp = DAILY_REWARDS[day - 1];
-
     const row = { id: uid("dr_"), user_id: userId, claim_date: t, day_index: day, xp, created_at: Date.now() };
-
     const { error } = await sb.from("daily_rewards").insert([row]);
     if (error) throw new Error(error.message);
-
     const { data: u } = await sb.from("users").select("xp").eq("id", userId).maybeSingle();
     await sb.from("users").update({ xp: (u?.xp || 0) + xp }).eq("id", userId);
-
     API.trackActivity({ userId, userName: userName || "", userRole: "student", type: "daily_reward", target: `اليوم ${day} — ${xp} XP`, details: { xp, day } });
-
     return { success: true, xp, day_index: day };
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // الميزة #1: وضع التدريب (Practice Mode)
+  // ═══════════════════════════════════════════════════════════
+
+  async startPracticeSession({ userId, subjectId, unitId, lessonId, count = 20 }) {
+    const sb = await getClient();
+    let q = sb.from("questions").select("id");
+    if (lessonId) q = q.eq("lesson_id", lessonId);
+    else if (unitId) q = q.eq("unit_id", unitId);
+    else if (subjectId) q = q.eq("subject_id", subjectId);
+    const { data, error } = await q.limit(200);
+    if (error) throw new Error(error.message);
+    const allIds = (data || []).map(x => x.id);
+    if (allIds.length === 0) throw new Error("لا توجد أسئلة متاحة في هذا القسم");
+    const shuffled = allIds.sort(() => Math.random() - 0.5).slice(0, Math.min(count, allIds.length));
+    const sessionId = uid("prac_");
+    const now = Date.now();
+    const { error: insertErr } = await sb.from("practice_sessions").insert([{
+      id: sessionId, user_id: userId, subject_id: subjectId || null,
+      unit_id: unitId || null, lesson_id: lessonId || null,
+      question_ids: shuffled, status: "in_progress",
+      started_at: now, created_at: now
+    }]);
+    if (insertErr) throw new Error(insertErr.message);
+    return { sessionId, questionIds: shuffled };
+  },
+
+  async submitPracticeAnswer({ sessionId, questionId, given, correct }) {
+    const sb = await getClient();
+    const { data: session } = await sb.from("practice_sessions").select("*").eq("id", sessionId).maybeSingle();
+    if (!session) throw new Error("الجلسة غير موجودة");
+    const answers = session.answers || {};
+    answers[questionId] = given;
+    const isCorrect = given === correct;
+    const newScore = (session.score || 0) + (isCorrect ? 1 : 0);
+    await sb.from("practice_sessions").update({
+      answers, score: newScore,
+      total: Math.max(session.total || 0, Object.keys(answers).length)
+    }).eq("id", sessionId);
+    return { isCorrect, newScore };
+  },
+
+  async completePracticeSession(sessionId, { total }) {
+    const sb = await getClient();
+    const { data: session } = await sb.from("practice_sessions").select("*").eq("id", sessionId).maybeSingle();
+    if (!session) throw new Error("الجلسة غير موجودة");
+    const score = session.score || 0;
+    const pct = total > 0 ? Math.round((score / total) * 100) : 0;
+    const now = Date.now();
+    await sb.from("practice_sessions").update({
+      score, total, pct, status: "completed",
+      completed_at: now
+    }).eq("id", sessionId);
+    return { score, total, pct };
+  },
+
+  async getPracticeHistory(userId, limit = 20) {
+    const sb = await getClient();
+    const { data } = await sb.from("practice_sessions")
+      .select("*").eq("user_id", userId).eq("status", "completed")
+      .order("completed_at", { ascending: false }).limit(limit);
+    return data || [];
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // الميزة #4: متجر XP (XP Shop)
+  // ═══════════════════════════════════════════════════════════
+
+  async listShopItems() {
+    const sb = await getClient();
+    const { data } = await sb.from("xp_shop_items")
+      .select("*").eq("active", true).order("xp_cost", { ascending: true });
+    return data || [];
+  },
+
+  async purchaseShopItem({ userId, itemId, userXp }) {
+    const sb = await getClient();
+    const { data: item } = await sb.from("xp_shop_items").select("*").eq("id", itemId).maybeSingle();
+    if (!item) throw new Error("المنتج غير موجود");
+    if (!item.active) throw new Error("المنتج غير متاح حاليًا");
+    if (item.stock !== null && item.stock !== undefined && item.stock <= 0) throw new Error("المنتج نفد من المخزون");
+    if (userXp < item.xp_cost) throw new Error("نقاط XP غير كافية");
+
+    const { data: user } = await sb.from("users").select("xp").eq("id", userId).maybeSingle();
+    const newXp = Math.max(0, (user?.xp || 0) - item.xp_cost);
+    await sb.from("users").update({ xp: newXp }).eq("id", userId);
+
+    const purchaseId = uid("pch_");
+    const now = Date.now();
+    const { error } = await sb.from("xp_purchases").insert([{
+      id: purchaseId, user_id: userId, item_id: itemId,
+      item_name: item.name, xp_spent: item.xp_cost,
+      status: "completed", created_at: now
+    }]);
+    if (error) throw new Error(error.message);
+
+    if (item.stock !== null && item.stock !== undefined && item.stock > 0) {
+      await sb.from("xp_shop_items").update({ stock: item.stock - 1 }).eq("id", itemId);
+    }
+
+    if (item.type === "coupon" && item.coupon_code) {
+      await sb.from("coupons").insert([{
+        id: uid("cpn_"),
+        code: item.coupon_code + "-" + purchaseId.slice(-4),
+        discount: item.discount_value || 10,
+        max_uses: 1, used_count: 0,
+        active: true, created_at: now
+      }]).catch(() => {});
+    }
+
+    API.trackActivity({
+      userId, userName: "", userRole: "student",
+      type: "shop_purchase", target: item.name,
+      details: { item_id: itemId, xp_cost: item.xp_cost }
+    });
+
+    return { newXp, purchaseId, item };
+  },
+
+  async getMyPurchases(userId, limit = 20) {
+    const sb = await getClient();
+    const { data } = await sb.from("xp_purchases")
+      .select("*").eq("user_id", userId)
+      .order("created_at", { ascending: false }).limit(limit);
+    return data || [];
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // الميزة #5: الإشعارات الفورية (Push Notifications)
+  // ═══════════════════════════════════════════════════════════
+
+  async registerPushSubscription({ userId, subscription }) {
+    const sb = await getClient();
+    const { data: existing } = await sb.from("push_subscriptions")
+      .select("id").eq("user_id", userId).eq("endpoint", subscription.endpoint).maybeSingle();
+    if (existing) {
+      await sb.from("push_subscriptions").update({
+        subscription_json: subscription, updated_at: Date.now(), active: true
+      }).eq("id", existing.id);
+      return existing.id;
+    }
+    const id = uid("push_");
+    const { error } = await sb.from("push_subscriptions").insert([{
+      id, user_id: userId,
+      endpoint: subscription.endpoint,
+      subscription_json: subscription,
+      active: true, created_at: Date.now(), updated_at: Date.now()
+    }]);
+    if (error) throw new Error(error.message);
+    return id;
+  },
+
+  async getMyPushSubscriptions(userId) {
+    const sb = await getClient();
+    const { data } = await sb.from("push_subscriptions")
+      .select("*").eq("user_id", userId).eq("active", true);
+    return data || [];
+  },
+
+  async removePushSubscription(userId) {
+    const sb = await getClient();
+    await sb.from("push_subscriptions").update({ active: false }).eq("user_id", userId);
+    return true;
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // الميزة #7: Flashcards
+  // ═══════════════════════════════════════════════════════════
+
+  async createFlashcard({ userId, lessonId, front, back, tags }) {
+    const sb = await getClient();
+    const now = Date.now();
+    const card = {
+      id: uid("fc_"), user_id: userId, lesson_id: lessonId || null,
+      front, back, tags: tags || [],
+      ease_factor: 2.5, interval_days: 0, repetitions: 0,
+      next_review_at: now, created_at: now, updated_at: now
+    };
+    const { data, error } = await sb.from("flashcards").insert([card]).select().single();
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
+  async getFlashcards(userId, { dueOnly = false } = {}) {
+    const sb = await getClient();
+    let q = sb.from("flashcards").select("*").eq("user_id", userId);
+    if (dueOnly) q = q.lte("next_review_at", Date.now());
+    const { data } = await q.order("next_review_at", { ascending: true }).limit(500);
+    return data || [];
+  },
+
+  async reviewFlashcard({ cardId, quality }) {
+    const sb = await getClient();
+    const { data: card } = await sb.from("flashcards").select("*").eq("id", cardId).maybeSingle();
+    if (!card) throw new Error("البطاقة غير موجودة");
+
+    let ef = card.ease_factor || 2.5;
+    let interval = card.interval_days || 0;
+    let reps = card.repetitions || 0;
+
+    ef = Math.max(1.3, ef + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)));
+    if (quality < 3) {
+      reps = 0;
+      interval = 1;
+    } else {
+      reps += 1;
+      if (reps === 1) interval = 1;
+      else if (reps === 2) interval = 6;
+      else interval = Math.round(interval * ef);
+    }
+    const nextReviewAt = Date.now() + interval * 86400000;
+
+    await sb.from("flashcards").update({
+      ease_factor: ef, interval_days: interval, repetitions: reps,
+      next_review_at: nextReviewAt, last_review_at: Date.now(), updated_at: Date.now()
+    }).eq("id", cardId);
+
+    return { next_review_at: nextReviewAt, interval_days: interval };
+  },
+
+  async deleteFlashcard(cardId) {
+    const sb = await getClient();
+    await sb.from("flashcards").delete().eq("id", cardId);
+    return true;
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // الميزة #8: تحليلات الطالب (Personal Analytics)
+  // ═══════════════════════════════════════════════════════════
+
+  async getStudentAnalytics(userId) {
+    const sb = await getClient();
+    const now = Date.now();
+    const last30 = now - 30 * 86400000;
+    const last7 = now - 7 * 86400000;
+
+    const { data: attempts } = await sb.from("exam_attempts").select("*").eq("user_id", userId).gte("at", last30);
+    const { data: practice } = await sb.from("practice_sessions").select("*").eq("user_id", userId).eq("status", "completed").gte("completed_at", last30);
+    const { data: activity } = await sb.from("activity").select("*").eq("user_id", userId).gte("at", last30).limit(2000);
+    const { data: errors } = await sb.from("user_errors").select("*").eq("user_id", userId).order("count", { ascending: false }).limit(10);
+
+    const xpByDay = {};
+    (activity || []).forEach(a => {
+      if (a.type === "lesson_complete") {
+        const d = new Date(a.at).toISOString().slice(0, 10);
+        xpByDay[d] = (xpByDay[d] || 0) + ((a.details && a.details.xp) || 20);
+      }
+    });
+
+    const weakLessons = {};
+    (errors || []).forEach(e => {
+      if (e.lesson_id) weakLessons[e.lesson_id] = (weakLessons[e.lesson_id] || 0) + (e.count || 1);
+    });
+
+    const avgExamPct = attempts && attempts.length > 0 ? Math.round(attempts.reduce((s, a) => s + (a.pct || 0), 0) / attempts.length) : 0;
+    const avgPracticePct = practice && practice.length > 0 ? Math.round(practice.reduce((s, p) => s + (p.pct || 0), 0) / practice.length) : 0;
+
+    const last7Activity = (activity || []).filter(a => a.at >= last7).length;
+
+    return {
+      xpByDay,
+      weakLessons,
+      avgExamPct,
+      avgPracticePct,
+      last7Activity,
+      totalAttempts: (attempts || []).length,
+      totalPractice: (practice || []).length,
+      topErrors: errors || []
+    };
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // الميزة #9: PWA Offline (Cache Management)
+  // ═══════════════════════════════════════════════════════════
+
+  async cacheLessonForOffline({ lessonId, userId }) {
+    const sb = await getClient();
+    const id = uid("off_");
+    const { error } = await sb.from("offline_cache").insert([{
+      id, user_id: userId, lesson_id: lessonId,
+      cached_at: Date.now()
+    }]);
+    if (error && !error.message.includes("duplicate")) throw new Error(error.message);
+    return true;
+  },
+
+  async getOfflineCachedLessons(userId) {
+    const sb = await getClient();
+    const { data } = await sb.from("offline_cache")
+      .select("*").eq("user_id", userId).order("cached_at", { ascending: false });
+    return data || [];
+  },
+
+  async removeOfflineCache({ lessonId, userId }) {
+    const sb = await getClient();
+    await sb.from("offline_cache").delete().eq("user_id", userId).eq("lesson_id", lessonId);
+    return true;
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // الميزة #10: تتبع مشاهدة الفيديو (Video Tracking)
+  // ═══════════════════════════════════════════════════════════
+
+  async trackVideoProgress({ userId, lessonId, watchedPercent, lastPosition }) {
+    const sb = await getClient();
+    const now = Date.now();
+    const { data: existing } = await sb.from("video_progress")
+      .select("*").eq("user_id", userId).eq("lesson_id", lessonId).maybeSingle();
+
+    if (existing) {
+      const maxPercent = Math.max(existing.watched_percent || 0, watchedPercent);
+      const milestones = existing.milestones || {};
+      if (watchedPercent >= 25 && !milestones.p25) { milestones.p25 = now; }
+      if (watchedPercent >= 50 && !milestones.p50) { milestones.p50 = now; }
+      if (watchedPercent >= 75 && !milestones.p75) { milestones.p75 = now; }
+      if (watchedPercent >= 90 && !milestones.p90) { milestones.p90 = now; }
+      await sb.from("video_progress").update({
+        watched_percent: maxPercent,
+        last_position: lastPosition || 0,
+        milestones,
+        updated_at: now
+      }).eq("id", existing.id);
+      return { watchedPercent: maxPercent, milestones };
+    } else {
+      const milestones = {};
+      if (watchedPercent >= 25) milestones.p25 = now;
+      if (watchedPercent >= 50) milestones.p50 = now;
+      if (watchedPercent >= 75) milestones.p75 = now;
+      if (watchedPercent >= 90) milestones.p90 = now;
+      const id = uid("vp_");
+      await sb.from("video_progress").insert([{
+        id, user_id: userId, lesson_id: lessonId,
+        watched_percent: watchedPercent,
+        last_position: lastPosition || 0,
+        milestones, created_at: now, updated_at: now
+      }]);
+      return { watchedPercent, milestones };
+    }
+  },
+
+  async getVideoProgress({ userId, lessonId }) {
+    const sb = await getClient();
+    const { data } = await sb.from("video_progress")
+      .select("*").eq("user_id", userId).eq("lesson_id", lessonId).maybeSingle();
+    return data || null;
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // الميزة #11: مجموعات الدراسة (Study Groups)
+  // ═══════════════════════════════════════════════════════════
+
+  async createStudyGroup({ userId, name, subjectId, description }) {
+    const sb = await getClient();
+    const now = Date.now();
+    const groupId = uid("grp_");
+    const { error } = await sb.from("study_groups").insert([{
+      id: groupId, name, subject_id: subjectId || null,
+      description: description || "", leader_id: userId,
+      max_members: 5, created_at: now
+    }]);
+    if (error) throw new Error(error.message);
+
+    await sb.from("study_group_members").insert([{
+      id: uid("grm_"), group_id: groupId, user_id: userId,
+      role: "leader", joined_at: now
+    }]);
+
+    return groupId;
+  },
+
+  async listStudyGroups({ subjectId, excludeUserId } = {}) {
+    const sb = await getClient();
+    let q = sb.from("study_groups").select("*").eq("active", true);
+    if (subjectId) q = q.eq("subject_id", subjectId);
+    const { data: groups } = await q.limit(50);
+    if (!groups || groups.length === 0) return [];
+
+    const groupIds = groups.map(g => g.id);
+    const { data: members } = await sb.from("study_group_members")
+      .select("*").in("group_id", groupIds);
+
+    const membersMap = {};
+    (members || []).forEach(m => {
+      if (!membersMap[m.group_id]) membersMap[m.group_id] = [];
+      membersMap[m.group_id].push(m);
+    });
+
+    return groups
+      .map(g => {
+        const gm = membersMap[g.id] || [];
+        return { ...g, members_count: gm.length, is_member: gm.some(m => m.user_id === excludeUserId) };
+      })
+      .filter(g => g.members_count < g.max_members);
+  },
+
+  async getGroupDetails({ groupId, userId }) {
+    const sb = await getClient();
+    const { data: group } = await sb.from("study_groups").select("*").eq("id", groupId).maybeSingle();
+    if (!group) throw new Error("المجموعة غير موجودة");
+
+    const { data: members } = await sb.from("study_group_members")
+      .select("*").eq("group_id", groupId);
+    const userIds = (members || []).map(m => m.user_id);
+    const { data: users } = await sb.from("users")
+      .select("id, name, avatar, gender, xp, governorate")
+      .in("id", userIds);
+
+    const enrichedMembers = (members || []).map(m => ({
+      ...m,
+      user: (users || []).find(u => u.id === m.user_id)
+    }));
+
+    return {
+      group,
+      members: enrichedMembers,
+      isMember: enrichedMembers.some(m => m.user_id === userId)
+    };
+  },
+
+  async joinStudyGroup({ groupId, userId }) {
+    const sb = await getClient();
+    const { data: existing } = await sb.from("study_group_members")
+      .select("id").eq("group_id", groupId).eq("user_id", userId).maybeSingle();
+    if (existing) throw new Error("أنت عضو بالفعل");
+
+    const { count } = await sb.from("study_group_members")
+      .select("*", { count: "exact", head: true }).eq("group_id", groupId);
+    const { data: group } = await sb.from("study_groups").select("max_members").eq("id", groupId).maybeSingle();
+    if (group && count >= group.max_members) throw new Error("المجموعة مكتملة");
+
+    await sb.from("study_group_members").insert([{
+      id: uid("grm_"), group_id: groupId, user_id: userId,
+      role: "member", joined_at: Date.now()
+    }]);
+    return true;
+  },
+
+  async leaveStudyGroup({ groupId, userId }) {
+    const sb = await getClient();
+    await sb.from("study_group_members").delete().eq("group_id", groupId).eq("user_id", userId);
+    return true;
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // الميزة #12: مسابقة المدارس (School Leaderboard)
+  // ═══════════════════════════════════════════════════════════
+
+  async setUserSchool({ userId, schoolName }) {
+    const sb = await getClient();
+    await sb.from("users").update({ school_name: schoolName || null }).eq("id", userId);
+    return true;
+  },
+
+  async getSchoolLeaderboard(limit = 20) {
+    const sb = await getClient();
+    const { data: users } = await sb.from("users")
+      .select("school_name, xp, role, active, banned")
+      .eq("role", "student").eq("active", true).eq("banned", false)
+      .not("school_name", "is", null);
+
+    const schools = {};
+    (users || []).forEach(u => {
+      if (!u.school_name) return;
+      if (!schools[u.school_name]) {
+        schools[u.school_name] = { name: u.school_name, students: 0, totalXp: 0, avgXp: 0 };
+      }
+      schools[u.school_name].students += 1;
+      schools[u.school_name].totalXp += (u.xp || 0);
+    });
+
+    return Object.values(schools)
+      .map(s => ({ ...s, avgXp: Math.round(s.totalXp / s.students) }))
+      .sort((a, b) => b.totalXp - a.totalXp)
+      .slice(0, limit);
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // الميزة #14: التحدي اليومي (Daily Challenge)
+  // ═══════════════════════════════════════════════════════════
+
+  async getOrCreateDailyChallenge() {
+    const sb = await getClient();
+    const t = today();
+    const { data: existing } = await sb.from("daily_challenges").select("*").eq("challenge_date", t).maybeSingle();
+    if (existing) return existing;
+    const { data: questions } = await sb.from("questions").select("id").limit(500);
+    const allIds = (questions || []).map(q => q.id);
+    if (allIds.length < 5) throw new Error("لا توجد أسئلة كافية للتحدي اليومي");
+    const shuffled = allIds.sort(() => Math.random() - 0.5).slice(0, 5);
+    const row = {
+      id: uid("dc_"), challenge_date: t,
+      question_ids: shuffled, created_at: Date.now()
+    };
+    const { data, error } = await sb.from("daily_challenges").insert([row]).select().single();
+    if (error) {
+      const { data: retry } = await sb.from("daily_challenges").select("*").eq("challenge_date", t).maybeSingle();
+      if (retry) return retry;
+      throw new Error(error.message);
+    }
+    return data;
+  },
+
+  async getDailyChallengeAttempt(userId) {
+    const sb = await getClient();
+    const t = today();
+    const { data } = await sb.from("daily_challenge_attempts")
+      .select("*").eq("user_id", userId).eq("challenge_date", t).maybeSingle();
+    return data || null;
+  },
+
+  async submitDailyChallenge({ userId, userName, score, total, answers }) {
+    const sb = await getClient();
+    const t = today();
+    const { data: existing } = await sb.from("daily_challenge_attempts")
+      .select("id").eq("user_id", userId).eq("challenge_date", t).maybeSingle();
+    if (existing) throw new Error("أتممت تحدي اليوم بالفعل ✅");
+    const pct = Math.round((score / total) * 100);
+    const xpEarned = score === total ? 100 : Math.round(score * 15);
+    const row = {
+      id: uid("dca_"), user_id: userId, challenge_date: t,
+      score, total, xp_earned: xpEarned,
+      answers: answers || {}, completed_at: Date.now()
+    };
+    const { error } = await sb.from("daily_challenge_attempts").insert([row]);
+    if (error) throw new Error(error.message);
+    if (xpEarned > 0) {
+      const { data: u } = await sb.from("users").select("xp").eq("id", userId).maybeSingle();
+      await sb.from("users").update({ xp: (u?.xp || 0) + xpEarned }).eq("id", userId);
+    }
+    API.trackActivity({
+      userId, userName, type: "daily_challenge",
+      target: `التحدي اليومي — ${score}/${total}`,
+      details: { score, total, pct, xp: xpEarned }
+    });
+    return { score, total, pct, xpEarned };
+  },
+
+  async getDailyChallengeLeaderboard() {
+    const sb = await getClient();
+    const t = today();
+    const { data: attempts } = await sb.from("daily_challenge_attempts")
+      .select("*").eq("challenge_date", t)
+      .order("score", { ascending: false })
+      .order("completed_at", { ascending: true })
+      .limit(20);
+    if (!attempts || attempts.length === 0) return [];
+    const userIds = [...new Set(attempts.map(a => a.user_id))];
+    const { data: users } = await sb.from("users")
+      .select("id, name, avatar, governorate, xp")
+      .in("id", userIds);
+    return attempts.map((a, i) => ({
+      ...a, rank: i + 1,
+      user: (users || []).find(u => u.id === a.user_id)
+    }));
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // الميزة #17: تقويم المذاكرة (Study Calendar)
+  // ═══════════════════════════════════════════════════════════
+
+  async createStudyPlan({ userId, title, examDate, subjectId, dailyMinutes = 30 }) {
+    const sb = await getClient();
+    const now = Date.now();
+    const daysLeft = Math.max(1, Math.ceil((examDate - now) / 86400000));
+    const planId = uid("plan_");
+    const { error } = await sb.from("study_plans").insert([{
+      id: planId, user_id: userId, title,
+      subject_id: subjectId || null,
+      exam_date: examDate, daily_minutes: dailyMinutes,
+      total_days: daysLeft, completed_days: 0,
+      status: "active", created_at: now
+    }]);
+    if (error) throw new Error(error.message);
+    return { planId, daysLeft };
+  },
+
+  async getMyStudyPlans(userId) {
+    const sb = await getClient();
+    const { data } = await sb.from("study_plans")
+      .select("*").eq("user_id", userId).order("exam_date", { ascending: true });
+    return data || [];
+  },
+
+  async getStudyTasksForDate({ userId, date }) {
+    const sb = await getClient();
+    const { data } = await sb.from("study_tasks")
+      .select("*").eq("user_id", userId).eq("task_date", date)
+      .order("created_at", { ascending: true });
+    return data || [];
+  },
+
+  async markStudyTaskDone({ taskId, userId }) {
+    const sb = await getClient();
+    await sb.from("study_tasks").update({ completed: true, completed_at: Date.now() }).eq("id", taskId);
+    const { data: u } = await sb.from("users").select("xp").eq("id", userId).maybeSingle();
+    await sb.from("users").update({ xp: (u?.xp || 0) + 10 }).eq("id", userId);
+    return true;
+  },
+
+  async generateStudyTasks({ planId, userId, subjectId, examDate, dailyMinutes }) {
+    const sb = await getClient();
+    const now = Date.now();
+    const daysLeft = Math.max(1, Math.ceil((examDate - now) / 86400000));
+    let q = sb.from("lessons").select("id, title, duration");
+    if (subjectId) {
+      const { data: units } = await sb.from("units").select("id").eq("subject_id", subjectId);
+      const unitIds = (units || []).map(u => u.id);
+      if (unitIds.length > 0) q = q.in("unit_id", unitIds);
+    }
+    const { data: lessons } = await q.eq("published", true);
+    const lessonList = (lessons || []).sort(() => Math.random() - 0.5);
+    if (lessonList.length === 0) throw new Error("لا توجد دروس متاحة");
+
+    const tasks = [];
+    const lessonsPerDay = Math.max(1, Math.ceil(lessonList.length / daysLeft));
+
+    for (let day = 0; day < Math.min(daysLeft, 30); day++) {
+      const taskDate = new Date(now + day * 86400000).toISOString().slice(0, 10);
+      const dayLessons = lessonList.slice(day * lessonsPerDay, (day + 1) * lessonsPerDay);
+      for (const lesson of dayLessons) {
+        tasks.push({
+          id: uid("task_"),
+          user_id: userId, plan_id: planId,
+          task_date: taskDate,
+          lesson_id: lesson.id,
+          title: lesson.title,
+          duration: lesson.duration || 15,
+          completed: false,
+          created_at: now
+        });
+      }
+    }
+
+    if (tasks.length > 0) {
+      const { error } = await sb.from("study_tasks").insert(tasks);
+      if (error) throw new Error(error.message);
+    }
+    return tasks.length;
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // الميزة #19: الوضع الليلي/النهاري
+  // ═══════════════════════════════════════════════════════════
+
+  async setUserTheme(userId, theme) {
+    const sb = await getClient();
+    await sb.from("users").update({ theme }).eq("id", userId);
+    try { localStorage.setItem("me_theme", theme); } catch (e) {}
+    return true;
+  },
+
+  getUserTheme() {
+    try {
+      return localStorage.getItem("me_theme") || "dark";
+    } catch (e) { return "dark"; }
+  },
+
+  applyTheme(theme) {
+    try {
+      document.documentElement.setAttribute("data-theme", theme);
+      localStorage.setItem("me_theme", theme);
+    } catch (e) {}
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // الميزة #22: وضع التركيز (Focus Mode)
+  // ═══════════════════════════════════════════════════════════
+
+  async startFocusSession({ userId, durationMinutes = 25, label }) {
+    const sb = await getClient();
+    const id = uid("fcs_");
+    const now = Date.now();
+    const { error } = await sb.from("focus_sessions").insert([{
+      id, user_id: userId,
+      duration_minutes: durationMinutes,
+      label: label || "جلسة مذاكرة",
+      started_at: now,
+      status: "active",
+      xp_awarded: 0,
+      created_at: now
+    }]);
+    if (error) throw new Error(error.message);
+    return id;
+  },
+
+  async completeFocusSession({ sessionId, userId, completed = true }) {
+    const sb = await getClient();
+    const { data: session } = await sb.from("focus_sessions").select("*").eq("id", sessionId).maybeSingle();
+    if (!session) throw new Error("الجلسة غير موجودة");
+    const now = Date.now();
+    const duration = Math.round((now - session.started_at) / 60000);
+    const xpAwarded = completed ? Math.max(5, Math.min(30, duration)) : 0;
+    await sb.from("focus_sessions").update({
+      status: completed ? "completed" : "cancelled",
+      ended_at: now, actual_minutes: duration, xp_awarded: xpAwarded
+    }).eq("id", sessionId);
+    if (xpAwarded > 0) {
+      const { data: u } = await sb.from("users").select("xp").eq("id", userId).maybeSingle();
+      await sb.from("users").update({ xp: (u?.xp || 0) + xpAwarded }).eq("id", userId);
+    }
+    return { duration, xpAwarded };
+  },
+
+  async getFocusHistory(userId, limit = 20) {
+    const sb = await getClient();
+    const { data } = await sb.from("focus_sessions")
+      .select("*").eq("user_id", userId).eq("status", "completed")
+      .order("started_at", { ascending: false }).limit(limit);
+    return data || [];
+  },
+
+  async setFocusMode(userId, active) {
+    const sb = await getClient();
+    await sb.from("users").update({ focus_mode: active }).eq("id", userId);
+    return true;
   },
 
   ytId(url) {
