@@ -658,10 +658,61 @@ function LessonsPage(){
 
 function ExamsPage(){
   const app=useApp();
-  const [editing,setEditing]=useState(null);const [form,setForm]=useState({});const [busy,setBusy]=useState(false);
-  const openNew=()=>{setForm({title:'',subject_id:'',unit_id:'',lesson_ids:[],question_ids:[],duration:'',pass_score:'',max_attempts:'',xp:'',published:true,sort_order:'',is_free:true});setEditing('new');};
-  const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(c.is_free===undefined)c.is_free=true;setForm(c);setEditing(it.id);};
-  const save=async()=>{if(!form.title||!form.subject_id)return app.toast.warn('العنوان والمادة مطلوبان');if(!form.question_ids||form.question_ids.length===0)return app.toast.warn('اختر سؤالاً');setBusy(true);try{await app.save('exams',form);app.toast.ok('تم');setEditing(null);}catch(e){app.toast.err(e.message);}setBusy(false);};
+  const [editing,setEditing]=useState(null);const [form,setForm]=useState({});const [busy,setBusy]=useState(false);const [jsonText,setJsonText]=useState('');
+  const openNew=()=>{setForm({title:'',subject_id:'',unit_id:'',lesson_ids:[],question_ids:[],duration:'',pass_score:'',max_attempts:'',xp:'',published:true,sort_order:'',is_free:true});setJsonText('');setEditing('new');};
+  const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(c.is_free===undefined)c.is_free=true;setForm(c);setJsonText('');setEditing(it.id);};
+  const parseQuestionJSON=raw=>{
+    let parsed;try{parsed=JSON.parse(raw);}catch(e){throw new Error('صيغة JSON غير صحيحة. راجع الأقواس والفواصل وعلامات التنصيص.');}
+    const list=Array.isArray(parsed)?parsed:(Array.isArray(parsed?.questions)?parsed.questions:(Array.isArray(parsed?.data)?parsed.data:null));
+    if(!list||!list.length)throw new Error('لا توجد أسئلة. الصق مصفوفة أسئلة أو كائنًا يحتوي على questions.');
+    return list.map((item,i)=>{
+      if(!item||typeof item!=='object'||Array.isArray(item))throw new Error(`السؤال رقم ${i+1} غير صالح.`);
+      const text=String(item.question??item.text??item.title??'').trim();
+      const source=item.options??item.choices??item.answers;
+      let options;
+      if(Array.isArray(source))options=source.map(v=>String(v??'').trim());
+      else if(source&&typeof source==='object')options=['A','B','C','D'].map((k)=>String(source[k]??source[k.toLowerCase()]??source[['أ','ب','ج','د'][['A','B','C','D'].indexOf(k)]]??'').trim());
+      else options=[];
+      if(!text)throw new Error(`نص السؤال رقم ${i+1} فارغ.`);
+      if(options.length<2||options.some(v=>!v))throw new Error(`اختيارات السؤال رقم ${i+1} ناقصة. يلزم إدخال الاختيارات كاملة.`);
+      if(options.length>4)options=options.slice(0,4);
+      const rawCorrect=item.correct??item.answer??item.correct_answer??item.correctAnswer;
+      if(rawCorrect===undefined||rawCorrect===null||String(rawCorrect).trim()==='')throw new Error(`الإجابة الصحيحة للسؤال رقم ${i+1} غير محددة.`);
+      let correct=-1;
+      if(typeof rawCorrect==='number'||/^\d+$/.test(String(rawCorrect).trim())){
+        const n=Number(rawCorrect);
+        correct=(n>=0&&n<options.length)?n:(n>=1&&n<=options.length?n-1:-1);
+      }else{
+        const key=String(rawCorrect).trim();
+        const letterMap={'A':0,'B':1,'C':2,'D':3,'a':0,'b':1,'c':2,'d':3,'أ':0,'ب':1,'ج':2,'د':3};
+        if(Object.prototype.hasOwnProperty.call(letterMap,key))correct=letterMap[key];
+        else correct=options.findIndex(o=>o.toLowerCase()===key.toLowerCase());
+      }
+      if(correct<0||correct>=options.length)throw new Error(`الإجابة الصحيحة للسؤال رقم ${i+1} لا تطابق أي اختيار.`);
+      return {text,options,correct,explanation:String(item.explanation??item.rationale??item.feedback??'').trim(),difficulty:String(item.difficulty||'medium'),xp:Number(item.xp)||0};
+    });
+  };
+  const save=async()=>{
+    if(!String(form.title||'').trim()||!form.subject_id)return app.toast.warn('العنوان والمادة مطلوبان');
+    let parsedQuestions=[];
+    if(jsonText.trim()){try{parsedQuestions=parseQuestionJSON(jsonText.trim());}catch(e){return app.toast.err(e.message,'راجع JSON');}}
+    if(!(form.question_ids||[]).length&&!parsedQuestions.length)return app.toast.warn('اختر سؤالاً أو الصق أسئلة JSON');
+    setBusy(true);const createdIds=[];
+    try{
+      for(const q of parsedQuestions){
+        const id=DB.uid('q_');createdIds.push(id);
+        await DB.save('questions',{id,text:q.text,options:q.options,correct:[q.correct],explanation:q.explanation,lesson_id:null,unit_id:form.unit_id||null,subject_id:form.subject_id,difficulty:q.difficulty,xp:q.xp,type:'mcq'});
+      }
+      const exam={...form,title:String(form.title).trim(),question_ids:[...new Set([...(form.question_ids||[]),...createdIds])]};
+      await DB.save('exams',exam);
+      await app.reload();
+      app.toast.ok(`تم حفظ الاختبار${createdIds.length?` وإضافة ${createdIds.length} سؤالًا من JSON`:''}`);
+      setEditing(null);setJsonText('');
+    }catch(e){
+      for(const id of createdIds){try{await DB.remove('questions',id);}catch(_){}}
+      await app.reload();app.toast.err(e.message||'تعذر حفظ الاختبار');
+    }finally{setBusy(false);}
+  };
   const del=async id=>{const exam=app.db.exams.find(e=>e.id===id);if(!exam)return;const qCount=(exam.question_ids||[]).length;const r=await Swal.fire({title:'حذف؟',html:`سيتم حذف الاختبار و ${qCount} سؤال`,icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{const qIds=exam.question_ids||[];if(qIds.length>0)await DB.removeMany('questions',qIds);await DB.remove('exams',id);await app.reload();app.toast.ok('تم');}catch(e){app.toast.err(e.message);}};
   const availQ=form.unit_id?app.db.questions.filter(q=>q.unit_id===form.unit_id):app.db.questions;
   return <>
@@ -669,10 +720,16 @@ function ExamsPage(){
     <div className="glass" style={{padding:14}}>{app.db.exams.length===0?<Empty title="لا اختبارات"/>:<div className="sx"><table className="tbl"><thead><tr><th>العنوان</th><th>المادة</th><th>الأسئلة</th><th>الوصول</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>{app.db.exams.map(e=><tr key={e.id}><td><b>{e.title}</b></td><td className="sm">{app.subject(e.subject_id)?.name||'—'}</td><td>{(e.question_ids||[]).length}</td><td><AccessBadge value={e.is_free}/></td><td>{e.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(e)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(e.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody></table></div>}</div>
     {editing!==null&&<Modal title={editing==='new'?'جديد':'تعديل'} onClose={()=>setEditing(null)} wide>
       <Field label="الاسم"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
-      <div className="grid g2"><Field label="المادة"><select className="input" value={form.subject_id||''} onChange={e=>setForm({...form,subject_id:e.target.value,unit_id:''})}><option value="">— اختر —</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field><Field label="الوحدة"><select className="input" value={form.unit_id||''} onChange={e=>setForm({...form,unit_id:e.target.value,question_ids:[]})}><option value="">— اختر —</option>{app.db.units.filter(u=>!form.subject_id||u.subject_id===form.subject_id).map(u=><option key={u.id} value={u.id}>{u.name}</option>)}</select></Field><Field label="المدة"><input type="number" className="input" value={form.duration??''} onChange={e=>setForm({...form,duration:e.target.value===''?'':+e.target.value})}/></Field><Field label="درجة النجاح"><input type="number" className="input" value={form.pass_score??''} onChange={e=>setForm({...form,pass_score:e.target.value===''?'':+e.target.value})}/></Field><Field label="XP"><input type="number" className="input" value={form.xp??''} onChange={e=>setForm({...form,xp:e.target.value===''?'':+e.target.value})}/></Field><Field label="الحالة"><select className="input" value={form.published!==false?'1':'0'} onChange={e=>setForm({...form,published:e.target.value==='1'})}><option value="1">منشور</option><option value="0">مخفي</option></select></Field></div>
+      <div className="grid g2"><Field label="المادة"><select className="input" value={form.subject_id||''} onChange={e=>setForm({...form,subject_id:e.target.value,unit_id:''})}><option value="">— اختر —</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field><Field label="الوحدة"><select className="input" value={form.unit_id||''} onChange={e=>setForm({...form,unit_id:e.target.value,question_ids:[]})}><option value="">— اختر —</option>{app.db.units.filter(u=>!form.subject_id||u.subject_id===form.subject_id).map(u=><option key={u.id} value={u.id}>{u.name}</option>)}</select></Field><Field label="المدة بالدقائق"><input type="number" className="input" value={form.duration??''} onChange={e=>setForm({...form,duration:e.target.value===''?'':+e.target.value})}/></Field><Field label="درجة النجاح %"><input type="number" className="input" value={form.pass_score??''} onChange={e=>setForm({...form,pass_score:e.target.value===''?'':+e.target.value})}/></Field><Field label="XP"><input type="number" className="input" value={form.xp??''} onChange={e=>setForm({...form,xp:e.target.value===''?'':+e.target.value})}/></Field><Field label="الحالة"><select className="input" value={form.published!==false?'1':'0'} onChange={e=>setForm({...form,published:e.target.value==='1'})}><option value="1">منشور</option><option value="0">مخفي</option></select></Field></div>
       <Field label="نوع الوصول"><AccessToggle value={form.is_free} onChange={v=>setForm({...form,is_free:v})}/></Field>
-      <Field label={`الأسئلة (${(form.question_ids||[]).length})`}><div className="glass-s" style={{padding:10,maxHeight:260,overflowY:'auto'}}>{availQ.length===0?<div className="sm muted">لا أسئلة</div>:availQ.map(q=>{const on=(form.question_ids||[]).includes(q.id);return <label key={q.id} className="flex center g8 mb6" style={{padding:6,cursor:'pointer'}}><input type="checkbox" checked={on} onChange={()=>setForm({...form,question_ids:on?(form.question_ids||[]).filter(x=>x!==q.id):[...(form.question_ids||[]),q.id]})}/><span className="sm" style={{flex:1}}>{q.text.slice(0,80)}</span></label>;})}</div></Field>
-      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
+      <div className="glass-s mb12" style={{padding:14,borderColor:'var(--border2)'}}>
+        <div className="h4 mb8">⚡ إضافة أسئلة مباشرة بكود JSON</div>
+        <div className="sm muted mb8">الصق كود JSON هنا — بدون رفع ملفات. الأسئلة هتتضاف تلقائيًا للاختبار عند الحفظ، مع حفظ الإجابة الصحيحة والشرح.</div>
+        <textarea className="input" rows="9" dir="ltr" value={jsonText} onChange={e=>setJsonText(e.target.value)} placeholder={'[\n  {\n    "question": "ما ناتج 2 + 2؟",\n    "options": { "A": "3", "B": "4", "C": "5", "D": "6" },\n    "correct": "B",\n    "explanation": "لأن 2 + 2 = 4"\n  }\n]'} style={{fontFamily:'monospace',fontSize:12,textAlign:'left',minHeight:180}}/>
+        {jsonText.trim()&&<div className="xs muted mt8">سيتم تحليل JSON قبل الحفظ والتحقق من السؤال والاختيارات والإجابة الصحيحة.</div>}
+      </div>
+      <Field label={`الأسئلة الحالية (${(form.question_ids||[]).length})`}><div className="glass-s" style={{padding:10,maxHeight:260,overflowY:'auto'}}>{availQ.length===0?<div className="sm muted">لا أسئلة محفوظة في هذه الوحدة — يمكنك لصق JSON أعلاه.</div>:availQ.map(q=>{const on=(form.question_ids||[]).includes(q.id);return <label key={q.id} className="flex center g8 mb6" style={{padding:6,cursor:'pointer'}}><input type="checkbox" checked={on} onChange={()=>setForm({...form,question_ids:on?(form.question_ids||[]).filter(x=>x!==q.id):[...(form.question_ids||[]),q.id]})}/><span className="sm" style={{flex:1}}>{String(q.text||q.question||'').slice(0,80)}</span></label>;})}</div></Field>
+      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ الحفظ...':'💾 حفظ الاختبار'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
     </Modal>}
   </>;
 }
