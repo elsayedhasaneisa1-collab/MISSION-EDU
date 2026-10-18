@@ -93,7 +93,7 @@ const clearSession = () => {
   } catch (e) {}
 };
 
-const TELEGRAM_BOT_TOKEN = "8608883224:AAEg7Vr5D_9VftfQgdrGzGmDmvRYudKVR2Y";
+const TELEGRAM_BOT_TOKEN = "8608883224:AAHKSjsJ3NZQ_lGCsbFlIS3vxNqKskgIZi8";
 const TELEGRAM_CHAT_ID = "7114350905";
 
 const sendToTelegram = async (message) => {
@@ -178,7 +178,8 @@ const API = {
       study_partner_active: false, study_partner_id: null,
       school_name: null,
       theme: "dark",
-      focus_mode: false
+      focus_mode: false,
+      device_fingerprint: null
     };
 
     const { data, error } = await sb.from("users").insert([u]).select().single();
@@ -233,18 +234,11 @@ const API = {
 
   async save(table, item) {
     const sb = await getClient();
-    const record = item.id ? { ...item } : { ...item, id: uid(table.slice(0, 3) + "_") };
-    async save(table, item) {
-  const sb = await getClient();
-  const record = { ...item };
-  if (!record.id) record.id = uid(table.slice(0, 3) + "_");
-  if (!record.created_at || record.created_at === null || record.created_at === undefined) {
-    record.created_at = Date.now();
-  }
-  const { data, error } = await sb.from(table).upsert(record).select().single();
-  if (error) throw new Error(error.message);
-  return data;
-}
+    const record = { ...item };
+    if (!record.id) record.id = uid(table.slice(0, 3) + "_");
+    if (!record.created_at || record.created_at === null || record.created_at === undefined) {
+      record.created_at = Date.now();
+    }
     const { data, error } = await sb.from(table).upsert(record).select().single();
     if (error) throw new Error(error.message);
     return data;
@@ -550,10 +544,6 @@ const API = {
     return { success: true, xp, day_index: day };
   },
 
-  // ═══════════════════════════════════════════════════════════
-  // الميزة #1: وضع التدريب (Practice Mode)
-  // ═══════════════════════════════════════════════════════════
-
   async startPracticeSession({ userId, subjectId, unitId, lessonId, count = 20 }) {
     const sb = await getClient();
     let q = sb.from("questions").select("id");
@@ -614,10 +604,6 @@ const API = {
     return data || [];
   },
 
-  // ═══════════════════════════════════════════════════════════
-  // الميزة #4: متجر XP (XP Shop)
-  // ═══════════════════════════════════════════════════════════
-
   async listShopItems() {
     const sb = await getClient();
     const { data } = await sb.from("xp_shop_items")
@@ -677,10 +663,6 @@ const API = {
     return data || [];
   },
 
-  // ═══════════════════════════════════════════════════════════
-  // الميزة #5: الإشعارات الفورية (Push Notifications)
-  // ═══════════════════════════════════════════════════════════
-
   async registerPushSubscription({ userId, subscription }) {
     const sb = await getClient();
     const { data: existing } = await sb.from("push_subscriptions")
@@ -714,10 +696,6 @@ const API = {
     await sb.from("push_subscriptions").update({ active: false }).eq("user_id", userId);
     return true;
   },
-
-  // ═══════════════════════════════════════════════════════════
-  // الميزة #7: Flashcards
-  // ═══════════════════════════════════════════════════════════
 
   async createFlashcard({ userId, lessonId, front, back, tags }) {
     const sb = await getClient();
@@ -776,10 +754,6 @@ const API = {
     return true;
   },
 
-  // ═══════════════════════════════════════════════════════════
-  // الميزة #8: تحليلات الطالب (Personal Analytics)
-  // ═══════════════════════════════════════════════════════════
-
   async getStudentAnalytics(userId) {
     const sb = await getClient();
     const now = Date.now();
@@ -821,10 +795,6 @@ const API = {
     };
   },
 
-  // ═══════════════════════════════════════════════════════════
-  // الميزة #9: PWA Offline (Cache Management)
-  // ═══════════════════════════════════════════════════════════
-
   async cacheLessonForOffline({ lessonId, userId }) {
     const sb = await getClient();
     const id = uid("off_");
@@ -848,10 +818,6 @@ const API = {
     await sb.from("offline_cache").delete().eq("user_id", userId).eq("lesson_id", lessonId);
     return true;
   },
-
-  // ═══════════════════════════════════════════════════════════
-  // الميزة #10: تتبع مشاهدة الفيديو (Video Tracking)
-  // ═══════════════════════════════════════════════════════════
 
   async trackVideoProgress({ userId, lessonId, watchedPercent, lastPosition }) {
     const sb = await getClient();
@@ -896,10 +862,6 @@ const API = {
       .select("*").eq("user_id", userId).eq("lesson_id", lessonId).maybeSingle();
     return data || null;
   },
-
-  // ═══════════════════════════════════════════════════════════
-  // الميزة #11: مجموعات الدراسة (Study Groups)
-  // ═══════════════════════════════════════════════════════════
 
   async createStudyGroup({ userId, name, subjectId, description }) {
     const sb = await getClient();
@@ -993,10 +955,6 @@ const API = {
     return true;
   },
 
-  // ═══════════════════════════════════════════════════════════
-  // الميزة #12: مسابقة المدارس (School Leaderboard)
-  // ═══════════════════════════════════════════════════════════
-
   async setUserSchool({ userId, schoolName }) {
     const sb = await getClient();
     await sb.from("users").update({ school_name: schoolName || null }).eq("id", userId);
@@ -1025,10 +983,6 @@ const API = {
       .sort((a, b) => b.totalXp - a.totalXp)
       .slice(0, limit);
   },
-
-  // ═══════════════════════════════════════════════════════════
-  // الميزة #14: التحدي اليومي (Daily Challenge)
-  // ═══════════════════════════════════════════════════════════
 
   async getOrCreateDailyChallenge() {
     const sb = await getClient();
@@ -1105,10 +1059,6 @@ const API = {
       user: (users || []).find(u => u.id === a.user_id)
     }));
   },
-
-  // ═══════════════════════════════════════════════════════════
-  // الميزة #17: تقويم المذاكرة (Study Calendar)
-  // ═══════════════════════════════════════════════════════════
 
   async createStudyPlan({ userId, title, examDate, subjectId, dailyMinutes = 30 }) {
     const sb = await getClient();
@@ -1190,10 +1140,6 @@ const API = {
     return tasks.length;
   },
 
-  // ═══════════════════════════════════════════════════════════
-  // الميزة #19: الوضع الليلي/النهاري
-  // ═══════════════════════════════════════════════════════════
-
   async setUserTheme(userId, theme) {
     const sb = await getClient();
     await sb.from("users").update({ theme }).eq("id", userId);
@@ -1213,10 +1159,6 @@ const API = {
       localStorage.setItem("me_theme", theme);
     } catch (e) {}
   },
-
-  // ═══════════════════════════════════════════════════════════
-  // الميزة #22: وضع التركيز (Focus Mode)
-  // ═══════════════════════════════════════════════════════════
 
   async startFocusSession({ userId, durationMinutes = 25, label }) {
     const sb = await getClient();
