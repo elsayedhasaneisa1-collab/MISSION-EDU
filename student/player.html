@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>مشغل الفيديو | MISSION EDU</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#000;color:#e8eefc;font-family:Tahoma,Arial,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.stage{position:relative;width:100%;height:100%;background:#000;overflow:hidden;display:flex;align-items:center;justify-content:center}
+video,iframe.embed{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;object-fit:contain}
+.watermark{position:absolute;z-index:10;pointer-events:none;color:rgba(255,70,70,.42);font-size:clamp(12px,2vw,17px);font-weight:900;text-shadow:0 1px 3px #000,0 0 6px #000;padding:4px 7px;border-radius:5px;direction:ltr;max-width:80%;overflow-wrap:anywhere}
+.error{padding:20px;text-align:center;color:#ffb4b4;font-size:15px}
+</style></head>
+<body><main class="stage" id="stage"><div id="videoRoot"></div><div class="watermark" id="watermark"></div></main>
+<script>
+(()=>{
+const p=new URLSearchParams(location.search),type=(p.get('type')||'youtube').toLowerCase(),url=p.get('url')||'',title=p.get('title')||'فيديو الدرس',wm=p.get('wm')||'طالب';
+document.title=title+' | MISSION EDU';
+const root=document.getElementById('videoRoot'),mark=document.getElementById('watermark');mark.textContent=wm;
+function ytId(u){const m=u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);return m?m[1]:''}
+function showError(t){root.innerHTML='<div class="error"></div>';root.firstChild.textContent=t}
+if(!url){showError('رابط الفيديو غير موجود');}
+else if(type==='youtube'){
+ const id=ytId(url);if(!id)showError('رابط YouTube غير صالح');else{const f=document.createElement('iframe');f.className='embed';f.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?rel=0&playsinline=1&autoplay=1&controls=1&fs=1';f.allow='accelerometer; autoplay; encrypted-media; picture-in-picture; fullscreen';f.allowFullscreen=true;f.referrerPolicy='strict-origin-when-cross-origin';f.title=title;root.appendChild(f)}
+}else if(type==='vimeo'){
+ const m=url.match(/vimeo\.com\/(?:video\/)?(\d+)/);if(!m)showError('رابط Vimeo غير صالح');else{const f=document.createElement('iframe');f.className='embed';f.src='https://player.vimeo.com/video/'+m[1]+'?dnt=1&title=0&byline=0&portrait=0';f.allow='autoplay; fullscreen; picture-in-picture';f.allowFullscreen=true;f.title=title;root.appendChild(f)}
+}else if(type==='mp4'||/\.mp4(?:$|\?)/i.test(url)){
+ const v=document.createElement('video');v.controls=true;v.autoplay=true;v.playsInline=true;v.controlsList='nodownload noremoteplayback noplaybackrate';v.disablePictureInPicture=true;v.preload='metadata';v.src=url;v.setAttribute('aria-label',title);root.appendChild(v);v.play().catch(()=>{});
+}else{
+ const f=document.createElement('iframe');f.className='embed';f.src=url;f.allow='autoplay; fullscreen; picture-in-picture';f.allowFullscreen=true;f.referrerPolicy='strict-origin-when-cross-origin';f.title=title;root.appendChild(f)
+}
+function moveMark(){const stage=document.getElementById('stage'),w=mark.offsetWidth,h=mark.offsetHeight;mark.style.left=Math.max(4,Math.random()*(stage.clientWidth-w-8))+'px';mark.style.top=Math.max(4,Math.random()*(stage.clientHeight-h-8))+'px';mark.style.right='auto';mark.style.bottom='auto'}
+moveMark();setInterval(moveMark,4500);window.addEventListener('resize',moveMark);
+document.addEventListener('contextmenu',e=>e.preventDefault());document.addEventListener('dragstart',e=>e.preventDefault());document.addEventListener('selectstart',e=>{if(!['INPUT','TEXTAREA'].includes(e.target.tagName))e.preventDefault()});document.addEventListener('keydown',e=>{if(e.key==='F12'||(e.ctrlKey&&e.shiftKey&&['I','J','C'].includes(e.key.toUpperCase()))||(e.ctrlKey&&['U','S'].includes(e.key.toUpperCase()))){e.preventDefault();e.stopPropagation()}});
+})();
+</script></body></html>
