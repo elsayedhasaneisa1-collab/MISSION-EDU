@@ -340,26 +340,15 @@ return '<span class="pill pill-paid"><i class="fa-solid fa-crown"></i> مشتر�
 }
 return '<span class="pill pill-free"><i class="fa-solid fa-user"></i> مجاني</span>';
 }
-async function downloadPdf(url, filename){
-try{
-const res = await fetch(url, { mode: 'cors' });
-if(!res.ok) throw new Error('HTTP ' + res.status);
-const blob = await res.blob();
-const blobUrl = URL.createObjectURL(blob);
-const a = document.createElement('a');
-a.href = blobUrl;
-a.download = filename || 'lesson.pdf';
-document.body.appendChild(a);
-a.click();
-document.body.removeChild(a);
-setTimeout(()=>URL.revokeObjectURL(blobUrl), 1500);
-return true;
-}catch(e){
-console.warn('PDF download failed, opening in new tab:', e);
-window.open(url, '_blank');
-return false;
+function openPdfViewer(url, title, userPhone){
+  const params = new URLSearchParams({
+    url: url,
+    title: title || 'ملف الشرح',
+    wm: userPhone || 'طالب'
+  });
+  window.open(`/student/pdf-viewer.html?${params.toString()}`, '_blank');
 }
-}
+
 async function loadNote(userId, lessonId){
 try{
 const sb = await DB.getClient();
@@ -652,26 +641,26 @@ return `
 `;
 }
 function buildPdfHTML(pdfUrl, lessonTitle){
-if(!pdfUrl || !pdfUrl.trim()) return '';
-const fileName = (lessonTitle || 'lesson').replace(/[^\u0600-\u06FFa-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_') + '.pdf';
-return `
-<div class="glass mb20" style="padding:16px">
-<div class="h4 mb12" style="display:flex;align-items:center;gap:8px">
-<span style="font-size:18px">📄</span>
-ملف الشرح (PDF)
-</div>
-<button type="button" class="pdf-box" id="pdfLink" data-url="${esc(pdfUrl)}" data-filename="${esc(fileName)}">
-<div class="pdf-icon">PDF</div>
-<div class="pdf-info">
-<div class="pdf-title">اضغط لتحميل ملف الشرح</div>
-<div class="pdf-desc">ملف PDF يحتوي على شرح تفصيلي للدرس</div>
-</div>
-<div class="pdf-arrow"><i class="fa-solid fa-download"></i></div>
-</button>
-<div class="xs muted mt12" style="text-align:center">💡 يتحمّل تلقائيًا على جهازك</div>
-</div>
-`;
+  if(!pdfUrl || !pdfUrl.trim()) return '';
+  return `
+  <div class="glass mb20" style="padding:16px">
+    <div class="h4 mb12" style="display:flex;align-items:center;gap:8px">
+    <span style="font-size:18px">📄</span>
+    ملف الشرح (PDF)
+    </div>
+    <button type="button" class="pdf-box" id="pdfLink" data-url="${esc(pdfUrl)}">
+    <div class="pdf-icon">PDF</div>
+    <div class="pdf-info">
+    <div class="pdf-title">اضغط لفتح ملف الشرح</div>
+    <div class="pdf-desc">ملف PDF محمي ضد التحميل</div>
+    </div>
+    <div class="pdf-arrow"><i class="fa-solid fa-eye"></i></div>
+    </button>
+    <div class="xs muted mt12" style="text-align:center">🛡️ الملف محمي - لا يمكن تحميله</div>
+  </div>
+  `;
 }
+
 function buildRelatedExamsHTML(exams){
 if(!exams || exams.length === 0){
 return `
@@ -828,19 +817,21 @@ showLockedMessage();
 });
 const pdfLink = document.getElementById('pdfLink');
 if(pdfLink){
-pdfLink.addEventListener('click', async ()=>{
-try{
-DB.trackActivity({
-userId: u.id, userName: u.name,
-type: "pdf_open", target: l.title,
-details: { lesson: l.title, pdf: l.pdf_url }
-});
-}catch(e){}
-const url = pdfLink.dataset.url;
-const fname = pdfLink.dataset.filename || 'lesson.pdf';
-await downloadPdf(url, fname);
-});
+  pdfLink.addEventListener('click', (e)=>{
+    e.preventDefault();
+    try{
+      DB.trackActivity({
+        userId: u.id, userName: u.name,
+        type: "pdf_open", target: l.title,
+        details: { lesson: l.title, pdf: l.pdf_url }
+      });
+    }catch(e){}
+    const url = pdfLink.dataset.url;
+    const userPhone = (u.country_code || '') + (u.phone || '');
+    openPdfViewer(url, l.title, userPhone);
+  });
 }
+
 const btnDoneEl = document.getElementById("btnDone");
 if(btnDoneEl){
 btnDoneEl.addEventListener("click", async ()=>{
