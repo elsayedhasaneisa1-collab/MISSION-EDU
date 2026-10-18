@@ -766,7 +766,24 @@ function XPShopPage(){
   const [editing,setEditing]=useState(null);const [form,setForm]=useState({name:'',description:'',icon:'🎁',type:'reward',xp_cost:'',stock:'',active:true});const [busy,setBusy]=useState(false);
   const openNew=()=>{setForm({name:'',description:'',icon:'🎁',type:'reward',xp_cost:'',stock:'',active:true});setEditing('new');};
   const openEdit=it=>{setForm({...it});setEditing(it.id);};
-  const save=async()=>{if(!form.name||!form.xp_cost)return app.toast.warn('الاسم والسعر مطلوبان');setBusy(true);try{await app.save('xp_shop_items',form);app.toast.ok('تم');setEditing(null);}catch(e){app.toast.err(e.message);}setBusy(false);};
+  const save=async()=>{
+  if(!form.name||!form.xp_cost)return app.toast.warn('الاسم والسعر مطلوبان');
+  setBusy(true);
+  try{
+    const payload = {
+      ...form,
+      created_at: form.created_at || Date.now()
+    };
+    if(!payload.id) delete payload.id;
+    await app.save('xp_shop_items', payload);
+    app.toast.ok('تم');
+    setEditing(null);
+  }catch(e){
+    console.error('XP Shop save error:', e);
+    app.toast.err(e.message || 'خطأ غير متوقع');
+  }
+  setBusy(false);
+};
   const del=async id=>{const r=await Swal.fire({title:'حذف؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{await app.remove('xp_shop_items',id);app.toast.warn('تم');}catch(e){app.toast.err(e.message);}};
   return <>
     <div className="flex between center mb16"><div className="h2 grad">🛒 متجر XP</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> منتج جديد</button></div>
