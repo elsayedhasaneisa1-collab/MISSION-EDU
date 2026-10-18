@@ -170,6 +170,15 @@ function App() {
     })();
   }, []);
 
+  const cleanupChallenge = async () => {
+    if (!sb || !challenge) return;
+    try {
+      await sb.from('sv_answers').delete().eq('challenge_id', challenge.id);
+      await sb.from('sv_messages').delete().eq('challenge_id', challenge.id);
+      await sb.from('sv_challenges').delete().eq('id', challenge.id);
+    } catch (e) {}
+  };
+
   useEffect(() => {
     if (!sb || !challenge) return;
     const channel = sb.channel('sv_game_' + challenge.id)
@@ -203,6 +212,9 @@ function App() {
            setTimeout(() => setFloatEmojis(prev => prev.filter(e => e.id !== id)), 2000);
         }
       })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'sv_challenges', filter: `id=eq.${challenge.id}` }, () => {
+        if(view !== 'end' && view !== 'lobby') window.location.href = '/student/index.html';
+      })
       .subscribe();
     return () => { sb.removeChannel(channel); };
   }, [sb, challenge, view, qIndex]);
@@ -218,12 +230,10 @@ function App() {
 
   useEffect(() => {
     if (view !== 'game' || isVsShowing) return;
-    
     if (timer <= 0) {
       if (challenge.host_id === user.id) checkAdvance(true);
       return;
     }
-    
     timerRef.current = setTimeout(() => setTimer(t => t - 1), 1000);
     return () => clearTimeout(timerRef.current);
   }, [timer, view, challenge, user, isVsShowing]);
@@ -304,7 +314,12 @@ function App() {
   };
 
   const cancelGame = async () => {
-    await sb.from('sv_challenges').update({ status: 'cancelled' }).eq('id', challenge.id);
+    await cleanupChallenge();
+    window.location.href = '/student/index.html';
+  };
+
+  const finishGame = async () => {
+    await cleanupChallenge();
     window.location.href = '/student/index.html';
   };
 
@@ -462,7 +477,7 @@ function App() {
             <div style={{ color: '#7f93b8' }}>|</div>
             <div style={{ color: '#ef4444' }}>الخصم: {challenge.host_id !== user.id ? hostScore : guestScore}</div>
           </div>
-          <button className="btn btn-p" style={{ width: '100%' }} onClick={() => window.location.reload()}>العودة للرئيسية</button>
+          <button className="btn btn-p" style={{ width: '100%' }} onClick={finishGame}>العودة للرئيسية ومسح التحدي</button>
         </div>
       )}
     </div>
