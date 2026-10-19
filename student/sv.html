@@ -17,8 +17,9 @@
 body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(47,125,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(139,92,246,.14),transparent 60%),#04060e;color:#e8eefc;min-height:100vh;line-height:1.7;overflow-x:hidden}
 .glass{background:linear-gradient(180deg,rgba(21,31,56,.72),rgba(11,17,34,.62));border:1px solid rgba(90,140,230,.16);border-radius:20px;backdrop-filter:blur(16px);box-shadow:0 18px 50px rgba(0,0,0,.45)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:12px 22px;border-radius:13px;font-weight:700;font-size:15px;transition:.24s;border:none;cursor:pointer;font-family:inherit}
+.btn:disabled{opacity:.5;cursor:not-allowed}
 .btn-p{background:linear-gradient(135deg,#2f7dff,#1f5fd6);color:#fff;box-shadow:0 10px 28px rgba(47,125,255,.36)}
-.btn-p:hover{transform:translateY(-2px);box-shadow:0 14px 38px rgba(47,125,255,.55)}
+.btn-p:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 14px 38px rgba(47,125,255,.55)}
 .btn-g{background:rgba(47,125,255,.10);color:#5aa9ff;border:1px solid rgba(90,140,230,.32)}
 .btn-s{background:rgba(255,255,255,.05);color:#b7c6e4;border:1px solid rgba(90,140,230,.16)}
 .btn-ok{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff}
@@ -35,35 +36,37 @@ body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 
 .tab{flex:1;padding:12px;text-align:center;font-weight:800;border-radius:10px;cursor:pointer;color:#7f93b8;transition:.2s}
 .tab.active{background:linear-gradient(135deg,#2f7dff,#8b5cf6);color:#fff;box-shadow:0 4px 12px rgba(47,125,255,.3)}
 .form-group{margin-bottom:16px}
-.link-box{display:flex;gap:8px;margin:20px 0;}
-.link-input{flex:1;padding:12px;border-radius:10px;background:rgba(0,0,0,.3);border:1px solid rgba(90,140,230,.3);color:#fbbf24;font-family:monospace;font-size:14px;text-align:center;font-weight:900;}
-.game-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.score-box{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.4);padding:8px 16px;border-radius:20px;border:1px solid rgba(255,255,255,.1)}
-.score-box.mine{border-color:#2f7dff}
-.score-box.theirs{border-color:#ef4444}
-.tug-bar{height:12px;background:rgba(0,0,0,.5);border-radius:20px;margin-bottom:20px;position:relative;overflow:hidden;display:flex;justify-content:center;}
-.tug-fill{position:absolute;top:0;bottom:0;transition:all .5s cubic-bezier(.2,.8,.3,1);}
-.tug-host{left:50%;background:#2f7dff;}
-.tug-guest{right:50%;background:#ef4444;}
+.link-box{display:flex;gap:8px;margin:20px 0}
+.link-input{flex:1;padding:12px;border-radius:10px;background:rgba(0,0,0,.3);border:1px solid rgba(90,140,230,.3);color:#fbbf24;font-family:monospace;font-size:13px;text-align:center;font-weight:900;direction:ltr}
+.game-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:10px}
+.score-box{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.4);padding:8px 16px;border-radius:20px;border:1px solid rgba(255,255,255,.1);font-weight:700}
+.score-box.mine{border-color:#2f7dff;color:#5aa9ff}
+.score-box.theirs{border-color:#ef4444;color:#fca5a5}
+.tug-bar{height:12px;background:rgba(0,0,0,.5);border-radius:20px;margin-bottom:20px;position:relative;overflow:hidden;display:flex;justify-content:center}
+.tug-fill{position:absolute;top:0;bottom:0;transition:all .5s cubic-bezier(.2,.8,.3,1)}
+.tug-host{left:50%;background:#2f7dff}
+.tug-guest{right:50%;background:#ef4444}
 .question-card{padding:30px;text-align:center;margin-bottom:20px;position:relative}
-.timer-ring{position:absolute;top:-20px;right:20px;width:50px;height:50px;display:grid;place-items:center;background:#0b1122;border-radius:50%;border:2px solid #fbbf24;font-weight:900;font-size:18px;color:#fbbf24;}
+.timer-ring{position:absolute;top:-20px;right:20px;width:50px;height:50px;display:grid;place-items:center;background:#0b1122;border-radius:50%;border:2px solid #fbbf24;font-weight:900;font-size:18px;color:#fbbf24;font-variant-numeric:tabular-nums}
 .question-text{font-size:22px;font-weight:800;line-height:1.6;margin-bottom:24px;margin-top:10px}
 .options{display:flex;flex-direction:column;gap:12px}
 .opt{padding:16px 20px;border-radius:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(90,140,230,.2);cursor:pointer;text-align:right;font-size:16px;font-weight:600;transition:.2s;display:flex;align-items:center;gap:14px}
 .opt:hover{background:rgba(47,125,255,.1);border-color:#2f7dff}
+.opt.selected{background:rgba(47,125,255,.12);border-color:#2f7dff}
 .opt.correct{background:rgba(34,197,94,.2);border-color:#22c55e;color:#fff}
 .opt.wrong{background:rgba(239,68,68,.2);border-color:#ef4444;color:#fff}
-.opt-l{width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,.1);display:grid;place-items:center;font-weight:800}
+.opt-l{width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,.1);display:grid;place-items:center;font-weight:800;flex-shrink:0}
 .chat-btn{position:fixed;bottom:20px;left:20px;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#2f7dff,#8b5cf6);color:#fff;display:grid;place-items:center;font-size:24px;box-shadow:0 10px 30px rgba(47,125,255,.5);z-index:50;border:none;cursor:pointer}
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:flex-end;justify-content:center}
 .chat-panel{width:100%;max-width:600px;background:#0b1122;border-radius:20px 20px 0 0;padding:20px;border:1px solid rgba(90,140,230,.3);animation:slideUp .3s}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .msg-list{height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
-.msg{padding:10px 16px;border-radius:16px;max-width:80%;font-size:14px}
+.msg{padding:10px 16px;border-radius:16px;max-width:80%;font-size:14px;word-wrap:break-word}
 .msg.mine{align-self:flex-start;background:#2f7dff;color:#fff;border-bottom-right-radius:4px}
 .msg.theirs{align-self:flex-end;background:rgba(255,255,255,.1);border-bottom-left-radius:4px}
 .emoji-bar{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px}
-.emoji-btn{font-size:24px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:8px;cursor:pointer;transition:.2s}
+.emoji-btn{font-size:24px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:8px;cursor:pointer;transition:.2s;flex-shrink:0}
+.emoji-btn:hover{background:rgba(255,255,255,.15)}
 .float-emoji{position:fixed;bottom:80px;font-size:48px;animation:floatUp 2s ease-out forwards;pointer-events:none;z-index:200;filter:drop-shadow(0 0 10px rgba(255,255,255,0.5))}
 @keyframes floatUp{0%{transform:translateY(0) scale(0.5);opacity:1}50%{transform:translateY(-150px) scale(1.2) rotate(10deg);opacity:1}100%{transform:translateY(-300px) scale(1) rotate(-10deg);opacity:0}}
 .vs-screen{position:fixed;inset:0;background:#04060e;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px}
@@ -76,42 +79,60 @@ body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 
 @keyframes pulseVs{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
 @keyframes slideInLeft{from{transform:translateX(-100px);opacity:0}to{transform:translateX(0);opacity:1}}
 @keyframes slideInRight{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}
+.disc-banner{padding:12px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);border-radius:12px;margin-bottom:12px;text-align:center;color:#fca5a5;font-weight:700;font-size:14px}
 </style>
 </head>
 <body>
 <div id="root"></div>
-
 <script src="/db.js"></script>
 <script type="text/babel">
-const {useState, useEffect, useRef} = React;
+const {useState, useEffect, useRef, useCallback} = React;
 const DB = window.MissionDB;
 const EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🔥', '👏', '💯'];
+
+function parseQuestionIds(raw) {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === 'string') {
+    try { return JSON.parse(raw); } catch (e) { return []; }
+  }
+  return [];
+}
 
 function App() {
   const [sb, setSb] = useState(null);
   const [user, setUser] = useState(null);
   const [view, setView] = useState('loading');
-  const [mode, setMode] = useState('create');
   const [subjects, setSubjects] = useState([]);
   const [selSubj, setSelSubj] = useState('');
   const [selQCount, setSelQCount] = useState(10);
-  
   const [challenge, setChallenge] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [qIndex, setQIndex] = useState(0);
-  const [hostScore, setHostScore] = useState(0);
-  const [guestScore, setGuestScore] = useState(0);
   const [myAnswer, setMyAnswer] = useState(null);
+  const [answerResult, setAnswerResult] = useState(null);
   const [timer, setTimer] = useState(15);
   const [qStartTime, setQStartTime] = useState(0);
   const [isVsShowing, setIsVsShowing] = useState(false);
-  
   const [showChat, setShowChat] = useState(false);
   const [messages, setMessages] = useState([]);
   const [msgText, setMsgText] = useState('');
   const [floatEmojis, setFloatEmojis] = useState([]);
+  const [opponentName, setOpponentName] = useState('الخصم');
+  const [busy, setBusy] = useState(false);
+  const [disconnected, setDisconnected] = useState(false);
 
   const timerRef = useRef(null);
+  const lastUpdateRef = useRef(Date.now());
+  const msgRateRef = useRef(0);
+  const gameStartedRef = useRef(false);
+  const userRef = useRef(null);
+  const challengeRef = useRef(null);
+  const qIndexRef = useRef(0);
+
+  useEffect(() => { userRef.current = user; }, [user]);
+  useEffect(() => { challengeRef.current = challenge; }, [challenge]);
+  useEffect(() => { qIndexRef.current = qIndex; }, [qIndex]);
 
   const playSound = (type) => {
     try {
@@ -119,22 +140,34 @@ function App() {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.connect(gain); gain.connect(ctx.destination);
-      if(type === 'correct') {
+      if (type === 'correct') {
         osc.frequency.setValueAtTime(523.25, ctx.currentTime);
         osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
         osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2);
         gain.gain.setValueAtTime(0.1, ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
         osc.start(); osc.stop(ctx.currentTime + 0.4);
-      } else if(type === 'wrong') {
+      } else if (type === 'wrong') {
         osc.frequency.setValueAtTime(300, ctx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.3);
         gain.gain.setValueAtTime(0.1, ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
         osc.start(); osc.stop(ctx.currentTime + 0.3);
       }
-    } catch(e) {}
+    } catch (e) {}
   };
+
+  const triggerStart = useCallback(() => {
+    if (gameStartedRef.current) return;
+    gameStartedRef.current = true;
+    setIsVsShowing(true);
+    setTimeout(() => {
+      setIsVsShowing(false);
+      setView('game');
+      setQStartTime(Date.now());
+      lastUpdateRef.current = Date.now();
+    }, 3000);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -143,21 +176,31 @@ function App() {
       const sid = DB.getSessionId();
       if (!sid || sid === 'guest') { window.location.href = '/auth/login.html'; return; }
       const u = await DB.getUser(sid);
-      if (!u || u.banned === true) { DB.clearSession(); window.location.href = '/auth/login.html'; return; }
+      if (!u || u.banned === true || u.active === false) {
+        DB.clearSession();
+        window.location.href = '/auth/login.html';
+        return;
+      }
       setUser(u);
-      
-      const { data: subs } = await client.from('subjects').select('*');
+
+      const { data: subs } = await client.from('subjects').select('id,name');
       setSubjects(subs || []);
 
       const urlParams = new URLSearchParams(window.location.search);
       const joinId = urlParams.get('id');
-      if(joinId) {
-        setView('loading');
+      if (joinId) {
         const { data: ch } = await client.from('sv_challenges').select('*').eq('id', joinId).eq('status', 'waiting').maybeSingle();
-        if(ch && ch.host_id !== u.id) {
-          await client.from('sv_challenges').update({ guest_id: u.id, status: 'playing' }).eq('id', ch.id);
+        if (ch && ch.host_id !== u.id) {
+          const { data: hostUser } = await client.from('users').select('name').eq('id', ch.host_id).maybeSingle();
+          if (hostUser) setOpponentName(hostUser.name || 'الخصم');
+          const { error: updateErr } = await client.from('sv_challenges').update({ guest_id: u.id, status: 'playing' }).eq('id', ch.id).eq('status', 'waiting');
+          if (updateErr) {
+            Swal.fire('خطأ', 'تعذر الانضمام للتحدي', 'error').then(() => window.location.href = '/student/index.html');
+            return;
+          }
           setChallenge({ ...ch, guest_id: u.id, status: 'playing' });
-          setView('game');
+          setView('waiting');
+          triggerStart();
         } else if (ch && ch.host_id === u.id) {
           setChallenge(ch);
           setView('waiting');
@@ -168,37 +211,25 @@ function App() {
         setView('lobby');
       }
     })();
-  }, []);
-
-  const cleanupChallenge = async () => {
-    if (!sb || !challenge) return;
-    try {
-      await sb.from('sv_answers').delete().eq('challenge_id', challenge.id);
-      await sb.from('sv_messages').delete().eq('challenge_id', challenge.id);
-      await sb.from('sv_challenges').delete().eq('id', challenge.id);
-    } catch (e) {}
-  };
+  }, [triggerStart]);
 
   useEffect(() => {
     if (!sb || !challenge) return;
     const channel = sb.channel('sv_game_' + challenge.id)
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'sv_challenges', filter: `id=eq.${challenge.id}` }, payload => {
         const newData = payload.new;
+        lastUpdateRef.current = Date.now();
+        setDisconnected(false);
         setChallenge(newData);
-        setHostScore(newData.host_score);
-        setGuestScore(newData.guest_score);
-        
-        if (newData.status === 'playing' && view === 'waiting') {
-           setIsVsShowing(true);
-           setTimeout(() => { setIsVsShowing(false); setView('game'); setQStartTime(Date.now()); }, 3000);
-        }
+        if (newData.status === 'playing' && !gameStartedRef.current) triggerStart();
         if (newData.status === 'finished') setView('end');
         if (newData.status === 'cancelled') {
-           Swal.fire('انتهى التحدي', 'قام الخصم بإلغاء التحدي', 'info').then(() => window.location.href = '/student/index.html');
+          Swal.fire('انتهى التحدي', 'قام الخصم بإلغاء التحدي', 'info').then(() => window.location.href = '/student/index.html');
         }
-        if (newData.current_question > qIndex) {
+        if (newData.current_question > qIndexRef.current) {
           setQIndex(newData.current_question);
           setMyAnswer(null);
+          setAnswerResult(null);
           setTimer(15);
           setQStartTime(Date.now());
         }
@@ -206,149 +237,215 @@ function App() {
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'sv_messages', filter: `challenge_id=eq.${challenge.id}` }, payload => {
         const msg = payload.new;
         setMessages(prev => [...prev, msg]);
-        if(msg.emoji) {
-           const id = Date.now() + Math.random();
-           setFloatEmojis(prev => [...prev, {id, emoji: msg.emoji, left: Math.random() * 80 + 10}]);
-           setTimeout(() => setFloatEmojis(prev => prev.filter(e => e.id !== id)), 2000);
+        if (msg.emoji) {
+          const id = Date.now() + Math.random();
+          setFloatEmojis(prev => [...prev, { id, emoji: msg.emoji, left: Math.random() * 80 + 10 }]);
+          setTimeout(() => setFloatEmojis(prev => prev.filter(e => e.id !== id)), 2000);
         }
       })
       .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'sv_challenges', filter: `id=eq.${challenge.id}` }, () => {
-        if(view !== 'end' && view !== 'lobby') window.location.href = '/student/index.html';
+        if (view !== 'end' && view !== 'lobby') window.location.href = '/student/index.html';
       })
       .subscribe();
     return () => { sb.removeChannel(channel); };
-  }, [sb, challenge, view, qIndex]);
+  }, [sb, challenge?.id, view, triggerStart]);
 
   useEffect(() => {
     if (view === 'game' && challenge && questions.length === 0) {
-      sb.from('questions').select('id,text,options').in('id', challenge.question_ids).then(({ data }) => {
-        const ordered = challenge.question_ids.map(id => data.find(q => q.id === id)).filter(Boolean);
+      const qIds = parseQuestionIds(challenge.question_ids);
+      if (qIds.length === 0) return;
+      sb.from('questions_public').select('id,text,options').in('id', qIds).then(({ data }) => {
+        const ordered = qIds.map(id => (data || []).find(q => q.id === id)).filter(Boolean);
         setQuestions(ordered);
       });
     }
-  }, [view, challenge, questions, sb]);
+  }, [view, challenge, questions.length, sb]);
 
   useEffect(() => {
     if (view !== 'game' || isVsShowing) return;
     if (timer <= 0) {
-      if (challenge.host_id === user.id) checkAdvance(true);
+      if (challenge && challenge.host_id === user?.id) checkAdvance(true);
       return;
     }
     timerRef.current = setTimeout(() => setTimer(t => t - 1), 1000);
     return () => clearTimeout(timerRef.current);
   }, [timer, view, challenge, user, isVsShowing]);
 
+  useEffect(() => {
+    if (view !== 'game') return;
+    const iv = setInterval(() => {
+      if (Date.now() - lastUpdateRef.current > 60000 && challengeRef.current?.status === 'playing') {
+        setDisconnected(true);
+      }
+    }, 5000);
+    return () => clearInterval(iv);
+  }, [view]);
+
   const checkAdvance = async (force = false) => {
-    if (challenge.host_id !== user.id) return;
+    if (!challenge || challenge.host_id !== user.id) return;
     const { data: ans } = await sb.from('sv_answers').select('user_id').eq('challenge_id', challenge.id).eq('question_index', qIndex);
-    const hostAns = ans.some(a => a.user_id === challenge.host_id);
-    const guestAns = ans.some(a => a.user_id === challenge.guest_id);
+    const hostAns = (ans || []).some(a => a.user_id === challenge.host_id);
+    const guestAns = (ans || []).some(a => a.user_id === challenge.guest_id);
     if ((hostAns && guestAns) || force) {
+      const totalQ = parseQuestionIds(challenge.question_ids).length;
       const nextQ = qIndex + 1;
-      if (nextQ >= challenge.question_ids.length) await sb.from('sv_challenges').update({ status: 'finished', current_question: nextQ }).eq('id', challenge.id);
-      else await sb.from('sv_challenges').update({ current_question: nextQ }).eq('id', challenge.id);
+      if (nextQ >= totalQ) {
+        await sb.from('sv_challenges').update({ status: 'finished', current_question: nextQ }).eq('id', challenge.id);
+      } else {
+        await sb.from('sv_challenges').update({ current_question: nextQ }).eq('id', challenge.id);
+      }
     }
   };
 
   const handleAnswer = async (optIdx) => {
-    if (myAnswer !== null || isVsShowing) return;
+    if (myAnswer !== null || isVsShowing || busy) return;
+    setBusy(true);
     setMyAnswer(optIdx);
-    
     const timeTaken = (Date.now() - qStartTime) / 1000;
-    const { data: qFull } = await sb.from('questions').select('correct').eq('id', questions[qIndex].id).single();
-    const correctIdx = qFull.correct[0];
-    const isCorrect = optIdx === correctIdx;
-    
-    let points = 0;
-    if (isCorrect) {
-      points = 10;
-      if (timeTaken < 5) points += 5;
-      playSound('correct');
-    } else {
-      points = -3;
-      playSound('wrong');
+    try {
+      const { data, error } = await sb.rpc('sv_submit_answer', {
+        p_challenge_id: challenge.id,
+        p_question_index: qIndex,
+        p_answer_index: optIdx,
+        p_time_taken: timeTaken
+      });
+      if (error) throw new Error(error.message);
+      setAnswerResult(data);
+      if (data.is_correct) playSound('correct');
+      else playSound('wrong');
+      if (challenge.host_id === user.id) {
+        setTimeout(() => checkAdvance(false), 500);
+      }
+    } catch (e) {
+      Swal.fire('خطأ', e.message || 'تعذر إرسال الإجابة', 'error');
+      setMyAnswer(null);
+    } finally {
+      setBusy(false);
     }
-
-    const isHost = challenge.host_id === user.id;
-    const newScore = (isHost ? hostScore : guestScore) + points;
-
-    await sb.from('sv_answers').insert([{ 
-      id: DB.uid('sva_'), challenge_id: challenge.id, user_id: user.id, 
-      question_index: qIndex, answer_index: optIdx, is_correct: isCorrect, time_taken: timeTaken, created_at: Date.now() 
-    }]);
-    
-    await sb.from('sv_challenges').update(isHost ? { host_score: newScore } : { guest_score: newScore }).eq('id', challenge.id);
-    
-    if (isHost) setTimeout(() => checkAdvance(false), 500);
   };
 
   const createChallenge = async () => {
-    const count = parseInt(selQCount);
-    let qQuery = sb.from('questions').select('id');
-    if (selSubj) qQuery = qQuery.eq('subject_id', selSubj);
-    
-    const { data: qs } = await qQuery.limit(200);
-    if (!qs || qs.length < count) return Swal.fire('خطأ', 'الأسئلة غير كافية لهذا الاختبار', 'warning');
-    
-    const shuffled = qs.sort(() => 0.5 - Math.random()).slice(0, count).map(q => q.id);
-    const chId = DB.uid('sv_');
-    const ch = { 
-      id: chId, host_id: user.id, subject_id: selSubj || null, 
-      question_ids: shuffled, status: 'waiting', host_score: 0, guest_score: 0, 
-      current_question: 0, total_questions: count, created_at: Date.now() 
-    };
-    await sb.from('sv_challenges').insert([ch]);
-    setChallenge(ch); setView('waiting');
+    if (busy) return;
+    setBusy(true);
+    try {
+      const count = parseInt(selQCount);
+      let qQuery = sb.from('questions_public').select('id');
+      if (selSubj) qQuery = qQuery.eq('subject_id', selSubj);
+      const { data: qs } = await qQuery.limit(200);
+      if (!qs || qs.length < count) {
+        Swal.fire('خطأ', 'الأسئلة غير كافية لهذا الاختبار', 'warning');
+        return;
+      }
+      const shuffled = [...qs].sort(() => 0.5 - Math.random()).slice(0, count).map(q => q.id);
+      const ch = {
+        id: DB.uid('sv_'),
+        host_id: user.id,
+        subject_id: selSubj || null,
+        question_ids: shuffled,
+        status: 'waiting',
+        host_score: 0,
+        guest_score: 0,
+        current_question: 0,
+        total_questions: count,
+        created_at: Date.now()
+      };
+      const { error } = await sb.from('sv_challenges').insert([ch]);
+      if (error) throw new Error(error.message);
+      setChallenge(ch);
+      setView('waiting');
+    } catch (e) {
+      Swal.fire('خطأ', e.message || 'تعذر إنشاء التحدي', 'error');
+    } finally {
+      setBusy(false);
+    }
   };
 
   const copyLink = () => {
     const link = window.location.origin + window.location.pathname + '?id=' + challenge.id;
-    navigator.clipboard.writeText(link);
-    Swal.fire({ title: '✅ تم النسخ', text: 'تم نسخ لينك التحدي، أرسله لصديقك!', icon: 'success', timer: 2000, showConfirmButton: false });
+    try {
+      navigator.clipboard.writeText(link);
+      Swal.fire({ title: '✅ تم النسخ', text: 'أرسل اللينك لصديقك', icon: 'success', timer: 2000, showConfirmButton: false });
+    } catch (e) {
+      Swal.fire('اللينك', link, 'info');
+    }
   };
 
   const sendMessage = async (text, emoji) => {
+    const now = Date.now();
+    if (now - msgRateRef.current < 1000) return;
+    msgRateRef.current = now;
     if (!text && !emoji) return;
-    await sb.from('sv_messages').insert([{ id: DB.uid('svm_'), challenge_id: challenge.id, user_id: user.id, user_name: user.name, text: text || null, emoji: emoji || null, created_at: Date.now() }]);
-    if (text) setMsgText('');
+    try {
+      const cleanText = text ? String(text).slice(0, 300).replace(/[<>]/g, '') : null;
+      await sb.from('sv_messages').insert([{
+        id: DB.uid('svm_'),
+        challenge_id: challenge.id,
+        user_id: user.id,
+        user_name: user.name,
+        text: cleanText || null,
+        emoji: emoji || null,
+        created_at: Date.now()
+      }]);
+      if (text) setMsgText('');
+    } catch (e) {}
   };
 
   const cancelGame = async () => {
-    await cleanupChallenge();
-    window.location.href = '/student/index.html';
+    if (!challenge || !sb) return;
+    try { await sb.from('sv_challenges').update({ status: 'cancelled' }).eq('id', challenge.id); } catch (e) {}
+    setTimeout(() => { window.location.href = '/student/index.html'; }, 300);
   };
 
   const finishGame = async () => {
-    await cleanupChallenge();
+    if (!challenge || !sb) return;
+    try { await sb.from('sv_challenges').delete().eq('id', challenge.id); } catch (e) {}
     window.location.href = '/student/index.html';
   };
 
-  const getTugWidth = () => {
-    const total = Math.abs(hostScore) + Math.abs(guestScore);
-    if (total === 0) return 0;
-    return (Math.abs(hostScore - guestScore) / total) * 50;
+  const getScore = () => {
+    if (!challenge || !user) return { mine: 0, theirs: 0 };
+    const isHost = challenge.host_id === user.id;
+    return {
+      mine: isHost ? (challenge.host_score || 0) : (challenge.guest_score || 0),
+      theirs: isHost ? (challenge.guest_score || 0) : (challenge.host_score || 0)
+    };
   };
 
-  if (view === 'loading') return <div style={{minHeight: '100vh', display: 'grid', placeItems: 'center'}}><div className="spinner"></div></div>;
+  const getTugWidth = () => {
+    const { mine, theirs } = getScore();
+    const total = Math.abs(mine) + Math.abs(theirs);
+    if (total === 0) return 0;
+    return (Math.abs(mine - theirs) / total) * 50;
+  };
+
+  if (view === 'loading') {
+    return <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center' }}><div className="spinner"></div></div>;
+  }
+
+  const score = getScore();
+  const myName = user?.name || 'أنت';
+  const qIds = challenge ? parseQuestionIds(challenge.question_ids) : [];
+  const totalQ = qIds.length;
+  const isAnswered = myAnswer !== null;
 
   return (
     <div className="container">
-      {floatEmojis.map(e => <div key={e.id} className="float-emoji" style={{left: `${e.left}%`}}>{e.emoji}</div>)}
+      {floatEmojis.map(e => <div key={e.id} className="float-emoji" style={{ left: `${e.left}%` }}>{e.emoji}</div>)}
 
       {isVsShowing && (
         <div className="vs-screen">
           <div className="vs-avatars">
             <div className="vs-player">
-              <div className="vs-avatar">{user.avatar || '🧑‍🎓'}</div>
-              <div style={{fontWeight: 800}}>{user.name}</div>
+              <div className="vs-avatar">{user?.avatar || '🧑‍🎓'}</div>
+              <div style={{ fontWeight: 800 }}>{myName}</div>
             </div>
             <div className="vs-text">VS</div>
             <div className="vs-player right">
               <div className="vs-avatar">👤</div>
-              <div style={{fontWeight: 800}}>الخصم</div>
+              <div style={{ fontWeight: 800 }}>{opponentName}</div>
             </div>
           </div>
-          <div style={{fontSize: 24, fontWeight: 900, color: '#fff', animation: 'pulseVs 1s infinite'}}>استعد...</div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: '#fff', animation: 'pulseVs 1s infinite' }}>استعد...</div>
         </div>
       )}
 
@@ -360,9 +457,7 @@ function App() {
 
       {view === 'lobby' && (
         <div className="glass" style={{ padding: 30 }}>
-          <div className="tabs">
-            <div className={`tab active`}>إنشاء تحدي</div>
-          </div>
+          <div className="tabs"><div className="tab active">إنشاء تحدي</div></div>
           <div className="form-group">
             <label className="lbl">المادة (اختياري)</label>
             <select className="input" value={selSubj} onChange={e => setSelSubj(e.target.value)}>
@@ -378,14 +473,18 @@ function App() {
               <option value="15">15 سؤال (تحدي)</option>
             </select>
           </div>
-          <button className="btn btn-p" style={{ width: '100%', marginTop: 10 }} onClick={createChallenge}>🚀 إنشاء التحدي</button>
+          <button className="btn btn-p" style={{ width: '100%', marginTop: 10 }} onClick={createChallenge} disabled={busy}>
+            {busy ? 'جارٍ...' : '🚀 إنشاء التحدي'}
+          </button>
         </div>
       )}
 
-      {view === 'waiting' && (
+      {view === 'waiting' && challenge && (
         <div className="glass" style={{ padding: 40, textAlign: 'center' }}>
           <div className="spinner" style={{ marginBottom: 20 }}></div>
-          <h2 style={{ fontSize: 20, marginBottom: 10 }}>في انتظار انضمام صديقك...</h2>
+          <h2 style={{ fontSize: 20, marginBottom: 10 }}>
+            {challenge.guest_id ? 'بدأ التحدي...' : 'في انتظار انضمام صديقك...'}
+          </h2>
           <p style={{ color: '#7f93b8', marginBottom: 20 }}>أرسل هذا اللينك لصديقك لينضم للتحدي</p>
           <div className="link-box">
             <input className="link-input" readOnly value={window.location.origin + window.location.pathname + '?id=' + challenge.id} />
@@ -396,60 +495,60 @@ function App() {
 
       {view === 'game' && questions.length > 0 && !isVsShowing && (
         <>
+          {disconnected && (
+            <div className="disc-banner">⚠️ الخصم غير متصل — قد يكون خرج من التحدي</div>
+          )}
           <div className="game-header">
-            <div className={`score-box ${challenge.host_id === user.id ? 'mine' : 'theirs'}`}>
-              <span>أنت</span><b>{challenge.host_id === user.id ? hostScore : guestScore}</b>
-            </div>
-            <div className="timer">{timer}</div>
-            <div className={`score-box ${challenge.host_id !== user.id ? 'mine' : 'theirs'}`}>
-              <b>{challenge.host_id !== user.id ? hostScore : guestScore}</b><span>الخصم</span>
-            </div>
+            <div className="score-box mine"><span>أنت</span><b>{score.mine}</b></div>
+            <div style={{ fontSize: 28, fontWeight: 900, color: timer <= 5 ? '#fca5a5' : '#fbbf24', minWidth: 50, textAlign: 'center', fontVariantNumeric: 'tabular-nums' }}>{timer}</div>
+            <div className="score-box theirs"><b>{score.theirs}</b><span>{opponentName}</span></div>
           </div>
-
           <div className="tug-bar">
             <div className="tug-host" style={{ width: `${getTugWidth()}%` }}></div>
             <div className="tug-guest" style={{ width: `${getTugWidth()}%` }}></div>
           </div>
-
           <div className="glass question-card">
-            <div className="timer-ring">{timer}</div>
-            <div style={{ color: '#7f93b8', marginBottom: 10, fontWeight: 700 }}>سؤال {qIndex + 1} من {challenge.total_questions}</div>
-            <div className="question-text">{questions[qIndex].text}</div>
+            <div className="timer-ring" style={{ borderColor: timer <= 5 ? '#ef4444' : '#fbbf24', color: timer <= 5 ? '#fca5a5' : '#fbbf24' }}>{timer}</div>
+            <div style={{ color: '#7f93b8', marginBottom: 10, fontWeight: 700 }}>سؤال {qIndex + 1} من {totalQ}</div>
+            <div className="question-text">{questions[qIndex]?.text || ''}</div>
             <div className="options">
-              {questions[qIndex].options.map((opt, i) => {
+              {(questions[qIndex]?.options || []).map((opt, i) => {
                 let cls = 'opt';
-                if (myAnswer !== null) {
-                  if (i === myAnswer) cls += ' selected';
+                if (answerResult && answerResult.correct_index != null) {
+                  if (answerResult.correct_index === i) cls += ' correct';
+                  else if (myAnswer === i) cls += ' wrong';
+                } else if (myAnswer === i) {
+                  cls += ' selected';
                 }
                 return (
                   <div key={i} className={cls} onClick={() => handleAnswer(i)}>
-                    <div className="opt-l">{['أ','ب','ج','د'][i]}</div>
+                    <div className="opt-l">{['أ', 'ب', 'ج', 'د'][i]}</div>
                     <div>{opt}</div>
                   </div>
                 );
               })}
             </div>
-            {myAnswer !== null && (
+            {isAnswered && (
               <div style={{ marginTop: 20, color: '#fbbf24', fontWeight: 800 }}>
-                بانتظار الخصم...
+                {answerResult
+                  ? (answerResult.is_correct ? '✅ إجابة صحيحة! بانتظار الخصم...' : '❌ إجابة خاطئة. بانتظار الخصم...')
+                  : 'جارٍ التحقق...'}
               </div>
             )}
           </div>
-
           <button className="chat-btn" onClick={() => setShowChat(true)}>💬</button>
-
           {showChat && (
             <div className="overlay" onClick={() => setShowChat(false)}>
               <div className="chat-panel" onClick={e => e.stopPropagation()}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-                  <h3 style={{ fontSize: 18 }}>الدردشة المباشرة</h3>
+                  <h3 style={{ fontSize: 18 }}>الدردشة</h3>
                   <button className="btn btn-s" style={{ padding: '4px 10px' }} onClick={() => setShowChat(false)}>✕</button>
                 </div>
                 <div className="msg-list">
                   {messages.map(m => (
                     <div key={m.id} className={`msg ${m.user_id === user.id ? 'mine' : 'theirs'}`}>
                       {m.text && <div>{m.text}</div>}
-                      {m.emoji && <div style={{ fontSize: 32, background: 'transparent', padding: 0 }}>{m.emoji}</div>}
+                      {m.emoji && <div style={{ fontSize: 32, padding: 0 }}>{m.emoji}</div>}
                     </div>
                   ))}
                 </div>
@@ -457,7 +556,7 @@ function App() {
                   {EMOJIS.map(e => <button key={e} className="emoji-btn" onClick={() => sendMessage(null, e)}>{e}</button>)}
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <input className="input" value={msgText} onChange={e => setMsgText(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendMessage(msgText)} placeholder="اكتب رسالة..." />
+                  <input className="input" value={msgText} onChange={e => setMsgText(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendMessage(msgText)} placeholder="اكتب رسالة..." maxLength={300} />
                   <button className="btn btn-p" onClick={() => sendMessage(msgText)}>إرسال</button>
                 </div>
               </div>
@@ -466,18 +565,27 @@ function App() {
         </>
       )}
 
-      {view === 'end' && (
+      {view === 'game' && questions.length === 0 && (
         <div className="glass" style={{ padding: 40, textAlign: 'center' }}>
-          <div style={{ fontSize: 80, marginBottom: 20 }}>🏆</div>
+          <div className="spinner" style={{ marginBottom: 20 }}></div>
+          <div>جارٍ تحميل الأسئلة...</div>
+        </div>
+      )}
+
+      {view === 'end' && challenge && (
+        <div className="glass" style={{ padding: 40, textAlign: 'center' }}>
+          <div style={{ fontSize: 80, marginBottom: 20 }}>
+            {score.mine > score.theirs ? '🏆' : score.mine < score.theirs ? '💔' : '🤝'}
+          </div>
           <h1 style={{ fontSize: 32, marginBottom: 10 }}>
-            {hostScore > guestScore ? (challenge.host_id === user.id ? 'أنت الفائز! 🎉' : 'الخصم فاز 💔') : hostScore < guestScore ? (challenge.guest_id === user.id ? 'أنت الفائز! 🎉' : 'الخصم فاز 💔') : 'تعادل! 🤝'}
+            {score.mine > score.theirs ? 'أنت الفائز! 🎉' : score.mine < score.theirs ? `${opponentName} فاز 💔` : 'تعادل! 🤝'}
           </h1>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 20, fontSize: 24, fontWeight: 900, marginBottom: 30 }}>
-            <div style={{ color: '#2f7dff' }}>أنت: {challenge.host_id === user.id ? hostScore : guestScore}</div>
+            <div style={{ color: '#2f7dff' }}>أنت: {score.mine}</div>
             <div style={{ color: '#7f93b8' }}>|</div>
-            <div style={{ color: '#ef4444' }}>الخصم: {challenge.host_id !== user.id ? hostScore : guestScore}</div>
+            <div style={{ color: '#ef4444' }}>{opponentName}: {score.theirs}</div>
           </div>
-          <button className="btn btn-p" style={{ width: '100%' }} onClick={finishGame}>العودة للرئيسية ومسح التحدي</button>
+          <button className="btn btn-p" style={{ width: '100%' }} onClick={finishGame}>العودة للرئيسية</button>
         </div>
       )}
     </div>
