@@ -146,7 +146,6 @@ ul{list-style:none}
 .player-close:hover{background:rgba(239,68,68,.25);color:#fff}
 .player-stage{position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;isolation:isolate;flex:1}
 .player-stage iframe,.player-stage video{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;pointer-events:auto}
-.watermark{position:absolute;z-index:100;font-size:15px;font-weight:900;font-family:'Cairo','Tajawal',sans-serif;color:rgba(255,60,60,.32);text-shadow:0 0 4px rgba(255,60,60,.15),1px 1px 1px rgba(0,0,0,.3);padding:0;background:transparent;border:none;outline:none;pointer-events:none;user-select:none;-webkit-user-select:none;white-space:nowrap;transition:top 1.8s cubic-bezier(.4,0,.2,1),left 1.8s cubic-bezier(.4,0,.2,1);letter-spacing:1px;direction:ltr}
 .shield-overlay{position:absolute;inset:0;z-index:80;pointer-events:none}
 .shield-side{position:absolute;top:60px;bottom:80px;width:50px;background:transparent;z-index:80;pointer-events:auto;cursor:default}
 .shield-side.right{right:0;left:auto}
@@ -162,7 +161,6 @@ ul{list-style:none}
 .player-title{font-size:12px}
 .player-badge{display:none}
 .player-btn,.player-close{width:32px;height:32px;font-size:14px}
-.watermark{font-size:12px}
 }
 @media(max-width:640px){
 .player-modal{padding:0}
@@ -171,7 +169,6 @@ ul{list-style:none}
 .player-title{font-size:12px}
 .player-badge{display:none}
 .player-btn,.player-close{width:34px;height:34px;font-size:14px}
-.watermark{font-size:12px}
 }
 </style>
 </head>
@@ -204,7 +201,6 @@ ul{list-style:none}
 <div class="shield-overlay"></div>
 <div class="shield-side left"></div>
 <div class="shield-side right"></div>
-<div class="watermark" id="watermark" style="top:20px;left:20px">MISSION EDU</div>
 <div id="playerContainer"></div>
 </div>
 </div>
@@ -233,7 +229,7 @@ const userAvatar = document.getElementById("userAvatar");
 let state = {
   user: null, lesson: null, unit: null, subject: null,
   relatedExams: [], unitPct: 0, doneUnit: 0, totalUnit: 0,
-  isDone: false, watermarkTimer: null, isFullscreen: false,
+  isDone: false, isFullscreen: false,
   note: '', noteId: null, noteTimer: null, noteSaving: false, noteDirty: false,
   hasVideoAccess: false, hasExamAccess: {}, completing: false
 };
@@ -794,10 +790,7 @@ function openPlayer(lesson, user){
   }
   const playerTitle = document.getElementById('playerTitle');
   if(playerTitle) playerTitle.textContent = lesson.title || 'الدرس';
-  const watermark = document.getElementById('watermark');
-  if(watermark){
-    watermark.textContent = ((user.country_code || '') + (user.phone || '')) || user.name || 'طالب';
-  }
+  
   const container = document.getElementById('playerContainer');
   if(container){
     const playerParams = new URLSearchParams({
@@ -815,7 +808,7 @@ function openPlayer(lesson, user){
   const modal = document.getElementById('playerModal');
   if(modal){ modal.classList.add('open'); document.body.style.overflow = 'hidden'; }
   setTimeout(()=>{ enterFullscreenLandscape(); }, 100);
-  startWatermarkMotion();
+  
   try{
     DB.logActivity(user.id, user.name, "video_play", lesson.title);
   }catch(e){}
@@ -829,7 +822,6 @@ function closePlayer(){
   lockOrientation('portrait');
   const container = document.getElementById('playerContainer');
   if(container) container.innerHTML = '';
-  stopWatermarkMotion();
 }
 
 async function enterFullscreenLandscape(){
@@ -873,21 +865,6 @@ function toggleFullscreen(){
     enterFullscreenLandscape();
   }
 }
-
-function moveWatermark(){
-  const wm = document.getElementById('watermark');
-  const stage = document.getElementById('playerStage');
-  if(!wm || !stage) return;
-  const w = stage.offsetWidth, h = stage.offsetHeight;
-  const maxX = Math.max(20, w - 180);
-  const maxY = Math.max(20, h - 50);
-  wm.style.left = (Math.floor(Math.random() * maxX) + 10) + 'px';
-  wm.style.top = (Math.floor(Math.random() * maxY) + 10) + 'px';
-  wm.style.right = 'auto';
-  wm.style.bottom = 'auto';
-}
-function startWatermarkMotion(){ moveWatermark(); state.watermarkTimer = setInterval(moveWatermark, 5000); }
-function stopWatermarkMotion(){ if(state.watermarkTimer){ clearInterval(state.watermarkTimer); state.watermarkTimer = null; } }
 
 async function load(){
   if(!lessonId){
