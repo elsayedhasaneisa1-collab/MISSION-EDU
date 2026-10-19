@@ -111,20 +111,6 @@ body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 
 
 <script src="/db.js"></script>
 <script>
-(function(){
-  const blocked = (e) => {
-    if (e.key === "F12" ||
-        (e.ctrlKey && e.shiftKey && ["I","J","C","K"].includes(e.key.toUpperCase())) ||
-        (e.ctrlKey && e.key.toUpperCase() === "U")) {
-      e.preventDefault();
-      e.stopPropagation();
-      return false;
-    }
-  };
-  document.addEventListener("keydown", blocked, true);
-  document.addEventListener("contextmenu", (e) => e.preventDefault());
-})();
-
 function openWhatsApp(){
   const text = encodeURIComponent("مرحبًا، أريد الاستفسار عن منصة MISSION EDU");
   window.open("https://wa.me/201128351702?text=" + text, "_blank");
@@ -152,16 +138,27 @@ async function sendReport(){
 
   try {
     const DB = window.MissionDB;
-    let userName = "زائر", userPhone = "—";
+    let userName = "زائر", userPhone = "—", reporterId = null;
     const sid = DB.getSessionId();
     if (sid) {
       const u = await DB.getUser(sid);
       if (u) {
         userName = u.name || userName;
         userPhone = (u.country_code || "+20") + (u.phone || "");
+        reporterId = u.id;
       }
     }
-    await DB.reportIssue({ userName, userPhone, message: msg });
+    const sb = await DB.getClient();
+    await sb.from('reports').insert([{
+      id: DB.uid('rep_'),
+      user_id: reporterId || '',
+      user_name: userName,
+      user_phone: userPhone,
+      reporter_id: reporterId,
+      reason: 'بلاغ عام',
+      details: msg,
+      created_at: Date.now()
+    }]);
     document.getElementById("reportBody").style.display = "none";
     document.getElementById("reportSuccess").style.display = "block";
     setTimeout(closeReport, 2200);
@@ -182,7 +179,7 @@ async function sendReport(){
   try {
     if (!DB) {
       statusEl.innerHTML = '<div class="err">فشل تحميل db.js، جارٍ إعادة التوجيه...</div>';
-      setTimeout(goLogin, 1500);
+      setTimeout(goLogin, 1200);
       return;
     }
 
@@ -190,20 +187,29 @@ async function sendReport(){
     if (!sid) return goLogin();
 
     const user = await DB.getUser(sid);
-    if (!user || user.active === false) {
+    if (!user || user.active === false || user.banned === true) {
       DB.clearSession();
       return goLogin();
     }
 
-    statusEl.textContent = user.role === "admin"
-      ? "جارٍ فتح لوحة الإدارة..."
-      : "جارٍ فتح لوحة الطالب...";
+    if (user.role === "admin") {
+      statusEl.textContent = "جارٍ فتح لوحة الإدارة...";
+      window.location.replace("/admin/index.html");
+      return;
+    }
 
-    setTimeout(() => DB.redirectByRole(user), 350);
+    if (user.role === "student") {
+      statusEl.textContent = "جارٍ فتح لوحة الطالب...";
+      window.location.replace("/student/index.html");
+      return;
+    }
+
+    DB.clearSession();
+    goLogin();
   } catch (e) {
     loaderEl.style.display = "none";
     statusEl.innerHTML = '<div class="err">تعذّر الاتصال، جارٍ إعادة التوجيه...</div>';
-    setTimeout(goLogin, 1800);
+    setTimeout(goLogin, 1200);
   }
 })();
 </script>
