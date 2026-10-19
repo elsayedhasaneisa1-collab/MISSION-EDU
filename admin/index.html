@@ -1250,7 +1250,7 @@ function StudentProfilePage({studentId,onClose}){
         <Stat label="XP" value={DB.fmt(student.xp||0)} icon="trend" color="#FFD700"/>
         <Stat label="دروس مكتملة" value={DB.fmt(completed)} icon="book" color="#22c55e"/>
         <Stat label="السلسلة" value={DB.fmt(student.streak||0)} icon="flash" color="#f59e0b"/>
-        <Stat label="بلاغات" value={DB.fmt(reports.length)}>0?'#ef4444':'#8a7d55'}/>
+        <Stat label="بلاغات" value={DB.fmt(student.reports_count||0)} icon="alert" color={(student.reports_count||0)>0?'#ef4444':'#8a7d55'}/>
       </div>
       <div className="mt16">
         <div className="flex between center mb8">
