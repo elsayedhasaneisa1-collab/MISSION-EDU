@@ -514,8 +514,7 @@ function HomePage({onNavigate}){
   const user=app.currentUser;
   const lvl=app.getLevel(user.xp||0);
   const totalLessons=app.db.lessons.filter(l=>l.published!==false).length;
-  const toArray = (v) => { if (!v) return []; if (Array.isArray(v)) return v; if (typeof v === 'string') { try { const p = JSON.parse(v); return Array.isArray(p) ? p : []; } catch(e) { return []; } } return []; };
-const completed=toArray(user.completed_lessons).length;
+  const completed=(user.completed_lessons||[]).length;
   const progress=totalLessons?Math.round((completed/totalLessons)*100):0;
   const recentExams=app.db.exams.slice(0,3);
   const today = new Date().toLocaleDateString('en-CA');
@@ -527,7 +526,7 @@ const completed=toArray(user.completed_lessons).length;
     setClaiming(true);
     try {
       const sb = await DB.getClient();
-      const { data, error } = await sb.rpc('claim_daily_reward');
+      const { data, error } = await sb.rpc('claim_daily_reward', { p_user_id: user.id });
       if (error) throw new Error(error.message);
       if (!data.claimed) { app.toast.info('استلمت مكافأة اليوم بالفعل'); await app.reload(); return; }
       playSound('success');
@@ -583,7 +582,7 @@ const completed=toArray(user.completed_lessons).length;
     </div>}
     <div className="grid g2 mb16">
       <div className="glass" style={{padding:18}}>
-        <div className="flex between center mb12"><div className="h4" style={{color:'var(--gold)'}}>📚 المواد الدراسية</div><button className="btn btn-s btn-sm" onClick={()=>onNavigate('lessons')}>الكل</button></div>
+        <div className="flex between center mb12"><div className="h4" style={{color:'var(--gold)'}}>📖 مواصلة التعلم</div><button className="btn btn-s btn-sm" onClick={()=>onNavigate('lessons')}>الكل</button></div>
         {app.db.lessons.filter(l=>l.published!==false).slice(0,3).map(l=><div key={l.id} className="flex center g12 mb8" style={{padding:10,background:'rgba(0,212,255,.04)',borderRadius:10,border:'1px solid var(--border)',cursor:'pointer'}} onClick={()=>window.location.href=`lesson.html?id=${l.id}`}>
           <div style={{width:40,height:40,borderRadius:10,background:'var(--grad-gold)',display:'grid',placeItems:'center',color:'#050a14',fontSize:18}}>📖</div>
           <div style={{flex:1,minWidth:0}}><div className="sm" style={{fontWeight:700}}>{SEC.esc(l.title)}</div><div className="xs muted">{SEC.esc(app.unit(l.unit_id)?.name||'')}</div></div>
@@ -617,21 +616,17 @@ function LessonsPage(){
   const user=app.currentUser;
   const [selectedSubject,setSelectedSubject]=useState(null);
 
-  // ─── helper آمن لـ completed_lessons (jsonb) ───
-  const getCompletedArr = () => {
-    const v = user?.completed_lessons;
-    if(!v) return [];
-    if(Array.isArray(v)) return v;
-    if(typeof v === 'string'){
-      try{ const p = JSON.parse(v); return Array.isArray(p)?p:[]; }catch(e){ return []; }
+  const toArray = (v) => {
+    if (!v) return [];
+    if (Array.isArray(v)) return v;
+    if (typeof v === 'string') {
+      try { const p = JSON.parse(v); return Array.isArray(p) ? p : []; } catch(e) { return []; }
     }
     return [];
   };
-  const completedArr = getCompletedArr();
 
-  // ═══════════════════════════════════════════════════════════════
-  // المستوى 1: قائمة المواد
-  // ═══════════════════════════════════════════════════════════════
+  const completedArr = toArray(user.completed_lessons);
+
   if(!selectedSubject){
     const subjects = app.db.subjects || [];
     return <>
@@ -691,9 +686,6 @@ function LessonsPage(){
     </>;
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // المستوى 2: دروس المادة (مجمعة حسب الوحدة)
-  // ═══════════════════════════════════════════════════════════════
   const subject = app.subject(selectedSubject);
   const subjectLessons = app.db.lessons.filter(l=>{
     if(l.published===false) return false;
@@ -792,6 +784,7 @@ function LessonsPage(){
     )}
   </>;
 }
+
 function ExamsPage(){
   const app=useApp();
   const exams=app.db.exams.filter(e=>e.published!==false);
@@ -853,7 +846,8 @@ function PracticePage(){
       const sb=await DB.getClient();
       const {data,error}=await sb.rpc('practice_answer',{
         p_question_id:session[qIndex].id,
-        p_answer_index:oi
+        p_answer_index:oi,
+        p_user_id:app.currentUser.id
       });
       if(error) throw new Error(error.message);
       setAnswers(a=>({...a,[qIndex]:{selected:oi,is_correct:data.is_correct,correct_index:data.correct_index,explanation:data.explanation}}));
@@ -874,7 +868,8 @@ function PracticePage(){
         const {data,error}=await sb.rpc('practice_complete',{
           p_subject_id:filterSubject==='all'?null:filterSubject,
           p_score:score,
-          p_total:session.length
+          p_total:session.length,
+          p_user_id:app.currentUser.id
         });
         if(error) throw new Error(error.message);
         app.toast.ok(`🎉 انتهى التدريب! +${data.xp_gained} XP (${score}/${session.length})`);
@@ -961,7 +956,7 @@ function XPShopPage(){
     setBusy(true);
     try{
       const sb=await DB.getClient();
-      const {data,error}=await sb.rpc('purchase_shop_item',{p_item_id:item.id});
+      const {data,error}=await sb.rpc('purchase_shop_item',{p_item_id:item.id, p_user_id: user.id});
       if(error) throw new Error(error.message);
       playSound('success');
       app.toast.ok(`🎉 تم شراء "${SEC.esc(data.item_name)}" مقابل ${data.xp_cost} XP`);
@@ -1341,7 +1336,8 @@ function FocusModePage(){
       const {data,error}=await sb.rpc('focus_complete',{
         p_label:label,
         p_duration:duration,
-        p_started_at:startedAt
+        p_started_at:startedAt,
+        p_user_id:user.id
       });
       if(error) throw new Error(error.message);
       playSound('success');
@@ -1504,22 +1500,23 @@ function StudentsDirectoryPage({onOpenChat}){
     });
     if(!r.isConfirmed)return;
     try{
-  const sb = await DB.getClient();
-  await sb.rpc('submit_user_report', {
-    p_reporter_id: app.currentUser.id,
-    p_target_id: target.id,
-    p_reason: SEC.clean(r.value.reason),
-    p_details: SEC.clean(SEC.maxLen(r.value.details, 500))
-  });
-  await app.reload();
-  app.toast.ok('تم إرسال البلاغ — سيتم مراجعته من الإدارة');
-}catch(e){
-  if(e.message.includes('already') || e.message.includes('من قبل')) {
-    app.toast.warn('لقد أبلغت عن هذا المستخدم من قبل');
-  } else {
-    app.toast.err(e.message);
-  }
-}
+      const sb=await DB.getClient();
+      await sb.rpc('submit_user_report', {
+        p_reporter_id: app.currentUser.id,
+        p_target_id: target.id,
+        p_reason: SEC.clean(r.value.reason),
+        p_details: SEC.clean(SEC.maxLen(r.value.details, 500))
+      });
+      await app.reload();
+      app.toast.ok('تم إرسال البلاغ — سيتم مراجعته من الإدارة');
+    }catch(e){
+      if(e.message.includes('already') || e.message.includes('من قبل')) {
+        app.toast.warn('لقد أبلغت عن هذا المستخدم من قبل');
+      } else {
+        app.toast.err(e.message);
+      }
+    }
+  };
   return <>
     <div className="h2 mb16 grad">👥 الطلاب</div>
     <div className="glass mb16" style={{padding:14}}>
@@ -1617,6 +1614,159 @@ function NotificationsPage(){
   </>;
 }
 
+function MyNotesPage(){
+  const app = useApp();
+  const user = app.currentUser;
+  const [notes, setNotes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [q, setQ] = useState('');
+
+  const loadNotes = useCallback(async ()=>{
+    setLoading(true);
+    try{
+      const data = await DB.getUserNotes(user.id);
+      setNotes(data || []);
+    }catch(e){
+      app.toast.err?.('تعذر تحميل الملاحظات');
+    }
+    setLoading(false);
+  },[user.id]);
+
+  useEffect(()=>{ loadNotes(); },[loadNotes]);
+
+  const del = async (id)=>{
+    const r = await Swal.fire({
+      title:'حذف الملاحظة؟',
+      text:'لا يمكن التراجع',
+      icon:'warning',
+      showCancelButton:true,
+      confirmButtonText:'نعم، احذف',
+      cancelButtonText:'إلغاء',
+      confirmButtonColor:'#ef4444',
+      cancelButtonColor:'#64748b',
+      background:'linear-gradient(180deg,#0a1220,#050a14)',
+      color:'#e0f7ff',
+      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+    });
+    if(!r.isConfirmed) return;
+    try{
+      await DB.deleteUserNote(id, user.id);
+      setNotes(prev=>prev.filter(n=>n.id!==id));
+      app.toast.warn('تم الحذف');
+    }catch(e){
+      app.toast.err(e.message||'فشل الحذف');
+    }
+  };
+
+  const filtered = useMemo(()=>{
+    if(!q.trim()) return notes;
+    const lc = q.toLowerCase();
+    return notes.filter(n=>(n.text||'').toLowerCase().includes(lc));
+  },[notes,q]);
+
+  const grouped = useMemo(()=>{
+    const map = {};
+    filtered.forEach(n=>{
+      const key = n.lesson_id || '_none';
+      if(!map[key]) map[key] = [];
+      map[key].push(n);
+    });
+    return map;
+  },[filtered]);
+
+  return <>
+    <div className="flex between center mb16 wrap g8">
+      <div>
+        <div className="h2 grad">📝 ملاحظاتي</div>
+        <div className="sm muted mt6">{notes.length} ملاحظة موزعة على {Object.keys(grouped).length} درس</div>
+      </div>
+      <button className="btn btn-s btn-sm" onClick={loadNotes}>🔄 تحديث</button>
+    </div>
+
+    <div className="glass mb16" style={{padding:14}}>
+      <input
+        className="input"
+        placeholder="🔍 ابحث في ملاحظاتك..."
+        value={q}
+        onChange={e=>setQ(e.target.value)}
+      />
+    </div>
+
+    {loading ? (
+      <div className="glass" style={{padding:40,textAlign:'center'}}>
+        <div className="spinner" style={{margin:'0 auto 14px'}}></div>
+        <div className="sm muted">جارٍ التحميل...</div>
+      </div>
+    ) : filtered.length===0 ? (
+      <div className="glass" style={{padding:40}}>
+        <Empty
+          icon="📝"
+          title={q ? 'لا نتائج للبحث' : 'لا ملاحظات بعد'}
+          desc={q ? 'جرّب كلمة تانية' : 'افتح أي درس واكتب ملاحظاتك هناك — هتظهر هنا'}
+        />
+      </div>
+    ) : (
+      Object.entries(grouped).map(([lessonId, lessonNotes])=>{
+        const lesson = lessonId!=='_none' ? app.lesson(lessonId) : null;
+        const unit = lesson ? app.unit(lesson.unit_id) : null;
+        const subject = unit ? app.subject(unit.subject_id) : null;
+
+        return (
+          <div key={lessonId} className="glass mb16" style={{padding:16}}>
+            <div className="flex between center mb12 wrap g8">
+              <div className="flex center g8" style={{flex:1,minWidth:0}}>
+                <div style={{width:36,height:36,borderRadius:10,background:'rgba(0,212,255,.15)',display:'grid',placeItems:'center',fontSize:16,flexShrink:0}}>
+                  📖
+                </div>
+                <div style={{minWidth:0}}>
+                  <div className="sm" style={{fontWeight:700,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
+                    {lesson ? SEC.esc(lesson.title) : 'درس محذوف'}
+                  </div>
+                  <div className="xs muted">
+                    {subject ? SEC.esc(subject.name) : ''}
+                    {unit ? ` • ${SEC.esc(unit.name)}` : ''}
+                  </div>
+                </div>
+              </div>
+              <div className="flex g6">
+                <span className="pill pill-b">{lessonNotes.length}</span>
+                {lesson && (
+                  <button
+                    className="btn btn-s btn-sm"
+                    onClick={()=>window.location.href=`lesson.html?id=${lessonId}`}>
+                    فتح ←
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="flex col g8">
+              {lessonNotes.map(n=>(
+                <div key={n.id} className="glass-s" style={{padding:12,borderInlineStart:'3px solid var(--gold)'}}>
+                  <div className="flex between center mb6">
+                    <span className="xs muted">
+                      {n.updated_at ? DB.formatDateTime(n.updated_at) : DB.formatDateTime(n.created_at)}
+                    </span>
+                    <button
+                      className="btn btn-dn btn-sm"
+                      onClick={()=>del(n.id)}
+                      title="حذف">
+                      ✕
+                    </button>
+                  </div>
+                  <div className="sm txt2" style={{whiteSpace:'pre-wrap',lineHeight:1.7}}>
+                    {SEC.esc(n.text||'')}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })
+    )}
+  </>;
+}
+
 function Footer(){
   const app=useApp();
   const user=app.currentUser;
@@ -1648,7 +1798,7 @@ function StudentApp(){
   useEffect(()=>{if(PUSH_MANAGER.isEnabled()){PUSH_MANAGER.show('MISSION EDU', 'أهلاً بك في المنصة 🎓');}},[]);
   const items=[
     {title:'الرئيسية',items:[{id:'home',icon:'home',label:'الرئيسية'},{id:'analytics',icon:'chart',label:'تحليلاتي'}]},
-    {title:'التعلم',items:[{id:'lessons',icon:'book',label:'المواد'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'practice',icon:'target',label:'وضع التدريب'},{id:'flashcards',icon:'layers',label:'Flashcards'}]},
+    {title:'التعلم',items:[{id:'lessons',icon:'book',label:'المواد'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'practice',icon:'target',label:'وضع التدريب'},{id:'flashcards',icon:'layers',label:'Flashcards'},{id:'notes',icon:'note',label:'ملاحظاتي'}]},
     {title:'الأنشطة',items:[
       {id:'focus',icon:'clock',label:'وضع التركيز'},
       {id:'calendar',icon:'calendar',label:'تقويم المذاكرة'},
@@ -1676,6 +1826,7 @@ function StudentApp(){
         {tab==='exams'&&<ExamsPage/>}
         {tab==='practice'&&<PracticePage/>}
         {tab==='flashcards'&&<FlashcardsPage/>}
+        {tab==='notes'&&<MyNotesPage/>}
         {tab==='focus'&&<FocusModePage/>}
         {tab==='calendar'&&<StudyCalendarPage/>}
         {tab==='groups'&&<StudyGroupsPage/>}
