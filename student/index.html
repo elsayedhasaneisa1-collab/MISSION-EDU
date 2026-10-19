@@ -1504,12 +1504,22 @@ function StudentsDirectoryPage({onOpenChat}){
     });
     if(!r.isConfirmed)return;
     try{
-      const sb=await DB.getClient();
-      await sb.from('reports').insert([{id:DB.uid('rep_'),user_id:target.id,user_name:target.name,user_phone:(target.country_code||'+20')+(target.phone||''),reporter_id:app.currentUser.id,reason:SEC.clean(r.value.reason),details:SEC.clean(SEC.maxLen(r.value.details,500)),created_at:Date.now()}]);
-      await app.reload();
-      app.toast.ok('تم إرسال البلاغ — سيتم مراجعته من الإدارة');
-    }catch(e){app.toast.err(e.message);}
-  };
+  const sb = await DB.getClient();
+  await sb.rpc('submit_user_report', {
+    p_reporter_id: app.currentUser.id,
+    p_target_id: target.id,
+    p_reason: SEC.clean(r.value.reason),
+    p_details: SEC.clean(SEC.maxLen(r.value.details, 500))
+  });
+  await app.reload();
+  app.toast.ok('تم إرسال البلاغ — سيتم مراجعته من الإدارة');
+}catch(e){
+  if(e.message.includes('already') || e.message.includes('من قبل')) {
+    app.toast.warn('لقد أبلغت عن هذا المستخدم من قبل');
+  } else {
+    app.toast.err(e.message);
+  }
+}
   return <>
     <div className="h2 mb16 grad">👥 الطلاب</div>
     <div className="glass mb16" style={{padding:14}}>
