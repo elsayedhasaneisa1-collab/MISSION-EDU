@@ -518,17 +518,38 @@ function HomePage({onNavigate}){
   const nextLevel=lvl.next?Math.max(0,(lvl.next.xp||0)-(user.xp||0)):0;
   const recentExams=app.db.exams.slice(0,3);
   const topStudents=[...app.db.users].filter(u=>u.role==='student'&&u.banned!==true).sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,5);
-  const today=new Date().toISOString().slice(0,10);
-  const todayReward=(app.db.daily_reward||[]).find(r=>r.user_id===user.id&&r.date===today);
-  const claimDailyReward=async ()=>{
-    if(todayReward) return app.toast.info('استلمت مكافأة اليوم بالفعل');
-    try{
-      await DB.save('daily_reward',{id:DB.uid('dr_'),user_id:user.id,date:today,xp:50,claimed_at:Date.now()});
-      await DB.updateUser(user.id,{xp:(user.xp||0)+50,last_daily_reward:Date.now()});
-      await app.reload();
-      app.toast.ok('🎁 +50 XP مكافأة يومية!');
-    }catch(e){app.toast.err(e.message);}
-  };
+  const today = new Date().toLocaleDateString('en-CA');
+const todayReward = (app.db.daily_reward || []).find(r => r.user_id === user.id && r.date === today);
+const claimDailyReward = async () => {
+  if (todayReward) return app.toast.info('استلمت مكافأة اليوم بالفعل');
+  try {
+    const sb = await DB.getClient();
+    const { data: existing } = await sb.from('daily_reward').select('*').eq('user_id', user.id).eq('date', today);
+    if (existing && existing.length > 0) {
+      return app.toast.info('استلمت مكافأة اليوم بالفعل');
+    }
+    await sb.from('daily_reward').insert([{
+      id: DB.uid('dr_'),
+      user_id: user.id,
+      date: today,
+      xp: 50,
+      claimed_at: Date.now()
+    }]);
+    await DB.updateUser(user.id, { xp: (user.xp || 0) + 50, last_daily_reward: Date.now() });
+    await app.reload();
+    app.toast.ok('🎁 +50 XP مكافأة يومية!');
+  } catch (e) {
+    console.error('Reward Error:', e);
+    Swal.fire({
+      title: 'خطأ في المكافأة',
+      text: e.message || 'حدث خطأ غير متوقع',
+      icon: 'error',
+      confirmButtonColor: '#00d4ff',
+      background: '#050a14',
+      color: '#e0f7ff'
+    });
+  }
+};
   return <>
     <div className="hero mb16">
       <div className="flex between center wrap g12">
