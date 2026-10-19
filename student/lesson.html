@@ -242,6 +242,15 @@ function esc(str){
   return String(str||"").replace(/[&<>"']/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[s]);
 }
 
+function safeArray(v) {
+  if (!v) return [];
+  if (Array.isArray(v)) return v;
+  if (typeof v === 'string') {
+    try { const p = JSON.parse(v); return Array.isArray(p) ? p : []; } catch(e) { return []; }
+  }
+  return [];
+}
+
 function parseVideo(v){
   if(!v) return null;
   if(typeof v === 'string'){
@@ -406,11 +415,7 @@ async function saveNote(silent){
     state.noteSaving = false;
     updateNoteStatus('saved');
     if(!silent){
-      DB.trackActivity({
-        userId: state.user.id, userName: state.user.name,
-        type: "note_save", target: state.lesson.title,
-        details: { lesson: state.lesson.title }
-      });
+      DB.logActivity(state.user.id, state.user.name, "note_save", state.lesson.title);
     }
   }catch(e){
     console.warn('saveNote:', e);
@@ -518,6 +523,9 @@ function buildRelatedExamsHTML(exams){
 function render(){
   const l = state.lesson;
   const u = state.user;
+  const kps = safeArray(l.key_points);
+  const exs = safeArray(l.examples);
+
   app.innerHTML = `
     <div class="fade-in">
       <div class="flex between center wrap-fl g12 mb16">
@@ -546,12 +554,12 @@ function render(){
             <div class="mb20" id="playerHost">${buildPlayerHTML(l.video, l.title, state.hasVideoAccess)}</div>
             ${buildPdfHTML(l.pdf_url, l.title, state.hasVideoAccess)}
             ${l.summary ? `<div class="h4 mb8">📝 ملخص الدرس</div><div class="sm txt2 mb16">${esc(l.summary)}</div>` : ''}
-            ${(l.key_points || []).length > 0 ? `
+            ${kps.length > 0 ? `
               <div class="h4 mb8">💡 النقاط المهمة</div>
-              <div class="mb16">${(l.key_points || []).map(k => `<div class="kp"><span class="kp-dot">◆</span><span class="sm txt2">${esc(k)}</span></div>`).join('')}</div>` : ''}
-            ${(l.examples || []).length > 0 ? `
+              <div class="mb16">${kps.map(k => `<div class="kp"><span class="kp-dot">◆</span><span class="sm txt2">${esc(k)}</span></div>`).join('')}</div>` : ''}
+            ${exs.length > 0 ? `
               <div class="h4 mb8">🧮 أمثلة محلولة</div>
-              <div class="mb16">${(l.examples || []).map(ex => `<div class="example"><div class="example-q"><b>س:</b> ${esc(ex.q)}</div><div class="example-a"><b>ج:</b> ${esc(ex.a)}</div></div>`).join('')}</div>` : ''}
+              <div class="mb16">${exs.map(ex => `<div class="example"><div class="example-q"><b>س:</b> ${esc(ex.q)}</div><div class="example-a"><b>ج:</b> ${esc(ex.a)}</div></div>`).join('')}</div>` : ''}
             ${l.notes ? `<div class="h4 mb8">📌 ملاحظات المعلم</div><div class="sm txt2 mb16">${esc(l.notes)}</div>` : ''}
             <div class="flex wrap-fl g8 mt20">
               <button class="btn btn-ok" id="btnDone" ${state.isDone || !state.hasVideoAccess ? 'disabled' : ''}>
@@ -610,11 +618,7 @@ function render(){
     pdfLink.addEventListener('click', (e)=>{
       e.preventDefault();
       try{
-        DB.trackActivity({
-          userId: u.id, userName: u.name,
-          type: "pdf_open", target: l.title,
-          details: { lesson: l.title }
-        });
+        DB.logActivity(u.id, u.name, "pdf_open", l.title);
       }catch(err){}
       const url = pdfLink.dataset.url;
       const userPhone = (u.country_code || '') + (u.phone || '');
@@ -650,11 +654,7 @@ function render(){
           return;
         }
 
-        DB.trackActivity({
-          userId: u.id, userName: u.name,
-          type: "lesson_complete", target: l.title,
-          details: { xp: data.gained }
-        });
+        DB.logActivity(u.id, u.name, "lesson_complete", l.title);
 
         let certificateEarned = null;
         try{
@@ -665,7 +665,7 @@ function render(){
             if(unitIds.length > 0){
               const { data: allLessons } = await sb.from("lessons").select("id").in("unit_id", unitIds).eq("published", true);
               const allLessonIds = (allLessons || []).map(x => x.id);
-              const completedArr = toArray(data.completed_lessons);
+              const completedArr = safeArray(data.completed_lessons);
               const allComplete = allLessonIds.length > 0 && allLessonIds.every(id => completedArr.includes(id));
               if(allComplete){
                 const { data: existingCert } = await sb.from("certificates").select("*").eq("user_id", u.id).eq("subject_id", subjectId).maybeSingle();
@@ -677,12 +677,7 @@ function render(){
                   };
                   const { data: insertedCert } = await sb.from("certificates").insert([newCert]).select().single();
                   certificateEarned = insertedCert || newCert;
-                  DB.trackActivity({
-                    userId: u.id, userName: u.name,
-                    type: "certificate_earned",
-                    target: state.subject?.name || 'مادة',
-                    details: { subject: state.subject?.name, cert_id: newCert.id }
-                  });
+                  DB.logActivity(u.id, u.name, "certificate_earned", state.subject?.name || 'مادة');
                 }
               }
             }
@@ -822,11 +817,7 @@ function openPlayer(lesson, user){
   setTimeout(()=>{ enterFullscreenLandscape(); }, 100);
   startWatermarkMotion();
   try{
-    DB.trackActivity({
-      userId: user.id, userName: user.name,
-      type: "video_play", target: lesson.title,
-      details: { lesson: lesson.title }
-    });
+    DB.logActivity(user.id, user.name, "video_play", lesson.title);
   }catch(e){}
 }
 
@@ -903,80 +894,91 @@ async function load(){
     app.innerHTML = `<div class="glass" style="padding:40px;text-align:center"><div class="h3 mb12">⚠️ لم يتم تحديد الدرس</div><p class="sm muted mb16">يرجى فتح الدرس من داخل المنصة</p><a href="/student/index.html" class="btn btn-p" style="text-decoration:none">العودة للرئيسية</a></div>`;
     return;
   }
-  const sid = DB.getSessionId();
-  if(!sid){ window.location.replace("/auth/login.html"); return; }
-  const user = await DB.getUser(sid);
-  if(!user || user.active === false){ DB.clearSession(); window.location.replace("/auth/login.html"); return; }
-  state.user = user;
-  userAvatar.textContent = user.avatar || "🧑‍🎓";
+  
+  try {
+    const sid = DB.getSessionId();
+    if(!sid){ window.location.replace("/auth/login.html"); return; }
+    
+    const user = await DB.getUser(sid);
+    if(!user || user.active === false){ DB.clearSession(); window.location.replace("/auth/login.html"); return; }
+    
+    state.user = user;
+    if (userAvatar) userAvatar.textContent = user.avatar || "🧑‍🎓";
 
-  const sb = await DB.getClient();
-  const { data: lesson, error } = await sb.from("lessons").select("*").eq("id", lessonId).maybeSingle();
-  if(error || !lesson){
-    app.innerHTML = `<div class="glass" style="padding:40px;text-align:center"><div class="h3 mb12">⚠️ الدرس غير موجود</div><a href="/student/index.html" class="btn btn-p" style="text-decoration:none">العودة للرئيسية</a></div>`;
-    return;
-  }
-  state.lesson = lesson;
-
-  DB.trackActivity({
-    userId: user.id, userName: user.name,
-    type: "lesson_view", target: lesson.title,
-    details: { lesson: lesson.title }
-  });
-
-  const { data: unit } = await sb.from("units").select("*").eq("id", lesson.unit_id).maybeSingle();
-  state.unit = unit;
-  if(unit){
-    const { data: subject } = await sb.from("subjects").select("*").eq("id", unit.subject_id).maybeSingle();
-    state.subject = subject;
-  }
-
-  const { data: unitLessons } = await sb.from("lessons").select("id").eq("unit_id", lesson.unit_id).eq("published", true);
-  const { data: userData } = await sb.from("users").select("completed_lessons").eq("id", user.id).maybeSingle();
-  const toArray = (v) => { if (!v) return []; if (Array.isArray(v)) return v; if (typeof v === 'string') { try { const p = JSON.parse(v); return Array.isArray(p) ? p : []; } catch(e) { return []; } } return []; };
-const completed = toArray(userData?.completed_lessons);
-  state.totalUnit = unitLessons?.length || 1;
-  state.doneUnit = (unitLessons || []).filter(l => completed.includes(l.id)).length;
-  state.unitPct = Math.round((state.doneUnit / state.totalUnit) * 100);
-  state.isDone = completed.includes(lesson.id);
-
-  const { data: allExams } = await sb.from("exams").select("*").eq("published", true);
-  state.relatedExams = (allExams || []).filter(e => {
-    let lessonIds = e.lesson_ids;
-    if(typeof lessonIds === 'string'){ try{ lessonIds = JSON.parse(lessonIds); }catch(err){ lessonIds = []; } }
-    return Array.isArray(lessonIds) && lessonIds.includes(lesson.id);
-  });
-
-  state.hasVideoAccess = hasAccess(user, lesson);
-  state.hasExamAccess = {};
-  state.relatedExams.forEach(e => { state.hasExamAccess[e.id] = hasAccess(user, e); });
-
-  await loadNote(user.id, lesson.id);
-  render();
-
-  const closeBtn = document.getElementById('playerClose');
-  if(closeBtn) closeBtn.addEventListener('click', closePlayer);
-  const fsBtn = document.getElementById('playerFullscreen');
-  if(fsBtn) fsBtn.addEventListener('click', toggleFullscreen);
-  const modal = document.getElementById('playerModal');
-  if(modal) modal.addEventListener('click', (e)=>{ if(e.target === modal) closePlayer(); });
-
-  document.addEventListener('keydown', e => {
-    if(e.key === 'Escape'){
-      const modal = document.getElementById('playerModal');
-      if(modal && modal.classList.contains('open')) closePlayer();
+    const sb = await DB.getClient();
+    const { data: lesson, error } = await sb.from("lessons").select("*").eq("id", lessonId).maybeSingle();
+    
+    if(error || !lesson){
+      app.innerHTML = `<div class="glass" style="padding:40px;text-align:center"><div class="h3 mb12">⚠️ الدرس غير موجود أو تم حذفه</div><a href="/student/index.html" class="btn btn-p" style="text-decoration:none">العودة للرئيسية</a></div>`;
+      return;
     }
-  });
+    
+    state.lesson = lesson;
 
-  document.addEventListener('visibilitychange', ()=>{
-    if(document.hidden && state.noteDirty) saveNote(true);
-  });
+    DB.logActivity(user.id, user.name, "lesson_view", lesson.title);
 
-  window.addEventListener('beforeunload', ()=>{
-    if(state.noteDirty) saveNote(true);
-  });
+    const { data: unit } = await sb.from("units").select("*").eq("id", lesson.unit_id).maybeSingle();
+    state.unit = unit;
+    if(unit){
+      const { data: subject } = await sb.from("subjects").select("*").eq("id", unit.subject_id).maybeSingle();
+      state.subject = subject;
+    }
 
-  try{ localStorage.setItem('student_last_lesson', lessonId); }catch(e){}
+    const { data: unitLessons } = await sb.from("lessons").select("id").eq("unit_id", lesson.unit_id).eq("published", true);
+    const { data: userData } = await sb.from("users").select("completed_lessons").eq("id", user.id).maybeSingle();
+    
+    const completed = safeArray(userData?.completed_lessons);
+    
+    state.totalUnit = unitLessons?.length || 1;
+    state.doneUnit = (unitLessons || []).filter(l => completed.includes(l.id)).length;
+    state.unitPct = Math.round((state.doneUnit / state.totalUnit) * 100);
+    state.isDone = completed.includes(lesson.id);
+
+    const { data: allExams } = await sb.from("exams").select("*").eq("published", true);
+    state.relatedExams = (allExams || []).filter(e => {
+      const lessonIds = safeArray(e.lesson_ids);
+      return lessonIds.includes(lesson.id);
+    });
+
+    state.hasVideoAccess = hasAccess(user, lesson);
+    state.hasExamAccess = {};
+    state.relatedExams.forEach(e => { state.hasExamAccess[e.id] = hasAccess(user, e); });
+
+    await loadNote(user.id, lesson.id);
+    render();
+
+    const closeBtn = document.getElementById('playerClose');
+    if(closeBtn) closeBtn.addEventListener('click', closePlayer);
+    const fsBtn = document.getElementById('playerFullscreen');
+    if(fsBtn) fsBtn.addEventListener('click', toggleFullscreen);
+    const modal = document.getElementById('playerModal');
+    if(modal) modal.addEventListener('click', (e)=>{ if(e.target === modal) closePlayer(); });
+
+    document.addEventListener('keydown', e => {
+      if(e.key === 'Escape'){
+        const modal = document.getElementById('playerModal');
+        if(modal && modal.classList.contains('open')) closePlayer();
+      }
+    });
+
+    document.addEventListener('visibilitychange', ()=>{
+      if(document.hidden && state.noteDirty) saveNote(true);
+    });
+
+    window.addEventListener('beforeunload', ()=>{
+      if(state.noteDirty) saveNote(true);
+    });
+
+    try{ localStorage.setItem('student_last_lesson', lessonId); }catch(e){}
+
+  } catch (err) {
+    console.error(err);
+    app.innerHTML = `<div class="glass" style="padding:40px;text-align:center">
+      <div class="h3 mb12" style="color:#fca5a5">⚠️ حدث خطأ أثناء تحميل الدرس</div>
+      <p class="sm muted mb16">${err.message || 'تأكد من اتصالك بالإنترنت وحاول مرة أخرى'}</p>
+      <a href="/student/index.html" class="btn btn-p" style="text-decoration:none">العودة للرئيسية</a>
+    </div>`;
+  }
 }
 
 window.openWhatsApp = ()=>{
