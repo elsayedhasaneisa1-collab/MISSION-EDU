@@ -583,7 +583,7 @@ const completed=toArray(user.completed_lessons).length;
     </div>}
     <div className="grid g2 mb16">
       <div className="glass" style={{padding:18}}>
-        <div className="flex between center mb12"><div className="h4" style={{color:'var(--gold)'}}>📖 مواصلة التعلم</div><button className="btn btn-s btn-sm" onClick={()=>onNavigate('lessons')}>الكل</button></div>
+        <div className="flex between center mb12"><div className="h4" style={{color:'var(--gold)'}}>📚 المواد الدراسية</div><button className="btn btn-s btn-sm" onClick={()=>onNavigate('lessons')}>الكل</button></div>
         {app.db.lessons.filter(l=>l.published!==false).slice(0,3).map(l=><div key={l.id} className="flex center g12 mb8" style={{padding:10,background:'rgba(0,212,255,.04)',borderRadius:10,border:'1px solid var(--border)',cursor:'pointer'}} onClick={()=>window.location.href=`lesson.html?id=${l.id}`}>
           <div style={{width:40,height:40,borderRadius:10,background:'var(--grad-gold)',display:'grid',placeItems:'center',color:'#050a14',fontSize:18}}>📖</div>
           <div style={{flex:1,minWidth:0}}><div className="sm" style={{fontWeight:700}}>{SEC.esc(l.title)}</div><div className="xs muted">{SEC.esc(app.unit(l.unit_id)?.name||'')}</div></div>
@@ -614,31 +614,184 @@ const completed=toArray(user.completed_lessons).length;
 
 function LessonsPage(){
   const app=useApp();
-  const [filterSubject,setFilterSubject]=useState('all');
-  const lessons=app.db.lessons.filter(l=>l.published!==false);
-  const filtered=filterSubject==='all'?lessons:lessons.filter(l=>{const u=app.unit(l.unit_id);return u?.subject_id===filterSubject;});
+  const user=app.currentUser;
+  const [selectedSubject,setSelectedSubject]=useState(null);
+
+  // ─── helper آمن لـ completed_lessons (jsonb) ───
+  const getCompletedArr = () => {
+    const v = user?.completed_lessons;
+    if(!v) return [];
+    if(Array.isArray(v)) return v;
+    if(typeof v === 'string'){
+      try{ const p = JSON.parse(v); return Array.isArray(p)?p:[]; }catch(e){ return []; }
+    }
+    return [];
+  };
+  const completedArr = getCompletedArr();
+
+  // ═══════════════════════════════════════════════════════════════
+  // المستوى 1: قائمة المواد
+  // ═══════════════════════════════════════════════════════════════
+  if(!selectedSubject){
+    const subjects = app.db.subjects || [];
+    return <>
+      <div className="h2 mb16 grad">📚 المواد الدراسية</div>
+      {subjects.length===0?(
+        <div className="glass" style={{padding:30}}><Empty icon="📚" title="لا توجد مواد بعد"/></div>
+      ):(
+        <div className="grid g3">
+          {subjects.map(s=>{
+            const subjectLessons = app.db.lessons.filter(l=>{
+              if(l.published===false) return false;
+              const u = app.unit(l.unit_id);
+              return u?.subject_id === s.id;
+            });
+            const unitsInSubject = (app.db.units||[]).filter(u=>u.subject_id===s.id);
+            const doneCount = subjectLessons.filter(l=>completedArr.includes(l.id)).length;
+            const pct = subjectLessons.length ? Math.round((doneCount/subjectLessons.length)*100) : 0;
+            return (
+              <div key={s.id}
+                className="glass hv"
+                style={{padding:20,cursor:'pointer',position:'relative',overflow:'hidden'}}
+                onClick={()=>setSelectedSubject(s.id)}>
+
+                <div style={{position:'absolute',top:-20,insetInlineEnd:-20,fontSize:100,opacity:.06,pointerEvents:'none'}}>
+                  {s.icon||'📚'}
+                </div>
+
+                <div className="flex center g12 mb12" style={{position:'relative'}}>
+                  <div style={{width:56,height:56,borderRadius:16,background:'var(--grad-gold)',display:'grid',placeItems:'center',fontSize:28,flexShrink:0,boxShadow:'0 8px 24px rgba(0,212,255,.35)'}}>
+                    {s.icon||'📚'}
+                  </div>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div className="h3" style={{lineHeight:1.3}}>{SEC.esc(s.name||'مادة')}</div>
+                    <div className="xs muted">{subjectLessons.length} درس • {unitsInSubject.length} وحدة</div>
+                  </div>
+                </div>
+
+                {s.desc && (
+                  <div className="xs muted mb12" style={{lineHeight:1.6,position:'relative'}}>
+                    {SEC.esc(s.desc)}
+                  </div>
+                )}
+
+                <div className="bar" style={{height:7,marginBottom:8}}>
+                  <div className="bar-f bar-b" style={{width:`${pct}%`}}/>
+                </div>
+
+                <div className="flex between center" style={{position:'relative'}}>
+                  <span className="pill pill-b">📖 {doneCount}/{subjectLessons.length}</span>
+                  <span className="sm" style={{color:'var(--gold)',fontWeight:800}}>ادخل ←</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </>;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // المستوى 2: دروس المادة (مجمعة حسب الوحدة)
+  // ═══════════════════════════════════════════════════════════════
+  const subject = app.subject(selectedSubject);
+  const subjectLessons = app.db.lessons.filter(l=>{
+    if(l.published===false) return false;
+    const u = app.unit(l.unit_id);
+    return u?.subject_id === selectedSubject;
+  });
+  const subjectUnits = (app.db.units||[])
+    .filter(u=>u.subject_id===selectedSubject)
+    .sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
+
   return <>
-    <div className="h2 mb16 grad">📖 الدروس</div>
-    <div className="flex wrap g6 mb16">
-      <button onClick={()=>setFilterSubject('all')} className={`msg-tab ${filterSubject==='all'?'active':''}`}>الكل ({lessons.length})</button>
-      {app.db.subjects.map(s=><button key={s.id} onClick={()=>setFilterSubject(s.id)} className={`msg-tab ${filterSubject===s.id?'active':''}`}>{SEC.esc(s.name)}</button>)}
+    <button className="btn btn-s btn-sm mb12" onClick={()=>setSelectedSubject(null)}>
+      ← رجوع للمواد
+    </button>
+
+    <div className="glass mb16" style={{padding:20}}>
+      <div className="flex center g16 wrap">
+        <div style={{width:64,height:64,borderRadius:18,background:'var(--grad-gold)',display:'grid',placeItems:'center',fontSize:32,flexShrink:0,boxShadow:'0 8px 24px rgba(0,212,255,.4)'}}>
+          {subject?.icon||'📚'}
+        </div>
+        <div style={{flex:1,minWidth:200}}>
+          <div className="h2 grad mb6">{SEC.esc(subject?.name||'مادة')}</div>
+          {subject?.desc && <div className="sm muted mb6">{SEC.esc(subject.desc)}</div>}
+          <div className="flex wrap g6">
+            <span className="pill pill-b">📖 {subjectLessons.length} درس</span>
+            <span className="pill pill-b">📁 {subjectUnits.length} وحدة</span>
+            <span className="pill pill-g">✅ {subjectLessons.filter(l=>completedArr.includes(l.id)).length} مكتمل</span>
+          </div>
+        </div>
+      </div>
     </div>
-    {filtered.length===0?<div className="glass" style={{padding:30}}><Empty icon="📖" title="لا دروس"/></div>:
-    <div className="grid g3">{filtered.map(l=>{
-      const unit=app.unit(l.unit_id);
-      return <div key={l.id} className="lesson-card" onClick={()=>window.location.href=`lesson.html?id=${l.id}`}>
-        <div className="lesson-thumb">
-          <div className="play"><Icon name="play" size={24} color="#050a14"/></div>
+
+    {subjectUnits.length===0 ? (
+      <div className="glass" style={{padding:30}}>
+        <Empty icon="📁" title="لا توجد وحدات في هذه المادة" desc="الأدمن هيضيف الوحدات قريباً"/>
+      </div>
+    ) : subjectUnits.map((unit,ui)=>{
+      const unitLessons = subjectLessons
+        .filter(l=>l.unit_id===unit.id)
+        .sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
+      if(unitLessons.length===0) return null;
+
+      return (
+        <div key={unit.id} className="glass mb16" style={{padding:18}}>
+          <div className="flex between center mb12 wrap g8">
+            <div className="flex center g8">
+              <div style={{width:34,height:34,borderRadius:10,background:'rgba(0,212,255,.15)',display:'grid',placeItems:'center',fontWeight:900,color:'var(--gold)',fontSize:14}}>
+                {ui+1}
+              </div>
+              <div className="h4" style={{color:'var(--gold)'}}>📁 {SEC.esc(unit.name)}</div>
+            </div>
+            <span className="pill pill-b">{unitLessons.length} درس</span>
+          </div>
+
+          {unit.desc && <div className="xs muted mb12" style={{lineHeight:1.6}}>{SEC.esc(unit.desc)}</div>}
+
+          <div className="grid g2">
+            {unitLessons.map((l,li)=>{
+              const isDone = completedArr.includes(l.id);
+              return (
+                <div key={l.id}
+                  className="glass-s hv"
+                  style={{padding:14,cursor:'pointer',borderColor:isDone?'rgba(34,197,94,.35)':'var(--border)'}}
+                  onClick={()=>window.location.href=`lesson.html?id=${l.id}`}>
+                  <div className="flex center g12">
+                    <div style={{
+                      width:44,height:44,borderRadius:12,flexShrink:0,
+                      background:isDone?'linear-gradient(135deg,#16a34a,#22c55e)':'linear-gradient(135deg,#00d4ff,#0088cc)',
+                      display:'grid',placeItems:'center',fontSize:20,
+                      boxShadow:isDone?'0 6px 18px rgba(34,197,94,.35)':'0 6px 18px rgba(0,212,255,.35)'
+                    }}>
+                      {isDone?'✓':'▶'}
+                    </div>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div className="sm" style={{fontWeight:700,lineHeight:1.4}}>
+                        {SEC.esc(l.title)}
+                      </div>
+                      <div className="xs muted mt6">
+                        ⏱ {l.duration||15} دقيقة • +{l.xp||0} XP
+                      </div>
+                    </div>
+                    <span style={{color:'var(--gold)',fontSize:18,flexShrink:0,opacity:.7}}>←</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
-        <div className="lesson-body">
-          <div className="lesson-title">{SEC.esc(l.title)}</div>
-          <div className="lesson-meta"><span>{SEC.esc(unit?.name||'')}</span><span>•</span><span>+{l.xp||0} XP</span></div>
-        </div>
-      </div>;
-    })}</div>}
+      );
+    })}
+
+    {subjectLessons.length===0 && (
+      <div className="glass" style={{padding:30}}>
+        <Empty icon="📖" title="لا توجد دروس في هذه المادة بعد"/>
+      </div>
+    )}
   </>;
 }
-
 function ExamsPage(){
   const app=useApp();
   const exams=app.db.exams.filter(e=>e.published!==false);
@@ -1485,7 +1638,7 @@ function StudentApp(){
   useEffect(()=>{if(PUSH_MANAGER.isEnabled()){PUSH_MANAGER.show('MISSION EDU', 'أهلاً بك في المنصة 🎓');}},[]);
   const items=[
     {title:'الرئيسية',items:[{id:'home',icon:'home',label:'الرئيسية'},{id:'analytics',icon:'chart',label:'تحليلاتي'}]},
-    {title:'التعلم',items:[{id:'lessons',icon:'book',label:'الدروس'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'practice',icon:'target',label:'وضع التدريب'},{id:'flashcards',icon:'layers',label:'Flashcards'}]},
+    {title:'التعلم',items:[{id:'lessons',icon:'book',label:'المواد'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'practice',icon:'target',label:'وضع التدريب'},{id:'flashcards',icon:'layers',label:'Flashcards'}]},
     {title:'الأنشطة',items:[
       {id:'focus',icon:'clock',label:'وضع التركيز'},
       {id:'calendar',icon:'calendar',label:'تقويم المذاكرة'},
