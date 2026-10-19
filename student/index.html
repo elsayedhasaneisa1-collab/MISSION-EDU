@@ -518,7 +518,7 @@ function HomePage({onNavigate}){
   const progress=totalLessons?Math.round((completed/totalLessons)*100):0;
   const recentExams=app.db.exams.slice(0,3);
   const today = new Date().toLocaleDateString('en-CA');
-  const todayReward = (app.db.daily_reward || []).find(r => r.user_id === user.id && r.date === today);
+  const todayReward = (app.db.daily_reward || []).find(r => r.user_id === user.id && String(r.date).includes(today));
   const [claiming, setClaiming] = useState(false);
   const claimDailyReward = async () => {
     if (todayReward) return app.toast.info('استلمت مكافأة اليوم بالفعل');
