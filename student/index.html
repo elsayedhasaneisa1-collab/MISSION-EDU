@@ -6,11 +6,14 @@
 <meta name="theme-color" content="#050a14" />
 <title>MISSION EDU — المنصة التعليمية</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://unpkg.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
 <link rel="icon" type="image/png" href="/logo.png">
 <link rel="apple-touch-icon" href="/logo.png">
 <link rel="manifest" href="/manifest.json">
@@ -410,7 +413,8 @@ const Icon=({name,size=18,color='currentColor'})=>{
     moon:<><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></>,
     calendar:<><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></>,
     school:<><path d="M14 22v-4a2 2 0 1 0-4 0v4"/><path d="m18 10 4 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8l4-2"/><path d="M18 5v17"/><path d="m4 6 8-4 8 4"/><path d="M6 5v17"/><circle cx="12" cy="9" r="2"/></>,
-    handshake:<><path d="M11 17l-3-3 4-4 3 3"/><path d="M14 14l4 4-3 3-4-4"/><path d="M3 9l4-4 4 3"/><path d="M21 9l-4-4-4 3"/></>
+    handshake:<><path d="M11 17l-3-3 4-4 3 3"/><path d="M14 14l4 4-3 3-4-4"/><path d="M3 9l4-4 4 3"/><path d="M21 9l-4-4-4 3"/></>,
+    swords:<><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/><polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"/><line x1="5" y1="14" x2="9" y2="18"/><line x1="7" y1="17" x2="4" y2="20"/><line x1="3" y1="19" x2="5" y2="21"/></>
   };
   return <svg {...p}>{paths[name]||paths.help}</svg>;
 };
@@ -1530,11 +1534,22 @@ function StudentApp(){
   const items=[
     {title:'الرئيسية',items:[{id:'home',icon:'home',label:'الرئيسية'},{id:'analytics',icon:'chart',label:'تحليلاتي'}]},
     {title:'التعلم',items:[{id:'lessons',icon:'book',label:'الدروس'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'practice',icon:'target',label:'وضع التدريب'},{id:'flashcards',icon:'layers',label:'Flashcards'}]},
-    {title:'الأنشطة',items:[{id:'focus',icon:'clock',label:'وضع التركيز'},{id:'calendar',icon:'calendar',label:'تقويم المذاكرة'},{id:'groups',icon:'handshake',label:'مجموعات الدراسة'}]},
+    {title:'الأنشطة',items:[
+      {id:'focus',icon:'clock',label:'وضع التركيز'},
+      {id:'calendar',icon:'calendar',label:'تقويم المذاكرة'},
+      {id:'groups',icon:'handshake',label:'مجموعات الدراسة'},
+      {id:'friend-challenge',icon:'swords',label:'تحدي الأصدقاء'}
+    ]},
     {title:'التواصل',items:[{id:'leaderboard',icon:'trophy',label:'المتصدرين'},{id:'school-lb',icon:'school',label:'ترتيب المدارس'},{id:'students',icon:'users',label:'الطلاب'},{id:'messages',icon:'message',label:'الرسائل',badge:unreadMsgs||null},{id:'notifications',icon:'bell',label:'الإشعارات',badge:unreadNotifs||null}]},
     {title:'الحساب',items:[{id:'xp-shop',icon:'shoppingBag',label:'متجر XP'},{id:'profile',icon:'user',label:'ملفي'}]}
   ];
-  const navigate=(id,sub)=>{setTab(id);setSubId(sub||null);setSidebarOpen(false);};
+  const navigate=(id,sub)=>{
+    if(id === 'friend-challenge'){
+      window.location.href = '/student/sv.html';
+      return;
+    }
+    setTab(id);setSubId(sub||null);setSidebarOpen(false);
+  };
   return <div className="app">
     <Sidebar items={items} active={tab} onNav={navigate} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} onLogout={app.logout}/>
     <div className="main">
