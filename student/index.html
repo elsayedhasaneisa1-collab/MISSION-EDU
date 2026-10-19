@@ -4,15 +4,26 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="theme-color" content="#050a14" />
-<title>MISSION EDU — المنصة التعليمية</title>
+<title>MISSION EDU — لوحة الطالب</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
 <link rel="icon" type="image/png" href="/logo.png">
+<link rel="manifest" href="/manifest.json">
 <style>
-:root{--bg:#050a14;--bg2:#0a1220;--gold:#00d4ff;--gold-l:#00ffff;--gold-d:#0088cc;--gold-soft:#a0e8ff;--border:rgba(0,212,255,.18);--border2:rgba(0,212,255,.38);--txt:#e0f7ff;--txt2:#8fd4ee;--muted:#4a7a99;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#7c3aed;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.75), 0 0 0 1px rgba(0,212,255,.05) inset;--sh-gold:0 10px 30px rgba(0,212,255,.35);--grad-gold:linear-gradient(135deg,#00ffff 0%,#00d4ff 45%,#0088cc 100%)}
+:root{
+--bg:#050a14;--bg2:#0a1220;
+--gold:#00d4ff;--gold-l:#00ffff;--gold-d:#0088cc;--gold-soft:#a0e8ff;
+--border:rgba(0,212,255,.18);--border2:rgba(0,212,255,.38);
+--txt:#e0f7ff;--txt2:#8fd4ee;--muted:#4a7a99;
+--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#7c3aed;
+--r:20px;--rs:13px;
+--sh:0 18px 50px rgba(0,0,0,.75), 0 0 0 1px rgba(0,212,255,.05) inset;
+--sh-gold:0 10px 30px rgba(0,212,255,.35);
+--grad-gold:linear-gradient(135deg,#00ffff 0%,#00d4ff 45%,#0088cc 100%);
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{overflow-x:hidden;max-width:100vw;width:100%}
 body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(0,212,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(0,150,255,.14),transparent 60%),radial-gradient(700px 400px at 50% 110%,rgba(0,255,255,.08),transparent 70%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;line-height:1.7}
@@ -39,8 +50,8 @@ ul{list-style:none}
 @keyframes goldShine{0%{background-position:0% 50%}100%{background-position:300% 50%}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 .brand{display:flex;align-items:center;gap:11px;padding:8px 10px 16px}
-.brand-logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--grad-gold);box-shadow:0 8px 26px rgba(0,212,255,.55),0 0 0 1px rgba(95,251,255,.3) inset;position:relative}
-.brand-name{font-weight:900;font-size:17px;background:linear-gradient(100deg,#00ffff,#a0e8ff 45%,#00d4ff 90%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 4s linear infinite}
+.brand-logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--grad-gold);box-shadow:0 8px 26px rgba(0,212,255,.55);position:relative}
+.brand-name{font-weight:900;font-size:17px;background:linear-gradient(100deg,#00ffff,#a0e8ff 45%,#00d4ff 90%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .brand-sub{font-size:10.5px;color:var(--muted);font-weight:600}
 .nav-i{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:13px;color:var(--txt2);font-size:14px;font-weight:600;transition:.22s;width:100%;text-align:right;position:relative}
 .nav-i:hover{background:rgba(0,212,255,.10);color:var(--txt)}
@@ -50,8 +61,7 @@ ul{list-style:none}
 .nav-gt{font-size:10.5px;font-weight:800;color:var(--gold);letter-spacing:1px;padding:14px 14px 4px;opacity:.75}
 .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:8px;padding:8px 18px;background:rgba(5,10,20,.78);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);min-height:52px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:11px 20px;border-radius:13px;font-weight:700;font-size:14px;transition:.24s;white-space:nowrap;color:var(--txt)}
-.btn:active{transform:scale(.97)}
-.btn-p{background:var(--grad-gold);color:#050a14;box-shadow:0 10px 28px rgba(0,212,255,.42),0 0 0 1px rgba(95,251,255,.4) inset;position:relative;overflow:hidden}
+.btn-p{background:var(--grad-gold);color:#050a14;box-shadow:0 10px 28px rgba(0,212,255,.42);position:relative;overflow:hidden}
 .btn-p::before{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);transform:translateX(-100%);transition:transform .7s}
 .btn-p:hover::before{transform:translateX(100%)}
 .btn-p:hover{box-shadow:0 14px 40px rgba(0,212,255,.55);transform:translateY(-2px);color:#000}
@@ -66,11 +76,9 @@ ul{list-style:none}
 .h3{font-size:16px;font-weight:800}
 .h4{font-size:14.5px;font-weight:700}
 .muted{color:var(--muted)}.txt2{color:var(--txt2)}.sm{font-size:12.5px}.xs{font-size:11.5px}
-.grad{background:linear-gradient(100deg,#00ffff,#a0e8ff 50%,#00d4ff 100%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 5s linear infinite}
-.grid{display:grid;gap:16px}
-.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
-.flex{display:flex}.between{justify-content:space-between}.center{align-items:center}
-.wrap{flex-wrap:wrap}.col{flex-direction:column}
+.grad{background:linear-gradient(100deg,#00ffff,#a0e8ff 50%,#00d4ff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.grid{display:grid;gap:16px}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.flex{display:flex}.between{justify-content:space-between}.center{align-items:center}.wrap{flex-wrap:wrap}.col{flex-direction:column}
 .g6{gap:6px}.g8{gap:8px}.g12{gap:12px}.g16{gap:16px}
 .mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
 .mb6{margin-bottom:6px}.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
@@ -84,11 +92,9 @@ ul{list-style:none}
 .pill-free{background:linear-gradient(135deg,rgba(34,197,94,.22),rgba(34,197,94,.10));color:#86efac;border:1px solid rgba(34,197,94,.42)}
 .pill-paid{background:linear-gradient(135deg,rgba(0,212,255,.25),rgba(0,212,255,.10));color:#00ffff;border:1px solid rgba(0,212,255,.45)}
 .bar{height:9px;border-radius:20px;background:rgba(0,212,255,.10);overflow:hidden}
-.bar-f{height:100%;border-radius:20px;transition:width .8s}
-.bar-b{background:var(--grad-gold);box-shadow:0 0 14px rgba(0,212,255,.5)}
+.bar-f{height:100%;border-radius:20px;transition:width .8s;background:var(--grad-gold)}
 .input,textarea.input{width:100%;padding:11px 14px;border-radius:12px;background:rgba(5,10,20,.78);border:1.5px solid var(--border);outline:none;font-size:14px;transition:.22s;color:var(--txt)}
 .input:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(0,212,255,.14)}
-.lbl{display:block;font-size:12.5px;font-weight:700;color:var(--txt2);margin-bottom:6px}
 .stat-n{font-size:clamp(21px,3vw,28px);font-weight:900;letter-spacing:-1px;line-height:1.1}
 .stat-l{font-size:11.5px;color:var(--muted);font-weight:600}
 .div{height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:14px 0}
@@ -129,32 +135,21 @@ ul{list-style:none}
 .dev-btn,.tg-btn{display:inline-flex;align-items:center;gap:9px;padding:10px 20px;border-radius:50px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .32s;border:1px solid}
 .dev-btn{background:linear-gradient(135deg,rgba(0,212,255,.18),rgba(0,150,255,.18));border-color:rgba(0,212,255,.4);color:var(--txt)}
 .dev-btn:hover{background:linear-gradient(135deg,rgba(0,212,255,.32),rgba(0,150,255,.32));border-color:#00ffff;transform:translateY(-2px)}
-.dev-name b{background:linear-gradient(90deg,#00ffff,#a0e8ff,#00d4ff,#00ffff);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 3s linear infinite;font-weight:900}
+.dev-name b{background:linear-gradient(90deg,#00ffff,#a0e8ff,#00d4ff,#00ffff);background-size:300% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 3s linear infinite;font-weight:900}
 .tg-btn{background:rgba(0,212,255,.12);border-color:rgba(0,212,255,.35);color:#00ffff}
 .tg-btn:hover{background:rgba(0,212,255,.24);border-color:#00ffff;color:#a0e8ff}
 .swal-custom-popup{border:1px solid rgba(0,212,255,.4)!important;border-radius:22px!important;font-family:'Tajawal','Cairo',sans-serif!important}
 .swal-custom-title{color:#e0f7ff!important;font-size:20px!important;font-weight:800!important}
 .swal-custom-input{background:rgba(5,10,20,.78)!important;border:1.5px solid rgba(0,212,255,.35)!important;color:#e0f7ff!important;border-radius:12px!important}
-.section-title{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;color:var(--gold);margin:16px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-.msg-card{background:rgba(0,212,255,.04);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer}
-.msg-card:hover{background:rgba(0,212,255,.07)}
-.msg-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
-.msg-tab{padding:8px 16px;border-radius:20px;font-weight:700;font-size:12.5px;background:rgba(0,212,255,.06);border:1px solid var(--border);color:var(--txt2);cursor:pointer}
-.msg-tab.active{background:rgba(0,212,255,.20);border-color:var(--gold);color:#00ffff}
-.student-card{background:rgba(10,18,32,.65);border:1px solid var(--border);border-radius:16px;padding:16px;transition:.24s;text-align:center}
-.student-card:hover{transform:translateY(-4px);border-color:var(--border2);box-shadow:var(--sh-gold)}
 .lesson-card{background:rgba(10,18,32,.65);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:.24s;cursor:pointer}
 .lesson-card:hover{transform:translateY(-4px);border-color:var(--border2);box-shadow:var(--sh-gold)}
 .lesson-thumb{aspect-ratio:16/9;background:linear-gradient(135deg,#0a1220,#050a14);position:relative;display:grid;place-items:center}
 .lesson-thumb .play{width:56px;height:56px;border-radius:50%;background:rgba(0,212,255,.9);display:grid;place-items:center;color:#050a14;font-size:22px;box-shadow:0 8px 28px rgba(0,212,255,.6)}
-.lesson-body{padding:14px}
-.lesson-title{font-weight:800;font-size:14.5px;margin-bottom:6px}
+.lesson-body{padding:14px}.lesson-title{font-weight:800;font-size:14.5px;margin-bottom:6px}
 .lesson-meta{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:8px}
-.qbox-opt{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;margin-bottom:6px;background:rgba(255,255,255,.03);border:1px solid var(--border);cursor:pointer}
-.qbox-opt:hover{background:rgba(0,212,255,.08)}
-.qbox-opt-letter{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(0,212,255,.15);color:var(--gold);font-weight:800;font-size:12px;flex-shrink:0}
-.shop-card{background:rgba(10,18,32,.65);border:1px solid var(--border);border-radius:16px;padding:18px;text-align:center}
-.shop-card:hover{transform:translateY(-4px);border-color:var(--border2)}
+.student-card{background:rgba(10,18,32,.65);border:1px solid var(--border);border-radius:16px;padding:16px;transition:.24s;text-align:center}
+.student-card:hover{transform:translateY(-4px);border-color:var(--border2)}
+.shop-card{background:rgba(10,18,32,.65);border:1px solid var(--border);border-radius:16px;padding:18px;text-align:center;transition:.24s}
 .flashcard{perspective:1000px;height:200px;cursor:pointer;margin-bottom:12px}
 .flashcard-inner{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
 .flashcard.flipped .flashcard-inner{transform:rotateY(180deg)}
@@ -162,14 +157,21 @@ ul{list-style:none}
 .flashcard-front{background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(0,150,255,.08))}
 .flashcard-back{background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(34,197,94,.08));transform:rotateY(180deg)}
 .focus-timer{font-size:clamp(48px,10vw,96px);font-weight:900;letter-spacing:2px;font-family:monospace;color:var(--gold)}
+.msg-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.msg-tab{padding:8px 16px;border-radius:20px;font-weight:700;font-size:12.5px;background:rgba(0,212,255,.06);border:1px solid var(--border);color:var(--txt2);cursor:pointer}
+.msg-tab.active{background:rgba(0,212,255,.20);border-color:var(--gold);color:#00ffff}
+.msg-card{background:rgba(0,212,255,.04);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer}
+body.light-mode{--bg:#f0f4f8;--bg2:#e0e8f0;--txt:#0a1220;--txt2:#4a5f7a;--muted:#8fa5bd;background:#f0f4f8}
+body.light-mode .glass{background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(240,244,248,.85));border-color:rgba(0,212,255,.35)}
+body.light-mode .glass-s{background:rgba(255,255,255,.85)}
+body.light-mode .sidebar{background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(240,244,248,.95))}
+body.light-mode .topbar{background:rgba(255,255,255,.85)}
 @media(max-width:1080px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:860px){
 .sidebar{position:fixed;inset-inline-end:0;top:0;transform:translateX(-105%);transition:transform .34s;width:280px;max-width:85vw;box-shadow:-20px 0 60px rgba(0,0,0,.75);overflow-x:hidden}
 .sidebar.open{transform:translateX(0)!important}
-.mbar{display:flex}
-.content{padding:14px 14px 90px}
+.mbar{display:flex}.content{padding:14px 14px 90px}
 .topbar{padding:6px 10px;gap:6px;min-height:48px}
-.icon-btn{width:32px;height:32px;font-size:14px}
 .g2,.g3,.g4{grid-template-columns:1fr}
 }
 </style>
@@ -183,6 +185,7 @@ ul{list-style:none}
 <script src="/db.js"></script>
 <script>
 if (window.Babel) { Babel.registerPreset('react-classic', { presets: [[Babel.availablePresets['react'], { runtime: 'classic' }]] }); }
+if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(()=>{})); }
 </script>
 <script type="text/babel" data-presets="react-classic">
 const {useState,useEffect,useMemo,useCallback,useRef,createContext,useContext}=React;
@@ -203,6 +206,7 @@ function AppProvider({children}){
   const [db,setDb]=useState({users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[],polls:[],poll_votes:[],direct_messages:[],reports:[],friendships:[],xp_shop_items:[],xp_purchases:[],study_groups:[],study_group_members:[],study_plans:[],study_tasks:[],daily_challenges:[],daily_challenge_attempts:[],practice_sessions:[],focus_sessions:[],flashcards:[],video_progress:[],daily_reward:[]});
   const [currentUser,setCurrentUser]=useState(null);
   const [loading,setLoading]=useState(true);
+  const [isLight,setIsLight]=useState(false);
   const toast=useToast();
   const reload=useCallback(async ()=>{
     try{
@@ -219,11 +223,25 @@ function AppProvider({children}){
       });
     }catch(e){console.warn(e);}
   },[]);
-  useEffect(()=>{(async ()=>{try{const sid=DB.getSessionId();if(!sid){window.location.replace('../auth/login.html');return;}const u=await DB.getUser(sid);if(!u||u.active===false){DB.clearSession();window.location.replace('../auth/login.html');return;}if(u.banned===true){DB.clearSession();window.location.replace('../auth/banned.html');return;}setCurrentUser(u);await reload();}catch(e){console.warn(e);}setLoading(false);})();},[]);
+  useEffect(()=>{(async ()=>{try{const sid=DB.getSessionId();if(!sid){window.location.replace('../auth/login.html');return;}const u=await DB.getUser(sid);if(!u||u.active===false){DB.clearSession();window.location.replace('../auth/login.html');return;}if(u.banned===true){DB.clearSession();window.location.replace('../auth/banned.html');return;}setCurrentUser(u);if(u.theme==='light'){document.body.classList.add('light-mode');setIsLight(true);}await reload();}catch(e){console.warn(e);}setLoading(false);})();},[]);
+  
+  // Push Notifications
+  useEffect(()=>{if('Notification' in window && Notification.permission==='default'){Notification.requestPermission();}},[]);
+
   const logout=useCallback(()=>{Swal.fire({title:'تسجيل الخروج',text:'هل أنت متأكد؟',icon:'question',showCancelButton:true,confirmButtonText:'نعم، خروج',cancelButtonText:'إلغاء',confirmButtonColor:'#00d4ff',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #0a1220, #050a14)',color:'#e0f7ff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}}).then(r=>{if(r.isConfirmed){DB.clearSession();window.location.replace('../auth/login.html');}});},[]);
+  
+  const toggleTheme=useCallback(async ()=>{
+    const newTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
+    if(newTheme==='light') document.body.classList.add('light-mode');
+    else document.body.classList.remove('light-mode');
+    setIsLight(newTheme==='light');
+    if(currentUser){try{ await DB.updateUser(currentUser.id,{theme:newTheme}); }catch(e){}}
+  },[currentUser]);
+
   const save=useCallback(async (table,item)=>{const saved=await DB.save(table,item);await reload();return saved;},[reload]);
   const getLevel=useCallback((xp)=>{const ls=[...db.levels].sort((a,b)=>a.xp-b.xp);if(ls.length===0)return {current:{level:1,name:'مبتدئ',xp:0},next:null};let cur=ls[0],next=null;for(let i=0;i<ls.length;i++){if(xp>=ls[i].xp){cur=ls[i];next=ls[i+1]||null;}}return {current:cur,next};},[db.levels]);
-  return <AppCtx.Provider value={{db,currentUser,loading,logout,reload,save,getLevel,toast,subject:id=>db.subjects.find(s=>s.id===id),unit:id=>db.units.find(u=>u.id===id),lesson:id=>db.lessons.find(l=>l.id===id),exam:id=>db.exams.find(e=>e.id===id),question:id=>db.questions.find(q=>q.id===id)}}>{children}</AppCtx.Provider>;
+  
+  return <AppCtx.Provider value={{db,currentUser,loading,logout,reload,save,getLevel,toast,toggleTheme,isLight,subject:id=>db.subjects.find(s=>s.id===id),unit:id=>db.units.find(u=>u.id===id),lesson:id=>db.lessons.find(l=>l.id===id),exam:id=>db.exams.find(e=>e.id===id),question:id=>db.questions.find(q=>q.id===id)}}>{children}</AppCtx.Provider>;
 }
 
 const Icon=({name,size=18,color='currentColor'})=>{
@@ -255,23 +273,25 @@ const Icon=({name,size=18,color='currentColor'})=>{
     flash:<><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></>,
     award:<><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></>,
     check:<><polyline points="20 6 9 17 4 12"/></>,
-    flag:<><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></>,
+    sun:<><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></>,
+    moon:<><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></>,
     plus:<><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></>,
-    send:<><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></>
+    send:<><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></>,
+    video:<><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></>
   };
   return <svg {...p}>{paths[name]||paths.help}</svg>;
 };
 
-function Modal({title,children,onClose,wide}){return <div className="modal-bg" onClick={e=>e.target===e.currentTarget&&onClose()}><div className={`glass modal ${wide?'wide':''}`}><div className="flex between center mb16"><div className="h3">{title}</div><button className="icon-btn" onClick={onClose}><Icon name="close" size={16}/></button></div>{children}</div></div>;}
+function Modal({title,children,onClose}){return <div className="modal-bg" onClick={e=>e.target===e.currentTarget&&onClose()}><div className="glass modal"><div className="flex between center mb16"><div className="h3">{title}</div><button className="icon-btn" onClick={onClose}><Icon name="close" size={16}/></button></div>{children}</div></div>;}
 function Stat({label,value,icon,color='var(--gold)'}){return <div className="glass-s hv" style={{padding:16}}><div className="flex between center mb8"><div className="stat-l">{label}</div><div style={{color}}>{typeof icon==='string'?<Icon name={icon} size={20}/>:icon}</div></div><div className="stat-n" style={{color}}>{value}</div></div>;}
-function Field({label,children,hint}){return <div className="mb12"><label className="lbl">{label}</label>{children}{hint&&<div className="xs muted mt8">{hint}</div>}</div>;}
-function Empty({icon='📭',title,desc}){return <div className="empty"><div className="empty-ico">{icon}</div><div className="h4 txt2 mb8">{title}</div>{desc&&<div className="sm">{desc}</div>}</div>;}
+function Field({label,children}){return <div className="mb12"><label className="lbl" style={{display:'block',fontSize:12.5,fontWeight:700,color:'var(--txt2)',marginBottom:6}}>{label}</label>{children}</div>;}
+function Empty({icon='📭',title}){return <div className="empty"><div className="empty-ico">{icon}</div><div className="h4 txt2 mb8">{title}</div></div>;}
 function AccessBadge({value}){const isFree=value!==false&&value!=='paid';if(isFree)return <span className="pill pill-free">🆓 مجاني</span>;return <span className="pill pill-paid">🔒 مدفوع</span>;}
 
 function StudentAvatar({student, size=40}){
   const isPaid = student?.subscription==='paid' || student?.subscription==='vip';
   const safeImg = isPaid ? SEC.safeImg(student?.avatar_url) : null;
-  if(safeImg) return <img src={safeImg} alt="" loading="lazy" onError={e=>{e.currentTarget.style.display='none';}} style={{width:size,height:size,borderRadius:12,objectFit:'cover',border:'2px solid var(--gold)',flexShrink:0}}/>;
+  if(safeImg) return <img src={safeImg} loading="lazy" style={{width:size,height:size,borderRadius:12,objectFit:'cover',border:'2px solid var(--gold)',flexShrink:0}}/>;
   const isFemale = student?.gender==='female';
   const icon = isFemale ? '👧' : student?.gender==='male' ? '👦' : '👤';
   const bg = isFemale ? 'linear-gradient(135deg,#f472b6,#ec4899)' : 'linear-gradient(135deg,#60a5fa,#3b82f6)';
@@ -289,10 +309,11 @@ function Sidebar({items,active,onNav,open,onClose,onLogout}){
   </aside></>;
 }
 
-function Topbar({user,onMenu,onLogout,unreadNotifs=0,unreadMsgs=0,onOpenNotifications,onOpenMessages,onOpenProfile}){
+function Topbar({user,onMenu,onLogout,unreadNotifs=0,unreadMsgs=0,onOpenNotifications,onOpenMessages,onOpenProfile,onToggleTheme,isLight}){
   return <div className="topbar">
     <button className="icon-btn mbar" onClick={onMenu}><Icon name="menu" size={16}/></button>
     <div className="flex center g8" style={{marginInlineStart:'auto'}}>
+      <button className="icon-btn" onClick={onToggleTheme} title="تغيير المظهر"><Icon name={isLight?'moon':'sun'} size={16}/></button>
       <button className="icon-btn" onClick={onOpenMessages}><Icon name="message" size={16}/>{unreadMsgs>0&&<span style={{position:'absolute',top:-4,insetInlineEnd:-4,minWidth:18,height:18,borderRadius:9,background:'var(--grad-gold)',color:'#050a14',fontSize:10,fontWeight:900,display:'grid',placeItems:'center',padding:'0 5px'}}>{unreadMsgs>9?'9+':unreadMsgs}</span>}</button>
       <button className="icon-btn" onClick={onOpenNotifications}><Icon name="bell" size={16}/>{unreadNotifs>0&&<span style={{position:'absolute',top:-4,insetInlineEnd:-4,minWidth:18,height:18,borderRadius:9,background:'var(--grad-gold)',color:'#050a14',fontSize:10,fontWeight:900,display:'grid',placeItems:'center',padding:'0 5px'}}>{unreadNotifs>9?'9+':unreadNotifs}</span>}</button>
       <button className="glass-s" onClick={onOpenProfile} style={{padding:'4px 10px',display:'flex',alignItems:'center',gap:8,borderColor:'var(--border2)',cursor:'pointer'}}><StudentAvatar student={user} size={30}/><span className="sm" style={{fontWeight:700}}>{SEC.esc(user.name)}</span></button>
@@ -311,6 +332,11 @@ function HomePage({onNavigate}){
   const recentExams=app.db.exams.slice(0,3);
   const today = new Date().toLocaleDateString('en-CA');
   const todayReward = (app.db.daily_reward || []).find(r => r.user_id === user.id && r.date === today);
+  
+  // Video Tracking (Last watched)
+  const lastVideo = (app.db.video_progress||[]).filter(v=>v.user_id===user.id && v.seconds>0).sort((a,b)=>b.updated_at-a.updated_at)[0];
+  const lastLesson = lastVideo ? app.lesson(lastVideo.lesson_id) : null;
+
   const claimDailyReward = async () => {
     if (todayReward) return app.toast.info('استلمت مكافأة اليوم بالفعل');
     try {
@@ -323,21 +349,37 @@ function HomePage({onNavigate}){
       app.toast.ok('🎁 +50 XP مكافأة يومية!');
     } catch (e) { app.toast.err(e.message); }
   };
+
   return <>
     <div className="hero mb16">
       <div className="flex between center wrap g12">
         <div><div className="h2 mb6 grad">أهلاً، {SEC.esc(user.name.split(' ')[0])} 👋</div><div className="sm txt2">مستواك: Lv {lvl.current.level} — {SEC.esc(lvl.current.name)}</div></div>
         <div style={{textAlign:'left'}}><div className="sm muted mb6">XP</div><div className="stat-n" style={{color:'var(--gold)'}}>{DB.fmt(user.xp||0)}</div></div>
       </div>
-      <div className="mt16"><div className="flex between center mb8"><span className="sm">📊 التقدم الكلي</span><span className="sm" style={{fontWeight:900,color:'var(--gold)'}}>{progress}%</span></div><div className="bar" style={{height:10}}><div className="bar-f bar-b" style={{width:`${progress}%`}}/></div></div>
+      <div className="mt16"><div className="flex between center mb8"><span className="sm">📊 التقدم الكلي</span><span className="sm" style={{fontWeight:900,color:'var(--gold)'}}>{progress}%</span></div><div className="bar" style={{height:10}}><div className="bar-f" style={{width:`${progress}%`}}/></div></div>
     </div>
+    
     <div className="grid g4 mb16">
       <Stat label="المستوى" value={`Lv ${lvl.current.level}`} icon="trend" color="var(--gold)"/>
       <Stat label="السلسلة" value={DB.fmt(user.streak||0)} icon="flash" color="#f59e0b"/>
       <Stat label="الدروس" value={`${completed}/${totalLessons}`} icon="book" color="#22c55e"/>
       <Stat label="الإنجازات" value={DB.fmt((user.achievements||[]).length)} icon="award" color="var(--gold-d)"/>
     </div>
+
+    {lastLesson && (
+      <div className="glass mb16" style={{padding:18,borderColor:'var(--gold)'}}>
+        <div className="flex between center wrap g8">
+          <div className="flex center g12">
+            <div style={{width:40,height:40,borderRadius:10,background:'rgba(0,212,255,.15)',display:'grid',placeItems:'center',color:'var(--gold)'}}><Icon name="video" size={20}/></div>
+            <div><div className="h4">أكمل المشاهدة</div><div className="xs muted">{SEC.esc(lastLesson.title)} - توقفت عند {Math.floor(lastVideo.seconds/60)}:{String(lastVideo.seconds%60).padStart(2,'0')}</div></div>
+          </div>
+          <button className="btn btn-p" onClick={()=>window.location.href=`lesson.html?id=${lastLesson.id}`}>متابعة</button>
+        </div>
+      </div>
+    )}
+
     {!todayReward&&<div className="glass mb16" style={{padding:18,borderColor:'rgba(34,197,94,.4)'}}><div className="flex between center wrap g8"><div className="flex center g12"><div style={{fontSize:32}}>🎁</div><div><div className="h4" style={{color:'#6ee7a0'}}>مكافأة اليوم جاهزة!</div><div className="xs muted">استلم +50 XP</div></div></div><button className="btn btn-ok" onClick={claimDailyReward}><Icon name="gift" size={16}/> استلام</button></div></div>}
+    
     <div className="grid g2 mb16">
       <div className="glass" style={{padding:18}}>
         <div className="flex between center mb12"><div className="h4" style={{color:'var(--gold)'}}>📖 مواصلة التعلم</div><button className="btn btn-s btn-sm" onClick={()=>onNavigate('lessons')}>الكل</button></div>
@@ -535,7 +577,7 @@ function StudentApp(){
   return <div className="app">
     <Sidebar items={items} active={tab} onNav={navigate} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} onLogout={app.logout}/>
     <div className="main">
-      <Topbar user={user} onMenu={()=>setSidebarOpen(true)} onLogout={app.logout} unreadNotifs={unreadNotifs} unreadMsgs={unreadMsgs} onOpenNotifications={()=>navigate('notifications')} onOpenMessages={()=>navigate('messages')} onOpenProfile={()=>navigate('profile')}/>
+      <Topbar user={user} onMenu={()=>setSidebarOpen(true)} onLogout={app.logout} unreadNotifs={unreadNotifs} unreadMsgs={unreadMsgs} onOpenNotifications={()=>navigate('notifications')} onOpenMessages={()=>navigate('messages')} onOpenProfile={()=>navigate('profile')} onToggleTheme={app.toggleTheme} isLight={app.isLight}/>
       <div className="content">
         {tab==='home'&&<HomePage onNavigate={navigate}/>}
         {tab==='analytics'&&<AnalyticsPage/>}
