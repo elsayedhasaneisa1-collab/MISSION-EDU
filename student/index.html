@@ -310,6 +310,11 @@ function AppProvider({children}){
       const extraResults=await Promise.all(extra.map(async(t)=>{try{const res=await sb.from(t).select('*').limit(2000);return{t,data:res.data||[]};}catch(e){return{t,data:[]};}}));
       extraResults.forEach(r=>{data[r.t]=r.data;});
       setDb(data);
+      setCurrentUser(prev => {
+  if (!prev) return null;
+  const fresh = data.users.find(u => u.id === prev.id);
+  return fresh || prev;
+});
     }catch(e){console.warn(e);}
   },[]);
   useEffect(()=>{(async ()=>{try{const sid=DB.getSessionId();if(!sid){window.location.replace('/auth/login.html');return;}const u=await DB.getUser(sid);if(!u||u.active===false){DB.clearSession();window.location.replace('/auth/login.html');return;}if(u.banned===true){DB.clearSession();window.location.replace('/auth/banned.html');return;}setCurrentUser(u);if(u.theme==='light')document.body.classList.add('light-mode');await reload();}catch(e){console.warn(e);}setLoading(false);})();},[]);
