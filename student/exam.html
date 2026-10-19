@@ -173,7 +173,6 @@ body.exam-active input,body.exam-active textarea{user-select:text!important;-web
 .opt.selected .opt-letter{border-color:var(--blue);background:var(--blue);color:#fff}
 .opt.ok .opt-letter{border-color:var(--green);background:var(--green);color:#fff}
 .opt.bad .opt-letter{border-color:var(--red);background:var(--red);color:#fff}
-.resume-banner{padding:16px;border-radius:14px;background:linear-gradient(135deg,rgba(251,191,36,.15),rgba(251,191,36,.05));border:1px solid rgba(251,191,36,.4);margin-bottom:16px}
 @media(max-width:900px){
   .exam-layout{flex-direction:column}
   .sidebar{width:100%;height:auto;position:static;border-left:none;border-bottom:1px solid var(--border);padding:15px}
@@ -189,7 +188,7 @@ body.exam-active input,body.exam-active textarea{user-select:text!important;-web
 <body>
 
 <div class="topbar">
-  <a href="/student/index.html" class="back-btn">
+  <a href="index.html" class="back-btn">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
     رجوع
   </a>
@@ -216,6 +215,20 @@ body.exam-active input,body.exam-active textarea{user-select:text!important;-web
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="/db.js"></script>
 <script>
+window.onerror = function(msg, url, line, col, error) {
+  if (window._errorShown) return;
+  window._errorShown = true;
+  Swal.fire({
+    icon: 'error',
+    title: 'حدث خطأ غير متوقع',
+    html: `<div style="text-align:right;font-size:13px;direction:rtl">${msg}<br><br><b>السطر: ${line}</b></div>`,
+    background: 'linear-gradient(180deg, #151f38, #0b1122)',
+    color: '#e8eefc',
+    confirmButtonColor: '#2f7dff'
+  }).then(() => { window._errorShown = false; location.reload(); });
+  return false;
+};
+
 (function(){
 "use strict";
 
@@ -392,7 +405,12 @@ function renderStart(){
     </div>`;
 
   const startBtn = document.getElementById("btnStart");
-  if(startBtn) startBtn.addEventListener("click", startExam);
+  if(startBtn) {
+    startBtn.addEventListener("click", function(e) {
+      e.preventDefault();
+      startExam();
+    });
+  }
 }
 
 function renderExam(){
@@ -401,6 +419,11 @@ function renderExam(){
   app.className = 'exam-layout';
 
   const q = state.questions[state.current];
+  if (!q) {
+    app.innerHTML = `<div class="glass" style="padding:40px;text-align:center"><div class="h3 mb12" style="color:#fca5a5">⚠️ حدث خطأ أثناء تحميل السؤال</div><p class="sm muted mb16">تعذر العثور على بيانات السؤال، يرجى إعادة المحاولة.</p><a href="index.html" class="btn btn-p mt16" style="text-decoration:none">العودة للرئيسية</a></div>`;
+    return;
+  }
+
   const total = state.questions.length;
 
   let answeredCount = 0;
@@ -552,7 +575,7 @@ function renderResult(){
       </div>
       <div class="h3 mb12">📋 مراجعة الإجابات</div>
       ${reviewHtml}
-      <div class="flex g8 mt16"><a href="/student/index.html" class="btn btn-p btn-block" style="text-decoration:none">🏠 العودة للرئيسية</a></div>
+      <div class="flex g8 mt16"><a href="index.html" class="btn btn-p btn-block" style="text-decoration:none">🏠 العودة للرئيسية</a></div>
     </div>`;
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
@@ -675,22 +698,22 @@ function removeExamProtection(){
 }
 
 function startExam(){
+  if(state.questions.length === 0){
+    Swal.fire({icon:'error',title:'خطأ',text:'لا توجد أسئلة في هذا الاختبار',background:'linear-gradient(180deg, #151f38, #0b1122)',color:'#e8eefc'});
+    return;
+  }
   state.started = true;
   state.submitted = false;
   state.cancelled = false;
   state.current = 0;
   state.answers = {};
   state.visited = { 0: true };
-  state.timeLeft = state.exam.duration * 60;
+  state.timeLeft = (state.exam.duration || 15) * 60;
   state.result = null;
   state.startedAt = Date.now();
   saveState();
 
-  DB.trackActivity({
-    userId: state.user.id, userName: state.user.name,
-    type: "exam_start", target: state.exam.title,
-    details: { exam: state.exam.title }
-  });
+  DB.logActivity(state.user.id, state.user.name, "exam_start", state.exam.title);
 
   clearInterval(state.timer);
   state.timer = setInterval(()=>{
@@ -745,11 +768,7 @@ async function cancelExam(reason){
     durationSeconds = state.startedAt ? Math.max(0, Math.floor((Date.now() - state.startedAt)/1000)) : 0;
   }
 
-  DB.trackActivity({
-    userId: state.user.id, userName: state.user.name,
-    type: 'exam_cancelled', target: state.exam.title,
-    details: { exam_id: state.exam.id, reason, duration_seconds: durationSeconds }
-  });
+  DB.logActivity(state.user.id, state.user.name, 'exam_cancelled', state.exam.title);
 
   setTimeout(()=>{ removeExamBlockOverlay(); }, 600);
 
@@ -773,7 +792,7 @@ async function cancelExam(reason){
             <div class="pill pill-y" style="padding:8px 16px;font-size:13px"><i class="fa-solid fa-xmark"></i> الحالة: ملغي</div>
           </div>
           <div class="cancelled-note">⛔ تم تسجيل هذه المحاولة كـ <b style="color:#fca5a5">ملغي</b> وسيراها الأدمن.</div>
-          <a href="/student/index.html" class="btn btn-p btn-lg" style="text-decoration:none;min-width:220px">
+          <a href="index.html" class="btn btn-p btn-lg" style="text-decoration:none;min-width:220px">
             <i class="fa-solid fa-arrow-right"></i> رجوع للرئيسية
           </a>
         </div>
@@ -819,15 +838,7 @@ async function submitExam(){
       questionResults: data.question_results || []
     };
 
-    DB.trackActivity({
-      userId: state.user.id, userName: state.user.name,
-      type: "exam_submit", target: state.exam.title,
-      details: {
-        score: data.score, total: data.total, pct: data.pct,
-        passed: data.passed, gained: data.gained,
-        duration: data.duration_seconds
-      }
-    });
+    DB.logActivity(state.user.id, state.user.name, "exam_submit", state.exam.title);
 
     renderResult();
     window.scrollTo({top: 0, behavior: 'smooth'});
@@ -851,57 +862,87 @@ async function load(){
     app.style.display = 'block';
     app.style.maxWidth = '760px';
     app.className = 'wrap';
-    app.innerHTML = `<div class="glass" style="padding:40px;text-align:center"><div class="h3 mb12">⚠️ لم يتم تحديد الاختبار</div><a href="/student/index.html" class="btn btn-p mt16" style="text-decoration:none">العودة للرئيسية</a></div>`;
+    app.innerHTML = `<div class="glass" style="padding:40px;text-align:center"><div class="h3 mb12">⚠️ لم يتم تحديد الاختبار</div><a href="index.html" class="btn btn-p mt16" style="text-decoration:none">العودة للرئيسية</a></div>`;
     return;
   }
 
-  const sid = DB.getSessionId();
-  if(!sid){ window.location.replace("/auth/login.html"); return; }
-  const user = await DB.getUser(sid);
-  if(!user || user.active === false){ DB.clearSession(); window.location.replace("/auth/login.html"); return; }
-  state.user = user;
-  userAvatar.textContent = user.avatar || "🧑‍🎓";
+  try {
+    const sid = DB.getSessionId();
+    if(!sid){ window.location.replace("/auth/login.html"); return; }
+    const user = await DB.getUser(sid);
+    if(!user || user.active === false){ DB.clearSession(); window.location.replace("/auth/login.html"); return; }
+    state.user = user;
+    if (userAvatar) userAvatar.textContent = user.avatar || "🧑‍🎓";
 
-  const sb = await DB.getClient();
-  const { data: exam, error } = await sb.from("exams").select("*").eq("id", examId).maybeSingle();
-  if(error || !exam){
+    const sb = await DB.getClient();
+    const { data: exam, error } = await sb.from("exams").select("*").eq("id", examId).maybeSingle();
+    if(error || !exam){
+      app.style.display = 'block';
+      app.style.maxWidth = '760px';
+      app.className = 'wrap';
+      app.innerHTML = `<div class="glass" style="padding:40px;text-align:center"><div class="h3 mb12">⚠️ الاختبار غير موجود</div><a href="index.html" class="btn btn-p mt16" style="text-decoration:none">العودة للرئيسية</a></div>`;
+      return;
+    }
+    state.exam = exam;
+    state.hasAccess = hasAccess(user, exam);
+
+    if(!state.hasAccess){
+      app.style.display = 'block';
+      app.style.maxWidth = '760px';
+      app.className = 'wrap';
+      renderLocked();
+      return;
+    }
+
+    const qIds = Array.isArray(exam.question_ids) ? exam.question_ids : (typeof exam.question_ids === 'string' ? JSON.parse(exam.question_ids) : []);
+    if(qIds.length === 0){
+      app.style.display = 'block';
+      app.style.maxWidth = '760px';
+      app.className = 'wrap';
+      app.innerHTML = `<div class="glass" style="padding:40px;text-align:center"><div class="h3 mb12">⚠️ لا توجد أسئلة في الاختبار</div><a href="index.html" class="btn btn-p mt16" style="text-decoration:none">العودة للرئيسية</a></div>`;
+      return;
+    }
+
+    let questions = [];
+    try {
+        const { data: qData, error: qErr } = await sb.from("questions_public").select("*").in("id", qIds);
+        if (qErr) console.error("questions_public error:", qErr);
+        if (qData && qData.length > 0) {
+            questions = qData;
+        } else {
+            const { data: fbData, error: fbErr } = await sb.from("questions").select("id, text, options, subject_id, unit_id, lesson_id, xp, explanation").in("id", qIds);
+            if (!fbErr && fbData) questions = fbData;
+        }
+    } catch (e) {
+        console.error("Fetch questions error:", e);
+    }
+
+    const orderedQs = qIds.map(id => (questions||[]).find(q => q.id === id)).filter(Boolean);
+    state.questions = orderedQs;
+
+    if (state.questions.length === 0) {
+        app.style.display = 'block';
+        app.style.maxWidth = '760px';
+        app.className = 'wrap';
+        app.innerHTML = `<div class="glass" style="padding:40px;text-align:center"><div class="h3 mb12" style="color:#fca5a5">⚠️ تعذر تحميل أسئلة الاختبار</div><p class="sm muted mb16">تأكد من وجود الأسئلة في بنك الأسئلة أو تواصل مع الإدارة.</p><a href="index.html" class="btn btn-p mt16" style="text-decoration:none">العودة للرئيسية</a></div>`;
+        return;
+    }
+
+    const { data: attempts } = await sb.from("exam_attempts").select("*").eq("user_id", user.id).eq("exam_id", examId).order("at", {ascending:false});
+    state.attempts = attempts || [];
+
     app.style.display = 'block';
     app.style.maxWidth = '760px';
     app.className = 'wrap';
-    app.innerHTML = `<div class="glass" style="padding:40px;text-align:center"><div class="h3 mb12">⚠️ الاختبار غير موجود</div><a href="/student/index.html" class="btn btn-p mt16" style="text-decoration:none">العودة للرئيسية</a></div>`;
-    return;
+    renderStart();
+
+  } catch (err) {
+      console.error(err);
+      app.style.display = 'block';
+      app.style.maxWidth = '760px';
+      app.className = 'wrap';
+      app.innerHTML = `<div class="glass" style="padding:40px;text-align:center"><div class="h3 mb12" style="color:#fca5a5">⚠️ حدث خطأ غير متوقع</div><p class="sm muted mb16">${err.message}</p><a href="index.html" class="btn btn-p mt16" style="text-decoration:none">العودة للرئيسية</a></div>`;
   }
-  state.exam = exam;
-  state.hasAccess = hasAccess(user, exam);
-
-  if(!state.hasAccess){
-    app.style.display = 'block';
-    app.style.maxWidth = '760px';
-    app.className = 'wrap';
-    renderLocked();
-    return;
-  }
-
-  const qIds = exam.question_ids || [];
-  if(qIds.length === 0){
-    app.style.display = 'block';
-    app.style.maxWidth = '760px';
-    app.className = 'wrap';
-    app.innerHTML = `<div class="glass" style="padding:40px;text-align:center"><div class="h3 mb12">⚠️ لا توجد أسئلة في الاختبار</div><a href="/student/index.html" class="btn btn-p mt16" style="text-decoration:none">العودة للرئيسية</a></div>`;
-    return;
-  }
-
-  const { data: questions } = await sb.from("questions_public").select("*").in("id", qIds);
-  const orderedQs = qIds.map(id => (questions||[]).find(q => q.id === id)).filter(Boolean);
-  state.questions = orderedQs;
-
-  const { data: attempts } = await sb.from("exam_attempts").select("*").eq("user_id", user.id).eq("exam_id", examId).order("at", {ascending:false});
-  state.attempts = attempts || [];
-
-  app.style.display = 'block';
-  app.style.maxWidth = '760px';
-  app.className = 'wrap';
-  renderStart();
 }
 
 window.openWhatsApp = ()=>{
