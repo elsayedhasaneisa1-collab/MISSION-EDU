@@ -1250,7 +1250,7 @@ function StudentProfilePage({studentId,onClose}){
         <Stat label="XP" value={DB.fmt(student.xp||0)} icon="trend" color="#FFD700"/>
         <Stat label="دروس مكتملة" value={DB.fmt(completed)} icon="book" color="#22c55e"/>
         <Stat label="السلسلة" value={DB.fmt(student.streak||0)} icon="flash" color="#f59e0b"/>
-        <Stat label="بلاغات" value={DB.fmt(student.reports_count||0)} icon="alert" color={(student.reports_count||0)>0?'#ef4444':'#8a7d55'}/>
+        <Stat label="بلاغات" value={DB.fmt(reports.length)}>0?'#ef4444':'#8a7d55'}/>
       </div>
       <div className="mt16">
         <div className="flex between center mb8">
@@ -1506,11 +1506,184 @@ function NotificationsPage(){
 }
 
 function ReportsPage(){
-  const [reports,setReports]=useState([]);const [loading,setLoading]=useState(true);
-  useEffect(()=>{(async()=>{try{const sb=await DB.getClient();const {data}=await sb.from('reports').select('*').order('created_at',{ascending:false}).limit(50);setReports(data||[]);}catch(e){}setLoading(false);})();},[]);
+  const app=useApp();
+  const [reports,setReports]=useState([]);
+  const [loading,setLoading]=useState(true);
+  const [filter,setFilter]=useState('pending');
+  const [busy,setBusy]=useState(null);
+
+  const load=useCallback(async()=>{
+    setLoading(true);
+    try{
+      const data=await DB.getAdminReports?.(filter) || null;
+      if(data){ setReports(data); }
+      else{
+        // fallback: قراءة مباشرة (تشتغل لو الأدمن عنده RLS access)
+        const sb=await DB.getClient();
+        const {data:rows}=await sb.from('reports').select('*').order('created_at',{ascending:false}).limit(500);
+        setReports(rows||[]);
+      }
+    }catch(e){ console.warn(e); app.toast.err?.('تعذر تحميل البلاغات'); }
+    setLoading(false);
+  },[filter]);
+
+  useEffect(()=>{ load(); },[load]);
+
+  const review=async(reportId,status,action,banTarget,banReason)=>{
+    setBusy(reportId);
+    try{
+      const sb=await DB.getClient();
+      const {data,error}=await sb.rpc('admin_review_report',{
+        p_report_id:reportId,
+        p_status:status,
+        p_action:action||null,
+        p_notes:null,
+        p_ban_target:!!banTarget,
+        p_ban_reason:banReason||null
+      });
+      if(error)throw new Error(error.message);
+      app.toast.ok(banTarget?'✅ تم الحظر':'✅ تم تحديث البلاغ');
+      await load();
+      await app.reload();
+    }catch(e){
+      app.toast.err(e.message||'فشل');
+    }
+    setBusy(null);
+  };
+
+  const banAndReview=async(r)=>{
+    const res=await Swal.fire({
+      title:'حظر المستخدم؟',
+      html:`<div style="text-align:right;font-size:14px;line-height:1.8">
+        <div>👤 <b>${SEC.esc(r.user_name||'—')}</b></div>
+        <div>📱 ${SEC.esc(r.user_phone||'—')}</div>
+        <div>🚩 ${SEC.esc(r.reason||'—')}</div>
+      </div>`,
+      input:'text',
+      inputPlaceholder:'سبب الحظر (اختياري)',
+      showCancelButton:true,
+      confirmButtonText:'⛔ حظر',
+      cancelButtonText:'إلغاء',
+      confirmButtonColor:'#ef4444',
+      cancelButtonColor:'#64748b',
+      background:'linear-gradient(180deg,#1c160c,#0f0c07)',
+      color:'#f7f0dd',
+      customClass:{popup:'swal-custom-popup',title:'swal-custom-title',input:'swal-custom-input'}
+    });
+    if(!res.isConfirmed)return;
+    await review(r.id,'action_taken','banned',true,res.value||'حظر بسبب بلاغات');
+  };
+
+  const dismiss=async(r)=>{
+    await review(r.id,'dismissed','dismissed',false,null);
+  };
+
+  const takeAction=async(r)=>{
+    await review(r.id,'action_taken','warning_sent',false,null);
+  };
+
+  const statusBadge=(s)=>{
+    if(s==='pending') return <span className="pill pill-a">⏳ معلق</span>;
+    if(s==='dismissed') return <span className="pill pill-y">⊘ مرفوض</span>;
+    if(s==='action_taken') return <span className="pill pill-r">⚡ تم إجراء</span>;
+    return <span className="pill pill-g">✓ مراجع</span>;
+  };
+
+  const filtered=filter==='all'?reports:reports.filter(r=>(r.status||'pending')===filter);
+  const pendingCount=reports.filter(r=>(r.status||'pending')==='pending').length;
+
   return <>
-    <div className="h2 mb16 grad">📨 البلاغات</div>
-    <div className="glass" style={{padding:20}}>{loading?<div style={{textAlign:'center',padding:20}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>:reports.length===0?<Empty icon="📨" title="لا بلاغات"/>:<div className="flex col g8">{reports.map(r=><div key={r.id} className="glass-s" style={{padding:14}}><div className="flex between center mb8"><div className="h4">{SEC.esc(r.user_name)}</div><span className="xs muted">{DB.formatDateTime(r.created_at)}</span></div><div className="xs muted mb8" dir="ltr">📱 {SEC.esc(r.user_phone)}</div><div className="sm txt2" style={{background:'rgba(0,0,0,.25)',padding:10,borderRadius:10,borderInlineStart:'2px solid var(--gold)'}}>{SEC.esc(r.message||r.details)}</div></div>)}</div>}</div>
+    <div className="flex between center mb16 wrap g8">
+      <div>
+        <div className="h2 grad">📨 البلاغات</div>
+        <div className="sm muted mt6">
+          {pendingCount>0 ? `⚠️ ${pendingCount} بلاغ في انتظار المراجعة` : '✅ لا بلاغات معلقة'}
+        </div>
+      </div>
+      <div className="flex g8">
+        <span className="pill pill-b">{reports.length} إجمالي</span>
+        <button className="btn btn-s" onClick={load}>🔄</button>
+      </div>
+    </div>
+
+    <div className="msg-tabs mb16">
+      {[
+        {id:'pending',label:'⏳ معلق'},
+        {id:'action_taken',label:'⚡ إجراء'},
+        {id:'dismissed',label:'⊘ مرفوض'},
+        {id:'all',label:'الكل'}
+      ].map(f=>(
+        <button key={f.id} className={`msg-tab ${filter===f.id?'active':''}`} onClick={()=>setFilter(f.id)}>
+          {f.label}
+        </button>
+      ))}
+    </div>
+
+    <div className="glass" style={{padding:14}}>
+      {loading ? (
+        <div style={{textAlign:'center',padding:40}}>
+          <div className="spinner" style={{margin:'0 auto 14px'}}></div>
+        </div>
+      ) : filtered.length===0 ? (
+        <Empty icon="✅" title="لا بلاغات"/>
+      ) : (
+        <div className="flex col g8">
+          {filtered.map(r=>{
+            const isPending=(r.status||'pending')==='pending';
+            const isBusy=busy===r.id;
+            return (
+              <div key={r.id} className="glass-s" style={{padding:14,borderColor:isPending?'rgba(245,158,11,.35)':'var(--border)'}}>
+                <div className="flex between center mb8 wrap g8">
+                  <div className="flex center g8">
+                    <span className="sm" style={{fontWeight:700}}>👤 {SEC.esc(r.user_name||'—')}</span>
+                    <span className="xs muted" dir="ltr">📱 {SEC.esc(r.user_phone||'—')}</span>
+                  </div>
+                  <div className="flex g8">
+                    {statusBadge(r.status||'pending')}
+                    <span className="xs muted">{DB.formatDateTime(r.created_at)}</span>
+                  </div>
+                </div>
+
+                <div className="flex g8 mb8 wrap">
+                  <span className="pill pill-r">🚩 {SEC.esc(r.reason||'—')}</span>
+                  {r.target_total_reports && <span className="pill pill-a">إجمالي بلاغات: {r.target_total_reports}</span>}
+                  {r.target_distinct_reporters && <span className="pill pill-b">مُبلِّغون: {r.target_distinct_reporters}</span>}
+                  {r.target_is_banned && <span className="pill pill-r">⛔ محظور بالفعل</span>}
+                </div>
+
+                {r.details && (
+                  <div className="sm txt2 mb8" style={{background:'rgba(0,0,0,.25)',padding:10,borderRadius:10,borderInlineStart:'2px solid var(--gold)'}}>
+                    "{SEC.esc(r.details)}"
+                  </div>
+                )}
+
+                {r.reporter_name && (
+                  <div className="xs muted mb8">بلّغ عنه: <b>{SEC.esc(r.reporter_name)}</b></div>
+                )}
+
+                {isPending && (
+                  <div className="flex g6 wrap mt12">
+                    <button className="btn btn-dn btn-sm" onClick={()=>banAndReview(r)} disabled={isBusy}>
+                      {isBusy?'...':'⛔ حظر'}
+                    </button>
+                    <button className="btn btn-s btn-sm" onClick={()=>takeAction(r)} disabled={isBusy}>
+                      ⚡ إجراء
+                    </button>
+                    <button className="btn btn-s btn-sm" onClick={()=>dismiss(r)} disabled={isBusy}>
+                      ⊘ رفض
+                    </button>
+                  </div>
+                )}
+
+                {!isPending && r.admin_notes && (
+                  <div className="xs muted mt8">📝 {SEC.esc(r.admin_notes)}</div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
   </>;
 }
 
