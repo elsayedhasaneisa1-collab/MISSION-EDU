@@ -311,23 +311,20 @@
   // FIX #3: reportIssue — يستخدم جدول issues بدل reports
   // ═══════════════════════════════════════════════════════════════
   async function reportIssue(payload) {
-    try {
-      const sb = await getClient();
-      const userId = getSessionId();
-      if (!userId) return false;
-      const record = {
-        id: uid('iss_'),
-        user_id: userId,
-        user_name: String(payload.userName || 'زائر').slice(0, 100),
-        user_phone: String(payload.userPhone || '').slice(0, 30),
-        message: String(payload.message || '').slice(0, 2000),
-        status: 'open',
-        created_at: Date.now()
-      };
-      const { error } = await sb.from('issues').insert([record]);
-      return !error;
-    } catch (e) { return false; }
-  }
+  try {
+    const sb = await getClient();
+    const userId = getSessionId();
+    if (!userId) return false;
+    
+    const { error } = await sb.rpc('submit_issue', {
+      p_user_id: userId,
+      p_name: String(payload.userName || 'زائر').slice(0, 100),
+      p_phone: String(payload.userPhone || '').slice(0, 30),
+      p_message: String(payload.message || '').slice(0, 2000)
+    });
+    return !error;
+  } catch (e) { return false; }
+}
 
   async function getIssues(status) {
     try {
@@ -483,26 +480,21 @@
   // ═══════════════════════════════════════════════════════════════
   // Admin reports RPCs (للوحة الإدارة)
   // ═══════════════════════════════════════════════════════════════
-  async function getAdminReports(status) {
-    const sb = await getClient();
-    const { data, error } = await sb.rpc('get_admin_reports', { p_status: status || 'pending' });
-    if (error) throw new Error(error.message);
-    return data || [];
-  }
+  async function getAdminReports(status, adminId) {
+  const sb = await getClient();
+  const { data, error } = await sb.rpc('get_admin_reports', { p_admin_id: adminId, p_status: status || 'pending' });
+  if (error) throw new Error(error.message);
+  return data || [];
+}
 
-  async function adminReviewReport(reportId, status, action, notes, banTarget, banReason) {
-    const sb = await getClient();
-    const { data, error } = await sb.rpc('admin_review_report', {
-      p_report_id: reportId,
-      p_status: status,
-      p_action: action || null,
-      p_notes: notes || null,
-      p_ban_target: !!banTarget,
-      p_ban_reason: banReason || null
-    });
-    if (error) throw new Error(error.message);
-    return data;
-  }
+async function adminReviewReport(reportId, status, action, notes, banTarget, banReason, adminId) {
+  const sb = await getClient();
+  const { data, error } = await sb.rpc('admin_review_report', {
+    p_report_id: reportId, p_admin_id: adminId, p_status: status, p_action: action || null, p_notes: notes || null, p_ban_target: !!banTarget, p_ban_reason: banReason || null
+  });
+  if (error) throw new Error(error.message);
+  return data;
+}
 
   window.MissionDB = {
     getClient,
