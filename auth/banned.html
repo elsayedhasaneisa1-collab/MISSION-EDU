@@ -3,15 +3,16 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="theme-color" content="#0a0805" />
+<meta name="theme-color" content="#050a14" />
 <title>MISSION EDU — حساب محظور</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0a0805;--gold:#D4AF37;--gold-l:#FFD700;--border:rgba(212,175,55,.18);--border2:rgba(212,175,55,.38);--txt:#f7f0dd;--muted:#8a7d55;--red:#ef4444;--grad-gold:linear-gradient(135deg,#FFD700 0%,#D4AF37 45%,#B8860B 100%)}
+:root{--bg:#050a14;--gold:#00d4ff;--gold-l:#00ffff;--border:rgba(0,212,255,.18);--border2:rgba(0,212,255,.38);--txt:#e0f7ff;--muted:#4a7a99;--red:#ef4444;--grad-gold:linear-gradient(135deg,#00ffff 0%,#00d4ff 45%,#0088cc 100%)}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(212,175,55,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(239,68,68,.14),transparent 60%),var(--bg);color:var(--txt);min-height:100vh;display:grid;place-items:center;padding:20px;line-height:1.7}
-.card{width:100%;max-width:480px;background:linear-gradient(180deg,rgba(28,22,12,.92),rgba(15,12,7,.88));border:1px solid rgba(239,68,68,.4);border-radius:24px;padding:36px 30px;box-shadow:0 30px 80px rgba(0,0,0,.85);text-align:center;animation:pu .5s}
+html,body{overflow-x:hidden;max-width:100vw;width:100%}
+body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(0,212,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(239,68,68,.14),transparent 60%),var(--bg);color:var(--txt);min-height:100vh;display:grid;place-items:center;padding:20px;line-height:1.7}
+.card{width:100%;max-width:480px;background:linear-gradient(180deg,rgba(10,18,32,.92),rgba(5,10,20,.88));border:1px solid rgba(239,68,68,.4);border-radius:24px;padding:36px 30px;box-shadow:0 30px 80px rgba(0,0,0,.85);text-align:center;animation:pu .5s}
 @keyframes pu{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
 @keyframes goldShine{0%{background-position:0% 50%}100%{background-position:300% 50%}}
 .icon{width:100px;height:100px;margin:0 auto 20px;border-radius:50%;background:linear-gradient(135deg,rgba(239,68,68,.3),rgba(239,68,68,.1));display:grid;place-items:center;font-size:52px;border:2px solid rgba(239,68,68,.5);box-shadow:0 0 40px rgba(239,68,68,.4)}
@@ -19,11 +20,11 @@ body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 
 .msg{font-size:15px;color:var(--txt);margin-bottom:8px}
 .reason{background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:14px;margin:20px 0;font-size:13px;color:#fca5a5}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border-radius:14px;font-weight:800;font-size:15px;cursor:pointer;transition:.24s;border:none;font-family:inherit;text-decoration:none;margin-top:8px}
-.btn-p{background:var(--grad-gold);color:#1a1206;box-shadow:0 12px 32px rgba(212,175,55,.5)}
-.btn-s{background:rgba(212,175,55,.10);color:var(--gold);border:1px solid var(--border2)}
+.btn-p{background:var(--grad-gold);color:#050a14;box-shadow:0 12px 32px rgba(0,212,255,.5)}
+.btn-s{background:rgba(0,212,255,.10);color:var(--gold);border:1px solid var(--border2)}
 .btn-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;box-shadow:0 8px 24px rgba(37,211,102,.4)}
 .footer{margin-top:24px;padding-top:20px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)}
-.footer b{background:linear-gradient(90deg,#FFD700,#FFF3B0,#D4AF37,#FFD700);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 3s infinite;font-weight:900}
+.footer b{background:linear-gradient(90deg,#00ffff,#a0e8ff,#00d4ff,#00ffff);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 3s infinite;font-weight:900}
 </style>
 </head>
 <body>
@@ -32,43 +33,31 @@ body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 
   <div class="title">حسابك محظور</div>
   <div class="msg">لا يمكنك الوصول للمنصة حاليًا</div>
   <div class="reason" id="reasonBox">سبب الحظر: انتهاك سياسة المنصة</div>
-  <div style="font-size:13px;color:var(--muted);margin-bottom:20px">
-    للاستفسار أو طلب فك الحظر، تواصل مع الإدارة
-  </div>
-  <a href="https://wa.me/201128351702?text=مرحباً،%20أريد%20الاستفسار%20عن%20حظر%20حسابي" target="_blank" class="btn btn-wa">
-    💬 تواصل عبر واتساب
-  </a>
-  <a href="/auth/login.html" class="btn btn-s">
-    ← العودة لتسجيل الدخول
-  </a>
+  <div style="font-size:13px;color:var(--muted);margin-bottom:20px">للاستفسار أو طلب فك الحظر، تواصل مع الإدارة</div>
+  <a href="https://wa.me/201128351702?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D8%8C%20%D8%A3%D8%B1%D9%8A%D8%AF%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%AD%D8%B8%D8%B1%20%D8%AD%D8%B3%D8%A7%D8%A8%D9%8A" target="_blank" rel="noopener noreferrer" class="btn btn-wa">💬 تواصل عبر واتساب</a>
+  <a href="/auth/login.html" class="btn btn-s">← العودة لتسجيل الدخول</a>
   <div class="footer">Developed by <b>EL-sayed Hasan</b></div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/db.js"></script>
 <script>
 (function(){
-  try {
-    const raw = localStorage.getItem('mission_session');
-    if (raw) {
-      const s = JSON.parse(raw);
-      if (s && s.userId) {
-        fetch('/db.js').then(() => {
-          const check = async () => {
-            if (!window.MissionDB) return setTimeout(check, 100);
-            const u = await MissionDB.getUser(s.userId);
-            if (u && u.ban_reason) {
-              document.getElementById('reasonBox').textContent = 'سبب الحظر: ' + u.ban_reason;
-            }
-            MissionDB.clearSession();
-          };
-          check();
-        }).catch(() => {});
+  'use strict';
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  (async()=>{
+    try{
+      const raw = localStorage.getItem('mission_session');
+      if(raw){
+        const s = JSON.parse(raw);
+        if(s && s.userId){
+          const u = await MissionDB.getUser(s.userId);
+          if(u && u.ban_reason){ document.getElementById('reasonBox').textContent = 'سبب الحظر: ' + esc(u.ban_reason); }
+        }
       }
-    }
-  } catch(e) {}
-  setTimeout(() => { try { localStorage.removeItem('mission_session'); } catch(e) {} }, 3000);
+    }catch(e){}
+    setTimeout(()=>{ try{ localStorage.removeItem('mission_session'); }catch(e){} }, 5000);
+  })();
 })();
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>window.SUPABASE_URL='YOUR_SUPABASE_URL';window.SUPABASE_ANON_KEY='YOUR_SUPABASE_ANON_KEY';</script>
-<script src="/db.js"></script>
 </body>
 </html>

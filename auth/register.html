@@ -3,46 +3,49 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="theme-color" content="#0a0805" />
+<meta name="theme-color" content="#050a14" />
 <title>MISSION EDU — حساب جديد</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <link rel="icon" type="image/png" href="/logo.png">
 <style>
-:root{--bg:#0a0805;--gold:#D4AF37;--gold-l:#FFD700;--gold-d:#8B6914;--border:rgba(212,175,55,.18);--border2:rgba(212,175,55,.38);--txt:#f7f0dd;--txt2:#d4c79a;--muted:#8a7d55;--red:#ef4444;--grad-gold:linear-gradient(135deg,#FFD700 0%,#D4AF37 45%,#B8860B 100%)}
+:root{--bg:#050a14;--bg2:#0a1220;--gold:#00d4ff;--gold-l:#00ffff;--gold-d:#0088cc;--gold-soft:#a0e8ff;--border:rgba(0,212,255,.18);--border2:rgba(0,212,255,.38);--txt:#e0f7ff;--txt2:#8fd4ee;--muted:#4a7a99;--red:#ef4444;--green:#22c55e;--grad-gold:linear-gradient(135deg,#00ffff 0%,#00d4ff 45%,#0088cc 100%)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(212,175,55,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(184,134,11,.14),transparent 60%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;display:grid;place-items:center;padding:20px;line-height:1.7}
-.auth-card{width:100%;max-width:500px;background:linear-gradient(180deg,rgba(28,22,12,.92),rgba(15,12,7,.88));border:1px solid var(--border2);border-radius:24px;padding:36px 30px;box-shadow:0 30px 80px rgba(0,0,0,.85);backdrop-filter:blur(20px);animation:pu .5s;position:relative}
+html,body{overflow-x:hidden;max-width:100vw;width:100%}
+body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(0,212,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(0,150,255,.14),transparent 60%),radial-gradient(700px 400px at 50% 110%,rgba(0,255,255,.08),transparent 70%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;display:grid;place-items:center;padding:20px;line-height:1.7}
+.auth-card{width:100%;max-width:500px;background:linear-gradient(180deg,rgba(10,18,32,.92),rgba(5,10,20,.88));border:1px solid var(--border2);border-radius:24px;padding:36px 30px;box-shadow:0 30px 80px rgba(0,0,0,.85);backdrop-filter:blur(20px);animation:pu .5s;position:relative}
 @keyframes pu{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
 @keyframes sp{to{transform:rotate(360deg)}}
 @keyframes goldShine{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 .brand{display:flex;align-items:center;gap:14px;margin-bottom:28px;justify-content:center}
-.brand-logo{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;background:var(--grad-gold);box-shadow:0 12px 32px rgba(212,175,55,.6)}
-.brand-name{font-weight:900;font-size:22px;background:linear-gradient(100deg,#FFD700,#FFF3B0 45%,#D4AF37 90%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 4s infinite}
+.brand-logo{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;background:var(--grad-gold);box-shadow:0 12px 32px rgba(0,212,255,.6)}
+.brand-name{font-weight:900;font-size:22px;background:linear-gradient(100deg,#00ffff,#a0e8ff 45%,#00d4ff 90%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 4s infinite}
 .brand-sub{font-size:11px;color:var(--muted);font-weight:600}
-.title{font-size:24px;font-weight:900;text-align:center;margin-bottom:8px;background:linear-gradient(100deg,#FFD700,#FFF3B0 50%,#D4AF37 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.title{font-size:24px;font-weight:900;text-align:center;margin-bottom:8px;background:linear-gradient(100deg,#00ffff,#a0e8ff 50%,#00d4ff 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .subtitle{text-align:center;color:var(--muted);font-size:13px;margin-bottom:26px}
 .field{margin-bottom:14px}
 .lbl{display:block;font-size:13px;font-weight:700;color:var(--txt2);margin-bottom:6px}
-.input,select.input{width:100%;padding:12px 14px;border-radius:14px;background:rgba(15,12,7,.85);border:1.5px solid var(--border);outline:none;font-size:14px;color:var(--txt);transition:.22s;font-family:inherit}
-.input:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(212,175,55,.14)}
+.input,select.input{width:100%;padding:12px 14px;border-radius:14px;background:rgba(5,10,20,.85);border:1.5px solid var(--border);outline:none;font-size:14px;color:var(--txt);transition:.22s;font-family:inherit}
+.input:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(0,212,255,.14)}
 .input::placeholder{color:var(--muted)}
-select.input{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23D4AF37' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:left 14px center;padding-left:38px}
+select.input{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2300d4ff' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:left 14px center;padding-left:38px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .btn{width:100%;padding:14px;border-radius:14px;font-weight:800;font-size:15px;cursor:pointer;transition:.24s;font-family:inherit;border:none;display:flex;align-items:center;justify-content:center;gap:10px;min-height:52px;margin-top:8px}
-.btn-p{background:var(--grad-gold);color:#1a1206;box-shadow:0 12px 32px rgba(212,175,55,.5)}
-.btn-p:hover{box-shadow:0 16px 40px rgba(212,175,55,.7);transform:translateY(-2px)}
-.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-p{background:var(--grad-gold);color:#050a14;box-shadow:0 12px 32px rgba(0,212,255,.5)}
+.btn-p:hover{box-shadow:0 16px 40px rgba(0,212,255,.7);transform:translateY(-2px)}
+.btn-p:disabled{opacity:.5;cursor:not-allowed;transform:none}
 .link{color:var(--gold);text-decoration:none;font-weight:700;font-size:13px}
 .link:hover{color:var(--gold-l)}
 .error-msg{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);color:#fca5a5;padding:12px 16px;border-radius:12px;font-size:13px;margin-bottom:16px;display:none}
 .error-msg.show{display:block;animation:shake .4s}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
-.spinner{width:20px;height:20px;border:2.5px solid rgba(26,18,6,.3);border-top-color:#1a1206;border-radius:50%;animation:sp .8s linear infinite}
+.strength-bar{height:4px;border-radius:2px;background:rgba(255,255,255,.08);margin-top:6px;overflow:hidden}
+.strength-fill{height:100%;transition:.3s;width:0%}
+.spinner{width:20px;height:20px;border:2.5px solid rgba(5,10,20,.3);border-top-color:#050a14;border-radius:50%;animation:sp .8s linear infinite}
 .footer-dev{margin-top:26px;text-align:center;padding-top:20px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)}
-.footer-dev b{background:linear-gradient(90deg,#FFD700,#FFF3B0,#D4AF37,#FFD700);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 3s infinite;font-weight:900}
-.swal-custom-popup{border:1px solid rgba(212,175,55,.4)!important;border-radius:22px!important;font-family:'Tajawal','Cairo',sans-serif!important}
+.footer-dev b{background:linear-gradient(90deg,#00ffff,#a0e8ff,#00d4ff,#00ffff);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 3s infinite;font-weight:900}
+.swal-custom-popup{border:1px solid rgba(0,212,255,.4)!important;border-radius:22px!important;font-family:'Tajawal','Cairo',sans-serif!important}
 @media(max-width:480px){.auth-card{padding:28px 22px}.row{grid-template-columns:1fr}}
 </style>
 </head>
@@ -50,7 +53,7 @@ select.input{cursor:pointer;appearance:none;background-image:url("data:image/svg
 <div class="auth-card">
   <div class="brand">
     <div class="brand-logo">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1a1206" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#050a14" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
       </svg>
     </div>
@@ -65,15 +68,15 @@ select.input{cursor:pointer;appearance:none;background-image:url("data:image/svg
 
   <div class="error-msg" id="errorMsg"></div>
 
-  <form id="registerForm" novalidate>
+  <form id="registerForm" novalidate autocomplete="on">
     <div class="field">
-      <label class="lbl">الاسم الكامل *</label>
-      <input type="text" class="input" id="name" placeholder="اسمك الثلاثي" autocomplete="name" required maxlength="100"/>
+      <label class="lbl" for="name">الاسم الكامل *</label>
+      <input type="text" class="input" id="name" placeholder="اسمك الثلاثي" autocomplete="name" required maxlength="60" minlength="3"/>
     </div>
 
     <div class="row">
       <div class="field">
-        <label class="lbl">كود الدولة</label>
+        <label class="lbl" for="countryCode">كود الدولة</label>
         <select class="input" id="countryCode">
           <option value="+20">🇪🇬 +20</option>
           <option value="+966">🇸🇦 +966</option>
@@ -87,24 +90,25 @@ select.input{cursor:pointer;appearance:none;background-image:url("data:image/svg
         </select>
       </div>
       <div class="field">
-        <label class="lbl">رقم الهاتف *</label>
-        <input type="tel" class="input" id="phone" placeholder="1xxxxxxxxx" inputmode="numeric" autocomplete="tel" required/>
+        <label class="lbl" for="phone">رقم الهاتف *</label>
+        <input type="tel" class="input" id="phone" placeholder="1xxxxxxxxx" inputmode="numeric" autocomplete="tel" required maxlength="15"/>
       </div>
     </div>
 
     <div class="field">
-      <label class="lbl">كلمة المرور *</label>
-      <input type="password" class="input" id="password" placeholder="6 أحرف على الأقل" autocomplete="new-password" minlength="6" required/>
+      <label class="lbl" for="password">كلمة المرور *</label>
+      <input type="password" class="input" id="password" placeholder="6 أحرف على الأقل" autocomplete="new-password" minlength="6" maxlength="128" required/>
+      <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
     </div>
 
     <div class="field">
-      <label class="lbl">تأكيد كلمة المرور *</label>
-      <input type="password" class="input" id="passwordConfirm" placeholder="أعد كتابة كلمة المرور" autocomplete="new-password" minlength="6" required/>
+      <label class="lbl" for="passwordConfirm">تأكيد كلمة المرور *</label>
+      <input type="password" class="input" id="passwordConfirm" placeholder="أعد كتابة كلمة المرور" autocomplete="new-password" minlength="6" maxlength="128" required/>
     </div>
 
     <div class="row">
       <div class="field">
-        <label class="lbl">النوع *</label>
+        <label class="lbl" for="gender">النوع *</label>
         <select class="input" id="gender" required>
           <option value="">اختر</option>
           <option value="male">👦 ذكر</option>
@@ -112,7 +116,7 @@ select.input{cursor:pointer;appearance:none;background-image:url("data:image/svg
         </select>
       </div>
       <div class="field">
-        <label class="lbl">الصف الدراسي</label>
+        <label class="lbl" for="gradeId">الصف الدراسي</label>
         <select class="input" id="gradeId">
           <option value="">اختر</option>
         </select>
@@ -120,7 +124,7 @@ select.input{cursor:pointer;appearance:none;background-image:url("data:image/svg
     </div>
 
     <div class="field">
-      <label class="lbl">المحافظة</label>
+      <label class="lbl" for="governorate">المحافظة</label>
       <select class="input" id="governorate">
         <option value="">— بدون —</option>
         <option>القاهرة</option><option>الجيزة</option><option>الإسكندرية</option>
@@ -133,6 +137,11 @@ select.input{cursor:pointer;appearance:none;background-image:url("data:image/svg
         <option>أسوان</option><option>البحر الأحمر</option><option>الوادي الجديد</option>
         <option>مطروح</option><option>شمال سيناء</option><option>جنوب سيناء</option>
       </select>
+    </div>
+
+    <div class="field">
+      <label class="lbl" for="schoolName">اسم المدرسة</label>
+      <input type="text" class="input" id="schoolName" placeholder="اسم مدرستك" maxlength="100"/>
     </div>
 
     <button type="submit" class="btn btn-p" id="submitBtn">
@@ -148,57 +157,81 @@ select.input{cursor:pointer;appearance:none;background-image:url("data:image/svg
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>window.SUPABASE_URL='YOUR_SUPABASE_URL';window.SUPABASE_ANON_KEY='YOUR_SUPABASE_ANON_KEY';</script>
 <script src="/db.js"></script>
 <script>
 (function(){
   'use strict';
+  
+  const SECURITY = {
+    esc: s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),
+    clean: s => String(s ?? '').replace(/[<>]/g,'').replace(/\s+/g,' ').trim(),
+    isPhone: s => /^\d{8,15}$/.test(String(s||'')),
+    isName: s => /^[\u0600-\u06FFa-zA-Z\s]{3,60}$/.test(String(s||'')),
+    sleep: ms => new Promise(r => setTimeout(r, ms))
+  };
+  
+  const RATE_LIMIT_KEY = 'register_attempts';
+  const MAX_ATTEMPTS = 3;
+  const WINDOW = 60 * 60 * 1000;
+
+  function checkRateLimit(){
+    try{
+      const data = JSON.parse(localStorage.getItem(RATE_LIMIT_KEY) || '{}');
+      const now = Date.now();
+      if(data.resetAt && data.resetAt > now && data.count >= MAX_ATTEMPTS) return false;
+      if(!data.resetAt || data.resetAt < now){
+        localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify({count: 1, resetAt: now + WINDOW}));
+      } else {
+        data.count++;
+        localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(data));
+      }
+      return true;
+    }catch(e){ return true; }
+  }
+
   const form = document.getElementById('registerForm');
   const errorMsg = document.getElementById('errorMsg');
   const submitBtn = document.getElementById('submitBtn');
   const btnText = document.getElementById('btnText');
+  const strengthFill = document.getElementById('strengthFill');
+
+  function showError(msg){ errorMsg.textContent = SECURITY.clean(msg); errorMsg.classList.add('show'); setTimeout(()=>errorMsg.classList.remove('show'), 6000); window.scrollTo({top: 0, behavior: 'smooth'}); }
+  function setLoading(l){ submitBtn.disabled = l; btnText.textContent = l ? 'جارٍ إنشاء الحساب...' : 'إنشاء الحساب'; if(l && !document.getElementById('bs')){ const sp = document.createElement('span'); sp.className = 'spinner'; sp.id = 'bs'; submitBtn.prepend(sp); } else if(!l){ const sp = document.getElementById('bs'); if(sp) sp.remove(); } }
 
   MissionDB.getClient().then(async sb => {
-    try {
+    try{
       const { data } = await sb.from('grades').select('id,name').order('sort_order');
-      if (data) {
+      if(data){
         const sel = document.getElementById('gradeId');
-        data.forEach(g => {
-          const o = document.createElement('option');
-          o.value = g.id; o.textContent = g.name;
-          sel.appendChild(o);
-        });
+        data.forEach(g => { const o = document.createElement('option'); o.value = SECURITY.clean(g.id); o.textContent = SECURITY.clean(g.name); sel.appendChild(o); });
       }
-    } catch(e) {}
+    }catch(e){}
   });
 
-  function showError(msg) {
-    errorMsg.textContent = msg;
-    errorMsg.classList.add('show');
-    setTimeout(() => errorMsg.classList.remove('show'), 6000);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-  function setLoading(l) {
-    submitBtn.disabled = l;
-    btnText.textContent = l ? 'جارٍ إنشاء الحساب...' : 'إنشاء الحساب';
-    if (l && !document.getElementById('bs')) {
-      const sp = document.createElement('span');
-      sp.className='spinner'; sp.id='bs';
-      submitBtn.prepend(sp);
-    } else if (!l) {
-      const sp = document.getElementById('bs'); if (sp) sp.remove();
-    }
-  }
+  document.getElementById('phone').addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 15); });
 
-  document.getElementById('phone').addEventListener('input', e => {
-    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 15);
+  document.getElementById('password').addEventListener('input', e => {
+    const p = e.target.value;
+    let score = 0;
+    if(p.length >= 6) score++;
+    if(p.length >= 10) score++;
+    if(/[a-z]/.test(p)) score++;
+    if(/[A-Z]/.test(p)) score++;
+    if(/\d/.test(p)) score++;
+    if(/[^a-zA-Z0-9]/.test(p)) score++;
+    const pct = (score / 6) * 100;
+    const colors = ['#ef4444','#f59e0b','#f59e0b','#22c55e','#22c55e','#00ffff'];
+    strengthFill.style.width = pct + '%';
+    strengthFill.style.background = colors[Math.min(score, 5)];
   });
 
   form.addEventListener('submit', async e => {
     e.preventDefault();
     errorMsg.classList.remove('show');
 
-    const name = document.getElementById('name').value.trim();
+    if(!checkRateLimit()) return showError('عدد محاولات التسجيل تجاوز الحد — حاول لاحقًا');
+
+    const name = SECURITY.clean(document.getElementById('name').value);
     const countryCode = document.getElementById('countryCode').value;
     const phone = document.getElementById('phone').value.replace(/\D/g, '');
     const password = document.getElementById('password').value;
@@ -206,30 +239,25 @@ select.input{cursor:pointer;appearance:none;background-image:url("data:image/svg
     const gender = document.getElementById('gender').value;
     const gradeId = document.getElementById('gradeId').value || null;
     const governorate = document.getElementById('governorate').value || null;
+    const schoolName = SECURITY.clean(document.getElementById('schoolName').value);
 
-    if (!name || name.length < 3) return showError('الاسم يجب أن يكون 3 أحرف على الأقل');
-    if (!phone || phone.length < 8) return showError('رقم الهاتف غير صحيح');
-    if (!password || password.length < 6) return showError('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
-    if (password !== passwordConfirm) return showError('كلمتا المرور غير متطابقتين');
-    if (!gender) return showError('اختر النوع');
+    if(!SECURITY.isName(name)) return showError('الاسم يجب أن يكون 3-60 حرفًا (عربي أو إنجليزي)');
+    if(!SECURITY.isPhone(phone)) return showError('رقم الهاتف غير صحيح');
+    if(!password || password.length < 6) return showError('كلمة المرور 6 أحرف على الأقل');
+    if(password.length > 128) return showError('كلمة المرور طويلة جدًا');
+    if(password !== passwordConfirm) return showError('كلمتا المرور غير متطابقتين');
+    if(!gender) return showError('اختر النوع');
+    if(schoolName.length > 100) return showError('اسم المدرسة طويل جدًا');
 
     setLoading(true);
-    try {
-      const user = await MissionDB.createUser({
-        name, phone, country_code: countryCode, password,
-        gender, grade_id: gradeId, governorate
-      });
+    await SECURITY.sleep(500);
+
+    try{
+      const user = await MissionDB.createUser({name, phone, country_code: countryCode, password, gender, grade_id: gradeId, governorate, school_name: schoolName || null});
       MissionDB.setSession(user.id);
-      try {
-        const sb = await MissionDB.getClient();
-        await sb.from('activity').insert([{
-          id: MissionDB.uid('act_'),
-          user_id: user.id, user_name: user.name,
-          type: 'register', target: null, at: Date.now()
-        }]);
-      } catch(e) {}
+      try{ const sb = await MissionDB.getClient(); await sb.from('activity').insert([{id: MissionDB.uid('act_'), user_id: user.id, user_name: user.name, type: 'register', target: null, at: Date.now()}]); }catch(e){}
       window.location.replace('/student/index.html');
-    } catch (err) {
+    } catch(err) {
       setLoading(false);
       showError(err.message || 'فشل إنشاء الحساب');
     }
