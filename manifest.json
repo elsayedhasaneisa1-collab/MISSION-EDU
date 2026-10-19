@@ -1,18 +1,49 @@
 {
-  "name": "MISSION EDU — منصة المهام التعليمية",
+  "name": "MISSION EDU — منصة تعليمية متكاملة",
   "short_name": "MISSION EDU",
-  "description": "منصة تعليمية تحوّل المنهج إلى مهام وتحديات — تابع تقدمك، اختبر نفسك، وطوّر مستواك خطوة بخطوة.",
-  "lang": "ar",
-  "dir": "rtl",
-  "start_url": "/",
+  "description": "منصة تعليمية عربية متكاملة للطلاب — دروس، اختبارات، شهادات، وتحديات",
+  "start_url": "/auth/login.html",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#04060e",
-  "theme_color": "#04060e",
-  "categories": ["education", "productivity"],
+  "background_color": "#0a0805",
+  "theme_color": "#0a0805",
+  "lang": "ar",
+  "dir": "rtl",
+  "id": "/",
   "prefer_related_applications": false,
+  "categories": ["education", "productivity"],
   "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/logo.png",
       "sizes": "192x192",
@@ -21,23 +52,80 @@
     },
     {
       "src": "/logo.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/logo.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "الرئيسية"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "الدروس"
     }
   ],
   "shortcuts": [
     {
-      "name": "الرئيسية",
-      "short_name": "الرئيسية",
-      "url": "/",
+      "name": "الدروس",
+      "short_name": "الدروس",
+      "description": "فتح قائمة الدروس",
+      "url": "/student/index.html",
       "icons": [{ "src": "/logo.png", "sizes": "192x192" }]
     },
     {
-      "name": "تسجيل الدخول",
-      "short_name": "الدخول",
-      "url": "/auth/login.html",
+      "name": "الاختبارات",
+      "short_name": "اختبارات",
+      "description": "فتح الاختبارات",
+      "url": "/student/index.html",
+      "icons": [{ "src": "/logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "لوحة الإدارة",
+      "short_name": "الإدارة",
+      "description": "لوحة تحكم الأدمن",
+      "url": "/index.html",
       "icons": [{ "src": "/logo.png", "sizes": "192x192" }]
     }
-  ]
+  ],
+  "share_target": {
+    "action": "/student/index.html",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "protocol_handlers": [],
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
 }
