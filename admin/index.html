@@ -1522,7 +1522,8 @@ function ReportsPage(){
   const load=useCallback(async()=>{
     setLoading(true);
     try{
-      const data=await DB.getAdminReports?.(filter) || null;
+      const data = await DB.getAdminReports(filter, app.currentUser.id);
+setReports(data || []);
       if(data){ setReports(data); }
       else{
         // fallback: قراءة مباشرة (تشتغل لو الأدمن عنده RLS access)
@@ -1541,13 +1542,14 @@ function ReportsPage(){
     try{
       const sb=await DB.getClient();
       const {data,error}=await sb.rpc('admin_review_report',{
-        p_report_id:reportId,
-        p_status:status,
-        p_action:action||null,
-        p_notes:null,
-        p_ban_target:!!banTarget,
-        p_ban_reason:banReason||null
-      });
+  p_report_id: reportId,
+  p_admin_id: app.currentUser.id,
+  p_status: status,
+  p_action: action || null,
+  p_notes: null,
+  p_ban_target: !!banTarget,
+  p_ban_reason: banReason || null
+});
       if(error)throw new Error(error.message);
       app.toast.ok(banTarget?'✅ تم الحظر':'✅ تم تحديث البلاغ');
       await load();
