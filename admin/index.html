@@ -431,7 +431,14 @@ function Crud({title,collection,defaultItem,fields,columns}){
     {editing!==null&&<Modal title={editing==='new'?`${title} — جديد`:`${title} — تعديل`} onClose={()=>setEditing(null)} wide>
       {fields.map(f=>{const val=form[f.key]??'';
         if(f.type==='textarea') return <Field key={f.key} label={f.label}><textarea className="input" rows="4" value={val} onChange={e=>setForm({...form,[f.key]:e.target.value})}/></Field>;
-        if(f.type==='select') return <Field key={f.key} label={f.label}><select className="input" value={val} onChange={e=>setForm({...form,[f.key]:e.target.value})}>{(f.options||[]).map(o=><option key={o.value} value={o.value}>{o.label}</option>)}</select></Field>;
+        if(f.type==='select') return (
+  <Field key={f.key} label={f.label}>
+    <select className="input" value={val} onChange={e=>setForm({...form,[f.key]:e.target.value})}>
+      <option value="">— اختر —</option>
+      {(f.options||[]).map(o=><option key={o.value} value={o.value}>{o.label}</option>)}
+    </select>
+  </Field>
+);
         if(f.type==='number') return <Field key={f.key} label={f.label}><input type="number" className="input" value={val} onChange={e=>setForm({...form,[f.key]:e.target.value===''?'':+e.target.value})}/></Field>;
         return <Field key={f.key} label={f.label}><input className="input" value={val} onChange={e=>setForm({...form,[f.key]:e.target.value})}/></Field>;
       })}
