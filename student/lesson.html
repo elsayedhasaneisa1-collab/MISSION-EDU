@@ -635,7 +635,10 @@ function render(){
 
       try{
         const sb = await DB.getClient();
-        const { data, error } = await sb.rpc('complete_lesson', { p_lesson_id: l.id });
+        const { data, error } = await sb.rpc('complete_lesson', { 
+  p_lesson_id: l.id,
+  p_user_id: u.id
+});
         if(error) throw new Error(error.message);
 
         if(data.already_completed){

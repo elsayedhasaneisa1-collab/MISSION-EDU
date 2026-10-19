@@ -760,7 +760,8 @@ async function cancelExam(reason){
     const { data, error } = await sb.rpc('cancel_exam', {
       p_exam_id: state.exam.id,
       p_started_at: state.startedAt || Date.now(),
-      p_reason: reason || 'unknown'
+      p_reason: reason || 'unknown',
+      p_user_id: state.user.id
     });
     if(!error && data) durationSeconds = data.duration_seconds || 0;
     else durationSeconds = state.startedAt ? Math.max(0, Math.floor((Date.now() - state.startedAt)/1000)) : 0;
@@ -820,7 +821,8 @@ async function submitExam(){
     const { data, error } = await sb.rpc('submit_exam', {
       p_exam_id: state.exam.id,
       p_answers: answersPayload,
-      p_started_at: state.startedAt || Date.now()
+      p_started_at: state.startedAt || Date.now(),
+      p_user_id: state.user.id
     });
 
     if(error) throw new Error(error.message);
