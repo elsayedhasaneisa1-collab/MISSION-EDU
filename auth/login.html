@@ -32,13 +32,15 @@ body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 
 .input{width:100%;padding:13px 16px;border-radius:14px;background:rgba(5,10,20,.85);border:1.5px solid var(--border);outline:none;font-size:15px;color:var(--txt);transition:.22s;font-family:inherit}
 .input:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(0,212,255,.14)}
 .input::placeholder{color:var(--muted)}
-.input:disabled{opacity:.5;cursor:not-allowed}
 .btn{width:100%;padding:14px;border-radius:14px;font-weight:800;font-size:15px;cursor:pointer;transition:.24s;font-family:inherit;border:none;display:flex;align-items:center;justify-content:center;gap:10px;min-height:52px}
 .btn-p{background:var(--grad-gold);color:#050a14;box-shadow:0 12px 32px rgba(0,212,255,.5);position:relative;overflow:hidden}
 .btn-p::before{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent,rgba(255,255,255,.4),transparent);transform:translateX(-100%);transition:transform .7s}
 .btn-p:hover::before{transform:translateX(100%)}
 .btn-p:hover{box-shadow:0 16px 40px rgba(0,212,255,.7);transform:translateY(-2px)}
 .btn-p:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;box-shadow:0 8px 24px rgba(37,211,102,.4);text-decoration:none;display:flex;margin-top:12px}
+.btn-wa:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(37,211,102,.6)}
+.btn-wa svg{width:20px;height:20px;flex-shrink:0}
 .link{color:var(--gold);text-decoration:none;font-weight:700;font-size:13px;transition:.2s}
 .link:hover{color:var(--gold-l)}
 .divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-size:12px}
@@ -46,8 +48,6 @@ body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 
 .spinner{width:20px;height:20px;border:2.5px solid rgba(5,10,20,.3);border-top-color:#050a14;border-radius:50%;animation:sp .8s linear infinite}
 .error-msg{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);color:#fca5a5;padding:12px 16px;border-radius:12px;font-size:13px;margin-bottom:16px;display:none}
 .error-msg.show{display:block;animation:shake .4s}
-.info-msg{background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.4);color:#a0e8ff;padding:12px 16px;border-radius:12px;font-size:13px;margin-bottom:16px;display:none}
-.info-msg.show{display:block}
 .footer-dev{margin-top:26px;text-align:center;padding-top:20px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)}
 .footer-dev b{background:linear-gradient(90deg,#00ffff,#a0e8ff,#00d4ff,#00ffff);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 3s linear infinite;font-weight:900}
 .swal-custom-popup{border:1px solid rgba(0,212,255,.4)!important;border-radius:22px!important;font-family:'Tajawal','Cairo',sans-serif!important}
@@ -74,7 +74,6 @@ body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 
   <div class="subtitle">أهلاً بك مرة أخرى 👋</div>
 
   <div class="error-msg" id="errorMsg"></div>
-  <div class="info-msg" id="infoMsg"></div>
 
   <form id="loginForm" novalidate autocomplete="on">
     <div class="field">
@@ -95,8 +94,13 @@ body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 
   <div style="text-align:center;font-size:13px;color:var(--muted)">
     ليس لديك حساب؟ <a href="/auth/register.html" class="link">سجّل الآن</a>
     <br><br>
-    <a href="/auth/forgot-password.html" class="link" style="font-size:12px">نسيت كلمة المرور؟</a>
+    <span style="font-size:12px">نسيت كلمة المرور؟ تواصل مع الإدارة عبر واتساب</span>
   </div>
+
+  <a href="https://wa.me/201128351702?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D8%8C%20%D8%A3%D8%AD%D8%AA%D8%A7%D8%AC%20%D9%85%D8%B3%D8%A7%D8%B9%D8%AF%D8%A9%20%D9%81%D9%8A%20%D8%A7%D9%84%D9%85%D9%86%D8%B5%D8%A9" target="_blank" rel="noopener noreferrer" class="btn btn-wa">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+    تواصل مع الإدارة
+  </a>
 
   <div class="footer-dev">Developed by <b>EL-sayed Hasan</b></div>
 </div>
@@ -106,20 +110,16 @@ body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 
 <script>
 (function(){
   'use strict';
-  
   const RATE_LIMIT_KEY = 'login_attempts';
   const LOCKOUT_KEY = 'login_lockout';
   const MAX_ATTEMPTS = 5;
   const LOCKOUT_DURATION = 15 * 60 * 1000;
   const WINDOW_DURATION = 10 * 60 * 1000;
-
   const SECURITY = {
-    esc: s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),
     clean: s => String(s ?? '').replace(/[<>]/g,'').trim(),
-    isPhone: s => /^\+?\d{8,15}$/.test(String(s||'').replace(/\s/g,'')),
+    isPhone: s => /^\d{8,15}$/.test(String(s||'').replace(/\s/g,'')),
     sleep: ms => new Promise(r => setTimeout(r, ms))
   };
-
   function getAttempts(){
     try{
       const data = JSON.parse(localStorage.getItem(RATE_LIMIT_KEY) || '{}');
@@ -129,20 +129,15 @@ body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 
       return filtered;
     }catch(e){ return {}; }
   }
-
   function recordAttempt(phone){
     const attempts = getAttempts();
     const key = 'phone_' + phone.slice(-4);
     const now = Date.now();
-    if(!attempts[key] || attempts[key].resetAt < now){
-      attempts[key] = {count: 1, resetAt: now + WINDOW_DURATION};
-    } else {
-      attempts[key].count++;
-    }
+    if(!attempts[key] || attempts[key].resetAt < now){ attempts[key] = {count: 1, resetAt: now + WINDOW_DURATION}; }
+    else { attempts[key].count++; }
     try{ localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(attempts)); }catch(e){}
     return attempts[key];
   }
-
   function getLockout(){
     try{
       const data = JSON.parse(localStorage.getItem(LOCKOUT_KEY) || '{}');
@@ -151,68 +146,37 @@ body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 
       return null;
     }catch(e){ return null; }
   }
-
-  function setLockout(duration){
-    try{ localStorage.setItem(LOCKOUT_KEY, JSON.stringify({until: Date.now() + duration})); }catch(e){}
-  }
-
+  function setLockout(duration){ try{ localStorage.setItem(LOCKOUT_KEY, JSON.stringify({until: Date.now() + duration})); }catch(e){} }
   const form = document.getElementById('loginForm');
   const phoneInput = document.getElementById('phone');
   const passInput = document.getElementById('password');
   const submitBtn = document.getElementById('submitBtn');
   const btnText = document.getElementById('btnText');
   const errorMsg = document.getElementById('errorMsg');
-  const infoMsg = document.getElementById('infoMsg');
-
-  function showError(msg){ errorMsg.textContent = SECURITY.clean(msg); errorMsg.classList.add('show'); infoMsg.classList.remove('show'); setTimeout(()=>errorMsg.classList.remove('show'), 6000); }
-  function showInfo(msg){ infoMsg.textContent = SECURITY.clean(msg); infoMsg.classList.add('show'); errorMsg.classList.remove('show'); }
+  function showError(msg){ errorMsg.textContent = SECURITY.clean(msg); errorMsg.classList.add('show'); setTimeout(()=>errorMsg.classList.remove('show'), 6000); }
   function setLoading(l){ submitBtn.disabled = l; btnText.textContent = l ? 'جارٍ الدخول...' : 'دخول'; if(l && !document.getElementById('btnSpinner')){ const sp = document.createElement('span'); sp.className = 'spinner'; sp.id = 'btnSpinner'; submitBtn.prepend(sp); } else if(!l){ const sp = document.getElementById('btnSpinner'); if(sp) sp.remove(); } }
-
   const lockout = getLockout();
   if(lockout){
     form.style.display = 'none';
     const remaining = Math.ceil((lockout.until - Date.now()) / 1000);
     const lockDiv = document.createElement('div');
-    lockDiv.innerHTML = `<div style="text-align:center;padding:20px 0">
-      <div style="font-size:48px;margin-bottom:12px">🔒</div>
-      <div style="font-weight:800;color:#fca5a5;margin-bottom:8px">الحساب مُقفل مؤقتًا</div>
-      <div class="xs muted mb12">تم تجاوز عدد المحاولات المسموح</div>
-      <div class="lockout-timer" id="timerDisplay">${Math.floor(remaining/60)}:${String(remaining%60).padStart(2,'0')}</div>
-      <div class="xs muted mt12">حاول مرة أخرى بعد انتهاء الوقت</div>
-    </div>`;
+    lockDiv.innerHTML = `<div style="text-align:center;padding:20px 0"><div style="font-size:48px;margin-bottom:12px">🔒</div><div style="font-weight:800;color:#fca5a5;margin-bottom:8px">الحساب مُقفل مؤقتًا</div><div class="xs muted mb12">تم تجاوز عدد المحاولات المسموح</div><div class="lockout-timer" id="timerDisplay">${Math.floor(remaining/60)}:${String(remaining%60).padStart(2,'0')}</div><div class="xs muted mt12">حاول مرة أخرى بعد انتهاء الوقت</div></div>`;
     form.parentNode.insertBefore(lockDiv, form);
-    const timerInterval = setInterval(()=>{
-      const l = getLockout();
-      if(!l){ clearInterval(timerInterval); window.location.reload(); return; }
-      const r = Math.ceil((l.until - Date.now()) / 1000);
-      const el = document.getElementById('timerDisplay');
-      if(el) el.textContent = `${Math.floor(r/60)}:${String(r%60).padStart(2,'0')}`;
-    }, 1000);
+    const timerInterval = setInterval(()=>{ const l = getLockout(); if(!l){ clearInterval(timerInterval); window.location.reload(); return; } const r = Math.ceil((l.until - Date.now()) / 1000); const el = document.getElementById('timerDisplay'); if(el) el.textContent = `${Math.floor(r/60)}:${String(r%60).padStart(2,'0')}`; }, 1000);
     return;
   }
-
   const existing = MissionDB.getSessionId();
   if(existing){
-    MissionDB.getUser(existing).then(u => {
-      if(u && u.active !== false && !u.banned){
-        window.location.replace(u.role === 'admin' ? '/index.html' : '/student/index.html');
-      }
-    }).catch(() => {});
+    MissionDB.getUser(existing).then(u => { if(u && u.active !== false && !u.banned){ window.location.replace(u.role === 'admin' ? '/index.html' : '/student/index.html'); } }).catch(() => {});
   }
-
   phoneInput.addEventListener('input', e => { e.target.value = e.target.value.replace(/[^\d+]/g, '').slice(0, 15); });
-
   form.addEventListener('submit', async e => {
     e.preventDefault();
     errorMsg.classList.remove('show');
-    infoMsg.classList.remove('show');
-
     const phone = phoneInput.value.replace(/\D/g, '');
     const pass = passInput.value;
-
     if(!SECURITY.isPhone(phone)) return showError('رقم الهاتف غير صحيح');
     if(!pass || pass.length < 6) return showError('كلمة المرور 6 أحرف على الأقل');
-
     const attempts = getAttempts();
     const key = 'phone_' + phone.slice(-4);
     if(attempts[key] && attempts[key].count >= MAX_ATTEMPTS){
@@ -221,36 +185,27 @@ body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 
       setTimeout(() => window.location.reload(), 2000);
       return;
     }
-
     setLoading(true);
     await SECURITY.sleep(600);
-
     try{
       const user = await MissionDB.loginUser(phone, pass);
       localStorage.removeItem(RATE_LIMIT_KEY);
       localStorage.removeItem(LOCKOUT_KEY);
       MissionDB.setSession(user.id);
-      if(user.role === 'admin'){
-        window.location.replace('/index.html');
-      } else {
-        window.location.replace('/student/index.html');
-      }
+      if(user.role === 'admin'){ window.location.replace('/index.html'); }
+      else { window.location.replace('/student/index.html'); }
     } catch(err) {
       setLoading(false);
       const newAttempt = recordAttempt(phone);
       const remaining = MAX_ATTEMPTS - newAttempt.count;
-      if(remaining <= 0){
-        setLockout(LOCKOUT_DURATION);
-        showError('تم قفل الحساب مؤقتًا — حاول بعد 15 دقيقة');
-      } else {
+      if(remaining <= 0){ setLockout(LOCKOUT_DURATION); showError('تم قفل الحساب مؤقتًا — حاول بعد 15 دقيقة'); }
+      else {
         let msg = err.message || 'فشل تسجيل الدخول';
         if(msg.includes('كلمة المرور')) msg = `كلمة المرور غير صحيحة (تبقى ${remaining} محاولات)`;
         else if(msg.includes('غير مسجل')) msg = 'رقم الهاتف غير مسجل';
         showError(msg);
       }
-      if(String(err.message).includes('محظور')){
-        setTimeout(() => { window.location.replace('/auth/banned.html'); }, 1500);
-      }
+      if(String(err.message).includes('محظور')){ setTimeout(() => { window.location.replace('/auth/banned.html'); }, 1500); }
     }
   });
 })();
