@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="theme-color" content="#050a14" />
-<title>MISSION EDU — لوحة الطالب</title>
+<title>MISSION EDU — المنصة التعليمية</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
@@ -50,7 +50,7 @@ ul{list-style:none}
 @keyframes goldShine{0%{background-position:0% 50%}100%{background-position:300% 50%}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 .brand{display:flex;align-items:center;gap:11px;padding:8px 10px 16px}
-.brand-logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--grad-gold);box-shadow:0 8px 26px rgba(0,212,255,.55);position:relative}
+.brand-logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--grad-gold);box-shadow:0 8px 26px rgba(0,212,255,.55),0 0 0 1px rgba(95,251,255,.3) inset;position:relative}
 .brand-name{font-weight:900;font-size:17px;background:linear-gradient(100deg,#00ffff,#a0e8ff 45%,#00d4ff 90%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .brand-sub{font-size:10.5px;color:var(--muted);font-weight:600}
 .nav-i{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:13px;color:var(--txt2);font-size:14px;font-weight:600;transition:.22s;width:100%;text-align:right;position:relative}
@@ -225,7 +225,6 @@ function AppProvider({children}){
   },[]);
   useEffect(()=>{(async ()=>{try{const sid=DB.getSessionId();if(!sid){window.location.replace('../auth/login.html');return;}const u=await DB.getUser(sid);if(!u||u.active===false){DB.clearSession();window.location.replace('../auth/login.html');return;}if(u.banned===true){DB.clearSession();window.location.replace('../auth/banned.html');return;}setCurrentUser(u);if(u.theme==='light'){document.body.classList.add('light-mode');setIsLight(true);}await reload();}catch(e){console.warn(e);}setLoading(false);})();},[]);
   
-  // Push Notifications
   useEffect(()=>{if('Notification' in window && Notification.permission==='default'){Notification.requestPermission();}},[]);
 
   const logout=useCallback(()=>{Swal.fire({title:'تسجيل الخروج',text:'هل أنت متأكد؟',icon:'question',showCancelButton:true,confirmButtonText:'نعم، خروج',cancelButtonText:'إلغاء',confirmButtonColor:'#00d4ff',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #0a1220, #050a14)',color:'#e0f7ff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}}).then(r=>{if(r.isConfirmed){DB.clearSession();window.location.replace('../auth/login.html');}});},[]);
@@ -333,7 +332,6 @@ function HomePage({onNavigate}){
   const today = new Date().toLocaleDateString('en-CA');
   const todayReward = (app.db.daily_reward || []).find(r => r.user_id === user.id && r.date === today);
   
-  // Video Tracking (Last watched)
   const lastVideo = (app.db.video_progress||[]).filter(v=>v.user_id===user.id && v.seconds>0).sort((a,b)=>b.updated_at-a.updated_at)[0];
   const lastLesson = lastVideo ? app.lesson(lastVideo.lesson_id) : null;
 
@@ -518,21 +516,47 @@ function LeaderboardPage(){
   return <><div className="h2 mb16 grad">🏆 لوحة المتصدرين</div>{students.length===0?<div className="glass" style={{padding:30}}><Empty icon="🏆" title="لا طلاب"/></div>:<div className="glass" style={{padding:18}}>{students.slice(0,50).map((s,i)=>{const lvl=app.getLevel(s.xp||0);return <div key={s.id} className="flex center g12" style={{padding:'10px 0',borderBottom:'1px solid rgba(0,212,255,.08)'}}><div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div><StudentAvatar student={s} size={40}/><div style={{flex:1}}><div className="sm" style={{fontWeight:700}}>{SEC.esc(s.name)}</div><div className="xs muted">Lv {lvl.current.level} — {SEC.esc(lvl.current.name)}</div></div><span className="pill pill-b">{DB.fmt(s.xp||0)} XP</span></div>;})}</div>}</>;
 }
 
-function StudentsDirectoryPage(){
+function StudentsDirectoryPage({onChat}){
   const app=useApp();const [q,setQ]=useState('');
   const students=app.db.users.filter(u=>u.role==='student'&&u.banned!==true&&u.id!==app.currentUser.id);
   const filtered=students.filter(s=>s.name.toLowerCase().includes(q.toLowerCase()));
-  return <><div className="h2 mb16 grad">👥 الطلاب</div><div className="glass mb16" style={{padding:14}}><input className="input" placeholder="🔍 ابحث..." value={q} onChange={e=>setQ(e.target.value)}/></div>{filtered.length===0?<div className="glass" style={{padding:30}}><Empty icon="👥" title="لا طلاب"/></div>:<div className="grid g3">{filtered.map(s=>{const lvl=app.getLevel(s.xp||0);return <div key={s.id} className="student-card"><StudentAvatar student={s} size={70}/><div className="h4 mt8">{SEC.esc(s.name)}</div><div className="xs muted">Lv {lvl.current.level}</div><div className="mt8"><span className="pill pill-b">{DB.fmt(s.xp||0)} XP</span></div></div>;})}</div>}</>;
+  return <><div className="h2 mb16 grad">👥 الطلاب</div><div className="glass mb16" style={{padding:14}}><input className="input" placeholder="🔍 ابحث..." value={q} onChange={e=>setQ(e.target.value)}/></div>{filtered.length===0?<div className="glass" style={{padding:30}}><Empty icon="👥" title="لا طلاب"/></div>:<div className="grid g3">{filtered.map(s=>{const lvl=app.getLevel(s.xp||0);return <div key={s.id} className="student-card"><StudentAvatar student={s} size={70}/><div className="h4 mt8">{SEC.esc(s.name)}</div><div className="xs muted">Lv {lvl.current.level}</div><div className="mt8"><span className="pill pill-b">{DB.fmt(s.xp||0)} XP</span></div><button className="btn btn-p btn-sm btn-block mt12" onClick={()=>onChat(s.id)}><Icon name="message" size={14}/> مراسلة</button></div>;})}</div>}</>;
 }
 
-function MessagesPage(){
-  const app=useApp();const user=app.currentUser;const [chatWith,setChatWith]=useState(null);const [text,setText]=useState('');
+function MessagesPage({initialChat,clearChat}){
+  const app=useApp();const user=app.currentUser;const [chatWith,setChatWith]=useState(initialChat||null);const [text,setText]=useState('');
+  
+  useEffect(()=>{ if(initialChat) setChatWith(initialChat); },[initialChat]);
+
   const allMsgs=(app.db.direct_messages||[]);
   const inbox=allMsgs.filter(m=>m.to_id===user.id).sort((a,b)=>b.created_at-a.created_at);
   const conversation=chatWith?allMsgs.filter(m=>(m.from_id===user.id&&m.to_id===chatWith)||(m.from_id===chatWith&&m.to_id===user.id)).sort((a,b)=>a.created_at-b.created_at):[];
   const otherUser=chatWith?app.db.users.find(u=>u.id===chatWith):null;
+  
   const send=async ()=>{const t=SEC.clean(text);if(!t)return;try{await DB.save('direct_messages',{from_id:user.id,to_id:chatWith,text:t,created_at:Date.now(),read:false});setText('');await app.reload();}catch(e){app.toast.err(e.message);}};
-  if(chatWith&&otherUser){return <><div className="flex between center mb16"><button className="btn btn-s" onClick={()=>setChatWith(null)}>← رجوع</button><div className="flex center g8"><StudentAvatar student={otherUser} size={36}/><div className="sm" style={{fontWeight:700}}>{SEC.esc(otherUser.name)}</div></div></div><div className="glass" style={{padding:16}}>{conversation.map(m=><div key={m.id} style={{display:'flex',justifyContent:m.from_id===user.id?'flex-end':'flex-start'}}><div style={{maxWidth:'70%',padding:'10px 14px',borderRadius:14,marginBottom:8,background:m.from_id===user.id?'rgba(0,212,255,.2)':'rgba(255,255,255,.06)'}}>{SEC.esc(m.text)}</div></div>)}<div className="flex g8 mt12"><input className="input" placeholder="اكتب..." value={text} onChange={e=>setText(e.target.value)} onKeyDown={e=>e.key==='Enter'&&send()}/><button className="btn btn-p" onClick={send}><Icon name="send" size={16}/></button></div></div></>;}
+  
+  const goBack = () => {
+     setChatWith(null);
+     if(clearChat) clearChat();
+  };
+
+  if(chatWith&&otherUser){
+    return <>
+      <div className="flex between center mb16">
+        <button className="btn btn-s" onClick={goBack}>← رجوع</button>
+        <div className="flex center g8"><StudentAvatar student={otherUser} size={36}/><div className="sm" style={{fontWeight:700}}>{SEC.esc(otherUser.name)}</div></div>
+      </div>
+      <div className="glass" style={{padding:16}}>
+        <div style={{minHeight:200,maxHeight:400,overflowY:'auto',paddingBottom:10}}>
+          {conversation.length===0? <div className="xs muted text-center" style={{textAlign:'center',padding:20}}>لا رسائل بعد، ابدأ المحادثة</div> : conversation.map(m=><div key={m.id} style={{display:'flex',justifyContent:m.from_id===user.id?'flex-end':'flex-start'}}><div style={{maxWidth:'70%',padding:'10px 14px',borderRadius:14,marginBottom:8,background:m.from_id===user.id?'rgba(0,212,255,.2)':'rgba(255,255,255,.06)'}}>{SEC.esc(m.text)}</div></div>)}
+        </div>
+        <div className="flex g8 mt12">
+          <input className="input" placeholder="اكتب رسالتك هنا..." value={text} onChange={e=>setText(e.target.value)} onKeyDown={e=>e.key==='Enter'&&send()}/>
+          <button className="btn btn-p" onClick={send} style={{whiteSpace:'nowrap'}}><Icon name="send" size={14}/> إرسال</button>
+        </div>
+      </div>
+    </>;
+  }
   return <><div className="h2 mb16 grad">💬 الرسائل</div><div className="glass" style={{padding:16}}>{inbox.length===0?<Empty icon="💬" title="لا رسائل"/>:inbox.map(m=>{const other=app.db.users.find(u=>u.id===m.from_id);return <div key={m.id} className="msg-card" onClick={()=>setChatWith(m.from_id)}><div className="flex between center mb6"><span className="sm" style={{fontWeight:700}}>{SEC.esc(other?.name||'محذوف')}</span><span className="xs muted">{DB.formatDateTime(m.created_at)}</span></div><div className="sm muted">{SEC.esc(m.text)}</div></div>;})}</div></>;
 }
 
@@ -550,19 +574,43 @@ function ProfilePage(){
 
 function Footer(){
   const app=useApp();const user=app.currentUser;
-  const sendReport=async()=>{const {value:msg}=await Swal.fire({title:'🚨 بلاغ',input:'textarea',inputPlaceholder:'اكتب رسالتك',showCancelButton:true,confirmButtonText:'📤 إرسال',cancelButtonText:'إلغاء',confirmButtonColor:'#00d4ff',cancelButtonColor:'#64748b',inputValidator:v=>{if(!v||v.trim().length<5)return 'رسالة قصيرة'},customClass:{popup:'swal-custom-popup',title:'swal-custom-title',input:'swal-custom-input'}});if(msg){const sent=await DB.reportIssue({userName:user?.name||'طالب',userPhone:(user?.country_code||'+20')+(user?.phone||'—'),message:SEC.clean(msg)});Swal.fire({icon:sent?'success':'error',title:sent?'✅':'❌',confirmButtonColor:'#00d4ff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});}};
+  const sendReport=async()=>{
+    const {value:msg}=await Swal.fire({title:'🚨 بلاغ',input:'textarea',inputPlaceholder:'اكتب رسالتك',showCancelButton:true,confirmButtonText:'📤 إرسال',cancelButtonText:'إلغاء',confirmButtonColor:'#00d4ff',cancelButtonColor:'#64748b',inputValidator:v=>{if(!v||v.trim().length<5)return 'رسالة قصيرة'},customClass:{popup:'swal-custom-popup',title:'swal-custom-title',input:'swal-custom-input'}});
+    if(msg){
+      try {
+        const sb = await DB.getClient();
+        const result = await sb.from('reports').insert([{
+          id: DB.uid('rep_'),
+          user_id: user?.id || 'unknown',
+          user_name: user?.name || 'طالب',
+          user_phone: (user?.country_code||'+20') + (user?.phone||''),
+          reporter_id: user?.id || null,
+          reason: 'بلاغ عام',
+          details: SEC.clean(msg),
+          created_at: Date.now()
+        }]);
+        if(result.error) throw new Error(result.error.message);
+        Swal.fire({icon:'success', title:'✅ تم الإرسال', text:'شكراً لك، تم إرسال البلاغ للإدارة', background:'#0a1220', color:'#fff'});
+      } catch(e) {
+        Swal.fire({icon:'error', title:'خطأ', text:'فشل إرسال البلاغ', background:'#0a1220', color:'#fff'});
+      }
+    }
+  };
   return <div className="footer-dev"><button className="dev-btn" onClick={()=>window.open("https://wa.me/201128351702","_blank")}><span className="dev-name">Developed by <b>EL-sayed Hasan</b></span></button><button className="tg-btn" onClick={sendReport}>بلاغ</button></div>;
 }
 
 function StudentApp(){
   const app=useApp();
   const [tab,setTab]=useState(()=>{try{return localStorage.getItem('student_tab')||'home'}catch(e){return 'home'}});
+  const [chatWith, setChatWith] = useState(null);
   const [sidebarOpen,setSidebarOpen]=useState(false);
   const user=app.currentUser;
   useEffect(()=>{try{localStorage.setItem('student_tab',tab)}catch(e){}},[tab]);
+  
   const unreadMsgs=(app.db.direct_messages||[]).filter(m=>m.to_id===user.id&&!m.read).length;
   const unreadNotifs=(app.db.notifications||[]).filter(n=>{if(n.target!=='all'&&n.target!==user.id)return false;return (Number(n.created_at)||0)>Number(localStorage.getItem('notif_read_'+user.id)||0);}).length;
   useEffect(()=>{if(tab==='notifications'){try{localStorage.setItem('notif_read_'+user.id,Date.now().toString())}catch(e){}}},[tab,user.id]);
+  
   const items=[
     {title:'الرئيسية',items:[{id:'home',icon:'home',label:'الرئيسية'},{id:'analytics',icon:'chart',label:'تحليلاتي'}]},
     {title:'التعلم',items:[{id:'lessons',icon:'book',label:'الدروس'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'practice',icon:'target',label:'وضع التدريب'},{id:'flashcards',icon:'layers',label:'Flashcards'}]},
@@ -570,10 +618,18 @@ function StudentApp(){
     {title:'التواصل',items:[{id:'leaderboard',icon:'trophy',label:'المتصدرين'},{id:'school-lb',icon:'school',label:'ترتيب المدارس'},{id:'students',icon:'users',label:'الطلاب'},{id:'messages',icon:'message',label:'الرسائل',badge:unreadMsgs||null},{id:'notifications',icon:'bell',label:'الإشعارات',badge:unreadNotifs||null}]},
     {title:'الحساب',items:[{id:'xp-shop',icon:'shoppingBag',label:'متجر XP'},{id:'profile',icon:'user',label:'ملفي'}]}
   ];
+  
   const navigate=(id)=>{
     if(id==='friend-challenge'){ window.location.href='sv.html'; return; }
     setTab(id);setSidebarOpen(false);
   };
+
+  const openChat = (studentId) => {
+    setChatWith(studentId);
+    setTab('messages');
+    setSidebarOpen(false);
+  };
+
   return <div className="app">
     <Sidebar items={items} active={tab} onNav={navigate} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} onLogout={app.logout}/>
     <div className="main">
@@ -591,8 +647,8 @@ function StudentApp(){
         {tab==='xp-shop'&&<XPShopPage/>}
         {tab==='leaderboard'&&<LeaderboardPage/>}
         {tab==='school-lb'&&<SchoolLeaderboardPage/>}
-        {tab==='students'&&<StudentsDirectoryPage/>}
-        {tab==='messages'&&<MessagesPage/>}
+        {tab==='students'&&<StudentsDirectoryPage onChat={openChat}/>}
+        {tab==='messages'&&<MessagesPage initialChat={chatWith} clearChat={()=>setChatWith(null)}/>}
         {tab==='notifications'&&<NotificationsPage/>}
         {tab==='profile'&&<ProfilePage/>}
         <Footer/>
