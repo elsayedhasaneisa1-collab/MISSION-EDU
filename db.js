@@ -74,7 +74,7 @@
 
   function ytId(url) {
     if (!url) return null;
-    const m = String(url).match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+    const m = String(url).match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
     return m ? m[1] : null;
   }
 
@@ -105,14 +105,39 @@
     try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
   }
 
+  // ═══════════════════════════════════════════════════════════════
+  // FIX #1: loadAll — يستخدم questions_public (بدون correct)
+  //        و لو الأدمن، يجيب الأسئلة الكاملة عبر RPC
+  // ═══════════════════════════════════════════════════════════════
   async function loadAll() {
     const sb = await getClient();
-    const tables = ['users','grades','subjects','units','lessons','questions','exams','missions','achievements','levels','notifications','activity','polls','poll_votes'];
+    const tables = ['users','grades','subjects','units','lessons','exams','missions','achievements','levels','notifications','activity','polls','poll_votes'];
     const result = {};
     await Promise.all(tables.map(async (t) => {
       try { const res = await sb.from(t).select('*').limit(2000); result[t] = res.data || []; }
       catch (e) { result[t] = []; }
     }));
+
+    // الأسئلة: جرّب الأدمن RPC، ثم fallback على public view
+    result.questions = [];
+    try {
+      const { data, error } = await sb.rpc('admin_get_questions', { p_limit: 2000 });
+      if (!error && Array.isArray(data) && data.length > 0) {
+        result.questions = data;
+      } else {
+        // مستخدم عادي — اجلب من questions_public (بدون correct)
+        const qRes = await sb.from('questions_public').select('*').limit(2000);
+        result.questions = qRes.data || [];
+      }
+    } catch (e) {
+      try {
+        const qRes = await sb.from('questions_public').select('*').limit(2000);
+        result.questions = qRes.data || [];
+      } catch (err) {
+        result.questions = [];
+      }
+    }
+
     return result;
   }
 
@@ -216,8 +241,16 @@
   async function unbanUser(userId) {
     if (!userId) throw new Error('معرف غير صالح');
     const sb = await getClient();
-    await sb.from('reports').delete().eq('user_id', userId);
-    const { data, error } = await sb.from('users').update({ banned: false, ban_reason: null, banned_at: null, reports_count: 0 }).eq('id', userId).select().maybeSingle();
+    // حذف البلاغات (RLS: admin_delete مسموح)
+    try { await sb.from('reports').delete().eq('user_id', userId); } catch (e) {}
+    // فك الحظر (trigger بيتجاوز تعديل الآخرين للأدمن)
+    const { data, error } = await sb.from('users').update({
+      banned: false,
+      ban_reason: null,
+      banned_at: null,
+      banned_by: null,
+      reports_count: 0
+    }).eq('id', userId).select().maybeSingle();
     if (error) throw new Error(error.message);
     return data;
   }
@@ -230,17 +263,34 @@
     return data || [];
   }
 
+  // ═══════════════════════════════════════════════════════════════
+  // FIX #2: deleteQuestion — يعتمد على .contains() مع fallback
+  // ═══════════════════════════════════════════════════════════════
   async function deleteQuestion(questionId) {
     if (!questionId) throw new Error('معرف غير صالح');
     const sb = await getClient();
-    const { data: exams } = await sb.from('exams').select('*').contains('question_ids', [questionId]);
+
+    let exams = [];
+    try {
+      const { data } = await sb.from('exams').select('*').contains('question_ids', [questionId]);
+      exams = data || [];
+    } catch (e) {
+      // fallback: جيب كل الاختبارات وفلتر في JS
+      const { data: all } = await sb.from('exams').select('*');
+      exams = (all || []).filter(ex => {
+        let qids = ex.question_ids;
+        if (typeof qids === 'string') { try { qids = JSON.parse(qids); } catch (err) { qids = []; } }
+        return Array.isArray(qids) && qids.includes(questionId);
+      });
+    }
+
     let examsUpdated = 0;
-    if (exams && exams.length) {
-      for (const exam of exams) {
-        const newIds = (exam.question_ids || []).filter(id => id !== questionId);
-        await sb.from('exams').update({ question_ids: newIds }).eq('id', exam.id);
-        examsUpdated++;
-      }
+    for (const exam of exams) {
+      let qids = exam.question_ids;
+      if (typeof qids === 'string') { try { qids = JSON.parse(qids); } catch (e) { qids = []; } }
+      const newIds = (qids || []).filter(id => id !== questionId);
+      await sb.from('exams').update({ question_ids: newIds }).eq('id', exam.id);
+      examsUpdated++;
     }
     await sb.from('questions').delete().eq('id', questionId);
     return { examsUpdated };
@@ -257,22 +307,46 @@
     } catch (e) { return 0; }
   }
 
+  // ═══════════════════════════════════════════════════════════════
+  // FIX #3: reportIssue — يستخدم جدول issues بدل reports
+  // ═══════════════════════════════════════════════════════════════
   async function reportIssue(payload) {
     try {
       const sb = await getClient();
+      const userId = getSessionId();
+      if (!userId) return false;
       const record = {
         id: uid('iss_'),
-        user_id: null,
+        user_id: userId,
         user_name: String(payload.userName || 'زائر').slice(0, 100),
         user_phone: String(payload.userPhone || '').slice(0, 30),
-        reporter_id: payload.reporterId || null,
-        reason: 'بلاغ عام',
-        details: String(payload.message || '').slice(0, 2000),
+        message: String(payload.message || '').slice(0, 2000),
+        status: 'open',
         created_at: Date.now()
       };
-      const { error } = await sb.from('reports').insert([record]);
+      const { error } = await sb.from('issues').insert([record]);
       return !error;
     } catch (e) { return false; }
+  }
+
+  async function getIssues(status) {
+    try {
+      const sb = await getClient();
+      let q = sb.from('issues').select('*').order('created_at', { ascending: false }).limit(500);
+      if (status && status !== 'all') q = q.eq('status', status);
+      const { data, error } = await q;
+      if (error) return [];
+      return data || [];
+    } catch (e) { return []; }
+  }
+
+  async function reviewIssue(issueId, status, notes) {
+    const sb = await getClient();
+    const { error } = await sb.rpc('admin_review_issue', {
+      p_issue_id: issueId, p_status: status, p_notes: notes || null
+    });
+    if (error) throw new Error(error.message);
+    return true;
   }
 
   async function getNotificationsFor(userId) {
@@ -374,22 +448,20 @@
     } catch (e) { return false; }
   }
 
+  // ═══════════════════════════════════════════════════════════════
+  // FIX #4: submitExamAttempt — يحوّل لاستخدام RPC
+  //        (للتوافق مع الكود القديم، لكن ينفذ عبر submit_exam)
+  // ═══════════════════════════════════════════════════════════════
   async function submitExamAttempt(payload) {
     if (!payload || !payload.userId || !payload.examId) throw new Error('بيانات غير صالحة');
     const sb = await getClient();
-    const record = {
-      id: uid('att_'),
-      user_id: payload.userId,
-      exam_id: payload.examId,
-      score: Number(payload.score) || 0,
-      total: Number(payload.total) || 0,
-      pct: Number(payload.pct) || 0,
-      passed: !!payload.passed,
-      status: payload.passed ? 'passed' : 'failed',
-      at: Date.now(),
-      duration_seconds: Number(payload.durationSeconds) || 0
-    };
-    const { data, error } = await sb.from('exam_attempts').insert([record]).select().maybeSingle();
+    const startedAt = payload.startedAt
+      || (Date.now() - ((Number(payload.durationSeconds) || 0) * 1000));
+    const { data, error } = await sb.rpc('submit_exam', {
+      p_exam_id: payload.examId,
+      p_answers: payload.answers || {},
+      p_started_at: startedAt
+    });
     if (error) throw new Error(error.message);
     return data;
   }
@@ -406,6 +478,30 @@
       }
       return true;
     } catch (e) { return false; }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // Admin reports RPCs (للوحة الإدارة)
+  // ═══════════════════════════════════════════════════════════════
+  async function getAdminReports(status) {
+    const sb = await getClient();
+    const { data, error } = await sb.rpc('get_admin_reports', { p_status: status || 'pending' });
+    if (error) throw new Error(error.message);
+    return data || [];
+  }
+
+  async function adminReviewReport(reportId, status, action, notes, banTarget, banReason) {
+    const sb = await getClient();
+    const { data, error } = await sb.rpc('admin_review_report', {
+      p_report_id: reportId,
+      p_status: status,
+      p_action: action || null,
+      p_notes: notes || null,
+      p_ban_target: !!banTarget,
+      p_ban_reason: banReason || null
+    });
+    if (error) throw new Error(error.message);
+    return data;
   }
 
   window.MissionDB = {
@@ -427,6 +523,8 @@
     deleteQuestion,
     cleanupExpiredPolls,
     reportIssue,
+    getIssues,
+    reviewIssue,
     getNotificationsFor,
     logActivity,
     updatePassword,
@@ -439,6 +537,8 @@
     markMessagesRead,
     submitExamAttempt,
     logError,
+    getAdminReports,
+    adminReviewReport,
     uid,
     fmt,
     formatDate,
