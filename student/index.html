@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="theme-color" content="#050a14" />
-<title>MISSION EDU — لوحة الطالب</title>
+<title>MISSION EDU — المنصة التعليمية</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
@@ -12,18 +12,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
 <link rel="icon" type="image/png" href="/logo.png">
 <style>
-:root{
---bg:#050a14;--bg2:#0a1220;
---gold:#00d4ff;--gold-l:#00ffff;--gold-d:#0088cc;
---gold-soft:#a0e8ff;
---border:rgba(0,212,255,.18);--border2:rgba(0,212,255,.38);
---txt:#e0f7ff;--txt2:#8fd4ee;--muted:#4a7a99;
---green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#7c3aed;
---r:20px;--rs:13px;
---sh:0 18px 50px rgba(0,0,0,.75), 0 0 0 1px rgba(0,212,255,.05) inset;
---sh-gold:0 10px 30px rgba(0,212,255,.35);
---grad-gold:linear-gradient(135deg,#00ffff 0%,#00d4ff 45%,#0088cc 100%);
-}
+:root{--bg:#050a14;--bg2:#0a1220;--gold:#00d4ff;--gold-l:#00ffff;--gold-d:#0088cc;--gold-soft:#a0e8ff;--border:rgba(0,212,255,.18);--border2:rgba(0,212,255,.38);--txt:#e0f7ff;--txt2:#8fd4ee;--muted:#4a7a99;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--violet:#7c3aed;--r:20px;--rs:13px;--sh:0 18px 50px rgba(0,0,0,.75), 0 0 0 1px rgba(0,212,255,.05) inset;--sh-gold:0 10px 30px rgba(0,212,255,.35);--grad-gold:linear-gradient(135deg,#00ffff 0%,#00d4ff 45%,#0088cc 100%)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{overflow-x:hidden;max-width:100vw;width:100%}
 body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(0,212,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(0,150,255,.14),transparent 60%),radial-gradient(700px 400px at 50% 110%,rgba(0,255,255,.08),transparent 70%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;line-height:1.7}
@@ -51,7 +40,6 @@ ul{list-style:none}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 .brand{display:flex;align-items:center;gap:11px;padding:8px 10px 16px}
 .brand-logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--grad-gold);box-shadow:0 8px 26px rgba(0,212,255,.55),0 0 0 1px rgba(95,251,255,.3) inset;position:relative}
-.brand-logo::after{content:'';position:absolute;inset:0;border-radius:14px;background:linear-gradient(135deg,rgba(255,255,255,.35),transparent 45%);pointer-events:none}
 .brand-name{font-weight:900;font-size:17px;background:linear-gradient(100deg,#00ffff,#a0e8ff 45%,#00d4ff 90%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 4s linear infinite}
 .brand-sub{font-size:10.5px;color:var(--muted);font-weight:600}
 .nav-i{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:13px;color:var(--txt2);font-size:14px;font-weight:600;transition:.22s;width:100%;text-align:right;position:relative}
@@ -66,27 +54,21 @@ ul{list-style:none}
 .btn-p{background:var(--grad-gold);color:#050a14;box-shadow:0 10px 28px rgba(0,212,255,.42),0 0 0 1px rgba(95,251,255,.4) inset;position:relative;overflow:hidden}
 .btn-p::before{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);transform:translateX(-100%);transition:transform .7s}
 .btn-p:hover::before{transform:translateX(100%)}
-.btn-p:hover{box-shadow:var(--sh-gold);transform:translateY(-2px);color:#000}
+.btn-p:hover{box-shadow:0 14px 40px rgba(0,212,255,.55);transform:translateY(-2px);color:#000}
 .btn-s{background:rgba(0,212,255,.08);color:var(--gold-soft);border:1px solid var(--border)}
 .btn-s:hover{background:rgba(0,212,255,.16);color:#a0e8ff;border-color:var(--border2)}
 .btn-ok{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff}
 .btn-dn{background:rgba(239,68,68,.14);color:#fca5a5;border:1px solid rgba(239,68,68,.32)}
-.btn-dn:hover{background:rgba(239,68,68,.24)}
 .btn-sm{padding:7px 13px;font-size:12.5px;border-radius:10px}
 .btn-block{width:100%}
 .btn:disabled{opacity:.42;cursor:not-allowed}
 .h2{font-size:clamp(17px,2.3vw,22px);font-weight:800}
 .h3{font-size:16px;font-weight:800}
 .h4{font-size:14.5px;font-weight:700}
-.muted{color:var(--muted)}
-.txt2{color:var(--txt2)}
-.sm{font-size:12.5px}
-.xs{font-size:11.5px}
+.muted{color:var(--muted)}.txt2{color:var(--txt2)}.sm{font-size:12.5px}.xs{font-size:11.5px}
 .grad{background:linear-gradient(100deg,#00ffff,#a0e8ff 50%,#00d4ff 100%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 5s linear infinite}
 .grid{display:grid;gap:16px}
-.g2{grid-template-columns:repeat(2,1fr)}
-.g3{grid-template-columns:repeat(3,1fr)}
-.g4{grid-template-columns:repeat(4,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
 .flex{display:flex}.between{justify-content:space-between}.center{align-items:center}
 .wrap{flex-wrap:wrap}.col{flex-direction:column}
 .g6{gap:6px}.g8{gap:8px}.g12{gap:12px}.g16{gap:16px}
@@ -104,10 +86,8 @@ ul{list-style:none}
 .bar{height:9px;border-radius:20px;background:rgba(0,212,255,.10);overflow:hidden}
 .bar-f{height:100%;border-radius:20px;transition:width .8s}
 .bar-b{background:var(--grad-gold);box-shadow:0 0 14px rgba(0,212,255,.5)}
-.input,select.input,textarea.input{width:100%;padding:11px 14px;border-radius:12px;background:rgba(5,10,20,.78);border:1.5px solid var(--border);outline:none;font-size:14px;transition:.22s;color:var(--txt)}
+.input,textarea.input{width:100%;padding:11px 14px;border-radius:12px;background:rgba(5,10,20,.78);border:1.5px solid var(--border);outline:none;font-size:14px;transition:.22s;color:var(--txt)}
 .input:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(0,212,255,.14)}
-.input::placeholder{color:var(--muted)}
-textarea.input{resize:vertical;min-height:80px}
 .lbl{display:block;font-size:12.5px;font-weight:700;color:var(--txt2);margin-bottom:6px}
 .stat-n{font-size:clamp(21px,3vw,28px);font-weight:900;letter-spacing:-1px;line-height:1.1}
 .stat-l{font-size:11.5px;color:var(--muted);font-weight:600}
@@ -146,24 +126,42 @@ textarea.input{resize:vertical;min-height:80px}
 .toast.info .toast-ico{background:rgba(0,212,255,.20);color:#00ffff}
 .toast.info .toast-bar-f{background:var(--grad-gold)}
 .footer-dev{display:flex;justify-content:center;gap:10px;padding:24px 20px 16px;margin-top:40px;border-top:1px solid rgba(0,212,255,.14);position:relative;flex-wrap:wrap}
-.footer-dev::before{content:"";position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:180px;height:1px;background:linear-gradient(90deg,transparent,#00ffff,transparent)}
 .dev-btn,.tg-btn{display:inline-flex;align-items:center;gap:9px;padding:10px 20px;border-radius:50px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .32s;border:1px solid}
 .dev-btn{background:linear-gradient(135deg,rgba(0,212,255,.18),rgba(0,150,255,.18));border-color:rgba(0,212,255,.4);color:var(--txt)}
 .dev-btn:hover{background:linear-gradient(135deg,rgba(0,212,255,.32),rgba(0,150,255,.32));border-color:#00ffff;transform:translateY(-2px)}
 .dev-name b{background:linear-gradient(90deg,#00ffff,#a0e8ff,#00d4ff,#00ffff);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 3s linear infinite;font-weight:900}
 .tg-btn{background:rgba(0,212,255,.12);border-color:rgba(0,212,255,.35);color:#00ffff}
 .tg-btn:hover{background:rgba(0,212,255,.24);border-color:#00ffff;color:#a0e8ff}
-.swal-custom-popup{border:1px solid rgba(0,212,255,.4)!important;border-radius:22px!important;box-shadow:0 24px 70px rgba(0,0,0,.85)!important;font-family:'Tajawal','Cairo',sans-serif!important}
-.swal-custom-title{color:#e0f7ff!important;font-size:20px!important;font-weight:800!important;font-family:'Tajawal','Cairo',sans-serif!important}
-.swal-custom-input{background:rgba(5,10,20,.78)!important;border:1.5px solid rgba(0,212,255,.35)!important;color:#e0f7ff!important;border-radius:12px!important;font-family:'Tajawal','Cairo',sans-serif!important}
+.swal-custom-popup{border:1px solid rgba(0,212,255,.4)!important;border-radius:22px!important;font-family:'Tajawal','Cairo',sans-serif!important}
+.swal-custom-title{color:#e0f7ff!important;font-size:20px!important;font-weight:800!important}
+.swal-custom-input{background:rgba(5,10,20,.78)!important;border:1.5px solid rgba(0,212,255,.35)!important;color:#e0f7ff!important;border-radius:12px!important}
+.section-title{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;color:var(--gold);margin:16px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.msg-card{background:rgba(0,212,255,.04);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer}
+.msg-card:hover{background:rgba(0,212,255,.07)}
+.msg-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.msg-tab{padding:8px 16px;border-radius:20px;font-weight:700;font-size:12.5px;background:rgba(0,212,255,.06);border:1px solid var(--border);color:var(--txt2);cursor:pointer}
+.msg-tab.active{background:rgba(0,212,255,.20);border-color:var(--gold);color:#00ffff}
+.student-card{background:rgba(10,18,32,.65);border:1px solid var(--border);border-radius:16px;padding:16px;transition:.24s;text-align:center}
+.student-card:hover{transform:translateY(-4px);border-color:var(--border2);box-shadow:var(--sh-gold)}
 .lesson-card{background:rgba(10,18,32,.65);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:.24s;cursor:pointer}
 .lesson-card:hover{transform:translateY(-4px);border-color:var(--border2);box-shadow:var(--sh-gold)}
-.lesson-thumb{aspect-ratio:16/9;background:linear-gradient(135deg,#0a1220,#050a14);position:relative;display:grid;place-items:center;overflow:hidden}
-.lesson-thumb .play{width:56px;height:56px;border-radius:50%;background:rgba(0,212,255,.9);display:grid;place-items:center;color:#050a14;font-size:22px;position:absolute;box-shadow:0 8px 28px rgba(0,212,255,.6)}
+.lesson-thumb{aspect-ratio:16/9;background:linear-gradient(135deg,#0a1220,#050a14);position:relative;display:grid;place-items:center}
+.lesson-thumb .play{width:56px;height:56px;border-radius:50%;background:rgba(0,212,255,.9);display:grid;place-items:center;color:#050a14;font-size:22px;box-shadow:0 8px 28px rgba(0,212,255,.6)}
 .lesson-body{padding:14px}
-.lesson-title{font-weight:800;font-size:14.5px;margin-bottom:6px;line-height:1.4}
+.lesson-title{font-weight:800;font-size:14.5px;margin-bottom:6px}
 .lesson-meta{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:8px}
-.sec-warning{position:fixed;top:0;inset-inline:0;background:linear-gradient(90deg,#dc2626,#ef4444);color:#fff;padding:10px;text-align:center;font-weight:800;font-size:13px;z-index:99999;display:none}
+.qbox-opt{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;margin-bottom:6px;background:rgba(255,255,255,.03);border:1px solid var(--border);cursor:pointer}
+.qbox-opt:hover{background:rgba(0,212,255,.08)}
+.qbox-opt-letter{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(0,212,255,.15);color:var(--gold);font-weight:800;font-size:12px;flex-shrink:0}
+.shop-card{background:rgba(10,18,32,.65);border:1px solid var(--border);border-radius:16px;padding:18px;text-align:center}
+.shop-card:hover{transform:translateY(-4px);border-color:var(--border2)}
+.flashcard{perspective:1000px;height:200px;cursor:pointer;margin-bottom:12px}
+.flashcard-inner{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg)}
+.flashcard-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;display:grid;place-items:center;padding:20px;text-align:center;font-weight:700;font-size:16px;border:1px solid var(--border2)}
+.flashcard-front{background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(0,150,255,.08))}
+.flashcard-back{background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(34,197,94,.08));transform:rotateY(180deg)}
+.focus-timer{font-size:clamp(48px,10vw,96px);font-weight:900;letter-spacing:2px;font-family:monospace;color:var(--gold)}
 @media(max-width:1080px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:860px){
 .sidebar{position:fixed;inset-inline-end:0;top:0;transform:translateX(-105%);transition:transform .34s;width:280px;max-width:85vw;box-shadow:-20px 0 60px rgba(0,0,0,.75);overflow-x:hidden}
@@ -191,9 +189,8 @@ const {useState,useEffect,useMemo,useCallback,useRef,createContext,useContext}=R
 const DB=window.MissionDB;
 const SEC = {
   esc: s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),
-  safeImg: u => /^https?:\/\/.+\.(png|jpe?g|gif|webp)(\?.*)?$/i.test(String(u || '')) || /^https:\/\/.+\.supabase\.co\/storage\//i.test(String(u||'')) ? u : null,
-  clean: s => String(s ?? '').replace(/[<>]/g,'').trim(),
-  maxLen: (s, n=500) => String(s ?? '').slice(0, n)
+  safeImg: u => /^https?:\/\/.+\.(png|jpe?g|gif|webp)(\?.*)?$/i.test(String(u || '')) ? u : null,
+  clean: s => String(s ?? '').replace(/[<>]/g,'').trim()
 };
 const ToastCtx=createContext(null);
 function ToastProvider({children}){const [items,setItems]=useState([]);const push=useCallback((msg,type='info',title,duration=3800)=>{const id=DB.uid('t_');const titles={ok:'تم بنجاح',err:'خطأ',warn:'تنبيه',info:'معلومة'};setItems(x=>[...x,{id,msg,type,title:title||titles[type]||'',duration}]);},[]);const remove=useCallback(id=>setItems(x=>x.filter(t=>t.id!==id)),[]);return <ToastCtx.Provider value={{ok:(m,t)=>push(m,'ok',t),err:(m,t)=>push(m,'err',t),warn:(m,t)=>push(m,'warn',t),info:(m,t)=>push(m,'info',t)}}>{children}<div className="toast-host">{items.map(t=><Toast key={t.id} data={t} onClose={()=>remove(t.id)}/>)}</div></ToastCtx.Provider>;}
@@ -201,8 +198,9 @@ function Toast({data,onClose}){const [out,setOut]=useState(false);const [progres
 const useToast=()=>useContext(ToastCtx);
 const AppCtx=createContext(null);
 const useApp=()=>useContext(AppCtx);
+
 function AppProvider({children}){
-  const [db,setDb]=useState({users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],levels:[],notifications:[],activity:[],daily_reward:[]});
+  const [db,setDb]=useState({users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[],polls:[],poll_votes:[],direct_messages:[],reports:[],friendships:[],xp_shop_items:[],xp_purchases:[],study_groups:[],study_group_members:[],study_plans:[],study_tasks:[],daily_challenges:[],daily_challenge_attempts:[],practice_sessions:[],focus_sessions:[],flashcards:[],video_progress:[],daily_reward:[]});
   const [currentUser,setCurrentUser]=useState(null);
   const [loading,setLoading]=useState(true);
   const toast=useToast();
@@ -210,12 +208,9 @@ function AppProvider({children}){
     try{
       const data=await DB.loadAll();
       const sb=await DB.getClient();
-      const [rewardRes, notifRes] = await Promise.all([
-        sb.from('daily_reward').select('*'),
-        sb.from('notifications').select('*')
-      ]);
-      data.daily_reward = rewardRes.data || [];
-      data.notifications = notifRes.data || [];
+      const extra=['direct_messages','xp_shop_items','xp_purchases','study_groups','study_group_members','study_plans','study_tasks','daily_challenges','daily_challenge_attempts','flashcards','video_progress','daily_reward','friendships','practice_sessions','focus_sessions'];
+      const extraResults=await Promise.all(extra.map(async(t)=>{try{const res=await sb.from(t).select('*').limit(2000);return{t,data:res.data||[]};}catch(e){return{t,data:[]};}}));
+      extraResults.forEach(r=>{data[r.t]=r.data;});
       setDb(data);
       setCurrentUser(prev => {
         if (!prev) return null;
@@ -226,54 +221,86 @@ function AppProvider({children}){
   },[]);
   useEffect(()=>{(async ()=>{try{const sid=DB.getSessionId();if(!sid){window.location.replace('../auth/login.html');return;}const u=await DB.getUser(sid);if(!u||u.active===false){DB.clearSession();window.location.replace('../auth/login.html');return;}if(u.banned===true){DB.clearSession();window.location.replace('../auth/banned.html');return;}setCurrentUser(u);await reload();}catch(e){console.warn(e);}setLoading(false);})();},[]);
   const logout=useCallback(()=>{Swal.fire({title:'تسجيل الخروج',text:'هل أنت متأكد؟',icon:'question',showCancelButton:true,confirmButtonText:'نعم، خروج',cancelButtonText:'إلغاء',confirmButtonColor:'#00d4ff',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #0a1220, #050a14)',color:'#e0f7ff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}}).then(r=>{if(r.isConfirmed){DB.clearSession();window.location.replace('../auth/login.html');}});},[]);
+  const save=useCallback(async (table,item)=>{const saved=await DB.save(table,item);await reload();return saved;},[reload]);
   const getLevel=useCallback((xp)=>{const ls=[...db.levels].sort((a,b)=>a.xp-b.xp);if(ls.length===0)return {current:{level:1,name:'مبتدئ',xp:0},next:null};let cur=ls[0],next=null;for(let i=0;i<ls.length;i++){if(xp>=ls[i].xp){cur=ls[i];next=ls[i+1]||null;}}return {current:cur,next};},[db.levels]);
-  return <AppCtx.Provider value={{db,currentUser,loading,logout,reload,getLevel,toast,subject:id=>db.subjects.find(s=>s.id===id),unit:id=>db.units.find(u=>u.id===id),lesson:id=>db.lessons.find(l=>l.id===id),exam:id=>db.exams.find(e=>e.id===id)}}>{children}</AppCtx.Provider>;
+  return <AppCtx.Provider value={{db,currentUser,loading,logout,reload,save,getLevel,toast,subject:id=>db.subjects.find(s=>s.id===id),unit:id=>db.units.find(u=>u.id===id),lesson:id=>db.lessons.find(l=>l.id===id),exam:id=>db.exams.find(e=>e.id===id),question:id=>db.questions.find(q=>q.id===id)}}>{children}</AppCtx.Provider>;
 }
+
 const Icon=({name,size=18,color='currentColor'})=>{
   const p={width:size,height:size,viewBox:'0 0 24 24',fill:'none',stroke:color,strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round'};
   const paths={
     home:<><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></>,
     book:<><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></>,
     clipboard:<><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></>,
-    swords:<><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/><polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"/><line x1="5" y1="14" x2="9" y2="18"/><line x1="7" y1="17" x2="4" y2="20"/><line x1="3" y1="19" x2="5" y2="21"/></>,
-    trophy:<><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></>,
+    target:<><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></>,
+    layers:<><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/></>,
+    clock:<><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></>,
+    calendar:<><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></>,
+    handshake:<><path d="M11 17l-3-3 4-4 3 3"/><path d="M14 14l4 4-3 3-4-4"/></>,
+    swords:<><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/></>,
+    trophy:<><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></>,
+    school:<><path d="M14 22v-4a2 2 0 1 0-4 0v4"/><path d="m18 10 4 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8l4-2"/><circle cx="12" cy="9" r="2"/></>,
+    users:<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></>,
+    message:<><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></>,
+    bell:<><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></>,
+    shoppingBag:<><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></>,
     user:<><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></>,
+    chart:<><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></>,
     menu:<><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></>,
+    close:<><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>,
     logout:<><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></>,
     play:<><polygon points="5 3 19 12 5 21 5 3"/></>,
-    gift:<><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></>,
+    gift:<><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/></>,
     trend:<><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></>,
     flash:<><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></>,
     award:<><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></>,
-    close:<><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>,
-    check:<><polyline points="20 6 9 17 4 12"/></>
+    check:<><polyline points="20 6 9 17 4 12"/></>,
+    flag:<><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></>,
+    plus:<><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></>,
+    send:<><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></>
   };
   return <svg {...p}>{paths[name]||paths.help}</svg>;
 };
-function Stat({label,value,icon,color='var(--gold)'}){return <div className="glass-s" style={{padding:16}}><div className="flex between center mb8"><div className="stat-l">{label}</div><div style={{color}}><Icon name={icon} size={20}/></div></div><div className="stat-n" style={{color}}>{value}</div></div>;}
-function Empty({icon='📭',title}){return <div className="empty"><div className="empty-ico">{icon}</div><div className="h4 txt2 mb8">{title}</div></div>;}
+
+function Modal({title,children,onClose,wide}){return <div className="modal-bg" onClick={e=>e.target===e.currentTarget&&onClose()}><div className={`glass modal ${wide?'wide':''}`}><div className="flex between center mb16"><div className="h3">{title}</div><button className="icon-btn" onClick={onClose}><Icon name="close" size={16}/></button></div>{children}</div></div>;}
+function Stat({label,value,icon,color='var(--gold)'}){return <div className="glass-s hv" style={{padding:16}}><div className="flex between center mb8"><div className="stat-l">{label}</div><div style={{color}}>{typeof icon==='string'?<Icon name={icon} size={20}/>:icon}</div></div><div className="stat-n" style={{color}}>{value}</div></div>;}
+function Field({label,children,hint}){return <div className="mb12"><label className="lbl">{label}</label>{children}{hint&&<div className="xs muted mt8">{hint}</div>}</div>;}
+function Empty({icon='📭',title,desc}){return <div className="empty"><div className="empty-ico">{icon}</div><div className="h4 txt2 mb8">{title}</div>{desc&&<div className="sm">{desc}</div>}</div>;}
+function AccessBadge({value}){const isFree=value!==false&&value!=='paid';if(isFree)return <span className="pill pill-free">🆓 مجاني</span>;return <span className="pill pill-paid">🔒 مدفوع</span>;}
+
 function StudentAvatar({student, size=40}){
   const isPaid = student?.subscription==='paid' || student?.subscription==='vip';
   const safeImg = isPaid ? SEC.safeImg(student?.avatar_url) : null;
-  if(safeImg) return <img src={safeImg} loading="lazy" style={{width:size,height:size,borderRadius:12,objectFit:'cover',border:'2px solid var(--gold)',flexShrink:0}}/>;
+  if(safeImg) return <img src={safeImg} alt="" loading="lazy" onError={e=>{e.currentTarget.style.display='none';}} style={{width:size,height:size,borderRadius:12,objectFit:'cover',border:'2px solid var(--gold)',flexShrink:0}}/>;
   const isFemale = student?.gender==='female';
   const icon = isFemale ? '👧' : student?.gender==='male' ? '👦' : '👤';
   const bg = isFemale ? 'linear-gradient(135deg,#f472b6,#ec4899)' : 'linear-gradient(135deg,#60a5fa,#3b82f6)';
   return <div style={{width:size,height:size,borderRadius:12,background:bg,display:'grid',placeItems:'center',fontSize:size*0.55,flexShrink:0,border:'2px solid rgba(0,212,255,.4)'}}>{icon}</div>;
 }
-function Sidebar({items,active,onNav,open,onClose,onLogout}){return <>{open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',zIndex:55}}/>}<aside className={`sidebar ${open?'open':''}`}><div className="brand"><div className="brand-logo"><Icon name="trophy" size={22} color="#050a14"/></div><div><div className="brand-name">MISSION EDU</div><div className="brand-sub">المنصة التعليمية</div></div></div><div style={{flex:1,overflowY:'auto',display:'flex',flexDirection:'column',gap:'4px'}}>{items.map((g,gi)=><div key={gi}>{g.title&&<div className="nav-gt">{g.title}</div>}{g.items.map(it=><button key={it.id} className={`nav-i ${active===it.id?'on':''}`} onClick={()=>{onNav(it.id);onClose?.();}}><span className="nav-ico"><Icon name={it.icon} size={16}/></span><span>{it.label}</span></button>)}</div>)}</div><div style={{marginTop:'10px',paddingTop:'10px',borderTop:'1px solid var(--border)'}}><button className="nav-i" onClick={onLogout} style={{color:'#fca5a5',width:'100%'}}><span className="nav-ico"><Icon name="logout" size={16}/></span><span>تسجيل الخروج</span></button></div></aside></>;}
-function Topbar({user,onMenu,onLogout,onOpenProfile}){
+
+function Sidebar({items,active,onNav,open,onClose,onLogout}){
+  return <>{open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',zIndex:55}}/>}
+  <aside className={`sidebar ${open?'open':''}`}>
+    <div className="brand"><div className="brand-logo"><Icon name="trophy" size={22} color="#050a14"/></div><div><div className="brand-name">MISSION EDU</div><div className="brand-sub">المنصة التعليمية</div></div></div>
+    <div style={{flex:1,overflowY:'auto',display:'flex',flexDirection:'column',gap:'4px'}}>
+      {items.map((g,gi)=><div key={gi}>{g.title&&<div className="nav-gt">{g.title}</div>}{g.items.map(it=><button key={it.id} className={`nav-i ${active===it.id?'on':''}`} onClick={()=>{onNav(it.id);onClose?.();}}><span className="nav-ico"><Icon name={it.icon} size={16}/></span><span>{it.label}</span>{it.badge!=null&&<span className="pill pill-b" style={{marginInlineStart:'auto'}}>{it.badge}</span>}</button>)}</div>)}
+    </div>
+    <div style={{marginTop:'10px',paddingTop:'10px',borderTop:'1px solid var(--border)'}}><button className="nav-i" onClick={onLogout} style={{color:'#fca5a5',width:'100%'}}><span className="nav-ico"><Icon name="logout" size={16}/></span><span>تسجيل الخروج</span></button></div>
+  </aside></>;
+}
+
+function Topbar({user,onMenu,onLogout,unreadNotifs=0,unreadMsgs=0,onOpenNotifications,onOpenMessages,onOpenProfile}){
   return <div className="topbar">
     <button className="icon-btn mbar" onClick={onMenu}><Icon name="menu" size={16}/></button>
     <div className="flex center g8" style={{marginInlineStart:'auto'}}>
-      <button className="glass-s" onClick={onOpenProfile} style={{padding:'4px 10px',display:'flex',alignItems:'center',gap:8,borderColor:'var(--border2)',cursor:'pointer'}}>
-        <StudentAvatar student={user} size={30}/>
-        <span className="sm" style={{fontWeight:700}}>{SEC.esc(user.name)}</span>
-      </button>
+      <button className="icon-btn" onClick={onOpenMessages}><Icon name="message" size={16}/>{unreadMsgs>0&&<span style={{position:'absolute',top:-4,insetInlineEnd:-4,minWidth:18,height:18,borderRadius:9,background:'var(--grad-gold)',color:'#050a14',fontSize:10,fontWeight:900,display:'grid',placeItems:'center',padding:'0 5px'}}>{unreadMsgs>9?'9+':unreadMsgs}</span>}</button>
+      <button className="icon-btn" onClick={onOpenNotifications}><Icon name="bell" size={16}/>{unreadNotifs>0&&<span style={{position:'absolute',top:-4,insetInlineEnd:-4,minWidth:18,height:18,borderRadius:9,background:'var(--grad-gold)',color:'#050a14',fontSize:10,fontWeight:900,display:'grid',placeItems:'center',padding:'0 5px'}}>{unreadNotifs>9?'9+':unreadNotifs}</span>}</button>
+      <button className="glass-s" onClick={onOpenProfile} style={{padding:'4px 10px',display:'flex',alignItems:'center',gap:8,borderColor:'var(--border2)',cursor:'pointer'}}><StudentAvatar student={user} size={30}/><span className="sm" style={{fontWeight:700}}>{SEC.esc(user.name)}</span></button>
       <button className="icon-btn" onClick={onLogout}><Icon name="logout" size={16}/></button>
     </div>
   </div>;
 }
+
 function HomePage({onNavigate}){
   const app=useApp();
   const user=app.currentUser;
@@ -291,35 +318,18 @@ function HomePage({onNavigate}){
       const { data: existing } = await sb.from('daily_reward').select('*').eq('user_id', user.id).eq('date', today);
       if (existing && existing.length > 0) return app.toast.info('استلمت مكافأة اليوم بالفعل');
       await sb.from('daily_reward').insert([{ id: DB.uid('dr_'), user_id: user.id, date: today, xp: 50, claimed_at: Date.now() }]);
-      await DB.updateUser(user.id, { xp: (user.xp || 0) + 50, last_daily_reward: Date.now() });
+      await DB.updateUser(user.id, { xp: (user.xp || 0) + 50 });
       await app.reload();
       app.toast.ok('🎁 +50 XP مكافأة يومية!');
-    } catch (e) {
-      Swal.fire({ title: 'خطأ', text: e.message, icon: 'error', background: '#050a14', color: '#fff' });
-    }
+    } catch (e) { app.toast.err(e.message); }
   };
   return <>
     <div className="hero mb16">
       <div className="flex between center wrap g12">
-        <div>
-          <div className="h2 mb6 grad">أهلاً، {SEC.esc(user.name.split(' ')[0])} 👋</div>
-          <div className="sm txt2">مستواك: Lv {lvl.current.level} — {SEC.esc(lvl.current.name)}</div>
-        </div>
-        <div style={{textAlign:'left'}}>
-          <div className="sm muted mb6">XP</div>
-          <div className="stat-n" style={{color:'var(--gold)'}}>{DB.fmt(user.xp||0)}</div>
-        </div>
+        <div><div className="h2 mb6 grad">أهلاً، {SEC.esc(user.name.split(' ')[0])} 👋</div><div className="sm txt2">مستواك: Lv {lvl.current.level} — {SEC.esc(lvl.current.name)}</div></div>
+        <div style={{textAlign:'left'}}><div className="sm muted mb6">XP</div><div className="stat-n" style={{color:'var(--gold)'}}>{DB.fmt(user.xp||0)}</div></div>
       </div>
-      <div className="mt16">
-        <div className="flex between center mb8">
-          <span className="sm">📊 التقدم الكلي</span>
-          <span className="sm" style={{fontWeight:900,color:'var(--gold)'}}>{progress}%</span>
-        </div>
-        <div className="bar" style={{height:10}}><div className="bar-f bar-b" style={{width:`${progress}%`}}/></div>
-        <div className="flex between center mt8">
-          <span className="xs muted">{completed} من {totalLessons} درس</span>
-        </div>
-      </div>
+      <div className="mt16"><div className="flex between center mb8"><span className="sm">📊 التقدم الكلي</span><span className="sm" style={{fontWeight:900,color:'var(--gold)'}}>{progress}%</span></div><div className="bar" style={{height:10}}><div className="bar-f bar-b" style={{width:`${progress}%`}}/></div></div>
     </div>
     <div className="grid g4 mb16">
       <Stat label="المستوى" value={`Lv ${lvl.current.level}`} icon="trend" color="var(--gold)"/>
@@ -327,45 +337,26 @@ function HomePage({onNavigate}){
       <Stat label="الدروس" value={`${completed}/${totalLessons}`} icon="book" color="#22c55e"/>
       <Stat label="الإنجازات" value={DB.fmt((user.achievements||[]).length)} icon="award" color="var(--gold-d)"/>
     </div>
-    {!todayReward&&<div className="glass mb16" style={{padding:18,borderColor:'rgba(34,197,94,.4)'}}>
-      <div className="flex between center wrap g8">
-        <div className="flex center g12">
-          <div style={{fontSize:32}}>🎁</div>
-          <div><div className="h4" style={{color:'#6ee7a0'}}>مكافأة اليوم جاهزة!</div><div className="xs muted">استلم +50 XP</div></div>
-        </div>
-        <button className="btn btn-ok" onClick={claimDailyReward}><Icon name="gift" size={16}/> استلام</button>
-      </div>
-    </div>}
+    {!todayReward&&<div className="glass mb16" style={{padding:18,borderColor:'rgba(34,197,94,.4)'}}><div className="flex between center wrap g8"><div className="flex center g12"><div style={{fontSize:32}}>🎁</div><div><div className="h4" style={{color:'#6ee7a0'}}>مكافأة اليوم جاهزة!</div><div className="xs muted">استلم +50 XP</div></div></div><button className="btn btn-ok" onClick={claimDailyReward}><Icon name="gift" size={16}/> استلام</button></div></div>}
     <div className="grid g2 mb16">
       <div className="glass" style={{padding:18}}>
         <div className="flex between center mb12"><div className="h4" style={{color:'var(--gold)'}}>📖 مواصلة التعلم</div><button className="btn btn-s btn-sm" onClick={()=>onNavigate('lessons')}>الكل</button></div>
-        {app.db.lessons.filter(l=>l.published!==false).slice(0,3).map(l=><div key={l.id} className="flex center g12 mb8" style={{padding:10,background:'rgba(0,212,255,.04)',borderRadius:10,border:'1px solid var(--border)',cursor:'pointer'}} onClick={()=>window.location.href=`lesson.html?id=${l.id}`}>
-          <div style={{width:40,height:40,borderRadius:10,background:'var(--grad-gold)',display:'grid',placeItems:'center',color:'#050a14',fontSize:18}}>📖</div>
-          <div style={{flex:1,minWidth:0}}><div className="sm" style={{fontWeight:700}}>{SEC.esc(l.title)}</div><div className="xs muted">{SEC.esc(app.unit(l.unit_id)?.name||'')}</div></div>
-          <span className="pill pill-b">+{l.xp||0} XP</span>
-        </div>)}
+        {app.db.lessons.filter(l=>l.published!==false).slice(0,3).map(l=><div key={l.id} className="flex center g12 mb8" style={{padding:10,background:'rgba(0,212,255,.04)',borderRadius:10,border:'1px solid var(--border)',cursor:'pointer'}} onClick={()=>window.location.href=`lesson.html?id=${l.id}`}><div style={{width:40,height:40,borderRadius:10,background:'var(--grad-gold)',display:'grid',placeItems:'center',color:'#050a14',fontSize:18}}>📖</div><div style={{flex:1,minWidth:0}}><div className="sm" style={{fontWeight:700}}>{SEC.esc(l.title)}</div><div className="xs muted">{SEC.esc(app.unit(l.unit_id)?.name||'')}</div></div><span className="pill pill-b">+{l.xp||0} XP</span></div>)}
         {app.db.lessons.length===0&&<Empty icon="📖" title="لا دروس بعد"/>}
       </div>
       <div className="glass" style={{padding:18}}>
         <div className="flex between center mb12"><div className="h4" style={{color:'var(--gold)'}}>📝 اختبارات</div><button className="btn btn-s btn-sm" onClick={()=>onNavigate('exams')}>الكل</button></div>
-        {recentExams.map(e=><div key={e.id} className="flex center g12 mb8" style={{padding:10,background:'rgba(0,212,255,.04)',borderRadius:10,border:'1px solid var(--border)',cursor:'pointer'}} onClick={()=>window.location.href=`exam.html?id=${e.id}`}>
-          <div style={{width:40,height:40,borderRadius:10,background:'rgba(0,212,255,.15)',display:'grid',placeItems:'center',color:'var(--gold)',fontSize:18}}>📝</div>
-          <div style={{flex:1,minWidth:0}}><div className="sm" style={{fontWeight:700}}>{SEC.esc(e.title)}</div><div className="xs muted">{e.duration}د • {(e.question_ids||[]).length} سؤال</div></div>
-        </div>)}
+        {recentExams.map(e=><div key={e.id} className="flex center g12 mb8" style={{padding:10,background:'rgba(0,212,255,.04)',borderRadius:10,border:'1px solid var(--border)',cursor:'pointer'}} onClick={()=>window.location.href=`exam.html?id=${e.id}`}><div style={{width:40,height:40,borderRadius:10,background:'rgba(0,212,255,.15)',display:'grid',placeItems:'center',color:'var(--gold)',fontSize:18}}>📝</div><div style={{flex:1,minWidth:0}}><div className="sm" style={{fontWeight:700}}>{SEC.esc(e.title)}</div><div className="xs muted">{e.duration}د • {(e.question_ids||[]).length} سؤال</div></div></div>)}
         {app.db.exams.length===0&&<Empty icon="📝" title="لا اختبارات"/>}
       </div>
     </div>
     <div className="glass" style={{padding:18}}>
       <div className="flex between center mb12"><div className="h4" style={{color:'var(--gold)'}}>🏆 المتصدرون</div><button className="btn btn-s btn-sm" onClick={()=>onNavigate('leaderboard')}>الكل</button></div>
-      {[...app.db.users].filter(u=>u.role==='student'&&u.banned!==true).sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,5).map((s,i)=><div key={s.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid rgba(0,212,255,.08)'}}>
-        <div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div>
-        <StudentAvatar student={s} size={32}/>
-        <div style={{flex:1}}><div className="sm">{SEC.esc(s.name)}</div></div>
-        <span className="pill pill-b">{DB.fmt(s.xp||0)} XP</span>
-      </div>)}
+      {[...app.db.users].filter(u=>u.role==='student'&&u.banned!==true).sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,5).map((s,i)=><div key={s.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid rgba(0,212,255,.08)'}}><div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div><StudentAvatar student={s} size={32}/><div style={{flex:1}}><div className="sm">{SEC.esc(s.name)}</div></div><span className="pill pill-b">{DB.fmt(s.xp||0)} XP</span></div>)}
     </div>
   </>;
 }
+
 function LessonsPage(){
   const app=useApp();
   const [filterSubject,setFilterSubject]=useState('all');
@@ -374,141 +365,207 @@ function LessonsPage(){
   return <>
     <div className="h2 mb16 grad">📖 الدروس</div>
     <div className="flex wrap g6 mb16">
-      <button onClick={()=>setFilterSubject('all')} className={`msg-tab ${filterSubject==='all'?'active':''}`} style={{padding:'8px 16px',borderRadius:20,background:filterSubject==='all'?'rgba(0,212,255,.2)':'rgba(0,212,255,.06)',border:'1px solid var(--border2)',color:'var(--txt)',cursor:'pointer'}}>الكل ({lessons.length})</button>
-      {app.db.subjects.map(s=><button key={s.id} onClick={()=>setFilterSubject(s.id)} className={`msg-tab ${filterSubject===s.id?'active':''}`} style={{padding:'8px 16px',borderRadius:20,background:filterSubject===s.id?'rgba(0,212,255,.2)':'rgba(0,212,255,.06)',border:'1px solid var(--border2)',color:'var(--txt)',cursor:'pointer'}}>{SEC.esc(s.name)}</button>)}
+      <button onClick={()=>setFilterSubject('all')} className={`msg-tab ${filterSubject==='all'?'active':''}`}>الكل ({lessons.length})</button>
+      {app.db.subjects.map(s=><button key={s.id} onClick={()=>setFilterSubject(s.id)} className={`msg-tab ${filterSubject===s.id?'active':''}`}>{SEC.esc(s.name)}</button>)}
     </div>
     {filtered.length===0?<div className="glass" style={{padding:30}}><Empty icon="📖" title="لا دروس"/></div>:
-    <div className="grid g3">{filtered.map(l=>{
-      const unit=app.unit(l.unit_id);
-      return <div key={l.id} className="lesson-card" onClick={()=>window.location.href=`lesson.html?id=${l.id}`}>
-        <div className="lesson-thumb">
-          <div className="play"><Icon name="play" size={24} color="#050a14"/></div>
-        </div>
-        <div className="lesson-body">
-          <div className="lesson-title">{SEC.esc(l.title)}</div>
-          <div className="lesson-meta"><span>{SEC.esc(unit?.name||'')}</span><span>•</span><span>+{l.xp||0} XP</span></div>
-        </div>
-      </div>;
-    })}</div>}
+    <div className="grid g3">{filtered.map(l=>{const unit=app.unit(l.unit_id);return <div key={l.id} className="lesson-card" onClick={()=>window.location.href=`lesson.html?id=${l.id}`}><div className="lesson-thumb"><div className="play"><Icon name="play" size={24} color="#050a14"/></div></div><div className="lesson-body"><div className="lesson-title">{SEC.esc(l.title)}</div><div className="lesson-meta"><span>{SEC.esc(unit?.name||'')}</span><span>•</span><span>+{l.xp||0} XP</span></div></div></div>;})}</div>}
   </>;
 }
+
 function ExamsPage(){
   const app=useApp();
   const exams=app.db.exams.filter(e=>e.published!==false);
   return <>
     <div className="h2 mb16 grad">📝 الاختبارات</div>
     {exams.length===0?<div className="glass" style={{padding:30}}><Empty icon="📝" title="لا اختبارات"/></div>:
-    <div className="grid g2">{exams.map(e=>{
-      const isFree = e.is_free !== false;
-      return <div key={e.id} className="glass" style={{padding:18,cursor:'pointer'}} onClick={()=>window.location.href=`exam.html?id=${e.id}`}>
-        <div className="flex between center mb8"><div className="h4">{SEC.esc(e.title)}</div>{isFree ? <span className="pill pill-free">🆓 مجاني</span> : <span className="pill pill-paid">🔒 مدفوع</span>}</div>
-        <div className="xs muted mb8">{e.duration}د • {(e.question_ids||[]).length} سؤال • نجاح {e.pass_score}%</div>
-        <div className="flex between center">
-          <span className="pill pill-b">+{e.xp||0} XP</span>
-        </div>
-      </div>;
-    })}</div>}
+    <div className="grid g2">{exams.map(e=><div key={e.id} className="glass" style={{padding:18,cursor:'pointer'}} onClick={()=>window.location.href=`exam.html?id=${e.id}`}><div className="flex between center mb8"><div className="h4">{SEC.esc(e.title)}</div><AccessBadge value={e.is_free}/></div><div className="xs muted mb8">{e.duration}د • {(e.question_ids||[]).length} سؤال • نجاح {e.pass_score}%</div><div className="flex between center"><span className="pill pill-b">+{e.xp||0} XP</span></div></div>)}</div>}
   </>;
 }
+
+function PracticePage(){
+  const app=useApp();
+  const [session,setSession]=useState(null);
+  const [qIndex,setQIndex]=useState(0);
+  const [score,setScore]=useState(0);
+  const [answered,setAnswered]=useState(false);
+  const [selected,setSelected]=useState(null);
+  const [filterSubject,setFilterSubject]=useState('all');
+  const allQuestions=useMemo(()=>{let qs=app.db.questions||[];if(filterSubject!=='all')qs=qs.filter(q=>q.subject_id===filterSubject);return qs;},[app.db.questions,filterSubject]);
+  const startPractice=()=>{if(allQuestions.length===0)return app.toast.warn('لا توجد أسئلة');const shuffled=[...allQuestions].sort(()=>Math.random()-0.5).slice(0,10);setSession(shuffled);setQIndex(0);setScore(0);setAnswered(false);setSelected(null);};
+  const submitAnswer=(oi)=>{if(answered)return;setSelected(oi);setAnswered(true);const q=session[qIndex];const correct=Number(Array.isArray(q.correct)?q.correct[0]:q.correct);if(oi===correct)setScore(s=>s+1);};
+  const nextQuestion=async ()=>{if(qIndex+1>=session.length){try{const sb=await DB.getClient();await sb.from('practice_sessions').insert([{id:DB.uid('ps_'),user_id:app.currentUser.id,subject_id:filterSubject==='all'?null:filterSubject,score,total:session.length,pct:Math.round((score/session.length)*100),status:'completed',started_at:Date.now(),completed_at:Date.now()}]);const xpEarned=score*5;await DB.updateUser(app.currentUser.id,{xp:(app.currentUser.xp||0)+xpEarned});await app.reload();app.toast.ok(`انتهى التدريب! +${xpEarned} XP`);}catch(e){}setSession(null);}else{setQIndex(i=>i+1);setAnswered(false);setSelected(null);}};
+  if(session){
+    const q=session[qIndex];const correct=Number(Array.isArray(q.correct)?q.correct[0]:q.correct);const isDone=qIndex+1>=session.length;
+    return <><div className="flex between center mb16"><button className="btn btn-s" onClick={()=>setSession(null)}>← إلغاء</button><div className="flex g8"><span className="pill pill-b">{qIndex+1}/{session.length}</span><span className="pill pill-g">✓ {score}</span></div></div><div className="glass" style={{padding:22}}><div className="sm mb12" style={{fontWeight:700}}>{SEC.esc(q.text)}</div>{(q.options||[]).map((opt,oi)=>{const isCorrect=oi===correct;const isSelected=oi===selected;let bg='rgba(255,255,255,.03)',border='var(--border)';if(answered){if(isCorrect){bg='rgba(34,197,94,.15)';border='#22c55e';}else if(isSelected){bg='rgba(239,68,68,.15)';border='#ef4444';}}return <div key={oi} className="qbox-opt" onClick={()=>submitAnswer(oi)} style={{background:bg,borderColor:border,cursor:answered?'default':'pointer'}}><span className="qbox-opt-letter">{['A','B','C','D'][oi]}</span><span className="sm" style={{flex:1}}>{SEC.esc(opt)}</span>{answered&&isCorrect&&<span style={{color:'#22c55e'}}>✓</span>}</div>;})}{answered&&q.explanation&&<div className="xs mt12" style={{background:'rgba(0,212,255,.08)',padding:10,borderRadius:8}}>💡 {SEC.esc(q.explanation)}</div>}{answered&&<button className="btn btn-p btn-block mt16" onClick={nextQuestion}>{isDone?'✅ إنهاء':'السؤال التالي →'}</button>}</div></>;
+  }
+  return <><div className="h2 mb16 grad">🎯 وضع التدريب</div><div className="glass mb16" style={{padding:22}}><div className="h4 mb12" style={{color:'var(--gold)'}}>اختر المادة</div><div className="flex wrap g6 mb16"><button onClick={()=>setFilterSubject('all')} className={`msg-tab ${filterSubject==='all'?'active':''}`}>الكل ({app.db.questions.length})</button>{app.db.subjects.map(s=>{const cnt=app.db.questions.filter(q=>q.subject_id===s.id).length;if(cnt===0)return null;return <button key={s.id} onClick={()=>setFilterSubject(s.id)} className={`msg-tab ${filterSubject===s.id?'active':''}`}>{SEC.esc(s.name)} ({cnt})</button>;})}</div><div className="grid g3 mb16"><Stat label="أسئلة متاحة" value={DB.fmt(allQuestions.length)} icon="help" color="var(--gold)"/><Stat label="أسئلة الجلسة" value="10" icon="target" color="#22c55e"/><Stat label="XP محتمل" value="+50" icon="flash" color="#f59e0b"/></div><button className="btn btn-p btn-block" onClick={startPractice} disabled={allQuestions.length<1}><Icon name="play" size={16}/> ابدأ التدريب</button></div></>;
+}
+
+function XPShopPage(){
+  const app=useApp();
+  const user=app.currentUser;
+  const items=(app.db.xp_shop_items||[]).filter(i=>i.active!==false);
+  const [busy,setBusy]=useState(false);
+  const buy=async (item)=>{if((user.xp||0)<item.xp_cost)return app.toast.warn('XP غير كافي');if(item.stock===0)return app.toast.warn('نفذ المخزون');const r=await Swal.fire({title:'تأكيد الشراء',html:`<div style="font-size:48px;margin-bottom:12px">${SEC.esc(item.icon||'🎁')}</div><div style="font-weight:800;margin-bottom:8px">${SEC.esc(item.name)}</div><div style="color:#00ffff;font-weight:900">${item.xp_cost} XP</div>`,showCancelButton:true,confirmButtonText:'شراء',cancelButtonText:'إلغاء',confirmButtonColor:'#00d4ff',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#0a1220,#050a14)',color:'#e0f7ff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;setBusy(true);try{const sb=await DB.getClient();await sb.from('xp_purchases').insert([{id:DB.uid('pur_'),user_id:user.id,item_id:item.id,xp_spent:item.xp_cost,created_at:Date.now()}]);if(item.stock!=null)await sb.from('xp_shop_items').update({stock:item.stock-1}).eq('id',item.id);await DB.updateUser(user.id,{xp:(user.xp||0)-item.xp_cost});await app.reload();app.toast.ok('🎉 تم الشراء بنجاح!');}catch(e){app.toast.err(e.message);}setBusy(false);};
+  return <><div className="h2 mb16 grad">🛒 متجر XP</div><div className="glass mb16" style={{padding:18}}><div className="flex between center"><span className="sm">رصيدك</span><span className="stat-n" style={{color:'var(--gold)'}}>{DB.fmt(user.xp||0)} XP</span></div></div>{items.length===0?<div className="glass" style={{padding:30}}><Empty icon="🛒" title="لا منتجات متاحة"/></div>:<div className="grid g3">{items.map(item=><div key={item.id} className="shop-card"><div style={{fontSize:48,marginBottom:8}}>{SEC.esc(item.icon||'🎁')}</div><div className="h4 mb6">{SEC.esc(item.name)}</div><div className="xs muted mb12">{SEC.esc(item.description||'')}</div><div className="flex between center mb12"><span className="pill pill-b" style={{fontWeight:900}}>⚡ {item.xp_cost} XP</span><span className="xs muted">{item.stock!=null?`متوفر: ${item.stock}`:'∞'}</span></div><button className="btn btn-p btn-block" onClick={()=>buy(item)} disabled={busy||(user.xp||0)<item.xp_cost}>شراء</button></div>)}</div>}</>;
+}
+
+function FlashcardsPage(){
+  const app=useApp();
+  const user=app.currentUser;
+  const [editing,setEditing]=useState(null);const [form,setForm]=useState({front:'',back:''});const [flipped,setFlipped]=useState({});const [view,setView]=useState('study');
+  const cards=(app.db.flashcards||[]).filter(c=>c.user_id===user.id);
+  const dueCards=cards.filter(c=>!c.next_review_at||c.next_review_at<=Date.now());
+  const saveCard=async ()=>{if(!form.front.trim()||!form.back.trim())return app.toast.warn('اكتب السؤال والإجابة');try{await DB.save('flashcards',{id:editing==='new'?DB.uid('fc_'):editing,user_id:user.id,front:form.front,back:form.back,repetitions:0,next_review_at:Date.now(),created_at:Date.now()});await app.reload();app.toast.ok('تم الحفظ');setEditing(null);}catch(e){app.toast.err(e.message);}};
+  const reviewCard=async (card,known)=>{const newReps=known?(card.repetitions||0)+1:0;const nextIn=known?[1,3,7,14,30][Math.min(newReps-1,4)]*24*60*60*1000:10*60*1000;try{await DB.save('flashcards',{...card,repetitions:newReps,next_review_at:Date.now()+nextIn});await app.reload();}catch(e){}};
+  return <><div className="flex between center mb16 wrap g8"><div className="h2 grad">🃏 Flashcards</div><div className="flex g6"><button onClick={()=>setView('study')} className={`msg-tab ${view==='study'?'active':''}`}>📖 مذاكرة ({dueCards.length})</button><button onClick={()=>setView('manage')} className={`msg-tab ${view==='manage'?'active':''}`}>📋 إدارة ({cards.length})</button></div></div>{view==='study'&&<>{dueCards.length===0?<div className="glass" style={{padding:30}}><Empty icon="✅" title="كل البطاقات تمت مراجعتها"/></div>:<div>{dueCards.slice(0,1).map(card=><div key={card.id}><div className={`flashcard ${flipped[card.id]?'flipped':''}`} onClick={()=>setFlipped(f=>({...f,[card.id]:!f[card.id]}))}><div className="flashcard-inner"><div className="flashcard-face flashcard-front"><div>{SEC.esc(card.front)}</div></div><div className="flashcard-face flashcard-back"><div>{SEC.esc(card.back)}</div></div></div></div>{flipped[card.id]&&<div className="flex g8 mt16"><button className="btn btn-dn" style={{flex:1}} onClick={()=>{reviewCard(card,false);setFlipped(f=>({...f,[card.id]:false}));}}>❌ لم أتذكر</button><button className="btn btn-ok" style={{flex:1}} onClick={()=>{reviewCard(card,true);setFlipped(f=>({...f,[card.id]:false}));}}>✅ أتذكر</button></div>}</div>)}</div>}</>}{view==='manage'&&<><button className="btn btn-p btn-block mb16" onClick={()=>{setForm({front:'',back:''});setEditing('new');}}><Icon name="plus" size={16}/> بطاقة جديدة</button>{cards.length===0?<div className="glass" style={{padding:30}}><Empty icon="🃏" title="لا بطاقات"/></div>:<div className="grid g2">{cards.map(card=><div key={card.id} className="glass-s" style={{padding:14}}><div className="flex between center mb8"><span className="sm" style={{fontWeight:700}}>{SEC.esc(card.front)}</span><span className="pill pill-b">{card.repetitions||0}</span></div><div className="xs muted mb12">{SEC.esc(card.back)}</div><div className="flex g6"><button className="btn btn-s btn-sm" style={{flex:1}} onClick={()=>{setForm({front:card.front,back:card.back});setEditing(card.id);}}>تعديل</button></div></div>)}</div>}</>}{editing!==null&&<Modal title={editing==='new'?'بطاقة جديدة':'تعديل'} onClose={()=>setEditing(null)}><Field label="السؤال"><textarea className="input" rows="3" value={form.front} onChange={e=>setForm({...form,front:e.target.value})}/></Field><Field label="الإجابة"><textarea className="input" rows="3" value={form.back} onChange={e=>setForm({...form,back:e.target.value})}/></Field><div className="flex g8 mt16"><button className="btn btn-p" style={{flex:1}} onClick={saveCard}>حفظ</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div></Modal>}</>;
+}
+
+function AnalyticsPage(){
+  const app=useApp();
+  const user=app.currentUser;
+  const [attempts,setAttempts]=useState([]);
+  const [loading,setLoading]=useState(true);
+  const chart1=useRef(null);const c1=useRef(null);
+  useEffect(()=>{(async()=>{try{const sb=await DB.getClient();const {data}=await sb.from('exam_attempts').select('*').eq('user_id',user.id).order('at',{ascending:true});setAttempts(data||[]);}catch(e){}setLoading(false);})();},[user.id]);
+  useEffect(()=>{if(!chart1.current||!window.Chart||attempts.length===0)return;const ctx=chart1.current.getContext('2d');if(c1.current)c1.current.destroy();const last10=attempts.slice(-10);c1.current=new window.Chart(ctx,{type:'line',data:{labels:last10.map((_,i)=>`#${i+1}`),datasets:[{label:'النسبة %',data:last10.map(a=>a.pct||0),borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,.15)',fill:true,tension:.4,borderWidth:3,pointRadius:4,pointBackgroundColor:'#00ffff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#8fd4ee'},grid:{display:false}},y:{ticks:{color:'#8fd4ee'},grid:{color:'rgba(0,212,255,.08)'},max:100,beginAtZero:true}}}});return()=>{if(c1.current)c1.current.destroy();};},[attempts]);
+  if(loading)return <div className="glass" style={{padding:40,textAlign:'center'}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>;
+  return <><div className="h2 mb16 grad">📊 تحليلاتي</div><div className="grid g4 mb16"><Stat label="اختبارات" value={DB.fmt(attempts.length)} icon="clipboard" color="var(--gold)"/><Stat label="نجاحات" value={DB.fmt(attempts.filter(a=>a.passed).length)} icon="check" color="#22c55e"/><Stat label="متوسط" value={`${attempts.length?Math.round(attempts.reduce((s,a)=>s+(a.pct||0),0)/attempts.length):0}%`} icon="trend" color="#f59e0b"/><Stat label="XP" value={DB.fmt(user.xp||0)} icon="flash" color="var(--gold)"/></div><div className="glass" style={{padding:18}}><div className="h4 mb12" style={{color:'var(--gold)'}}>📈 تقدم المحاولات</div>{attempts.length===0?<Empty icon="📊" title="لا محاولات"/>:<div style={{height:280,position:'relative'}}><canvas ref={chart1}></canvas></div>}</div></>;
+}
+
+function StudyGroupsPage(){
+  const app=useApp();const user=app.currentUser;const [editing,setEditing]=useState(null);const [form,setForm]=useState({name:'',subject_id:'',max_members:10});
+  const groups=app.db.study_groups||[];const members=app.db.study_group_members||[];
+  const myGroups=groups.filter(g=>members.some(m=>m.group_id===g.id&&m.user_id===user.id));
+  const otherGroups=groups.filter(g=>!members.some(m=>m.group_id===g.id&&m.user_id===user.id));
+  const createGroup=async ()=>{if(!form.name.trim())return app.toast.warn('اكتب اسم الجروب');try{const gid=DB.uid('grp_');await DB.save('study_groups',{id:gid,name:form.name,subject_id:form.subject_id||null,leader_id:user.id,max_members:Number(form.max_members)||10,active:true,created_at:Date.now()});const sb=await DB.getClient();await sb.from('study_group_members').insert([{id:DB.uid('gm_'),group_id:gid,user_id:user.id,joined_at:Date.now()}]);await app.reload();app.toast.ok('تم إنشاء الجروب');setEditing(null);setForm({name:'',subject_id:'',max_members:10});}catch(e){app.toast.err(e.message);}};
+  const joinGroup=async (g)=>{const count=members.filter(m=>m.group_id===g.id).length;if(count>=g.max_members)return app.toast.warn('الجروب ممتلئ');try{const sb=await DB.getClient();await sb.from('study_group_members').insert([{id:DB.uid('gm_'),group_id:g.id,user_id:user.id,joined_at:Date.now()}]);await app.reload();app.toast.ok('انضممت للجروب');}catch(e){app.toast.err(e.message);}};
+  return <><div className="flex between center mb16 wrap g8"><div className="h2 grad">👥 مجموعات الدراسة</div><button className="btn btn-p" onClick={()=>setEditing('new')}><Icon name="plus" size={16}/> جروب جديد</button></div>{myGroups.length>0&&<><div className="h3 mb12" style={{color:'var(--gold)'}}>جروباتي</div><div className="grid g2 mb16">{myGroups.map(g=>{const gm=members.filter(m=>m.group_id===g.id);return <div key={g.id} className="glass" style={{padding:18}}><div className="flex between center mb8"><div className="h4">{SEC.esc(g.name)}</div><span className="pill pill-b">{gm.length}/{g.max_members}</span></div></div>;})}</div></>}<div className="h3 mb12" style={{color:'var(--gold)'}}>جروبات متاحة</div>{otherGroups.length===0?<div className="glass" style={{padding:30}}><Empty icon="👥" title="لا جروبات متاحة"/></div>:<div className="grid g2">{otherGroups.map(g=>{const gm=members.filter(m=>m.group_id===g.id);const full=gm.length>=g.max_members;return <div key={g.id} className="glass" style={{padding:18}}><div className="flex between center mb8"><div className="h4">{SEC.esc(g.name)}</div><span className="pill pill-b">{gm.length}/{g.max_members}</span></div><button className="btn btn-p btn-block btn-sm" onClick={()=>joinGroup(g)} disabled={full}>{full?'ممتلئ':'انضم'}</button></div>;})}</div>}{editing&&<Modal title="جروب جديد" onClose={()=>setEditing(null)}><Field label="اسم الجروب"><input className="input" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/></Field><Field label="المادة"><select className="input" value={form.subject_id} onChange={e=>setForm({...form,subject_id:e.target.value})}><option value="">بدون</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field><Field label="الحد الأقصى"><input type="number" className="input" value={form.max_members} onChange={e=>setForm({...form,max_members:e.target.value})}/></Field><div className="flex g8 mt16"><button className="btn btn-p" style={{flex:1}} onClick={createGroup}>إنشاء</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div></Modal>}</>;
+}
+
+function SchoolLeaderboardPage(){
+  const app=useApp();const [schools,setSchools]=useState([]);const [loading,setLoading]=useState(true);
+  useEffect(()=>{(async()=>{try{const students=app.db.users.filter(u=>u.role==='student'&&u.banned!==true);const map={};students.forEach(s=>{const school=s.school_name||'بدون مدرسة';if(!map[school])map[school]={name:school,count:0,totalXp:0,students:[]};map[school].count++;map[school].totalXp+=(s.xp||0);map[school].students.push(s);});const list=Object.values(map).map(s=>({...s,avgXp:Math.round(s.totalXp/s.count)})).sort((a,b)=>b.avgXp-a.avgXp);setSchools(list);}catch(e){}setLoading(false);})();},[app.db.users]);
+  if(loading)return <div className="glass" style={{padding:40,textAlign:'center'}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>;
+  return <><div className="h2 mb16 grad">🏫 ترتيب المدارس</div>{schools.length===0?<div className="glass" style={{padding:30}}><Empty icon="🏫" title="لا مدارس"/></div>:<div className="flex col g12">{schools.map((s,i)=><div key={s.name} className="glass" style={{padding:18}}><div className="flex between center mb12"><div className="flex center g12"><div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`} style={{width:44,height:44,fontSize:18}}>{i+1}</div><div><div className="h4">{SEC.esc(s.name)}</div><div className="xs muted">{s.count} طالب</div></div></div><div className="flex g8"><span className="pill pill-b">متوسط: {DB.fmt(s.avgXp)} XP</span></div></div></div>)}</div>}</>;
+}
+
+function StudyCalendarPage(){
+  const app=useApp();const user=app.currentUser;const [tasks,setTasks]=useState([]);const [editing,setEditing]=useState(null);const [form,setForm]=useState({title:'',due_date:new Date().toISOString().slice(0,10)});
+  useEffect(()=>{(async()=>{try{const sb=await DB.getClient();const {data}=await sb.from('study_tasks').select('*').eq('user_id',user.id).order('due_date',{ascending:true});setTasks(data||[]);}catch(e){}})();},[user.id]);
+  const addTask=async ()=>{if(!form.title.trim())return app.toast.warn('اكتب عنوان المهمة');try{const sb=await DB.getClient();await sb.from('study_tasks').insert([{id:DB.uid('tk_'),user_id:user.id,title:form.title,done:false,due_date:new Date(form.due_date).getTime(),created_at:Date.now()}]);const {data}=await sb.from('study_tasks').select('*').eq('user_id',user.id).order('due_date',{ascending:true});setTasks(data||[]);app.toast.ok('تمت الإضافة');setEditing(null);setForm({title:'',due_date:new Date().toISOString().slice(0,10)});}catch(e){app.toast.err(e.message);}};
+  const toggleTask=async (t)=>{try{const sb=await DB.getClient();await sb.from('study_tasks').update({done:!t.done}).eq('id',t.id);setTasks(ts=>ts.map(x=>x.id===t.id?{...x,done:!x.done}:x));}catch(e){}};
+  return <><div className="flex between center mb16 wrap g8"><div className="h2 grad">📅 تقويم المذاكرة</div><button className="btn btn-p" onClick={()=>setEditing('new')}><Icon name="plus" size={16}/> مهمة</button></div><div className="grid g3 mb16"><Stat label="مهام اليوم" value={tasks.filter(t=>new Date(t.due_date).toISOString().slice(0,10)===new Date().toISOString().slice(0,10)).length} icon="calendar" color="var(--gold)"/><Stat label="مكتملة" value={tasks.filter(t=>t.done).length} icon="check" color="#22c55e"/><Stat label="إجمالي" value={tasks.length} icon="target" color="#f59e0b"/></div>{tasks.length===0?<div className="glass" style={{padding:30}}><Empty icon="📅" title="لا مهام"/></div>:<div className="glass" style={{padding:14}}>{tasks.map(t=><div key={t.id} className="flex center g8" style={{padding:10,borderBottom:'1px solid var(--border)'}}><input type="checkbox" checked={t.done} onChange={()=>toggleTask(t)} style={{width:20,height:20}}/><span className="sm" style={{flex:1,textDecoration:t.done?'line-through':'none',opacity:t.done?.5:1}}>{SEC.esc(t.title)}</span></div>)}</div>}{editing&&<Modal title="مهمة جديدة" onClose={()=>setEditing(null)}><Field label="العنوان"><input className="input" value={form.title} onChange={e=>setForm({...form,title:e.target.value})}/></Field><Field label="التاريخ"><input type="date" className="input" value={form.due_date} onChange={e=>setForm({...form,due_date:e.target.value})}/></Field><div className="flex g8 mt16"><button className="btn btn-p" style={{flex:1}} onClick={addTask}>حفظ</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div></Modal>}</>;
+}
+
+function FocusModePage(){
+  const app=useApp();const user=app.currentUser;const [duration,setDuration]=useState(25);const [timeLeft,setTimeLeft]=useState(25*60);const [running,setRunning]=useState(false);const [startedAt,setStartedAt]=useState(null);const timerRef=useRef(null);
+  useEffect(()=>{if(running&&timeLeft>0){timerRef.current=setInterval(()=>{setTimeLeft(t=>{if(t<=1){clearInterval(timerRef.current);return 0;}return t-1;});},1000);return()=>clearInterval(timerRef.current);}},[running]);
+  useEffect(()=>{if(running&&timeLeft===0){finish();}},[timeLeft]);
+  const finish=async ()=>{setRunning(false);if(!startedAt)return;const minutes=Math.round((Date.now()-startedAt)/60000);try{const sb=await DB.getClient();await sb.from('focus_sessions').insert([{id:DB.uid('fs_'),user_id:user.id,label:'جلسة',duration_minutes:duration,actual_minutes:minutes,xp_awarded:minutes*2,status:'completed',started_at:startedAt,completed_at:Date.now()}]);await DB.updateUser(user.id,{xp:(user.xp||0)+minutes*2});await app.reload();app.toast.ok(`انتهت الجلسة! +${minutes*2} XP`);}catch(e){}setTimeLeft(duration*60);setStartedAt(null);};
+  const start=()=>{if(running){clearInterval(timerRef.current);setRunning(false);return;}setStartedAt(Date.now());setRunning(true);};
+  const reset=()=>{clearInterval(timerRef.current);setRunning(false);setTimeLeft(duration*60);setStartedAt(null);};
+  const fmt=s=>`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+  return <><div className="h2 mb16 grad">🎯 وضع التركيز</div><div className="glass mb16" style={{padding:30,textAlign:'center'}}><div className="focus-timer mb20">{fmt(timeLeft)}</div>{!running&&<div className="flex wrap g6 mb16" style={{justifyContent:'center'}}>{[5,15,25,45,60].map(d=><button key={d} onClick={()=>{setDuration(d);setTimeLeft(d*60);}} className={`msg-tab ${duration===d?'active':''}`}>{d} د</button>)}</div>}<div className="flex g8" style={{justifyContent:'center'}}><button className="btn btn-p" onClick={start} style={{minWidth:140}}>{running?'⏸️ إيقاف':'▶️ بدء'}</button><button className="btn btn-s" onClick={reset}>🔄 إعادة</button></div></div></>;
+}
+
 function LeaderboardPage(){
   const app=useApp();
   const students=[...app.db.users].filter(u=>u.role==='student'&&u.banned!==true).sort((a,b)=>(b.xp||0)-(a.xp||0));
-  return <>
-    <div className="h2 mb16 grad">🏆 لوحة المتصدرين</div>
-    {students.length===0?<div className="glass" style={{padding:30}}><Empty icon="🏆" title="لا طلاب"/></div>:
-    <div className="glass" style={{padding:18}}>{students.slice(0,50).map((s,i)=>{const lvl=app.getLevel(s.xp||0);return <div key={s.id} className="flex center g12" style={{padding:'10px 0',borderBottom:'1px solid rgba(0,212,255,.08)'}}>
-      <div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div>
-      <StudentAvatar student={s} size={40}/>
-      <div style={{flex:1,minWidth:0}}>
-        <div className="sm" style={{fontWeight:700}}>{SEC.esc(s.name)}</div>
-        <div className="xs muted">Lv {lvl.current.level} — {SEC.esc(lvl.current.name)}</div>
-      </div>
-      <span className="pill pill-b">{DB.fmt(s.xp||0)} XP</span>
-    </div>;})}</div>}
-  </>;
+  return <><div className="h2 mb16 grad">🏆 لوحة المتصدرين</div>{students.length===0?<div className="glass" style={{padding:30}}><Empty icon="🏆" title="لا طلاب"/></div>:<div className="glass" style={{padding:18}}>{students.slice(0,50).map((s,i)=>{const lvl=app.getLevel(s.xp||0);return <div key={s.id} className="flex center g12" style={{padding:'10px 0',borderBottom:'1px solid rgba(0,212,255,.08)'}}><div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div><StudentAvatar student={s} size={40}/><div style={{flex:1}}><div className="sm" style={{fontWeight:700}}>{SEC.esc(s.name)}</div><div className="xs muted">Lv {lvl.current.level} — {SEC.esc(lvl.current.name)}</div></div><span className="pill pill-b">{DB.fmt(s.xp||0)} XP</span></div>;})}</div>}</>;
 }
+
+function StudentsDirectoryPage(){
+  const app=useApp();const [q,setQ]=useState('');
+  const students=app.db.users.filter(u=>u.role==='student'&&u.banned!==true&&u.id!==app.currentUser.id);
+  const filtered=students.filter(s=>s.name.toLowerCase().includes(q.toLowerCase()));
+  return <><div className="h2 mb16 grad">👥 الطلاب</div><div className="glass mb16" style={{padding:14}}><input className="input" placeholder="🔍 ابحث..." value={q} onChange={e=>setQ(e.target.value)}/></div>{filtered.length===0?<div className="glass" style={{padding:30}}><Empty icon="👥" title="لا طلاب"/></div>:<div className="grid g3">{filtered.map(s=>{const lvl=app.getLevel(s.xp||0);return <div key={s.id} className="student-card"><StudentAvatar student={s} size={70}/><div className="h4 mt8">{SEC.esc(s.name)}</div><div className="xs muted">Lv {lvl.current.level}</div><div className="mt8"><span className="pill pill-b">{DB.fmt(s.xp||0)} XP</span></div></div>;})}</div>}</>;
+}
+
+function MessagesPage(){
+  const app=useApp();const user=app.currentUser;const [chatWith,setChatWith]=useState(null);const [text,setText]=useState('');
+  const allMsgs=(app.db.direct_messages||[]);
+  const inbox=allMsgs.filter(m=>m.to_id===user.id).sort((a,b)=>b.created_at-a.created_at);
+  const conversation=chatWith?allMsgs.filter(m=>(m.from_id===user.id&&m.to_id===chatWith)||(m.from_id===chatWith&&m.to_id===user.id)).sort((a,b)=>a.created_at-b.created_at):[];
+  const otherUser=chatWith?app.db.users.find(u=>u.id===chatWith):null;
+  const send=async ()=>{const t=SEC.clean(text);if(!t)return;try{await DB.save('direct_messages',{from_id:user.id,to_id:chatWith,text:t,created_at:Date.now(),read:false});setText('');await app.reload();}catch(e){app.toast.err(e.message);}};
+  if(chatWith&&otherUser){return <><div className="flex between center mb16"><button className="btn btn-s" onClick={()=>setChatWith(null)}>← رجوع</button><div className="flex center g8"><StudentAvatar student={otherUser} size={36}/><div className="sm" style={{fontWeight:700}}>{SEC.esc(otherUser.name)}</div></div></div><div className="glass" style={{padding:16}}>{conversation.map(m=><div key={m.id} style={{display:'flex',justifyContent:m.from_id===user.id?'flex-end':'flex-start'}}><div style={{maxWidth:'70%',padding:'10px 14px',borderRadius:14,marginBottom:8,background:m.from_id===user.id?'rgba(0,212,255,.2)':'rgba(255,255,255,.06)'}}>{SEC.esc(m.text)}</div></div>)}<div className="flex g8 mt12"><input className="input" placeholder="اكتب..." value={text} onChange={e=>setText(e.target.value)} onKeyDown={e=>e.key==='Enter'&&send()}/><button className="btn btn-p" onClick={send}><Icon name="send" size={16}/></button></div></div></>;}
+  return <><div className="h2 mb16 grad">💬 الرسائل</div><div className="glass" style={{padding:16}}>{inbox.length===0?<Empty icon="💬" title="لا رسائل"/>:inbox.map(m=>{const other=app.db.users.find(u=>u.id===m.from_id);return <div key={m.id} className="msg-card" onClick={()=>setChatWith(m.from_id)}><div className="flex between center mb6"><span className="sm" style={{fontWeight:700}}>{SEC.esc(other?.name||'محذوف')}</span><span className="xs muted">{DB.formatDateTime(m.created_at)}</span></div><div className="sm muted">{SEC.esc(m.text)}</div></div>;})}</div></>;
+}
+
+function NotificationsPage(){
+  const app=useApp();const user=app.currentUser;
+  const notifs=(app.db.notifications||[]).filter(n=>n.target==='all'||n.target===user.id).sort((a,b)=>(b.created_at||0)-(a.created_at||0));
+  return <><div className="h2 mb16 grad">🔔 الإشعارات</div>{notifs.length===0?<div className="glass" style={{padding:30}}><Empty icon="🔔" title="لا إشعارات"/></div>:<div className="flex col g8">{notifs.map(n=><div key={n.id} className="glass-s" style={{padding:14}}><div className="flex between center mb6"><div className="h4" style={{fontSize:14}}>{SEC.esc(n.title)}</div><span className="xs muted">{DB.formatDateTime(n.created_at)}</span></div><div className="sm txt2">{SEC.esc(n.body)}</div></div>)}</div>}</>;
+}
+
 function ProfilePage(){
-  const app=useApp();
-  const user=app.currentUser;
-  const lvl=app.getLevel(user.xp||0);
-  const changePassword=async ()=>{
-    const {value:newPass}=await Swal.fire({title:'كلمة مرور جديدة',input:'password',inputPlaceholder:'على الأقل 6 أحرف',showCancelButton:true,confirmButtonText:'حفظ',cancelButtonText:'إلغاء',confirmButtonColor:'#00d4ff',cancelButtonColor:'#64748b',inputValidator:v=>{if(!v||v.length<6)return 'قصيرة جدًا'},customClass:{popup:'swal-custom-popup',title:'swal-custom-title',input:'swal-custom-input'}});
-    if(newPass){try{await DB.updateUser(user.id,{password:newPass});app.toast.ok('تم التحديث');}catch(e){app.toast.err(e.message);}}
-  };
-  return <>
-    <div className="h2 mb16 grad">👤 ملفي</div>
-    <div className="glass mb16" style={{padding:22}}>
-      <div className="flex center g16 wrap">
-        <StudentAvatar student={user} size={100}/>
-        <div style={{flex:1,minWidth:200}}>
-          <div className="h2 mb6">{SEC.esc(user.name)}</div>
-          <div className="sm muted mb8" dir="ltr">📱 {(user.country_code||'+20')}{(user.phone||'').replace(/(\d{3})\d{4}(\d{3})/,'$1****$2')}</div>
-          <div className="flex wrap g6">
-            <span className="pill pill-b">🏆 Lv {lvl.current.level} — {SEC.esc(lvl.current.name)}</span>
-            {user.subscription==='vip'?<span className="pill pill-v">💎 VIP</span>:user.subscription==='paid'?<span className="pill pill-g">💳 مدفوع</span>:<span className="pill pill-y">🆓 مجاني</span>}
-            {user.governorate&&<span className="pill pill-b">📍 {SEC.esc(user.governorate)}</span>}
-          </div>
-        </div>
-      </div>
-      <div className="div"></div>
-      <div className="grid g4">
-        <Stat label="XP" value={DB.fmt(user.xp||0)} icon="trend" color="var(--gold)"/>
-        <Stat label="السلسلة" value={DB.fmt(user.streak||0)} icon="flash" color="#f59e0b"/>
-        <Stat label="دروس" value={DB.fmt((user.completed_lessons||[]).length)} icon="book" color="#22c55e"/>
-        <Stat label="إنجازات" value={DB.fmt((user.achievements||[]).length)} icon="award" color="var(--gold-d)"/>
-      </div>
-    </div>
-    <div className="glass" style={{padding:22}}>
-      <div className="h4 mb12" style={{color:'var(--gold)'}}>⚙️ الإعدادات</div>
-      <button className="btn btn-s btn-block mb12" onClick={changePassword}>🔑 تغيير كلمة المرور</button>
-      <button className="btn btn-dn btn-block" onClick={app.logout}>🚪 تسجيل الخروج</button>
-    </div>
-  </>;
+  const app=useApp();const user=app.currentUser;const lvl=app.getLevel(user.xp||0);
+  const changePassword=async ()=>{const {value:newPass}=await Swal.fire({title:'كلمة مرور جديدة',input:'password',inputPlaceholder:'6 أحرف على الأقل',showCancelButton:true,confirmButtonText:'حفظ',cancelButtonText:'إلغاء',confirmButtonColor:'#00d4ff',cancelButtonColor:'#64748b',inputValidator:v=>{if(!v||v.length<6)return 'قصيرة جدًا'},customClass:{popup:'swal-custom-popup',title:'swal-custom-title',input:'swal-custom-input'}});if(newPass){try{await DB.updateUser(user.id,{password:newPass});app.toast.ok('تم التحديث');}catch(e){app.toast.err(e.message);}}};
+  return <><div className="h2 mb16 grad">👤 ملفي</div><div className="glass mb16" style={{padding:22}}><div className="flex center g16 wrap"><StudentAvatar student={user} size={100}/><div style={{flex:1,minWidth:200}}><div className="h2 mb6">{SEC.esc(user.name)}</div><div className="sm muted mb8" dir="ltr">📱 {(user.country_code||'+20')}{(user.phone||'')}</div><div className="flex wrap g6"><span className="pill pill-b">🏆 Lv {lvl.current.level} — {SEC.esc(lvl.current.name)}</span>{user.subscription==='vip'?<span className="pill pill-v">💎 VIP</span>:user.subscription==='paid'?<span className="pill pill-g">💳 مدفوع</span>:<span className="pill pill-y">🆓 مجاني</span>}{user.governorate&&<span className="pill pill-b">📍 {SEC.esc(user.governorate)}</span>}</div></div></div><div className="div"></div><div className="grid g4"><Stat label="XP" value={DB.fmt(user.xp||0)} icon="trend" color="var(--gold)"/><Stat label="السلسلة" value={DB.fmt(user.streak||0)} icon="flash" color="#f59e0b"/><Stat label="دروس" value={DB.fmt((user.completed_lessons||[]).length)} icon="book" color="#22c55e"/><Stat label="إنجازات" value={DB.fmt((user.achievements||[]).length)} icon="award" color="var(--gold-d)"/></div></div><div className="glass" style={{padding:22}}><div className="h4 mb12" style={{color:'var(--gold)'}}>⚙️ الإعدادات</div><button className="btn btn-s btn-block mb12" onClick={changePassword}>🔑 تغيير كلمة المرور</button><button className="btn btn-dn btn-block" onClick={app.logout}>🚪 تسجيل الخروج</button></div></>;
 }
+
 function Footer(){
-  const app=useApp();
-  const user=app.currentUser;
-  const sendReport=async()=>{const {value:msg}=await Swal.fire({title:'🚨 بلاغ',input:'textarea',inputPlaceholder:'اكتب رسالتك',showCancelButton:true,confirmButtonText:'📤 إرسال',cancelButtonText:'إلغاء',confirmButtonColor:'#00d4ff',cancelButtonColor:'#64748b',inputValidator:v=>{if(!v||v.trim().length<5)return 'رسالة قصيرة'},customClass:{popup:'swal-custom-popup',title:'swal-custom-title',input:'swal-custom-input'}});if(msg){const sent=await DB.reportIssue({userName:user?.name||'طالب',userPhone:(user?.country_code||'+20')+(user?.phone||'—'),message:SEC.clean(SEC.maxLen(msg,2000))});Swal.fire({icon:sent?'success':'error',title:sent?'✅':'❌',confirmButtonColor:'#00d4ff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});}};
+  const app=useApp();const user=app.currentUser;
+  const sendReport=async()=>{const {value:msg}=await Swal.fire({title:'🚨 بلاغ',input:'textarea',inputPlaceholder:'اكتب رسالتك',showCancelButton:true,confirmButtonText:'📤 إرسال',cancelButtonText:'إلغاء',confirmButtonColor:'#00d4ff',cancelButtonColor:'#64748b',inputValidator:v=>{if(!v||v.trim().length<5)return 'رسالة قصيرة'},customClass:{popup:'swal-custom-popup',title:'swal-custom-title',input:'swal-custom-input'}});if(msg){const sent=await DB.reportIssue({userName:user?.name||'طالب',userPhone:(user?.country_code||'+20')+(user?.phone||'—'),message:SEC.clean(msg)});Swal.fire({icon:sent?'success':'error',title:sent?'✅':'❌',confirmButtonColor:'#00d4ff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});}};
   return <div className="footer-dev"><button className="dev-btn" onClick={()=>window.open("https://wa.me/201128351702","_blank")}><span className="dev-name">Developed by <b>EL-sayed Hasan</b></span></button><button className="tg-btn" onClick={sendReport}>بلاغ</button></div>;
 }
+
 function StudentApp(){
   const app=useApp();
   const [tab,setTab]=useState(()=>{try{return localStorage.getItem('student_tab')||'home'}catch(e){return 'home'}});
   const [sidebarOpen,setSidebarOpen]=useState(false);
   const user=app.currentUser;
   useEffect(()=>{try{localStorage.setItem('student_tab',tab)}catch(e){}},[tab]);
+  const unreadMsgs=(app.db.direct_messages||[]).filter(m=>m.to_id===user.id&&!m.read).length;
+  const unreadNotifs=(app.db.notifications||[]).filter(n=>{if(n.target!=='all'&&n.target!==user.id)return false;return (Number(n.created_at)||0)>Number(localStorage.getItem('notif_read_'+user.id)||0);}).length;
+  useEffect(()=>{if(tab==='notifications'){try{localStorage.setItem('notif_read_'+user.id,Date.now().toString())}catch(e){}}},[tab,user.id]);
   const items=[
-    {title:'الرئيسية',items:[{id:'home',icon:'home',label:'الرئيسية'}]},
-    {title:'التعلم',items:[{id:'lessons',icon:'book',label:'الدروس'},{id:'exams',icon:'clipboard',label:'الاختبارات'}]},
-    {title:'الأنشطة',items:[{id:'friend-challenge',icon:'swords',label:'تحدي الأصدقاء'}]},
-    {title:'التواصل',items:[{id:'leaderboard',icon:'trophy',label:'المتصدرين'}]},
-    {title:'الحساب',items:[{id:'profile',icon:'user',label:'ملفي'}]}
+    {title:'الرئيسية',items:[{id:'home',icon:'home',label:'الرئيسية'},{id:'analytics',icon:'chart',label:'تحليلاتي'}]},
+    {title:'التعلم',items:[{id:'lessons',icon:'book',label:'الدروس'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'practice',icon:'target',label:'وضع التدريب'},{id:'flashcards',icon:'layers',label:'Flashcards'}]},
+    {title:'الأنشطة',items:[{id:'focus',icon:'clock',label:'وضع التركيز'},{id:'calendar',icon:'calendar',label:'تقويم المذاكرة'},{id:'groups',icon:'handshake',label:'مجموعات الدراسة'},{id:'friend-challenge',icon:'swords',label:'تحدي الأصدقاء'}]},
+    {title:'التواصل',items:[{id:'leaderboard',icon:'trophy',label:'المتصدرين'},{id:'school-lb',icon:'school',label:'ترتيب المدارس'},{id:'students',icon:'users',label:'الطلاب'},{id:'messages',icon:'message',label:'الرسائل',badge:unreadMsgs||null},{id:'notifications',icon:'bell',label:'الإشعارات',badge:unreadNotifs||null}]},
+    {title:'الحساب',items:[{id:'xp-shop',icon:'shoppingBag',label:'متجر XP'},{id:'profile',icon:'user',label:'ملفي'}]}
   ];
   const navigate=(id)=>{
-    if(id === 'friend-challenge'){ window.location.href = 'sv.html'; return; }
+    if(id==='friend-challenge'){ window.location.href='sv.html'; return; }
     setTab(id);setSidebarOpen(false);
   };
   return <div className="app">
     <Sidebar items={items} active={tab} onNav={navigate} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} onLogout={app.logout}/>
     <div className="main">
-      <Topbar user={user} onMenu={()=>setSidebarOpen(true)} onLogout={app.logout} onOpenProfile={()=>navigate('profile')}/>
+      <Topbar user={user} onMenu={()=>setSidebarOpen(true)} onLogout={app.logout} unreadNotifs={unreadNotifs} unreadMsgs={unreadMsgs} onOpenNotifications={()=>navigate('notifications')} onOpenMessages={()=>navigate('messages')} onOpenProfile={()=>navigate('profile')}/>
       <div className="content">
         {tab==='home'&&<HomePage onNavigate={navigate}/>}
+        {tab==='analytics'&&<AnalyticsPage/>}
         {tab==='lessons'&&<LessonsPage/>}
         {tab==='exams'&&<ExamsPage/>}
+        {tab==='practice'&&<PracticePage/>}
+        {tab==='flashcards'&&<FlashcardsPage/>}
+        {tab==='focus'&&<FocusModePage/>}
+        {tab==='calendar'&&<StudyCalendarPage/>}
+        {tab==='groups'&&<StudyGroupsPage/>}
+        {tab==='xp-shop'&&<XPShopPage/>}
         {tab==='leaderboard'&&<LeaderboardPage/>}
+        {tab==='school-lb'&&<SchoolLeaderboardPage/>}
+        {tab==='students'&&<StudentsDirectoryPage/>}
+        {tab==='messages'&&<MessagesPage/>}
+        {tab==='notifications'&&<NotificationsPage/>}
         {tab==='profile'&&<ProfilePage/>}
         <Footer/>
       </div>
     </div>
   </div>;
 }
+
 function Root(){
   const app=useApp();
   if(app.loading)return <div className="loading"><div className="spinner"></div>جارٍ التحميل...</div>;
   if(!app.currentUser)return null;
   return <StudentApp/>;
 }
+
 function App(){return <ToastProvider><AppProvider><Root/></AppProvider></ToastProvider>;}
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
