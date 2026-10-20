@@ -299,7 +299,14 @@ const AppCtx=createContext(null);
 const useApp=()=>useContext(AppCtx);
 
 function AppProvider({children}){
-  const [db,setDb]=useState({users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[],polls:[],poll_votes:[],xp_shop_items:[],study_groups:[],study_group_members:[],study_plans:[],daily_challenges:[],practice_sessions:[],focus_sessions:[],flashcards:[],audit_logs:[]});
+  const [db,setDb]=useState(()=>{
+    try {
+      const cached = localStorage.getItem('admin_db_cache');
+      return cached ? JSON.parse(cached) : {users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[],polls:[],poll_votes:[],xp_shop_items:[],study_groups:[],study_group_members:[],study_plans:[],daily_challenges:[],practice_sessions:[],focus_sessions:[],flashcards:[],audit_logs:[]};
+    } catch(e) {
+      return {users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[],polls:[],poll_votes:[],xp_shop_items:[],study_groups:[],study_group_members:[],study_plans:[],daily_challenges:[],practice_sessions:[],focus_sessions:[],flashcards:[],audit_logs:[]};
+    }
+  });
   const [currentUser,setCurrentUser]=useState(null);
   const [loading,setLoading]=useState(true);
   const toast=useToast();
@@ -313,6 +320,7 @@ function AppProvider({children}){
       const extraResults=await Promise.all(extra.map(async(t)=>{try{const res=await sb.from(t).select('*').limit(2000);return{t,data:res.data||[]};}catch(e){return{t,data:[]};}}));
       extraResults.forEach(r=>{data[r.t]=r.data;});
       setDb(data);
+      try { localStorage.setItem('admin_db_cache', JSON.stringify(data)); } catch(e) {}
     }catch(e){console.warn(e);}
   },[]);
 
@@ -322,20 +330,12 @@ function AppProvider({children}){
 
   useEffect(()=>{const unlock=()=>{const ctx=getAudioCtx();if(ctx&&ctx.state==='suspended')ctx.resume();document.removeEventListener('click',unlock);document.removeEventListener('touchstart',unlock);};document.addEventListener('click',unlock,{once:true});document.addEventListener('touchstart',unlock,{once:true});return ()=>{document.removeEventListener('click',unlock);document.removeEventListener('touchstart',unlock);};},[]);
 
-  const logout=useCallback(()=>{Swal.fire({title:'تسجيل الخروج',text:'هل أنت متأكد؟',icon:'question',showCancelButton:true,confirmButtonText:'نعم، خروج',cancelButtonText:'إلغاء',confirmButtonColor:'#D4AF37',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}}).then(r=>{if(r.isConfirmed){DB.clearSession();window.location.replace('/auth/login.html');}});},[]);
+  const logout=useCallback(()=>{Swal.fire({title:'تسجيل الخروج',text:'هل أنت متأكد؟',icon:'question',showCancelButton:true,confirmButtonText:'نعم، خروج',cancelButtonText:'إلغاء',confirmButtonColor:'#D4AF37',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}}).then(r=>{if(r.isConfirmed){DB.clearSession();localStorage.removeItem('admin_db_cache');window.location.replace('/auth/login.html');}});},[]);
 
   const logAudit = useCallback(async(action, target, details) => {
     if(!currentUser) return;
     try {
-      await DB.save('audit_logs', {
-        id: DB.uid('log_'),
-        admin_id: currentUser.id,
-        admin_name: currentUser.name,
-        action,
-        target,
-        details: details || {},
-        created_at: Date.now()
-      });
+      await DB.save('audit_logs', { id: DB.uid('log_'), admin_id: currentUser.id, admin_name: currentUser.name, action, target, details: details || {}, created_at: Date.now() });
     } catch(e) {}
   }, [currentUser]);
 
@@ -343,25 +343,42 @@ function AppProvider({children}){
     const clean = SEC.sanitizeObject(item);
     if(!clean || typeof clean!=='object') throw new Error('بيانات غير صالحة');
     const saved=await DB.save(table,clean);
+    setDb(prev => {
+      const list = prev[table] || [];
+      const idx = list.findIndex(x => x.id === item.id);
+      const newList = [...list];
+      if (idx > -1) newList[idx] = item;
+      else newList.push(item);
+      const newDb = { ...prev, [table]: newList };
+      try { localStorage.setItem('admin_db_cache', JSON.stringify(newDb)); } catch(e) {}
+      return newDb;
+    });
     await logAudit('edit/create', `${table} : ${item.title || item.name || item.id}`, { table, id: item.id });
-    await reload();
     return saved;
-  },[reload, logAudit]);
+  },[logAudit]);
 
   const remove=useCallback(async (table,id)=>{
     if(!id || typeof id!=='string' || id.length<3) throw new Error('معرف غير صالح');
     await DB.remove(table,id);
+    setDb(prev => {
+      const newDb = { ...prev, [table]: (prev[table]||[]).filter(x => x.id !== id) };
+      try { localStorage.setItem('admin_db_cache', JSON.stringify(newDb)); } catch(e) {}
+      return newDb;
+    });
     await logAudit('delete', `${table} : ${id}`, { table, id });
-    await reload();
-  },[reload, logAudit]);
+  },[logAudit]);
 
   const removeMany=useCallback(async (table,ids)=>{
     const clean = (ids||[]).filter(x=>typeof x==='string'&&x.length>=3);
     if(!clean.length) return;
     await DB.removeMany(table,clean);
+    setDb(prev => {
+      const newDb = { ...prev, [table]: (prev[table]||[]).filter(x => !clean.includes(x.id)) };
+      try { localStorage.setItem('admin_db_cache', JSON.stringify(newDb)); } catch(e) {}
+      return newDb;
+    });
     await logAudit('bulk_delete', `${table}`, { table, count: clean.length });
-    await reload();
-  },[reload, logAudit]);
+  },[logAudit]);
 
   const getLevel=useCallback((xp)=>{const ls=[...db.levels].sort((a,b)=>a.xp-b.xp);if(ls.length===0)return {current:{level:1,name:'مبتدئ',xp:0},next:null};let cur=ls[0],next=null;for(let i=0;i<ls.length;i++){if(xp>=ls[i].xp){cur=ls[i];next=ls[i+1]||null;}}return {current:cur,next};},[db.levels]);
 
@@ -650,8 +667,6 @@ function AuditLogsPage(){
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-  // حالات الفلترة والبحث
   const [search, setSearch] = useState('');
   const [adminFilter, setAdminFilter] = useState('all');
 
@@ -669,14 +684,12 @@ function AuditLogsPage(){
     })();
   },[]);
 
-  // استخراج أسماء الأدمنز الفريدة عشان نحطها في الفلتر
   const uniqueAdmins = useMemo(() => {
     const admins = new Set();
     logs.forEach(l => { if(l.admin_name) admins.add(l.admin_name); });
     return Array.from(admins);
   }, [logs]);
 
-  // تطبيق الفلترة والبحث
   const filteredLogs = useMemo(() => {
     return logs.filter(l => {
       const matchAdmin = adminFilter === 'all' || l.admin_name === adminFilter;
@@ -691,11 +704,10 @@ function AuditLogsPage(){
 
   return <>
     <div className="flex between center mb16 wrap g8">
-      <div className="h2 grad">📜 سجل عمليات الأدمن (Audit Log)</div>
+      <div className="h2 grad">📜 سجل عمليات الأدمن</div>
       <span className="pill pill-b">{filteredLogs.length} عملية</span>
     </div>
 
-    {/* شريط البحث والفلترة */}
     <div className="glass mb16" style={{padding:14}}>
       <div className="flex wrap g12">
         <select className="input" style={{maxWidth:250}} value={adminFilter} onChange={e=>setAdminFilter(e.target.value)}>
@@ -1434,19 +1446,16 @@ function NotificationsPage(){
 
 function ReportsPage(){
   const app=useApp();
-  const [tab, setTab] = useState('students'); // students | footer
+  const [tab, setTab] = useState('students');
   
-  // حالات بلاغات الطلاب
   const [reports,setReports]=useState([]);
   const [loading,setLoading]=useState(true);
   const [filter,setFilter]=useState('pending');
   const [busy,setBusy]=useState(null);
 
-  // حالات رسائل الفوتر
   const [footerMsgs, setFooterMsgs] = useState([]);
   const [footerLoading, setFooterLoading] = useState(false);
 
-  // تحميل بلاغات الطلاب
   const loadReports=useCallback(async()=>{
     setLoading(true);
     try{
@@ -1461,12 +1470,10 @@ function ReportsPage(){
     setLoading(false);
   },[filter]);
 
-  // تحميل رسائل الفوتر
   const loadFooterMsgs = useCallback(async () => {
     setFooterLoading(true);
     try {
       const sb = await DB.getClient();
-      // ملاحظة: لو جدول الرسايل اسمه مختلف في db.js (زي feedback أو support)، غير كلمة 'issues' هنا
       const { data, error } = await sb.from('issues').select('*').order('created_at', { ascending: false }).limit(500);
       if (error) throw error;
       setFooterMsgs(data || []);
@@ -1481,7 +1488,6 @@ function ReportsPage(){
     if(tab === 'footer') loadFooterMsgs();
   },[tab, loadReports, loadFooterMsgs]);
 
-  // إجراءات بلاغات الطلاب
   const review=async(reportId,status,action,banTarget,banReason)=>{
     setBusy(reportId);
     try{
@@ -1508,7 +1514,6 @@ function ReportsPage(){
     return <span className="pill pill-g">✓ مراجع</span>;
   };
 
-  // حذف رسالة فوتر
   const deleteFooterMsg = async (id) => {
     const r = await Swal.fire({title:'حذف الرسالة؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
     if(!r.isConfirmed) return;
@@ -1536,13 +1541,11 @@ function ReportsPage(){
       </div>
     </div>
 
-    {/* التابات */}
     <div className="msg-tabs mb16">
       <button className={`msg-tab ${tab==='students'?'active':''}`} onClick={()=>setTab('students')}>🚩 بلاغات الطلاب</button>
       <button className={`msg-tab ${tab==='footer'?'active':''}`} onClick={()=>setTab('footer')}>✉️ رسائل الفوتر (الدعم)</button>
     </div>
 
-    {/* قسم بلاغات الطلاب */}
     {tab === 'students' && (
       <>
         <div className="msg-tabs mb16" style={{marginTop:-10}}>
@@ -1569,7 +1572,6 @@ function ReportsPage(){
       </>
     )}
 
-    {/* قسم رسائل الفوتر */}
     {tab === 'footer' && (
       <div className="glass" style={{padding:14}}>
         {footerLoading ? (<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>) : footerMsgs.length===0 ? (<Empty icon="✉️" title="لا توجد رسائل من الفوتر"/>) : (
