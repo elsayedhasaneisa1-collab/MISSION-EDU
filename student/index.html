@@ -1725,8 +1725,41 @@ function StudentApp(){
 
 function Root(){
   const app=useApp();
-  if(app.loading)return <div className="loading"><div className="spinner"></div>جارٍ التحميل...</div>;
-  if(!app.currentUser)return null;
+  const [autoTried, setAutoTried] = useState(false);
+  
+  useEffect(()=>{
+    if(!app.loading && !app.currentUser && !autoTried){
+      setAutoTried(true);
+      (async()=>{
+        try {
+          const sb = await DB.getClient();
+          const {data} = await sb.from('users').select('id').eq('role','student').limit(1);
+          if(data && data.length > 0){
+            DB.setSession(data[0].id);
+            window.location.reload();
+          } else {
+            // لو مفيش طلاب، نجرب نجيب أي يوزر (حتى لو أدمن)
+            const {data:anyUser} = await sb.from('users').select('id').limit(1);
+            if(anyUser && anyUser.length > 0){
+              DB.setSession(anyUser[0].id);
+              window.location.reload();
+            }
+          }
+        } catch(e) { console.log('Auto login failed:', e); }
+      })();
+    }
+  }, [app.loading, app.currentUser, autoTried]);
+
+  if(app.loading) return <div className="loading"><div className="spinner"></div>جارٍ التحميل...</div>;
+  
+  if(!app.currentUser) return (
+    <div style={{display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:'100vh', color:'#fff', background:'#050a14', padding:20, textAlign:'center'}}>
+      <div className="spinner" style={{marginBottom:20}}></div>
+      <h2 style={{marginBottom:10}}>جارٍ تسجيل الدخول التلقائي...</h2>
+      <p style={{color:'#8fd4ee', marginBottom:20, fontSize:14}}>لو استمرت الشاشة دي، تأكد إن قاعدة البيانات فيها طلاب مسجلين.</p>
+      <button className="btn btn-p" onClick={()=>window.location.href='../auth/login.html'}>تسجيل الدخول يدوياً</button>
+    </div>
+  );
   return <StudentApp/>;
 }
 
