@@ -121,6 +121,7 @@
     // الأسئلة: جرّب الأدمن RPC، ثم fallback على public view
     result.questions = [];
     try {
+      const adminId = getSessionId();
       const { data, error } = await sb.rpc('admin_get_questions', { p_limit: 2000 });
       if (!error && Array.isArray(data) && data.length > 0) {
         result.questions = data;
