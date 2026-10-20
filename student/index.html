@@ -1405,7 +1405,15 @@ function ProfilePage(){
   const app=useApp();
   const user=app.currentUser;
   const lvl=app.getLevel(user.xp||0);
-  const isPaid=user.subscription==='paid'||user.subscription==='vip';
+  const isPaid = (() => {
+  if (user.subscription === 'vip') return true;
+  if (user.subscription === 'paid') {
+    if (!user.subscription_until) return true;
+    const until = typeof user.subscription_until === 'number' ? user.subscription_until : new Date(user.subscription_until).getTime();
+    return !isNaN(until) && until > Date.now();
+  }
+  return false;
+})();
   const [uploading,setUploading]=useState(false);
   const uploadAvatar=async file=>{
     if(!file)return;
@@ -1439,7 +1447,10 @@ function ProfilePage(){
           <div className="sm muted mb8" dir="ltr">📱 {(user.country_code||'+20')}{(user.phone||'').replace(/(\d{3})\d{4}(\d{3})/,'$1****$2')}</div>
           <div className="flex wrap g6">
             <span className="pill pill-b">🏆 Lv {lvl.current.level} — {SEC.esc(lvl.current.name)}</span>
-            {user.subscription==='vip'?<span className="pill pill-v">💎 VIP</span>:user.subscription==='paid'?<span className="pill pill-g">💳 مدفوع</span>:<span className="pill pill-y">🆓 مجاني</span>}
+            {user.subscription==='vip' ? <span className="pill pill-v">💎 VIP</span> :
+ (user.subscription==='paid' && isPaid) ? <span className="pill pill-g">💳 مدفوع</span> :
+ (user.subscription==='paid' && !isPaid) ? <span className="pill pill-r">🔒 اشتراك منتهي</span> :
+ <span className="pill pill-y">🆓 مجاني</span>}
             {user.governorate&&<span className="pill pill-b">📍 {SEC.esc(user.governorate)}</span>}
             {user.school_name&&<span className="pill pill-b">🏫 {SEC.esc(user.school_name)}</span>}
           </div>
