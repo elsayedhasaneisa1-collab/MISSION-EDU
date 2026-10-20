@@ -55,6 +55,8 @@ ul{list-style:none}
 @keyframes goldShine{0%{background-position:0% 50%}100%{background-position:300% 50%}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(0,212,255,.4)}50%{box-shadow:0 0 40px rgba(0,212,255,.8)}}
+@keyframes pop{0%{transform:scale(.7);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
 .brand{display:flex;align-items:center;gap:11px;padding:8px 10px 16px}
 .brand-logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--grad-gold);box-shadow:0 8px 26px rgba(0,212,255,.55),0 0 0 1px rgba(95,251,255,.3) inset;position:relative}
 .brand-logo::after{content:'';position:absolute;inset:0;border-radius:14px;background:linear-gradient(135deg,rgba(255,255,255,.35),transparent 45%);pointer-events:none}
@@ -211,6 +213,8 @@ textarea.input{resize:vertical;min-height:80px}
 .calendar-day:hover{border-color:var(--border2)}
 .calendar-day.today{background:rgba(0,212,255,.20);border-color:var(--gold);font-weight:800}
 .calendar-day.done{background:rgba(34,197,94,.15);border-color:#22c55e}
+.reward-banner{animation:glow 2.5s ease-in-out infinite}
+.xp-pop{animation:pop .5s ease-out}
 body.light-mode{--bg:#f0f4f8;--bg2:#e0e8f0;--txt:#0a1220;--txt2:#4a5f7a;--muted:#8fa5bd;background:#f0f4f8}
 body.light-mode .glass{background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(240,244,248,.85));border-color:rgba(0,212,255,.35)}
 body.light-mode .glass-s{background:rgba(255,255,255,.85)}
@@ -245,7 +249,7 @@ const DB=window.MissionDB;
 const SEC = {
   esc: s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),
   safeUrl: u => /^https?:\/\//i.test(String(u || '')) ? u : '#',
-  safeImg: u => /^https?:\/\/.+\.(png|jpe?g|gif|webp)(\?.*)?$/i.test(String(u || '')) || /^https:\/\/.+\.supabase\.co\/storage\//i.test(String(u||'')) ? u : null,
+  safeImg: u => /^https?:\/\/.+\.(png|jpe?g|gif|webp)(\?.*)?$/i.test(String(u || '')) || /^https:\/\/.+\.supabase\.(co|in)\/storage\//i.test(String(u||'')) ? u : null,
   clean: s => String(s ?? '').replace(/[<>]/g,'').trim(),
   maxLen: (s, n=500) => String(s ?? '').slice(0, n),
   rateLimit: (()=>{const store={};return (key,ms=3000)=>{const now=Date.now();if(store[key]&&now-store[key]<ms)return false;store[key]=now;return true;};})(),
@@ -282,20 +286,37 @@ function Toast({data,onClose}){const [out,setOut]=useState(false);const [progres
 const useToast=()=>useContext(ToastCtx);
 const AppCtx=createContext(null);
 const useApp=()=>useContext(AppCtx);
+const EMPTY_DB={users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[],polls:[],poll_votes:[],direct_messages:[],reports:[],friendships:[],xp_shop_items:[],xp_purchases:[],study_groups:[],study_group_members:[],study_plans:[],study_tasks:[],daily_challenges:[],daily_challenge_attempts:[],practice_sessions:[],focus_sessions:[],flashcards:[],video_progress:[],daily_reward:[]};
 function AppProvider({children}){
-  const [db,setDb]=useState({users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[],polls:[],poll_votes:[],direct_messages:[],reports:[],friendships:[],xp_shop_items:[],xp_purchases:[],study_groups:[],study_group_members:[],study_plans:[],study_tasks:[],daily_challenges:[],daily_challenge_attempts:[],practice_sessions:[],focus_sessions:[],flashcards:[],video_progress:[],daily_reward:[]});
+  const [db,setDb]=useState(EMPTY_DB);
   const [currentUser,setCurrentUser]=useState(null);
   const [loading,setLoading]=useState(true);
   const toast=useToast();
   const reload=useCallback(async ()=>{
     try{
-      const data=await DB.loadAll();
-      const sb=await DB.getClient();
+      let data;
+      try{
+        data = await DB.loadAll();
+      }catch(e){
+        console.warn('loadAll failed, falling back:', e);
+        const sb = await DB.getClient();
+        const tables = ['users','grades','subjects','units','lessons','exams','missions','achievements','levels','notifications','activity','polls','poll_votes','direct_messages','reports','friendships','xp_shop_items','xp_purchases','study_groups','study_group_members','study_plans','study_tasks','daily_challenges','daily_challenge_attempts','practice_sessions','focus_sessions','flashcards','video_progress','daily_reward'];
+        data = {};
+        await Promise.all(tables.map(async t=>{
+          try{ const r = await sb.from(t).select('*').limit(2000); data[t] = r.data||[]; }
+          catch(err){ data[t] = []; }
+        }));
+      }
+      try{
+        const sb = await DB.getClient();
+        const { data: pubQs } = await sb.from('questions_public').select('*').limit(2000);
+        data.questions = pubQs || [];
+      }catch(e){ data.questions = data.questions || []; }
       const extra=['direct_messages','xp_shop_items','xp_purchases','study_groups','study_group_members','study_plans','study_tasks','daily_challenges','daily_challenge_attempts','flashcards','video_progress','daily_reward','friendships','practice_sessions','focus_sessions'];
-      const extraResults=await Promise.all(extra.map(async(t)=>{try{const res=await sb.from(t).select('*').limit(2000);return{t,data:res.data||[]};}catch(e){return{t,data:[]};}}));
+      const sb2 = await DB.getClient();
+      const extraResults=await Promise.all(extra.map(async(t)=>{try{const res=await sb2.from(t).select('*').limit(2000);return{t,data:res.data||[]};}catch(e){return{t,data:data[t]||[]};}}));
       extraResults.forEach(r=>{data[r.t]=r.data;});
       setDb(data);
-      
       setCurrentUser(prev => {
         if (!prev) return null;
         const fresh = data.users.find(u => u.id === prev.id);
@@ -306,29 +327,26 @@ function AppProvider({children}){
   useEffect(()=>{(async ()=>{try{const sid=DB.getSessionId();if(!sid){window.location.replace('../auth/login.html');return;}const u=await DB.getUser(sid);if(!u||u.active===false){DB.clearSession();window.location.replace('../auth/login.html');return;}if(u.banned===true){DB.clearSession();window.location.replace('../auth/banned.html');return;}setCurrentUser(u);if(u.theme==='light')document.body.classList.add('light-mode');await reload();}catch(e){console.warn(e);}setLoading(false);})();},[]);
   useEffect(()=>{
     if(!currentUser) return;
-    const initialXp = currentUser.xp || 0;
     const interval = setInterval(async ()=>{
       try{
         const fresh = await DB.getUser(currentUser.id);
         if(!fresh){ ANTI_TAMPER.lock('المستخدم غير موجود'); return; }
         if(fresh.banned === true){ ANTI_TAMPER.lock('تم حظر حسابك'); return; }
         if(fresh.active === false){ ANTI_TAMPER.lock('تم إيقاف حسابك'); return; }
-        const dbXp = Number(fresh.xp) || 0;
-        if(dbXp < initialXp - 100){ ANTI_TAMPER.lock('تلاعب محتمل في XP'); return; }
+        setCurrentUser(prev => {
+          if(!prev) return prev;
+          const next = {...prev};
+          let changed = false;
+          if(Number(fresh.xp) !== Number(prev.xp)){ next.xp = fresh.xp; changed = true; }
+          if(JSON.stringify(fresh.completed_lessons||[]) !== JSON.stringify(prev.completed_lessons||[])){ next.completed_lessons = fresh.completed_lessons||[]; changed = true; }
+          if(fresh.subscription !== prev.subscription){ next.subscription = fresh.subscription; changed = true; }
+          if(fresh.subscription_until !== prev.subscription_until){ next.subscription_until = fresh.subscription_until; changed = true; }
+          return changed ? next : prev;
+        });
       }catch(e){}
     }, 30000);
     return ()=>clearInterval(interval);
-  },[currentUser]);
-  useEffect(()=>{
-    if(!currentUser) return;
-    try{
-      let ref = currentUser;
-      Object.defineProperty(window, 'currentUser', {
-        configurable: false, get: ()=>ref,
-        set: (v)=>{ ANTI_TAMPER.lock('محاولة تعديل بيانات المستخدم من Console'); }
-      });
-    }catch(e){}
-  },[currentUser]);
+  },[currentUser?.id]);
   const logout=useCallback(()=>{Swal.fire({title:'تسجيل الخروج',text:'هل أنت متأكد؟',icon:'question',showCancelButton:true,confirmButtonText:'نعم، خروج',cancelButtonText:'إلغاء',confirmButtonColor:'#00d4ff',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #0a1220, #050a14)',color:'#e0f7ff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}}).then(r=>{if(r.isConfirmed){DB.clearSession();window.location.replace('../auth/login.html');}});},[]);
   const save=useCallback(async (table,item)=>{
     const clean = SEC.sanitizeObject(item);
@@ -372,6 +390,7 @@ const Icon=({name,size=18,color='currentColor'})=>{
     menu:<><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></>,
     close:<><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>,
     check:<><polyline points="20 6 9 17 4 12"/></>,
+    plus:<><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></>,
     play:<><polygon points="5 3 19 12 5 21 5 3"/></>,
     send:<><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></>,
     camera:<><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></>,
@@ -392,7 +411,10 @@ const Icon=({name,size=18,color='currentColor'})=>{
     calendar:<><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></>,
     school:<><path d="M14 22v-4a2 2 0 1 0-4 0v4"/><path d="m18 10 4 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8l4-2"/><path d="M18 5v17"/><path d="m4 6 8-4 8 4"/><path d="M6 5v17"/><circle cx="12" cy="9" r="2"/></>,
     handshake:<><path d="M11 17l-3-3 4-4 3 3"/><path d="M14 14l4 4-3 3-4-4"/><path d="M3 9l4-4 4 3"/><path d="M21 9l-4-4-4 3"/></>,
-    swords:<><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/><polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"/><line x1="5" y1="14" x2="9" y2="18"/><line x1="7" y1="17" x2="4" y2="20"/><line x1="3" y1="19" x2="5" y2="21"/></>
+    swords:<><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/><polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"/><line x1="5" y1="14" x2="9" y2="18"/><line x1="7" y1="17" x2="4" y2="20"/><line x1="3" y1="19" x2="5" y2="21"/></>,
+    star:<><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></>,
+    sparkle:<><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8"/></>,
+    crown:<><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7z"/><line x1="2" y1="20" x2="22" y2="20"/></>
   };
   return <svg {...p}>{paths[name]||paths.help}</svg>;
 };
@@ -413,7 +435,7 @@ function StudentAvatar({student, size=40}){
   const bg = isFemale ? 'linear-gradient(135deg,#f472b6,#ec4899)' : 'linear-gradient(135deg,#60a5fa,#3b82f6)';
   return <div style={{width:size,height:size,borderRadius:12,background:bg,display:'grid',placeItems:'center',fontSize:size*0.55,flexShrink:0,border:'2px solid rgba(0,212,255,.4)'}}>{icon}</div>;
 }
-function Sidebar({items,active,onNav,open,onClose,onLogout}){return <>{open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',zIndex:55}}/>}<aside className={`sidebar ${open?'open':''}`}><div className="brand"><div className="brand-logo"><Icon name="trophy" size={22} color="#050a14"/></div><div><div className="brand-name">MISSION EDU</div><div className="brand-sub">المنصة التعليمية</div></div></div><div style={{flex:1,overflowY:'auto',overflowX:'hidden',display:'flex',flexDirection:'column',gap:'4px',marginInlineEnd:'-6px',paddingInlineEnd:'6px'}}>{items.map((g,gi)=><div key={gi}>{g.title&&<div className="nav-gt">{g.title}</div>}{g.items.map(it=><button key={it.id} className={`nav-i ${active===it.id?'on':''}`} onClick={()=>{onNav(it.id);onClose?.();}}><span className="nav-ico"><Icon name={it.icon} size={16}/></span><span>{it.label}</span>{it.badge!=null&&<span className="pill pill-b" style={{marginInlineStart:'auto'}}>{it.badge}</span>}</button>)}</div>)}</div><div style={{marginTop:'10px',paddingTop:'10px',borderTop:'1px solid var(--border)',flexShrink:0}}><button className="nav-i" onClick={onLogout} style={{color:'#fca5a5',width:'100%'}}><span className="nav-ico"><Icon name="logout" size={16}/></span><span>تسجيل الخروج</span></button></div></aside></>;}
+function Sidebar({items,active,onNav,open,onClose,onLogout}){return <>{open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',zIndex:55}}/>}<aside className={`sidebar ${open?'open':''}`}><div className="brand"><div className="brand-logo"><Icon name="trophy" size={22} color="#050a14"/></div><div><div className="brand-name">MISSION EDU</div><div className="brand-sub">المنصة التعليمية</div></div></div><div style={{flex:1,overflowY:'auto',overflowX:'hidden',display:'flex',flexDirection:'column',gap:'4px',marginInlineEnd:'-6px',paddingInlineEnd:'6px'}}>{items.map((g,gi)=><div key={gi}>{g.title&&<div className="nav-gt">{g.title}</div>}{g.items.map(it=><button key={it.id} className={`nav-i ${active===it.id?'on':''}`} onClick={()=>{onNav(it.id);onClose?.();}}><span className="nav-ico"><Icon name={it.icon} size={16}/></span><span>{it.label}</span>{it.badge!=null&&it.badge>0&&<span className="pill pill-b" style={{marginInlineStart:'auto'}}>{it.badge}</span>}</button>)}</div>)}</div><div style={{marginTop:'10px',paddingTop:'10px',borderTop:'1px solid var(--border)',flexShrink:0}}><button className="nav-i" onClick={onLogout} style={{color:'#fca5a5',width:'100%'}}><span className="nav-ico"><Icon name="logout" size={16}/></span><span>تسجيل الخروج</span></button></div></aside></>;}
 function Topbar({user,onMenu,onLogout,unreadNotifs=0,unreadMsgs=0,onOpenNotifications,onOpenMessages,onOpenProfile,onEnablePush,pushEnabled,onToggleTheme,isLight}){
   return <div className="topbar">
     <button className="icon-btn mbar" onClick={onMenu}><Icon name="menu" size={16}/></button>
@@ -492,24 +514,29 @@ function HomePage({onNavigate}){
   const user=app.currentUser;
   const lvl=app.getLevel(user.xp||0);
   const totalLessons=app.db.lessons.filter(l=>l.published!==false).length;
-  const completed=(user.completed_lessons||[]).length;
+  const toArray = (v) => { if (!v) return []; if (Array.isArray(v)) return v; if (typeof v === 'string') { try { const p = JSON.parse(v); return Array.isArray(p) ? p : []; } catch(e) { return []; } } return []; };
+const completed=toArray(user.completed_lessons).length;
   const progress=totalLessons?Math.round((completed/totalLessons)*100):0;
   const recentExams=app.db.exams.slice(0,3);
-  
   const today = new Date().toLocaleDateString('en-CA');
   const todayReward = (app.db.daily_reward || []).find(r => r.user_id === user.id && r.date === today);
+  const [claiming, setClaiming] = useState(false);
   const claimDailyReward = async () => {
     if (todayReward) return app.toast.info('استلمت مكافأة اليوم بالفعل');
+    if (claiming) return;
+    setClaiming(true);
     try {
       const sb = await DB.getClient();
-      const { data: existing } = await sb.from('daily_reward').select('*').eq('user_id', user.id).eq('date', today);
-      if (existing && existing.length > 0) return app.toast.info('استلمت مكافأة اليوم بالفعل');
-      await sb.from('daily_reward').insert([{ id: DB.uid('dr_'), user_id: user.id, date: today, xp: 50, claimed_at: Date.now() }]);
-      await DB.updateUser(user.id, { xp: (user.xp || 0) + 50, last_daily_reward: Date.now() });
+      const { data, error } = await sb.rpc('claim_daily_reward');
+      if (error) throw new Error(error.message);
+      if (!data.claimed) { app.toast.info('استلمت مكافأة اليوم بالفعل'); await app.reload(); return; }
+      playSound('success');
+      app.toast.ok(`🎁 +${data.xp_gained} XP مكافأة يومية!`);
       await app.reload();
-      app.toast.ok('🎁 +50 XP مكافأة يومية!');
     } catch (e) {
-      Swal.fire({ title: 'خطأ', text: e.message, icon: 'error', background: '#050a14', color: '#fff' });
+      app.toast.err(e.message || 'تعذر استلام المكافأة');
+    } finally {
+      setClaiming(false);
     }
   };
 
@@ -533,6 +560,7 @@ function HomePage({onNavigate}){
         <div className="bar" style={{height:10}}><div className="bar-f bar-b" style={{width:`${progress}%`}}/></div>
         <div className="flex between center mt8">
           <span className="xs muted">{completed} من {totalLessons} درس</span>
+          <span className="xs muted">+{DB.fmt(lvl.next?Math.max(0,(lvl.next.xp)-(user.xp||0)):0)} XP للمستوى التالي</span>
         </div>
       </div>
     </div>
@@ -542,18 +570,20 @@ function HomePage({onNavigate}){
       <Stat label="الدروس" value={`${completed}/${totalLessons}`} icon="book" color="#22c55e"/>
       <Stat label="الإنجازات" value={DB.fmt((user.achievements||[]).length)} icon="award" color="var(--gold-d)"/>
     </div>
-    {!todayReward&&<div className="glass mb16" style={{padding:18,borderColor:'rgba(34,197,94,.4)'}}>
+    {!todayReward&&<div className="glass reward-banner mb16" style={{padding:18,borderColor:'rgba(34,197,94,.4)'}}>
       <div className="flex between center wrap g8">
         <div className="flex center g12">
           <div style={{fontSize:32}}>🎁</div>
           <div><div className="h4" style={{color:'#6ee7a0'}}>مكافأة اليوم جاهزة!</div><div className="xs muted">استلم +50 XP</div></div>
         </div>
-        <button className="btn btn-ok" onClick={claimDailyReward}><Icon name="gift" size={16}/> استلام</button>
+        <button className="btn btn-ok" onClick={claimDailyReward} disabled={claiming}>
+          <Icon name="gift" size={16}/> {claiming?'جارٍ...':'استلام'}
+        </button>
       </div>
     </div>}
     <div className="grid g2 mb16">
       <div className="glass" style={{padding:18}}>
-        <div className="flex between center mb12"><div className="h4" style={{color:'var(--gold)'}}>📖 مواصلة التعلم</div><button className="btn btn-s btn-sm" onClick={()=>onNavigate('lessons')}>الكل</button></div>
+        <div className="flex between center mb12"><div className="h4" style={{color:'var(--gold)'}}>📚 المواد الدراسية</div><button className="btn btn-s btn-sm" onClick={()=>onNavigate('lessons')}>الكل</button></div>
         {app.db.lessons.filter(l=>l.published!==false).slice(0,3).map(l=><div key={l.id} className="flex center g12 mb8" style={{padding:10,background:'rgba(0,212,255,.04)',borderRadius:10,border:'1px solid var(--border)',cursor:'pointer'}} onClick={()=>window.location.href=`lesson.html?id=${l.id}`}>
           <div style={{width:40,height:40,borderRadius:10,background:'var(--grad-gold)',display:'grid',placeItems:'center',color:'#050a14',fontSize:18}}>📖</div>
           <div style={{flex:1,minWidth:0}}><div className="sm" style={{fontWeight:700}}>{SEC.esc(l.title)}</div><div className="xs muted">{SEC.esc(app.unit(l.unit_id)?.name||'')}</div></div>
@@ -584,31 +614,184 @@ function HomePage({onNavigate}){
 
 function LessonsPage(){
   const app=useApp();
-  const [filterSubject,setFilterSubject]=useState('all');
-  const lessons=app.db.lessons.filter(l=>l.published!==false);
-  const filtered=filterSubject==='all'?lessons:lessons.filter(l=>{const u=app.unit(l.unit_id);return u?.subject_id===filterSubject;});
+  const user=app.currentUser;
+  const [selectedSubject,setSelectedSubject]=useState(null);
+
+  // ─── helper آمن لـ completed_lessons (jsonb) ───
+  const getCompletedArr = () => {
+    const v = user?.completed_lessons;
+    if(!v) return [];
+    if(Array.isArray(v)) return v;
+    if(typeof v === 'string'){
+      try{ const p = JSON.parse(v); return Array.isArray(p)?p:[]; }catch(e){ return []; }
+    }
+    return [];
+  };
+  const completedArr = getCompletedArr();
+
+  // ═══════════════════════════════════════════════════════════════
+  // المستوى 1: قائمة المواد
+  // ═══════════════════════════════════════════════════════════════
+  if(!selectedSubject){
+    const subjects = app.db.subjects || [];
+    return <>
+      <div className="h2 mb16 grad">📚 المواد الدراسية</div>
+      {subjects.length===0?(
+        <div className="glass" style={{padding:30}}><Empty icon="📚" title="لا توجد مواد بعد"/></div>
+      ):(
+        <div className="grid g3">
+          {subjects.map(s=>{
+            const subjectLessons = app.db.lessons.filter(l=>{
+              if(l.published===false) return false;
+              const u = app.unit(l.unit_id);
+              return u?.subject_id === s.id;
+            });
+            const unitsInSubject = (app.db.units||[]).filter(u=>u.subject_id===s.id);
+            const doneCount = subjectLessons.filter(l=>completedArr.includes(l.id)).length;
+            const pct = subjectLessons.length ? Math.round((doneCount/subjectLessons.length)*100) : 0;
+            return (
+              <div key={s.id}
+                className="glass hv"
+                style={{padding:20,cursor:'pointer',position:'relative',overflow:'hidden'}}
+                onClick={()=>setSelectedSubject(s.id)}>
+
+                <div style={{position:'absolute',top:-20,insetInlineEnd:-20,fontSize:100,opacity:.06,pointerEvents:'none'}}>
+                  {s.icon||'📚'}
+                </div>
+
+                <div className="flex center g12 mb12" style={{position:'relative'}}>
+                  <div style={{width:56,height:56,borderRadius:16,background:'var(--grad-gold)',display:'grid',placeItems:'center',fontSize:28,flexShrink:0,boxShadow:'0 8px 24px rgba(0,212,255,.35)'}}>
+                    {s.icon||'📚'}
+                  </div>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div className="h3" style={{lineHeight:1.3}}>{SEC.esc(s.name||'مادة')}</div>
+                    <div className="xs muted">{subjectLessons.length} درس • {unitsInSubject.length} وحدة</div>
+                  </div>
+                </div>
+
+                {s.desc && (
+                  <div className="xs muted mb12" style={{lineHeight:1.6,position:'relative'}}>
+                    {SEC.esc(s.desc)}
+                  </div>
+                )}
+
+                <div className="bar" style={{height:7,marginBottom:8}}>
+                  <div className="bar-f bar-b" style={{width:`${pct}%`}}/>
+                </div>
+
+                <div className="flex between center" style={{position:'relative'}}>
+                  <span className="pill pill-b">📖 {doneCount}/{subjectLessons.length}</span>
+                  <span className="sm" style={{color:'var(--gold)',fontWeight:800}}>ادخل ←</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </>;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // المستوى 2: دروس المادة (مجمعة حسب الوحدة)
+  // ═══════════════════════════════════════════════════════════════
+  const subject = app.subject(selectedSubject);
+  const subjectLessons = app.db.lessons.filter(l=>{
+    if(l.published===false) return false;
+    const u = app.unit(l.unit_id);
+    return u?.subject_id === selectedSubject;
+  });
+  const subjectUnits = (app.db.units||[])
+    .filter(u=>u.subject_id===selectedSubject)
+    .sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
+
   return <>
-    <div className="h2 mb16 grad">📖 الدروس</div>
-    <div className="flex wrap g6 mb16">
-      <button onClick={()=>setFilterSubject('all')} className={`msg-tab ${filterSubject==='all'?'active':''}`}>الكل ({lessons.length})</button>
-      {app.db.subjects.map(s=><button key={s.id} onClick={()=>setFilterSubject(s.id)} className={`msg-tab ${filterSubject===s.id?'active':''}`}>{SEC.esc(s.name)}</button>)}
+    <button className="btn btn-s btn-sm mb12" onClick={()=>setSelectedSubject(null)}>
+      ← رجوع للمواد
+    </button>
+
+    <div className="glass mb16" style={{padding:20}}>
+      <div className="flex center g16 wrap">
+        <div style={{width:64,height:64,borderRadius:18,background:'var(--grad-gold)',display:'grid',placeItems:'center',fontSize:32,flexShrink:0,boxShadow:'0 8px 24px rgba(0,212,255,.4)'}}>
+          {subject?.icon||'📚'}
+        </div>
+        <div style={{flex:1,minWidth:200}}>
+          <div className="h2 grad mb6">{SEC.esc(subject?.name||'مادة')}</div>
+          {subject?.desc && <div className="sm muted mb6">{SEC.esc(subject.desc)}</div>}
+          <div className="flex wrap g6">
+            <span className="pill pill-b">📖 {subjectLessons.length} درس</span>
+            <span className="pill pill-b">📁 {subjectUnits.length} وحدة</span>
+            <span className="pill pill-g">✅ {subjectLessons.filter(l=>completedArr.includes(l.id)).length} مكتمل</span>
+          </div>
+        </div>
+      </div>
     </div>
-    {filtered.length===0?<div className="glass" style={{padding:30}}><Empty icon="📖" title="لا دروس"/></div>:
-    <div className="grid g3">{filtered.map(l=>{
-      const unit=app.unit(l.unit_id);
-      return <div key={l.id} className="lesson-card" onClick={()=>window.location.href=`lesson.html?id=${l.id}`}>
-        <div className="lesson-thumb">
-          <div className="play"><Icon name="play" size={24} color="#050a14"/></div>
+
+    {subjectUnits.length===0 ? (
+      <div className="glass" style={{padding:30}}>
+        <Empty icon="📁" title="لا توجد وحدات في هذه المادة" desc="الأدمن هيضيف الوحدات قريباً"/>
+      </div>
+    ) : subjectUnits.map((unit,ui)=>{
+      const unitLessons = subjectLessons
+        .filter(l=>l.unit_id===unit.id)
+        .sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
+      if(unitLessons.length===0) return null;
+
+      return (
+        <div key={unit.id} className="glass mb16" style={{padding:18}}>
+          <div className="flex between center mb12 wrap g8">
+            <div className="flex center g8">
+              <div style={{width:34,height:34,borderRadius:10,background:'rgba(0,212,255,.15)',display:'grid',placeItems:'center',fontWeight:900,color:'var(--gold)',fontSize:14}}>
+                {ui+1}
+              </div>
+              <div className="h4" style={{color:'var(--gold)'}}>📁 {SEC.esc(unit.name)}</div>
+            </div>
+            <span className="pill pill-b">{unitLessons.length} درس</span>
+          </div>
+
+          {unit.desc && <div className="xs muted mb12" style={{lineHeight:1.6}}>{SEC.esc(unit.desc)}</div>}
+
+          <div className="grid g2">
+            {unitLessons.map((l,li)=>{
+              const isDone = completedArr.includes(l.id);
+              return (
+                <div key={l.id}
+                  className="glass-s hv"
+                  style={{padding:14,cursor:'pointer',borderColor:isDone?'rgba(34,197,94,.35)':'var(--border)'}}
+                  onClick={()=>window.location.href=`lesson.html?id=${l.id}`}>
+                  <div className="flex center g12">
+                    <div style={{
+                      width:44,height:44,borderRadius:12,flexShrink:0,
+                      background:isDone?'linear-gradient(135deg,#16a34a,#22c55e)':'linear-gradient(135deg,#00d4ff,#0088cc)',
+                      display:'grid',placeItems:'center',fontSize:20,
+                      boxShadow:isDone?'0 6px 18px rgba(34,197,94,.35)':'0 6px 18px rgba(0,212,255,.35)'
+                    }}>
+                      {isDone?'✓':'▶'}
+                    </div>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div className="sm" style={{fontWeight:700,lineHeight:1.4}}>
+                        {SEC.esc(l.title)}
+                      </div>
+                      <div className="xs muted mt6">
+                        ⏱ {l.duration||15} دقيقة • +{l.xp||0} XP
+                      </div>
+                    </div>
+                    <span style={{color:'var(--gold)',fontSize:18,flexShrink:0,opacity:.7}}>←</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
-        <div className="lesson-body">
-          <div className="lesson-title">{SEC.esc(l.title)}</div>
-          <div className="lesson-meta"><span>{SEC.esc(unit?.name||'')}</span><span>•</span><span>+{l.xp||0} XP</span></div>
-        </div>
-      </div>;
-    })}</div>}
+      );
+    })}
+
+    {subjectLessons.length===0 && (
+      <div className="glass" style={{padding:30}}>
+        <Empty icon="📖" title="لا توجد دروس في هذه المادة بعد"/>
+      </div>
+    )}
   </>;
 }
-
 function ExamsPage(){
   const app=useApp();
   const exams=app.db.exams.filter(e=>e.published!==false);
@@ -616,7 +799,7 @@ function ExamsPage(){
     <div className="h2 mb16 grad">📝 الاختبارات</div>
     {exams.length===0?<div className="glass" style={{padding:30}}><Empty icon="📝" title="لا اختبارات"/></div>:
     <div className="grid g2">{exams.map(e=>{
-      return <div key={e.id} className="glass" style={{padding:18,cursor:'pointer'}} onClick={()=>window.location.href=`exam.html?id=${e.id}`}>
+      return <div key={e.id} className="glass hv" style={{padding:18,cursor:'pointer'}} onClick={()=>window.location.href=`exam.html?id=${e.id}`}>
         <div className="flex between center mb8"><div className="h4">{SEC.esc(e.title)}</div><AccessBadge value={e.is_free}/></div>
         <div className="xs muted mb8">{e.duration}د • {(e.question_ids||[]).length} سؤال • نجاح {e.pass_score}%</div>
         <div className="flex between center">
@@ -629,77 +812,130 @@ function ExamsPage(){
 
 function PracticePage(){
   const app=useApp();
+  const [allQuestions,setAllQuestions]=useState([]);
+  const [loadingQs,setLoadingQs]=useState(true);
+  const [filterSubject,setFilterSubject]=useState('all');
   const [session,setSession]=useState(null);
   const [qIndex,setQIndex]=useState(0);
   const [score,setScore]=useState(0);
-  const [answered,setAnswered]=useState(false);
-  const [selected,setSelected]=useState(null);
-  const [filterSubject,setFilterSubject]=useState('all');
-  const allQuestions=useMemo(()=>{
-    let qs=app.db.questions||[];
-    if(filterSubject!=='all') qs=qs.filter(q=>q.subject_id===filterSubject);
-    return qs;
-  },[app.db.questions,filterSubject]);
-  const startPractice=()=>{
-    if(allQuestions.length===0) return app.toast.warn('لا توجد أسئلة');
-    const shuffled=[...allQuestions].sort(()=>Math.random()-0.5).slice(0,10);
-    setSession(shuffled);setQIndex(0);setScore(0);setAnswered(false);setSelected(null);
-  };
-  const submitAnswer=(oi)=>{
-    if(answered) return;
-    setSelected(oi);setAnswered(true);
-    const q=session[qIndex];
-    const correct=Number(Array.isArray(q.correct)?q.correct[0]:q.correct);
-    if(oi===correct) setScore(s=>s+1);
-  };
-  const nextQuestion=async ()=>{
-    if(qIndex+1>=session.length){
+  const [answers,setAnswers]=useState({});
+  const [busy,setBusy]=useState(false);
+
+  useEffect(()=>{
+    (async()=>{
       try{
         const sb=await DB.getClient();
-        await sb.from('practice_sessions').insert([{id:DB.uid('ps_'),user_id:app.currentUser.id,subject_id:filterSubject==='all'?null:filterSubject,score,total:session.length,pct:Math.round((score/session.length)*100),status:'completed',started_at:Date.now(),completed_at:Date.now()}]);
-        const xpEarned=score*5;
-        await DB.updateUser(app.currentUser.id,{xp:(app.currentUser.xp||0)+xpEarned});
-        await app.reload();
-        app.toast.ok(`انتهى التدريب! +${xpEarned} XP`);
-      }catch(e){}
-      setSession(null);
-    } else {
-      setQIndex(i=>i+1);setAnswered(false);setSelected(null);
+        const {data}=await sb.from('questions_public').select('id,text,options,subject_id').limit(500);
+        setAllQuestions(data||[]);
+      }catch(e){ console.warn(e); }
+      setLoadingQs(false);
+    })();
+  },[]);
+
+  const filteredQuestions=useMemo(()=>{
+    if(filterSubject==='all') return allQuestions;
+    return allQuestions.filter(q=>q.subject_id===filterSubject);
+  },[allQuestions,filterSubject]);
+
+  const startPractice=()=>{
+    if(filteredQuestions.length===0) return app.toast.warn('لا توجد أسئلة في هذه المادة');
+    const shuffled=[...filteredQuestions].sort(()=>Math.random()-0.5).slice(0,10);
+    setSession(shuffled);
+    setQIndex(0);
+    setScore(0);
+    setAnswers({});
+  };
+
+  const submitAnswer=async (oi)=>{
+    if(answers[qIndex] || busy) return;
+    setBusy(true);
+    try{
+      const sb=await DB.getClient();
+      const {data,error}=await sb.rpc('practice_answer',{
+        p_question_id:session[qIndex].id,
+        p_answer_index:oi
+      });
+      if(error) throw new Error(error.message);
+      setAnswers(a=>({...a,[qIndex]:{selected:oi,is_correct:data.is_correct,correct_index:data.correct_index,explanation:data.explanation}}));
+      if(data.is_correct){ setScore(s=>s+1); playSound('success'); }
+      else playSound('err');
+    }catch(e){
+      app.toast.err(e.message||'تعذر التحقق من الإجابة');
+    }finally{
+      setBusy(false);
     }
   };
+
+  const nextQuestion=async ()=>{
+    if(qIndex+1>=session.length){
+      setBusy(true);
+      try{
+        const sb=await DB.getClient();
+        const {data,error}=await sb.rpc('practice_complete',{
+          p_subject_id:filterSubject==='all'?null:filterSubject,
+          p_score:score,
+          p_total:session.length
+        });
+        if(error) throw new Error(error.message);
+        app.toast.ok(`🎉 انتهى التدريب! +${data.xp_gained} XP (${score}/${session.length})`);
+        await app.reload();
+        setSession(null);
+      }catch(e){
+        app.toast.err(e.message||'تعذر حفظ الجلسة');
+      }finally{
+        setBusy(false);
+      }
+    } else {
+      setQIndex(i=>i+1);
+    }
+  };
+
+  const exitSession=()=>{ if(busy) return; setSession(null); };
+
   if(session){
     const q=session[qIndex];
-    const correct=Number(Array.isArray(q.correct)?q.correct[0]:q.correct);
+    const ans=answers[qIndex];
+    const isAnswered=!!ans;
     const isDone=qIndex+1>=session.length;
     return <>
-      <div className="flex between center mb16"><button className="btn btn-s" onClick={()=>setSession(null)}>← إلغاء</button><div className="flex g8"><span className="pill pill-b">{qIndex+1}/{session.length}</span><span className="pill pill-g">✓ {score}</span></div></div>
+      <div className="flex between center mb16 wrap g8">
+        <button className="btn btn-s" onClick={exitSession} disabled={busy}>← إلغاء</button>
+        <div className="flex g8"><span className="pill pill-b">{qIndex+1}/{session.length}</span><span className="pill pill-g">✓ {score}</span></div>
+      </div>
       <div className="glass" style={{padding:22}}>
         <div className="sm mb12" style={{fontWeight:700}}>{SEC.esc(q.text)}</div>
         {(q.options||[]).map((opt,oi)=>{
-          const isCorrect=oi===correct;
-          const isSelected=oi===selected;
+          const isCorrect = isAnswered && ans.correct_index===oi;
+          const isSelected = isAnswered && ans.selected===oi;
           let bg='rgba(255,255,255,.03)',border='var(--border)';
-          if(answered){ if(isCorrect){bg='rgba(34,197,94,.15)';border='#22c55e';} else if(isSelected){bg='rgba(239,68,68,.15)';border='#ef4444';} }
-          return <div key={oi} className="qbox-opt" onClick={()=>submitAnswer(oi)} style={{background:bg,borderColor:border,cursor:answered?'default':'pointer'}}>
+          if(isAnswered){
+            if(isCorrect){ bg='rgba(34,197,94,.15)'; border='#22c55e'; }
+            else if(isSelected){ bg='rgba(239,68,68,.15)'; border='#ef4444'; }
+          }
+          return <div key={oi} className="qbox-opt" onClick={()=>submitAnswer(oi)} style={{background:bg,borderColor:border,cursor:isAnswered||busy?'default':'pointer',opacity:busy&&!isAnswered?.6:1}}>
             <span className="qbox-opt-letter">{['A','B','C','D'][oi]}</span>
             <span className="sm" style={{flex:1}}>{SEC.esc(opt)}</span>
-            {answered&&isCorrect&&<span style={{color:'#22c55e'}}>✓</span>}
+            {isCorrect&&<span style={{color:'#22c55e'}}>✓</span>}
+            {isSelected&&!isCorrect&&<span style={{color:'#ef4444'}}>✕</span>}
           </div>;
         })}
-        {answered&&q.explanation&&<div className="xs mt12" style={{background:'rgba(0,212,255,.08)',padding:10,borderRadius:8}}>💡 {SEC.esc(q.explanation)}</div>}
-        {answered&&<button className="btn btn-p btn-block mt16" onClick={nextQuestion}>{isDone?'✅ إنهاء':'السؤال التالي →'}</button>}
+        {isAnswered&&ans.explanation&&<div className="xs mt12" style={{background:'rgba(0,212,255,.08)',padding:10,borderRadius:8}}>💡 {SEC.esc(ans.explanation)}</div>}
+        {isAnswered&&<button className="btn btn-p btn-block mt16" onClick={nextQuestion} disabled={busy}>{busy?'جارٍ...':(isDone?'✅ إنهاء وحفظ':'السؤال التالي →')}</button>}
       </div>
     </>;
   }
+
   return <>
     <div className="h2 mb16 grad">🎯 وضع التدريب</div>
     <div className="glass mb16" style={{padding:22}}>
       <div className="h4 mb12" style={{color:'var(--gold)'}}>اختر المادة</div>
-      <div className="flex wrap g6 mb16">
-        <button onClick={()=>setFilterSubject('all')} className={`msg-tab ${filterSubject==='all'?'active':''}`}>الكل ({app.db.questions.length})</button>
-        {app.db.subjects.map(s=>{const cnt=app.db.questions.filter(q=>q.subject_id===s.id).length;if(cnt===0)return null;return <button key={s.id} onClick={()=>setFilterSubject(s.id)} className={`msg-tab ${filterSubject===s.id?'active':''}`}>{SEC.esc(s.name)} ({cnt})</button>;})}
-      </div>
-      <button className="btn btn-p btn-block" onClick={startPractice} disabled={allQuestions.length<1}><Icon name="play" size={16}/> ابدأ التدريب</button>
+      {loadingQs?<div style={{padding:20,textAlign:'center'}}><div className="spinner" style={{margin:'0 auto'}}/></div>:<>
+        <div className="flex wrap g6 mb16">
+          <button onClick={()=>setFilterSubject('all')} className={`msg-tab ${filterSubject==='all'?'active':''}`}>الكل ({allQuestions.length})</button>
+          {app.db.subjects.map(s=>{const cnt=allQuestions.filter(q=>q.subject_id===s.id).length;if(cnt===0)return null;return <button key={s.id} onClick={()=>setFilterSubject(s.id)} className={`msg-tab ${filterSubject===s.id?'active':''}`}>{SEC.esc(s.name)} ({cnt})</button>;})}
+        </div>
+        <button className="btn btn-p btn-block" onClick={startPractice} disabled={filteredQuestions.length<1}><Icon name="play" size={16}/> ابدأ التدريب ({Math.min(10,filteredQuestions.length)} سؤال)</button>
+      </>}
     </div>
   </>;
 }
@@ -712,18 +948,29 @@ function XPShopPage(){
   const buy=async (item)=>{
     if((user.xp||0) < item.xp_cost) return app.toast.warn('XP غير كافي');
     if(item.stock===0) return app.toast.warn('نفذ المخزون');
-    const r=await Swal.fire({title:'تأكيد الشراء',html:`<div style="font-size:48px;margin-bottom:12px">${SEC.esc(item.icon||'🎁')}</div><div style="font-weight:800;margin-bottom:8px">${SEC.esc(item.name)}</div><div style="color:#00ffff;font-weight:900">${item.xp_cost} XP</div>`,showCancelButton:true,confirmButtonText:'شراء',cancelButtonText:'إلغاء',confirmButtonColor:'#00d4ff',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#0a1220,#050a14)',color:'#e0f7ff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+    if(busy) return;
+    const r=await Swal.fire({
+      title:'تأكيد الشراء',
+      html:`<div style="font-size:48px;margin-bottom:12px">${SEC.esc(item.icon||'🎁')}</div><div style="font-weight:800;margin-bottom:8px">${SEC.esc(item.name)}</div><div style="color:#00ffff;font-weight:900">${item.xp_cost} XP</div>`,
+      showCancelButton:true,confirmButtonText:'شراء',cancelButtonText:'إلغاء',
+      confirmButtonColor:'#00d4ff',cancelButtonColor:'#64748b',
+      background:'linear-gradient(180deg,#0a1220,#050a14)',color:'#e0f7ff',
+      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+    });
     if(!r.isConfirmed) return;
     setBusy(true);
     try{
       const sb=await DB.getClient();
-      await sb.from('xp_purchases').insert([{id:DB.uid('pur_'),user_id:user.id,item_id:item.id,xp_spent:item.xp_cost,created_at:Date.now()}]);
-      if(item.stock!=null) await sb.from('xp_shop_items').update({stock:item.stock-1}).eq('id',item.id);
-      await DB.updateUser(user.id,{xp:(user.xp||0)-item.xp_cost});
+      const {data,error}=await sb.rpc('purchase_shop_item',{p_item_id:item.id});
+      if(error) throw new Error(error.message);
+      playSound('success');
+      app.toast.ok(`🎉 تم شراء "${SEC.esc(data.item_name)}" مقابل ${data.xp_cost} XP`);
       await app.reload();
-      app.toast.ok('🎉 تم الشراء بنجاح!');
-    }catch(e){app.toast.err(e.message);}
-    setBusy(false);
+    }catch(e){
+      app.toast.err(e.message||'فشل الشراء');
+    }finally{
+      setBusy(false);
+    }
   };
   return <>
     <div className="h2 mb16 grad">🛒 متجر XP</div>
@@ -739,7 +986,7 @@ function XPShopPage(){
         <span className="pill pill-b" style={{fontWeight:900}}>⚡ {item.xp_cost} XP</span>
         <span className="xs muted">{item.stock!=null?`متوفر: ${item.stock}`:'∞'}</span>
       </div>
-      <button className="btn btn-p btn-block" onClick={()=>buy(item)} disabled={busy||(user.xp||0)<item.xp_cost}>شراء</button>
+      <button className="btn btn-p btn-block" onClick={()=>buy(item)} disabled={busy||(user.xp||0)<item.xp_cost||item.stock===0}>{item.stock===0?'نفذ':'شراء'}</button>
     </div>)}</div>}
   </>;
 }
@@ -751,16 +998,20 @@ function FlashcardsPage(){
   const [form,setForm]=useState({front:'',back:''});
   const [flipped,setFlipped]=useState({});
   const [view,setView]=useState('study');
+  const [saving,setSaving]=useState(false);
   const cards=(app.db.flashcards||[]).filter(c=>c.user_id===user.id);
   const dueCards=cards.filter(c=>!c.next_review_at||c.next_review_at<=Date.now());
   const saveCard=async ()=>{
     if(!form.front.trim()||!form.back.trim()) return app.toast.warn('اكتب السؤال والإجابة');
+    if(saving) return;
+    setSaving(true);
     try{
       await DB.save('flashcards',{id:editing==='new'?DB.uid('fc_'):editing,user_id:user.id,front:form.front,back:form.back,repetitions:0,next_review_at:Date.now(),created_at:Date.now()});
       await app.reload();
       app.toast.ok('تم الحفظ');
       setEditing(null);
     }catch(e){app.toast.err(e.message);}
+    finally{setSaving(false);}
   };
   const reviewCard=async (card,known)=>{
     const newReps=known?(card.repetitions||0)+1:0;
@@ -804,7 +1055,7 @@ function FlashcardsPage(){
     {editing!==null&&<Modal title={editing==='new'?'بطاقة جديدة':'تعديل'} onClose={()=>setEditing(null)}>
       <Field label="السؤال (الوجه الأمامي)"><textarea className="input" rows="3" value={form.front} onChange={e=>setForm({...form,front:e.target.value})}/></Field>
       <Field label="الإجابة (الوجه الخلفي)"><textarea className="input" rows="3" value={form.back} onChange={e=>setForm({...form,back:e.target.value})}/></Field>
-      <div className="flex g8 mt16"><button className="btn btn-p" style={{flex:1}} onClick={saveCard}>حفظ</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
+      <div className="flex g8 mt16"><button className="btn btn-p" style={{flex:1}} onClick={saveCard} disabled={saving}>{saving?'جارٍ...':'حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
     </Modal>}
   </>;
 }
@@ -815,8 +1066,8 @@ function AnalyticsPage(){
   const [attempts,setAttempts]=useState([]);
   const [practice,setPractice]=useState([]);
   const [loading,setLoading]=useState(true);
-  const chart1=useRef(null);const chart2=useRef(null);
   const c1=useRef(null);const c2=useRef(null);
+  const chart1=useRef(null);const chart2=useRef(null);
   useEffect(()=>{(async()=>{
     try{
       const sb=await DB.getClient();
@@ -972,7 +1223,7 @@ function SchoolLeaderboardPage(){
       </div>
       <div className="flex g8"><span className="pill pill-b">متوسط: {DB.fmt(s.avgXp)} XP</span><span className="pill pill-g">إجمالي: {DB.fmt(s.totalXp)}</span></div>
       </div>
-      <div className="flex wrap g6">{s.students.sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,5).map(st=><span key={st.id} className="pill pill-y" style={{fontSize:10}}>{SEC.esc(st.name)}</span>)}</div>
+      <div className="flex wrap g6">{[...s.students].sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,5).map(st=><span key={st.id} className="pill pill-y" style={{fontSize:10}}>{SEC.esc(st.name)}</span>)}</div>
     </div>)}</div>}
   </>;
 }
@@ -1025,7 +1276,7 @@ function StudyCalendarPage(){
       <div className="h3 mb12" style={{color:'var(--gold)'}}>مهام اليوم</div>
       <div className="flex col g8 mb16">{todayTasks.map(t=><div key={t.id} className="glass-s" style={{padding:12}}>
         <div className="flex center g8">
-          <input type="checkbox" checked={t.done} onChange={()=>toggleTask(t)} style={{width:20,height:20}}/>
+          <input type="checkbox" checked={t.done} onChange={()=>toggleTask(t)} style={{width:20,height:20,accentColor:'#00d4ff'}}/>
           <span className="sm" style={{flex:1,textDecoration:t.done?'line-through':'none',opacity:t.done?.5:1}}>{SEC.esc(t.title)}</span>
           <button className="btn btn-dn btn-sm" onClick={()=>delTask(t.id)}>✕</button>
         </div>
@@ -1035,7 +1286,7 @@ function StudyCalendarPage(){
       <div className="h3 mb12" style={{color:'var(--gold)'}}>قادمة</div>
       <div className="flex col g8">{upcoming.map(t=><div key={t.id} className="glass-s" style={{padding:12}}>
         <div className="flex center g8">
-          <input type="checkbox" checked={t.done} onChange={()=>toggleTask(t)} style={{width:20,height:20}}/>
+          <input type="checkbox" checked={t.done} onChange={()=>toggleTask(t)} style={{width:20,height:20,accentColor:'#00d4ff'}}/>
           <div style={{flex:1}}>
             <div className="sm" style={{textDecoration:t.done?'line-through':'none'}}>{SEC.esc(t.title)}</div>
             <div className="xs muted">{new Date(t.due_date).toLocaleDateString('ar-EG')}</div>
@@ -1062,6 +1313,7 @@ function FocusModePage(){
   const [label,setLabel]=useState('جلسة مذاكرة');
   const [sessions,setSessions]=useState([]);
   const [startedAt,setStartedAt]=useState(null);
+  const [finishing,setFinishing]=useState(false);
   const timerRef=useRef(null);
   useEffect(()=>{(async()=>{
     try{
@@ -1080,23 +1332,35 @@ function FocusModePage(){
     if(running&&timeLeft===0){ finish(); }
   },[timeLeft]);
   const finish=async ()=>{
+    if(finishing) return;
     setRunning(false);
     if(!startedAt) return;
-    const minutes=Math.round((Date.now()-startedAt)/60000);
+    setFinishing(true);
     try{
       const sb=await DB.getClient();
-      await sb.from('focus_sessions').insert([{id:DB.uid('fs_'),user_id:user.id,label,duration_minutes:duration,actual_minutes:minutes,xp_awarded:minutes*2,status:'completed',started_at:startedAt,completed_at:Date.now()}]);
-      await DB.updateUser(user.id,{xp:(user.xp||0)+minutes*2});
+      const {data,error}=await sb.rpc('focus_complete',{
+        p_label:label,
+        p_duration:duration,
+        p_started_at:startedAt
+      });
+      if(error) throw new Error(error.message);
+      playSound('success');
+      app.toast.ok(`🎯 انتهت الجلسة! +${data.xp_gained} XP (${data.actual_minutes} دقيقة)`);
       await app.reload();
-      const {data}=await sb.from('focus_sessions').select('*').eq('user_id',user.id).eq('status','completed').order('started_at',{ascending:false}).limit(10);
-      setSessions(data||[]);
-      app.toast.ok(`انتهت الجلسة! +${minutes*2} XP`);
-    }catch(e){}
-    setTimeLeft(duration*60);setStartedAt(null);
+      const {data:fresh}=await sb.from('focus_sessions').select('*').eq('user_id',user.id).eq('status','completed').order('started_at',{ascending:false}).limit(10);
+      setSessions(fresh||[]);
+    }catch(e){
+      app.toast.err(e.message||'تعذر حفظ الجلسة');
+    }finally{
+      setTimeLeft(duration*60);
+      setStartedAt(null);
+      setFinishing(false);
+    }
   };
   const start=()=>{
     if(running){ clearInterval(timerRef.current); setRunning(false); return; }
-    setStartedAt(Date.now()); setRunning(true);
+    setStartedAt(Date.now());
+    setRunning(true);
   };
   const reset=()=>{ clearInterval(timerRef.current); setRunning(false); setTimeLeft(duration*60); setStartedAt(null); };
   const fmt=s=>`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
@@ -1109,8 +1373,8 @@ function FocusModePage(){
         {[5,15,25,45,60].map(d=><button key={d} onClick={()=>{setDuration(d);setTimeLeft(d*60);}} className={`msg-tab ${duration===d?'active':''}`}>{d} د</button>)}
       </div>}
       <div className="flex g8" style={{justifyContent:'center'}}>
-        <button className="btn btn-p" onClick={start} style={{minWidth:140}}>{running?'⏸️ إيقاف':'▶️ بدء'}</button>
-        <button className="btn btn-s" onClick={reset}>🔄 إعادة</button>
+        <button className="btn btn-p" onClick={start} style={{minWidth:140}} disabled={finishing}>{running?'⏸️ إيقاف':'▶️ بدء'}</button>
+        <button className="btn btn-s" onClick={reset} disabled={finishing}>🔄 إعادة</button>
       </div>
     </div>
     {sessions.length>0&&<>
@@ -1125,7 +1389,7 @@ function FocusModePage(){
 
 function LeaderboardPage(){
   const app=useApp();
-  const students=[...app.db.users].filter(u=>u.role==='student'&&u.banned!==true).sort((a,b)=>(b.xp||0)-(a.xp||0));
+  const students=useMemo(()=>[...app.db.users].filter(u=>u.role==='student'&&u.banned!==true).sort((a,b)=>(b.xp||0)-(a.xp||0)),[app.db.users]);
   return <>
     <div className="h2 mb16 grad">🏆 لوحة المتصدرين</div>
     {students.length===0?<div className="glass" style={{padding:30}}><Empty icon="🏆" title="لا طلاب"/></div>:
@@ -1240,16 +1504,22 @@ function StudentsDirectoryPage({onOpenChat}){
     });
     if(!r.isConfirmed)return;
     try{
-      const sb=await DB.getClient();
-      await sb.from('reports').insert([{id:DB.uid('rep_'),user_id:target.id,user_name:target.name,user_phone:(target.country_code||'+20')+(target.phone||''),reporter_id:app.currentUser.id,reason:SEC.clean(r.value.reason),details:SEC.clean(SEC.maxLen(r.value.details,500)),created_at:Date.now()}]);
-      const newCount=(target.reports_count||0)+1;
-      const update={reports_count:newCount};
-      if(newCount>=3){update.banned=true;update.ban_reason='حظر تلقائي - 3 بلاغات';update.banned_at=Date.now();}
-      await DB.updateUser(target.id,update);
-      await app.reload();
-      app.toast.ok(newCount>=3?'تم الإبلاغ والحظر التلقائي':'تم الإبلاغ');
-    }catch(e){app.toast.err(e.message);}
-  };
+  const sb = await DB.getClient();
+  await sb.rpc('submit_user_report', {
+    p_reporter_id: app.currentUser.id,
+    p_target_id: target.id,
+    p_reason: SEC.clean(r.value.reason),
+    p_details: SEC.clean(SEC.maxLen(r.value.details, 500))
+  });
+  await app.reload();
+  app.toast.ok('تم إرسال البلاغ — سيتم مراجعته من الإدارة');
+}catch(e){
+  if(e.message.includes('already') || e.message.includes('من قبل')) {
+    app.toast.warn('لقد أبلغت عن هذا المستخدم من قبل');
+  } else {
+    app.toast.err(e.message);
+  }
+}
   return <>
     <div className="h2 mb16 grad">👥 الطلاب</div>
     <div className="glass mb16" style={{padding:14}}>
@@ -1351,7 +1621,7 @@ function Footer(){
   const app=useApp();
   const user=app.currentUser;
   const sendReport=async()=>{const {value:msg}=await Swal.fire({title:'🚨 بلاغ',input:'textarea',inputPlaceholder:'اكتب رسالتك',showCancelButton:true,confirmButtonText:'📤 إرسال',cancelButtonText:'إلغاء',confirmButtonColor:'#00d4ff',cancelButtonColor:'#64748b',inputValidator:v=>{if(!v||v.trim().length<5)return 'رسالة قصيرة'},customClass:{popup:'swal-custom-popup',title:'swal-custom-title',input:'swal-custom-input'}});if(msg){const sent=await DB.reportIssue({userName:user?.name||'طالب',userPhone:(user?.country_code||'+20')+(user?.phone||'—'),message:SEC.clean(SEC.maxLen(msg,2000))});Swal.fire({icon:sent?'success':'error',title:sent?'✅':'❌',confirmButtonColor:'#00d4ff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});}};
-  return <div className="footer-dev"><button className="dev-btn" onClick={()=>window.open("https://wa.me/201128351702","_blank")}><span className="dev-name">Developed by <b>EL-sayed Hasan</b></span></button><button className="tg-btn" onClick={sendReport}>بلاغ</button></div>;
+  return <div className="footer-dev"><button className="dev-btn" onClick={()=>window.open("https://wa.me/201128351702","_blank","noopener,noreferrer")}><span className="dev-name">Developed by <b>EL-sayed Hasan</b></span></button><button className="tg-btn" onClick={sendReport}>بلاغ</button></div>;
 }
 
 function StudentApp(){
@@ -1378,7 +1648,7 @@ function StudentApp(){
   useEffect(()=>{if(PUSH_MANAGER.isEnabled()){PUSH_MANAGER.show('MISSION EDU', 'أهلاً بك في المنصة 🎓');}},[]);
   const items=[
     {title:'الرئيسية',items:[{id:'home',icon:'home',label:'الرئيسية'},{id:'analytics',icon:'chart',label:'تحليلاتي'}]},
-    {title:'التعلم',items:[{id:'lessons',icon:'book',label:'الدروس'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'practice',icon:'target',label:'وضع التدريب'},{id:'flashcards',icon:'layers',label:'Flashcards'}]},
+    {title:'التعلم',items:[{id:'lessons',icon:'book',label:'المواد'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'practice',icon:'target',label:'وضع التدريب'},{id:'flashcards',icon:'layers',label:'Flashcards'}]},
     {title:'الأنشطة',items:[
       {id:'focus',icon:'clock',label:'وضع التركيز'},
       {id:'calendar',icon:'calendar',label:'تقويم المذاكرة'},
@@ -1388,7 +1658,7 @@ function StudentApp(){
     {title:'التواصل',items:[{id:'leaderboard',icon:'trophy',label:'المتصدرين'},{id:'school-lb',icon:'school',label:'ترتيب المدارس'},{id:'students',icon:'users',label:'الطلاب'},{id:'messages',icon:'message',label:'الرسائل',badge:unreadMsgs||null},{id:'notifications',icon:'bell',label:'الإشعارات',badge:unreadNotifs||null}]},
     {title:'الحساب',items:[{id:'xp-shop',icon:'shoppingBag',label:'متجر XP'},{id:'profile',icon:'user',label:'ملفي'}]}
   ];
-  const navigate=(id,sub)=>{
+  const navigate=(id)=>{
     if(id === 'friend-challenge'){
       window.location.href = 'sv.html';
       return;
