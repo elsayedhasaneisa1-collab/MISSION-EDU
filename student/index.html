@@ -340,7 +340,11 @@ function AppProvider({children}){
     }catch(e){console.warn(e);}
   },[]);
   useEffect(()=>{(async ()=>{try{
-  let sid = DB.getSessionId();
+  const sid=DB.getSessionId();
+  if(!sid){ setLoading(false); return; } // بدل ما يطردك
+  const u=await DB.getUser(sid);
+  if(!u || u.active===false){ DB.clearSession(); setLoading(false); return; }
+  if(u.banned===true){ DB.clearSession(); setLoading(false); return; }
   
   // كود التفعيل التلقائي (للمعاينة)
   if(!sid){
@@ -1733,17 +1737,11 @@ function Root(){
       (async()=>{
         try {
           const sb = await DB.getClient();
-          const {data} = await sb.from('users').select('id').eq('role','student').limit(1);
+          // بيجيب أول مستخدم موجود في قاعدة البيانات عشان يفتحلك اللوحة
+          const {data} = await sb.from('users').select('id').limit(1);
           if(data && data.length > 0){
             DB.setSession(data[0].id);
             window.location.reload();
-          } else {
-            // لو مفيش طلاب، نجرب نجيب أي يوزر (حتى لو أدمن)
-            const {data:anyUser} = await sb.from('users').select('id').limit(1);
-            if(anyUser && anyUser.length > 0){
-              DB.setSession(anyUser[0].id);
-              window.location.reload();
-            }
           }
         } catch(e) { console.log('Auto login failed:', e); }
       })();
@@ -1756,7 +1754,7 @@ function Root(){
     <div style={{display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:'100vh', color:'#fff', background:'#050a14', padding:20, textAlign:'center'}}>
       <div className="spinner" style={{marginBottom:20}}></div>
       <h2 style={{marginBottom:10}}>جارٍ تسجيل الدخول التلقائي...</h2>
-      <p style={{color:'#8fd4ee', marginBottom:20, fontSize:14}}>لو استمرت الشاشة دي، تأكد إن قاعدة البيانات فيها طلاب مسجلين.</p>
+      <p style={{color:'#8fd4ee', marginBottom:20, fontSize:14}}>لو الشاشة وقفت هنا، يبقى مفيش مستخدمين في قاعدة البيانات، أو فيه مشكلة في الاتصال.</p>
       <button className="btn btn-p" onClick={()=>window.location.href='../auth/login.html'}>تسجيل الدخول يدوياً</button>
     </div>
   );
