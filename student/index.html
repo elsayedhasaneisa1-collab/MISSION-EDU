@@ -1743,39 +1743,52 @@ function StudentApp(){
 }
 
 function Root(){
-  const app=useApp();
+  const app = useApp();
   const [autoTried, setAutoTried] = useState(false);
-  
-  useEffect(()=>{
-    if(!app.loading && !app.currentUser && !autoTried){
+
+  // 1. تنفيذ الـ Hooks دائمًا في الأعلى (قاعدة React)
+  useEffect(() => {
+    if (!app.loading && !app.currentUser && !autoTried) {
       setAutoTried(true);
-      (async()=>{
+      (async () => {
         try {
           const sb = await DB.getClient();
-          // بيجيب أول مستخدم موجود في قاعدة البيانات عشان يفتحلك اللوحة
-          const {data} = await sb.from('users').select('id').limit(1);
-          if(data && data.length > 0){
+          const { data } = await sb.from('users').select('id').limit(1);
+          if (data && data.length > 0) {
             DB.setSession(data[0].id);
             window.location.reload();
           }
-        } catch(e) { console.log('Auto login failed:', e); }
+        } catch (e) {
+          console.error("Auto login failed:", e);
+        }
       })();
     }
   }, [app.loading, app.currentUser, autoTried]);
 
-  if(app.loading) return <div className="loading"><div className="spinner"></div>جارٍ التحميل...</div>;
-  
-  if(!app.currentUser) return (
-    <div style={{display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:'100vh', color:'#fff', background:'#050a14', padding:20, textAlign:'center'}}>
-      <div className="spinner" style={{marginBottom:20}}></div>
-      <h2 style={{marginBottom:10}}>جارٍ تسجيل الدخول التلقائي...</h2>
-      <p style={{color:'#8fd4ee', marginBottom:20, fontSize:14}}>لو الشاشة وقفت هنا، يبقى مفيش مستخدمين في قاعدة البيانات، أو فيه مشكلة في الاتصال.</p>
-      <button className="btn btn-p" onClick={()=>window.location.href='../auth/login.html'}>تسجيل الدخول يدوياً</button>
-    </div>
-  );
-  return <StudentApp/>;
-}
+  // 2. الآن يمكننا وضع شروط العرض
+  if (app.loading) {
+    return (
+      <div className="loading">
+        <div className="spinner"></div>
+        جارٍ التحميل...
+      </div>
+    );
+  }
 
+  if (!app.currentUser) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', color: '#fff', background: '#050a14', padding: 20, textAlign: 'center' }}>
+        <h2 style={{ marginBottom: 20, color: '#ef4444' }}>⚠️ لا يوجد مستخدم</h2>
+        <p style={{ color: '#8fd4ee', marginBottom: 20, maxWidth: 400 }}>
+          لم يتم العثور على أي حساب في قاعدة البيانات. تأكد من وجود طالب واحد على الأقل مسجل في Supabase.
+        </p>
+        <button className="btn btn-p" onClick={() => window.location.reload()}>إعادة المحاولة</button>
+      </div>
+    );
+  }
+
+  return <StudentApp />;
+}
 function App(){return <ToastProvider><AppProvider><Root/></AppProvider></ToastProvider>;}
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
