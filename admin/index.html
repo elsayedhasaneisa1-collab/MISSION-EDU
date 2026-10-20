@@ -1616,12 +1616,15 @@ function CertificatesGenPage(){
   const [busy,setBusy]=useState(false);
   const previewRef=useRef(null);
   const student=app.db.users.find(u=>u.id===studentId);
+  
+  const [certId] = useState(() => 'QC' + Math.random().toString(36).substring(2, 12).toUpperCase());
+
   const generate=async()=>{
     if(!student)return app.toast.warn('اختر طالب');
     if(!courseName.trim())return app.toast.warn('اكتب اسم الكورس');
     setBusy(true);
     try{
-      const canvas=await window.html2canvas(previewRef.current,{scale:2,backgroundColor:'#0a0805',useCORS:true});
+      const canvas=await window.html2canvas(previewRef.current,{scale:2,backgroundColor:'#05122b',useCORS:true});
       const link=document.createElement('a');
       link.download=`certificate_${student.name}_${Date.now()}.png`;
       link.href=canvas.toDataURL('image/png');
@@ -1630,9 +1633,18 @@ function CertificatesGenPage(){
     }catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
+
+  const formatDateAr = (d) => {
+    const dateObj = new Date(d);
+    dateObj.setHours(dateObj.getHours() + 2); 
+    return dateObj.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
+  };
+
   return <>
     <div className="h2 mb16 grad">🏅 مولّد الشهادات</div>
     <div className="grid g2 mb16">
+      
+      {/* فورم البيانات */}
       <div className="glass" style={{padding:20}}>
         <Field label="الطالب">
           <select className="input" value={studentId} onChange={e=>setStudentId(e.target.value)}>
@@ -1640,38 +1652,101 @@ function CertificatesGenPage(){
             {app.db.users.filter(u=>u.role==='student').map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
         </Field>
-        <Field label="اسم الكورس / الإنجاز">
-          <input className="input" value={courseName} onChange={e=>setCourseName(e.target.value)} placeholder="مثال: إتمام كورس الفيزياء"/>
+        <Field label="اسم المادة / الإنجاز">
+          <input className="input" value={courseName} onChange={e=>setCourseName(e.target.value)} placeholder="مثال: عربي - عام"/>
         </Field>
         <Field label="التاريخ">
           <input type="date" className="input" value={date} onChange={e=>setDate(e.target.value)}/>
         </Field>
-        <button className="btn btn-p btn-block" onClick={generate} disabled={busy||!student}>
-          {busy?'⏳ جارٍ...':'📸 تحميل الشهادة PNG'}
+        <button className="btn btn-p btn-block" onClick={generate} disabled={busy||!student} style={{whiteSpace:'normal', padding:'14px', marginTop:10}}>
+          {busy?'⏳ جارٍ التحميل...':'📸 تحميل الشهادة PNG'}
         </button>
       </div>
-      <div className="glass" style={{padding:20}}>
-        <div className="h4 mb12" style={{color:'var(--gold)'}}>معاينة</div>
-        <div style={{overflow:'auto',maxHeight:500}}>
+
+      {/* المعاينة */}
+      <div className="glass" style={{padding:20, minWidth:0}}>
+        <div className="h4 mb12" style={{color:'var(--gold)'}}>معاينة حية (اسحب في الموبايل)</div>
+        
+        <div style={{overflowX:'auto', width:'100%', paddingBottom:20}}>
+          
+          {/* التصميم الجديد بالكامل بالكود */}
           <div ref={previewRef} style={{
-            width:600,height:420,background:'linear-gradient(135deg,#0a0805 0%,#1c160c 50%,#0a0805 100%)',
-            border:'4px solid #D4AF37',borderRadius:12,padding:30,position:'relative',
-            display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',
-            fontFamily:'Tajawal,sans-serif',color:'#FFD700'
+            width: 900, height: 630, flexShrink:0, position:'relative', overflow:'hidden',
+            background: 'radial-gradient(circle at center, #0b224a 0%, #05122b 100%)',
+            fontFamily:'Tajawal, sans-serif', color:'#fff',
+            border: '12px solid #0a1f44',
+            boxShadow: 'inset 0 0 0 2px #00d2ff, inset 0 0 50px rgba(0, 210, 255, 0.1)'
           }}>
-            <div style={{position:'absolute',inset:12,border:'1px solid rgba(212,175,55,.4)',borderRadius:8,pointerEvents:'none'}}/>
-            <div style={{fontSize:14,letterSpacing:8,color:'#D4AF37',marginBottom:12}}>MISSION EDU</div>
-            <div style={{fontSize:11,color:'#d4c79a',marginBottom:20}}>CERTIFICATE OF ACHIEVEMENT</div>
-            <div style={{fontSize:16,color:'#d4c79a',marginBottom:8}}>شهادة إتمام</div>
-            <div style={{fontSize:32,fontWeight:900,color:'#FFD700',marginBottom:8,textShadow:'0 0 20px rgba(255,215,0,.5)'}}>
-              {student?.name||'اسم الطالب'}
+            
+            {/* زخارف الزوايا (الخطوط الزرقاء) */}
+            <div style={{position:'absolute', top:10, left:10, width:40, height:40, borderTop:'4px solid #00d2ff', borderLeft:'4px solid #00d2ff'}}/>
+            <div style={{position:'absolute', top:10, right:10, width:40, height:40, borderTop:'4px solid #00d2ff', borderRight:'4px solid #00d2ff'}}/>
+            <div style={{position:'absolute', bottom:10, left:10, width:40, height:40, borderBottom:'4px solid #00d2ff', borderLeft:'4px solid #00d2ff'}}/>
+            <div style={{position:'absolute', bottom:10, right:10, width:40, height:40, borderBottom:'4px solid #00d2ff', borderRight:'4px solid #00d2ff'}}/>
+
+            {/* الهيدر والشعار */}
+            <div style={{textAlign:'center', marginTop:40}}>
+              <div style={{display:'flex', justifyContent:'center', alignItems:'center', gap:8}}>
+                <span style={{fontSize:30}}>🎓</span>
+                <h1 style={{fontSize:32, margin:0, fontWeight:900, fontStyle:'italic', letterSpacing:1}}>
+                  <span style={{color:'#00d2ff'}}>MISSION</span> <span style={{color:'#FFD700'}}>EDU</span>
+                </h1>
+              </div>
+              <p style={{fontSize:14, color:'#a0b3d6', margin:'5px 0 0 0'}}>منصة تعليمية متكاملة</p>
             </div>
-            <div style={{fontSize:13,color:'#d4c79a',marginBottom:20,maxWidth:450}}>{courseName||'اسم الكورس'}</div>
-            <div style={{fontSize:11,color:'#8a7d55',marginTop:'auto'}}>{date}</div>
-            <div style={{position:'absolute',bottom:20,left:30,fontSize:10,color:'#8a7d55'}}>🏆</div>
-            <div style={{position:'absolute',bottom:20,right:30,fontSize:10,color:'#8a7d55'}}>🏆</div>
+
+            {/* شريط الشهادة */}
+            <div style={{position:'relative', textAlign:'center', marginTop:30}}>
+              <div style={{
+                background:'linear-gradient(90deg, #0f3b7a, #1e5cb3, #0f3b7a)', 
+                borderTop:'3px solid #FFD700', borderBottom:'3px solid #FFD700', 
+                padding:'15px 60px', display:'inline-block', position:'relative'
+              }}>
+                <h2 style={{fontSize:50, margin:0, color:'#fff', fontWeight:900, letterSpacing:2, textShadow:'0 2px 10px rgba(0,0,0,0.5)'}}>شهادة إتمام</h2>
+                <div style={{fontSize:12, letterSpacing:8, color:'#fff', fontWeight:700, marginTop:2, opacity:0.8}}>CERTIFICATE OF COMPLETION</div>
+                <div style={{position:'absolute', top:'50%', left:-30, transform:'translateY(-50%)', fontSize:40, color:'#FFD700'}}>❯</div>
+                <div style={{position:'absolute', top:'50%', right:-30, transform:'translateY(-50%)', fontSize:40, color:'#FFD700'}}>❮</div>
+              </div>
+            </div>
+
+            {/* بيانات الطالب */}
+            <div style={{textAlign:'center', marginTop:40}}>
+              <p style={{fontSize:18, color:'#fff', marginBottom:15}}>تشهد المنصة بأن الطالب</p>
+              <h3 style={{fontSize:55, color:'#FFD700', margin:'0 0 15px 0', fontWeight:900, textShadow:'0 0 25px rgba(255,215,0,0.5)', fontFamily:'Cairo, sans-serif'}}>{student?.name || 'اسم الطالب'}</h3>
+              
+              <p style={{fontSize:18, color:'#fff', marginBottom:15}}>قد أتم بنجاح دراسة مادة</p>
+              <h4 style={{fontSize:38, color:'#fff', margin:'0 0 10px 0', fontWeight:700, fontFamily:'Cairo, sans-serif'}}>{courseName || 'اسم المادة'}</h4>
+              
+              <div style={{width:150, height:4, background:'#00d2ff', margin:'20px auto', borderRadius:2, boxShadow:'0 0 10px #00d2ff'}}/>
+            </div>
+
+            {/* الفوتر (التاريخ ورقم الشهادة والتوقيع) */}
+            <div style={{position:'absolute', bottom:40, left:50, right:50, display:'flex', justifyContent:'space-between', alignItems:'flex-end'}}>
+              
+              <div style={{textAlign:'center'}}>
+                <p style={{fontSize:12, color:'#a0b3d6', margin:'0 0 6px 0'}}>تاريخ الإصدار</p>
+                <div style={{background:'rgba(0,0,0,0.3)', border:'1px solid #00d2ff', padding:'10px 20px', borderRadius:10, fontSize:18, color:'#fff', fontWeight:700}}>
+                  {formatDateAr(date)}
+                </div>
+              </div>
+
+              <div style={{textAlign:'center', flex:1}}>
+                <div style={{fontSize:16, fontWeight:900, fontStyle:'italic', color:'#00d2ff', marginBottom:8}}>MISSION EDU</div>
+                <div style={{width:150, height:1, background:'#a0b3d6', margin:'0 auto'}}/>
+                <p style={{fontSize:12, color:'#a0b3d6', margin:'6px 0 0 0'}}>التوقيع الرسمي</p>
+              </div>
+
+              <div style={{textAlign:'center'}}>
+                <p style={{fontSize:12, color:'#a0b3d6', margin:'0 0 6px 0'}}>رقم الشهادة</p>
+                <div style={{background:'rgba(0,0,0,0.3)', border:'1px solid #00d2ff', padding:'10px 20px', borderRadius:10, fontSize:16, color:'#fff', fontWeight:700, fontFamily:'monospace'}}>
+                  {certId}
+                </div>
+              </div>
+
+            </div>
           </div>
         </div>
+        
       </div>
     </div>
   </>;
