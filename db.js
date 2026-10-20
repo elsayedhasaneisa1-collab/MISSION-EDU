@@ -105,10 +105,6 @@
     try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // FIX #1: loadAll — يستخدم questions_public (بدون correct)
-  //        و لو الأدمن، يجيب الأسئلة الكاملة عبر RPC
-  // ═══════════════════════════════════════════════════════════════
   async function loadAll() {
     const sb = await getClient();
     const tables = ['users','grades','subjects','units','lessons','exams','missions','achievements','levels','notifications','activity','polls','poll_votes'];
@@ -118,15 +114,13 @@
       catch (e) { result[t] = []; }
     }));
 
-    // الأسئلة: جرّب الأدمن RPC، ثم fallback على public view
     result.questions = [];
     try {
       const adminId = getSessionId();
-      const { data, error } = await sb.rpc('admin_get_questions', { p_limit: 2000 });
+      const { data, error } = await sb.rpc('admin_get_questions', { p_admin_id: adminId, p_limit: 2000 });
       if (!error && Array.isArray(data) && data.length > 0) {
         result.questions = data;
       } else {
-        // مستخدم عادي — اجلب من questions_public (بدون correct)
         const qRes = await sb.from('questions_public').select('*').limit(2000);
         result.questions = qRes.data || [];
       }
@@ -242,9 +236,7 @@
   async function unbanUser(userId) {
     if (!userId) throw new Error('معرف غير صالح');
     const sb = await getClient();
-    // حذف البلاغات (RLS: admin_delete مسموح)
     try { await sb.from('reports').delete().eq('user_id', userId); } catch (e) {}
-    // فك الحظر (trigger بيتجاوز تعديل الآخرين للأدمن)
     const { data, error } = await sb.from('users').update({
       banned: false,
       ban_reason: null,
@@ -264,9 +256,6 @@
     return data || [];
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // FIX #2: deleteQuestion — يعتمد على .contains() مع fallback
-  // ═══════════════════════════════════════════════════════════════
   async function deleteQuestion(questionId) {
     if (!questionId) throw new Error('معرف غير صالح');
     const sb = await getClient();
@@ -276,7 +265,6 @@
       const { data } = await sb.from('exams').select('*').contains('question_ids', [questionId]);
       exams = data || [];
     } catch (e) {
-      // fallback: جيب كل الاختبارات وفلتر في JS
       const { data: all } = await sb.from('exams').select('*');
       exams = (all || []).filter(ex => {
         let qids = ex.question_ids;
@@ -308,24 +296,21 @@
     } catch (e) { return 0; }
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // FIX #3: reportIssue — يستخدم جدول issues بدل reports
-  // ═══════════════════════════════════════════════════════════════
   async function reportIssue(payload) {
-  try {
-    const sb = await getClient();
-    const userId = getSessionId();
-    if (!userId) return false;
-    
-    const { error } = await sb.rpc('submit_issue', {
-      p_user_id: userId,
-      p_name: String(payload.userName || 'زائر').slice(0, 100),
-      p_phone: String(payload.userPhone || '').slice(0, 30),
-      p_message: String(payload.message || '').slice(0, 2000)
-    });
-    return !error;
-  } catch (e) { return false; }
-}
+    try {
+      const sb = await getClient();
+      const userId = getSessionId();
+      if (!userId) return false;
+      
+      const { error } = await sb.rpc('submit_issue', {
+        p_user_id: userId,
+        p_name: String(payload.userName || 'زائر').slice(0, 100),
+        p_phone: String(payload.userPhone || '').slice(0, 30),
+        p_message: String(payload.message || '').slice(0, 2000)
+      });
+      return !error;
+    } catch (e) { return false; }
+  }
 
   async function getIssues(status) {
     try {
@@ -446,10 +431,6 @@
     } catch (e) { return false; }
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // FIX #4: submitExamAttempt — يحوّل لاستخدام RPC
-  //        (للتوافق مع الكود القديم، لكن ينفذ عبر submit_exam)
-  // ═══════════════════════════════════════════════════════════════
   async function submitExamAttempt(payload) {
     if (!payload || !payload.userId || !payload.examId) throw new Error('بيانات غير صالحة');
     const sb = await getClient();
@@ -458,7 +439,8 @@
     const { data, error } = await sb.rpc('submit_exam', {
       p_exam_id: payload.examId,
       p_answers: payload.answers || {},
-      p_started_at: startedAt
+      p_started_at: startedAt,
+      p_user_id: payload.userId
     });
     if (error) throw new Error(error.message);
     return data;
@@ -478,24 +460,51 @@
     } catch (e) { return false; }
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // Admin reports RPCs (للوحة الإدارة)
-  // ═══════════════════════════════════════════════════════════════
   async function getAdminReports(status, adminId) {
-  const sb = await getClient();
-  const { data, error } = await sb.rpc('get_admin_reports', { p_admin_id: adminId, p_status: status || 'pending' });
-  if (error) throw new Error(error.message);
-  return data || [];
-}
+    const sb = await getClient();
+    const { data, error } = await sb.rpc('get_admin_reports', { p_admin_id: adminId, p_status: status || 'pending' });
+    if (error) throw new Error(error.message);
+    return data || [];
+  }
 
-async function adminReviewReport(reportId, status, action, notes, banTarget, banReason, adminId) {
-  const sb = await getClient();
-  const { data, error } = await sb.rpc('admin_review_report', {
-    p_report_id: reportId, p_admin_id: adminId, p_status: status, p_action: action || null, p_notes: notes || null, p_ban_target: !!banTarget, p_ban_reason: banReason || null
-  });
-  if (error) throw new Error(error.message);
-  return data;
-}
+  async function adminReviewReport(reportId, status, action, notes, banTarget, banReason, adminId) {
+    const sb = await getClient();
+    const { data, error } = await sb.rpc('admin_review_report', {
+      p_report_id: reportId,
+      p_admin_id: adminId,
+      p_status: status,
+      p_action: action || null,
+      p_notes: notes || null,
+      p_ban_target: !!banTarget,
+      p_ban_reason: banReason || null
+    });
+    if (error) throw new Error(error.message);
+    return data;
+  }
+
+  async function getUserNotes(userId){
+    if(!userId) return [];
+    try{
+      const sb = await getClient();
+      const { data, error } = await sb.rpc('get_user_notes', { p_user_id: userId });
+      if(error) throw error;
+      return data || [];
+    }catch(e){
+      try{
+        const sb = await getClient();
+        const { data } = await sb.from('notes').select('*').eq('user_id', userId).order('updated_at',{ascending:false}).limit(500);
+        return data || [];
+      }catch(err){ return []; }
+    }
+  }
+
+  async function deleteUserNote(noteId, userId){
+    if(!noteId || !userId) throw new Error('بيانات غير صالحة');
+    const sb = await getClient();
+    const { error } = await sb.rpc('delete_user_note', { p_note_id: noteId, p_user_id: userId });
+    if(error) throw new Error(error.message);
+    return true;
+  }
 
   window.MissionDB = {
     getClient,
@@ -532,6 +541,8 @@ async function adminReviewReport(reportId, status, action, notes, banTarget, ban
     logError,
     getAdminReports,
     adminReviewReport,
+    getUserNotes,
+    deleteUserNote,
     uid,
     fmt,
     formatDate,
