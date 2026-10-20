@@ -243,6 +243,21 @@ body.light-mode .topbar{background:rgba(255,255,255,.85)}
 <body>
 <div id="secWarning" class="sec-warning">⚠️ تم كشف محاولة تلاعب — الجلسة هتُغلق</div>
 <div id="root"></div>
+<script>
+  window.onerror = function(msg, url, line, col, error) {
+    const root = document.getElementById('root');
+    if (root && root.innerHTML === '') {
+      root.innerHTML = `<div style="color:#ffb3b3; background:#1a0505; border:2px solid #ef4444; padding:20px; font-family:monospace; direction:ltr; text-align:left; margin:20px; border-radius:10px; position:relative; z-index:999999;">
+        <h2 style="color:#ef4444;">⚠️ خطأ في التشغيل (Error Found)</h2>
+        <p style="color:#fff"><b>Message:</b> ${msg}</p>
+        <p style="color:#fff"><b>Line:</b> ${line} | <b>Col:</b> ${col}</p>
+        <p style="color:#fff"><b>URL:</b> ${url}</p>
+        <pre style="color:#fff; background:#000; padding:10px; white-space:pre-wrap; overflow:auto;">${error ? error.stack : 'No stack trace'}</pre>
+        <p style="color:#ffd700; margin-top:20px;">تأكد من: 1) وجود ملف db.js في نفس المجلد. 2) تشغيل الموقع عبر سيرفر (Live Server) وليس بفتحه مباشرة. 3) عدم وجود أخطاء في كتابة الكود.</p>
+      </div>`;
+    }
+  };
+</script>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
