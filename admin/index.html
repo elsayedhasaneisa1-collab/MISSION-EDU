@@ -34,23 +34,31 @@
 --grad-gold:linear-gradient(135deg,#FFD700 0%,#D4AF37 45%,#B8860B 100%);
 --grad-gold-soft:linear-gradient(135deg,rgba(255,215,0,.18),rgba(212,175,55,.08));
 }
+
+body[data-theme="gold"] { --gold:#D4AF37; --gold-l:#FFD700; --gold-d:#8B6914; --bg:#0a0805; --grad-gold:linear-gradient(135deg,#FFD700 0%,#D4AF37 45%,#B8860B 100%); --border:rgba(212,175,55,.18); --border2:rgba(212,175,55,.38); }
+body[data-theme="blue"] { --gold:#2f7dff; --gold-l:#5aa9ff; --gold-d:#1f5fd6; --bg:#04060e; --grad-gold:linear-gradient(135deg,#5aa9ff 0%,#2f7dff 45%,#1f5fd6 100%); --border:rgba(47,125,255,.18); --border2:rgba(47,125,255,.38); }
+body[data-theme="green"] { --gold:#22c55e; --gold-l:#4ade80; --gold-d:#16a34a; --bg:#040a06; --grad-gold:linear-gradient(135deg,#4ade80 0%,#22c55e 45%,#16a34a 100%); --border:rgba(34,197,94,.18); --border2:rgba(34,197,94,.38); }
+body[data-theme="purple"] { --gold:#8b5cf6; --gold-l:#a78bfa; --gold-d:#7c3aed; --bg:#06040e; --grad-gold:linear-gradient(135deg,#a78bfa 0%,#8b5cf6 45%,#7c3aed 100%); --border:rgba(139,92,246,.18); --border2:rgba(139,92,246,.38); }
+body[data-theme="red"] { --gold:#ef4444; --gold-l:#f87171; --gold-d:#dc2626; --bg:#0e0404; --grad-gold:linear-gradient(135deg,#f87171 0%,#ef4444 45%,#dc2626 100%); --border:rgba(239,68,68,.18); --border2:rgba(239,68,68,.38); }
+
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{overflow-x:hidden;max-width:100vw;width:100%}
-body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(212,175,55,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(184,134,11,.14),transparent 60%),radial-gradient(700px 400px at 50% 110%,rgba(255,215,0,.08),transparent 70%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;line-height:1.7}
+body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,var(--border),transparent 62%),radial-gradient(950px 520px at -8% 18%,var(--border),transparent 60%),radial-gradient(700px 400px at 50% 110%,var(--border),transparent 70%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;line-height:1.7;transition: background-color 0.3s;}
 ::-webkit-scrollbar{width:10px;height:10px}
-::-webkit-scrollbar-track{background:rgba(212,175,55,.05)}
-::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#D4AF37,#8B6914);border-radius:20px}
-::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#FFD700,#D4AF37)}
+::-webkit-scrollbar-track{background:var(--border)}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--gold),var(--gold-d));border-radius:20px}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,var(--gold-l),var(--gold))}
 button,input,select,textarea{font-family:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none}
 ul{list-style:none}
 .glass{background:linear-gradient(180deg,rgba(28,22,12,.78),rgba(15,12,7,.68));border:1px solid var(--border);border-radius:var(--r);backdrop-filter:blur(16px);box-shadow:var(--sh);position:relative}
-.glass::before{content:'';position:absolute;inset:0;border-radius:var(--r);padding:1px;background:linear-gradient(135deg,rgba(255,215,0,.25),rgba(212,175,55,.05) 40%,rgba(255,215,0,.20));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.glass::before{content:'';position:absolute;inset:0;border-radius:var(--r);padding:1px;background:linear-gradient(135deg,var(--border2),transparent 40%,var(--border2));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
 .glass-s{background:rgba(28,22,12,.65);border:1px solid var(--border);border-radius:var(--rs)}
 .hv{transition:.28s cubic-bezier(.2,.8,.3,1)}
 .hv:hover{transform:translateY(-4px);border-color:var(--border2);box-shadow:var(--sh-gold)}
 .app{display:flex;min-height:100vh}
-.sidebar{width:264px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow:hidden;padding:18px 12px;display:flex;flex-direction:column;gap:6px;background:linear-gradient(180deg,rgba(15,12,7,.96),rgba(10,8,5,.92));border-inline-start:1px solid var(--border);z-index:60}
+.sidebar{width:264px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow:hidden;padding:18px 12px;display:flex;flex-direction:column;gap:6px;background:linear-gradient(180deg,rgba(15,12,7,.96),rgba(10,8,5,.92));border-inline-start:1px solid var(--border);z-index:60;transition: transform 0.3s;}
+.sidebar.hidden-sidebar { transform: translateX(-100%); position: fixed; }
 .main{flex:1;min-width:0;display:flex;flex-direction:column}
 .content{padding:22px 26px 100px;max-width:1440px;width:100%;margin:0 auto;animation:fu .5s}
 @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -60,29 +68,33 @@ ul{list-style:none}
 @keyframes sp{to{transform:rotate(360deg)}}
 @keyframes goldShine{0%{background-position:0% 50%}100%{background-position:300% 50%}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
+
+.skeleton { background: #1c160c; background-image: linear-gradient(90deg, #1c160c 0px, #2a2012 40px, #1c160c 80px); background-size: 1000px 100%; animation: shimmer 1.5s infinite linear; border-radius: 8px; }
+
 .brand{display:flex;align-items:center;gap:11px;padding:8px 10px 16px}
-.brand-logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--grad-gold);box-shadow:0 8px 26px rgba(212,175,55,.55),0 0 0 1px rgba(255,237,78,.3) inset;position:relative}
+.brand-logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--grad-gold);box-shadow:0 8px 26px var(--gold-glow),0 0 0 1px rgba(255,237,78,.3) inset;position:relative}
 .brand-logo::after{content:'';position:absolute;inset:0;border-radius:14px;background:linear-gradient(135deg,rgba(255,255,255,.35),transparent 45%);pointer-events:none}
-.brand-name{font-weight:900;font-size:17px;background:linear-gradient(100deg,#FFD700,#FFF3B0 45%,#D4AF37 90%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 4s linear infinite}
+.brand-name{font-weight:900;font-size:17px;background:linear-gradient(100deg,var(--gold-l),#fff 45%,var(--gold) 90%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 4s linear infinite}
 .brand-sub{font-size:10.5px;color:var(--muted);font-weight:600}
 .nav-i{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:13px;color:var(--txt2);font-size:14px;font-weight:600;transition:.22s;width:100%;text-align:right;position:relative}
-.nav-i:hover{background:rgba(212,175,55,.10);color:var(--txt)}
-.nav-i.on{background:linear-gradient(90deg,rgba(212,175,55,.24),rgba(212,175,55,.03));color:#FFF3B0}
-.nav-i.on::before{content:'';position:absolute;inset-inline-end:0;top:22%;height:56%;width:3px;border-radius:4px;background:linear-gradient(180deg,#FFD700,#D4AF37);box-shadow:0 0 12px rgba(255,215,0,.7)}
+.nav-i:hover{background:var(--border);color:var(--txt)}
+.nav-i.on{background:linear-gradient(90deg,var(--border2),transparent);color:var(--gold-l)}
+.nav-i.on::before{content:'';position:absolute;inset-inline-end:0;top:22%;height:56%;width:3px;border-radius:4px;background:linear-gradient(180deg,var(--gold-l),var(--gold));box-shadow:0 0 12px var(--gold-l)}
 .nav-ico{font-size:16px;width:22px;text-align:center;display:flex;justify-content:center}
 .nav-gt{font-size:10.5px;font-weight:800;color:var(--gold);letter-spacing:1px;padding:14px 14px 4px;opacity:.75}
 .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:8px;padding:8px 18px;background:rgba(10,8,5,.78);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);min-height:52px}
 .search{flex:1;max-width:480px;display:flex;align-items:center;gap:8px;background:rgba(28,22,12,.7);border:1px solid var(--border);border-radius:12px;padding:6px 12px;transition:.22s;min-height:38px}
-.search:focus-within{border-color:var(--gold);box-shadow:0 0 0 4px rgba(212,175,55,.12)}
+.search:focus-within{border-color:var(--gold);box-shadow:0 0 0 4px var(--border)}
 .search input{flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--txt)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:11px 20px;border-radius:13px;font-weight:700;font-size:14px;transition:.24s;white-space:nowrap;color:var(--txt)}
 .btn:active{transform:scale(.97)}
-.btn-p{background:var(--grad-gold);color:#1a1206;box-shadow:0 10px 28px rgba(212,175,55,.42),0 0 0 1px rgba(255,237,78,.4) inset;position:relative;overflow:hidden}
+.btn-p{background:var(--grad-gold);color:#1a1206;box-shadow:0 10px 28px var(--gold-glow),0 0 0 1px rgba(255,255,255,.2) inset;position:relative;overflow:hidden}
 .btn-p::before{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);transform:translateX(-100%);transition:transform .7s}
 .btn-p:hover::before{transform:translateX(100%)}
 .btn-p:hover{box-shadow:var(--sh-gold-h);transform:translateY(-2px);color:#000}
-.btn-s{background:rgba(212,175,55,.08);color:var(--gold-soft);border:1px solid var(--border)}
-.btn-s:hover{background:rgba(212,175,55,.16);color:#FFF3B0;border-color:var(--border2)}
+.btn-s{background:var(--border);color:var(--gold-soft);border:1px solid var(--border)}
+.btn-s:hover{background:var(--border2);color:var(--gold-l);border-color:var(--gold)}
 .btn-ok{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff}
 .btn-dn{background:rgba(239,68,68,.14);color:#fca5a5;border:1px solid rgba(239,68,68,.32)}
 .btn-dn:hover{background:rgba(239,68,68,.24)}
@@ -97,7 +109,7 @@ ul{list-style:none}
 .txt2{color:var(--txt2)}
 .sm{font-size:12.5px}
 .xs{font-size:11.5px}
-.grad{background:linear-gradient(100deg,#FFD700,#FFF3B0 50%,#D4AF37 100%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 5s linear infinite}
+.grad{background:linear-gradient(100deg,var(--gold-l),#fff 50%,var(--gold) 100%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 5s linear infinite}
 .grid{display:grid;gap:16px}
 .g2{grid-template-columns:repeat(2,1fr)}
 .g3{grid-template-columns:repeat(3,1fr)}
@@ -108,19 +120,19 @@ ul{list-style:none}
 .mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
 .mb6{margin-bottom:6px}.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
 .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:40px;font-size:11.5px;font-weight:700;border:1px solid transparent;white-space:nowrap}
-.pill-b{background:rgba(212,175,55,.16);color:#FFD700;border-color:rgba(212,175,55,.35)}
+.pill-b{background:var(--border);color:var(--gold-l);border-color:var(--border2)}
 .pill-g{background:rgba(34,197,94,.16);color:#6ee7a0;border-color:rgba(34,197,94,.32)}
 .pill-a{background:rgba(245,158,11,.14);color:#fcd34d;border-color:rgba(245,158,11,.28)}
 .pill-r{background:rgba(239,68,68,.16);color:#fca5a5;border-color:rgba(239,68,68,.32)}
 .pill-v{background:rgba(184,134,11,.18);color:#e0b84c;border-color:rgba(184,134,11,.35)}
 .pill-y{background:rgba(255,255,255,.06);color:var(--muted);border-color:var(--border)}
 .pill-free{background:linear-gradient(135deg,rgba(34,197,94,.22),rgba(34,197,94,.10));color:#86efac;border:1px solid rgba(34,197,94,.42);box-shadow:0 0 12px rgba(34,197,94,.15)}
-.pill-paid{background:linear-gradient(135deg,rgba(212,175,55,.25),rgba(212,175,55,.10));color:#FFD700;border:1px solid rgba(212,175,55,.45);box-shadow:0 0 12px rgba(212,175,55,.18)}
-.bar{height:9px;border-radius:20px;background:rgba(212,175,55,.10);overflow:hidden}
+.pill-paid{background:linear-gradient(135deg,var(--border2),var(--border));color:var(--gold-l);border:1px solid var(--gold);box-shadow:0 0 12px var(--border)}
+.bar{height:9px;border-radius:20px;background:var(--border);overflow:hidden}
 .bar-f{height:100%;border-radius:20px;transition:width .8s}
-.bar-b{background:var(--grad-gold);box-shadow:0 0 14px rgba(212,175,55,.5)}
+.bar-b{background:var(--grad-gold);box-shadow:0 0 14px var(--gold-glow)}
 .input,select.input,textarea.input{width:100%;padding:11px 14px;border-radius:12px;background:rgba(15,12,7,.78);border:1.5px solid var(--border);outline:none;font-size:14px;transition:.22s;color:var(--txt)}
-.input:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(212,175,55,.14)}
+.input:focus{border-color:var(--gold);box-shadow:0 0 0 4px var(--border)}
 .input::placeholder{color:var(--muted)}
 select.input{cursor:pointer;appearance:none;padding-left:38px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23D4AF37' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:left 14px center}
 textarea.input{resize:vertical;min-height:80px;font-family:inherit}
@@ -130,33 +142,33 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 .div{height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:14px 0}
 .tbl{width:100%;border-collapse:collapse;font-size:13.5px}
 .tbl th{text-align:right;padding:10px 12px;color:var(--gold);font-weight:700;font-size:11.5px;border-bottom:1px solid var(--border);white-space:nowrap;opacity:.85}
-.tbl td{padding:11px 12px;border-bottom:1px solid rgba(212,175,55,.08);vertical-align:middle}
-.tbl tr:hover td{background:rgba(212,175,55,.05)}
+.tbl td{padding:11px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.tbl tr:hover td{background:var(--border)}
 .sx{overflow-x:auto}
-.avatar{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:14px;background:var(--grad-gold);color:#1a1206;flex-shrink:0;box-shadow:0 4px 14px rgba(212,175,55,.4)}
-.icon-btn{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(212,175,55,.08);border:1px solid var(--border);transition:.2s;font-size:15px;color:var(--gold);position:relative;flex-shrink:0}
-.icon-btn:hover{background:rgba(212,175,55,.18);border-color:var(--border2);box-shadow:0 0 16px rgba(212,175,55,.3)}
+.avatar{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:14px;background:var(--grad-gold);color:#1a1206;flex-shrink:0;box-shadow:0 4px 14px var(--gold-glow)}
+.icon-btn{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--border);border:1px solid var(--border);transition:.2s;font-size:15px;color:var(--gold);position:relative;flex-shrink:0}
+.icon-btn:hover{background:var(--border2);border-color:var(--border2);box-shadow:0 0 16px var(--border2)}
 .modal-bg{position:fixed;inset:0;background:rgba(5,3,1,.85);backdrop-filter:blur(8px);z-index:900;display:grid;place-items:center;padding:18px;overflow-y:auto}
 .modal{width:100%;max-width:600px;max-height:90vh;overflow-y:auto;padding:22px;animation:pu .3s}
 .modal.wide{max-width:820px}
 .mbar{display:none}
-.hero{padding:16px 20px;border-radius:18px;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(212,175,55,.18),rgba(184,134,11,.12) 50%,rgba(255,215,0,.06));border:1px solid var(--border2);box-shadow:0 20px 50px rgba(0,0,0,.5),0 0 40px rgba(212,175,55,.10) inset}
-.hero::after{content:'';position:absolute;top:-50%;inset-inline-end:0;width:340px;height:340px;background:radial-gradient(circle,rgba(255,215,0,.18),transparent 65%);pointer-events:none;border-radius:50%}
+.hero{padding:16px 20px;border-radius:18px;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--border2),var(--border) 50%,transparent);border:1px solid var(--border2);box-shadow:0 20px 50px rgba(0,0,0,.5),0 0 40px var(--border) inset}
+.hero::after{content:'';position:absolute;top:-50%;inset-inline-end:0;width:340px;height:340px;background:radial-gradient(circle,var(--border2),transparent 65%);pointer-events:none;border-radius:50%}
 .vid-preview{aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;border:1px solid var(--border2);position:relative;margin-top:10px}
 .vid-preview iframe,.vid-preview video{width:100%;height:100%;border:0;display:block;object-fit:contain}
-.act-row{display:flex;gap:12px;padding:12px;border-radius:13px;background:rgba(212,175,55,.04);border:1px solid var(--border);align-items:flex-start}
-.act-ico{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:18px;flex-shrink:0;background:rgba(212,175,55,.15);color:var(--gold)}
+.act-row{display:flex;gap:12px;padding:12px;border-radius:13px;background:var(--border);border:1px solid var(--border);align-items:flex-start}
+.act-ico{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:18px;flex-shrink:0;background:var(--border2);color:var(--gold)}
 .empty{text-align:center;padding:52px 20px;color:var(--muted)}
 .empty-ico{font-size:52px;opacity:.35;margin-bottom:14px}
 .loading{display:grid;place-items:center;min-height:100vh;font-size:18px;color:var(--muted)}
-.spinner{width:48px;height:48px;border:3px solid rgba(212,175,55,.18);border-top-color:var(--gold);border-radius:50%;animation:sp 1s linear infinite;margin-bottom:14px;box-shadow:0 0 20px rgba(212,175,55,.3)}
+.spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:sp 1s linear infinite;margin-bottom:14px;box-shadow:0 0 20px var(--border2)}
 .rank{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-weight:900;font-size:15px;flex-shrink:0}
-.rank-1{background:linear-gradient(135deg,#FFD700,#D4AF37);color:#1a1206;box-shadow:0 0 20px rgba(255,215,0,.6)}
+.rank-1{background:linear-gradient(135deg,var(--gold-l),var(--gold));color:#1a1206;box-shadow:0 0 20px var(--gold-glow)}
 .rank-2{background:linear-gradient(135deg,#e8e8e8,#a8a8a8);color:#000}
 .rank-3{background:linear-gradient(135deg,#cd7f32,#8B6914);color:#fff}
-.rank-x{background:rgba(212,175,55,.10);color:var(--muted)}
+.rank-x{background:var(--border);color:var(--muted)}
 .toast-host{position:fixed;bottom:26px;inset-inline-start:26px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:min(440px,92vw)}
-.toast{pointer-events:auto;min-width:280px;padding:14px 16px 16px;border-radius:16px;background:linear-gradient(135deg,rgba(28,22,12,.98),rgba(15,12,7,.98));border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 30px rgba(212,175,55,.15);animation:slideIn .4s;position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:12px}
+.toast{pointer-events:auto;min-width:280px;padding:14px 16px 16px;border-radius:16px;background:linear-gradient(135deg,rgba(28,22,12,.98),rgba(15,12,7,.98));border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 30px var(--border);animation:slideIn .4s;position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:12px}
 .toast.out{animation:fadeOut .3s forwards}
 .toast-ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex-shrink:0}
 .toast-body{flex:1;min-width:0}
@@ -164,26 +176,26 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 .toast-msg{font-size:12.5px;color:var(--txt2);line-height:1.55}
 .toast-bar{position:absolute;bottom:0;inset-inline:0;height:3px;background:rgba(255,255,255,.06)}
 .toast-bar-f{height:100%;transition:width linear}
-.toast-close{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font-size:12px;color:var(--muted);background:rgba(212,175,55,.08);flex-shrink:0}
+.toast-close{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font-size:12px;color:var(--muted);background:var(--border);flex-shrink:0}
 .toast.ok .toast-ico{background:rgba(34,197,94,.18);color:#6ee7a0}
 .toast.ok .toast-bar-f{background:linear-gradient(90deg,#16a34a,#4ade80)}
 .toast.err .toast-ico{background:rgba(239,68,68,.18);color:#fca5a5}
 .toast.err .toast-bar-f{background:linear-gradient(90deg,#dc2626,#f87171)}
 .toast.warn .toast-ico{background:rgba(245,158,11,.18);color:#fcd34d}
 .toast.warn .toast-bar-f{background:linear-gradient(90deg,#d97706,#fbbf24)}
-.toast.info .toast-ico{background:rgba(212,175,55,.20);color:#FFD700}
+.toast.info .toast-ico{background:var(--border2);color:var(--gold-l)}
 .toast.info .toast-bar-f{background:var(--grad-gold)}
-.footer-dev{display:flex;justify-content:center;gap:10px;padding:24px 20px 16px;margin-top:40px;border-top:1px solid rgba(212,175,55,.14);position:relative;flex-wrap:wrap}
-.footer-dev::before{content:"";position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:180px;height:1px;background:linear-gradient(90deg,transparent,#FFD700,transparent)}
+.footer-dev{display:flex;justify-content:center;gap:10px;padding:24px 20px 16px;margin-top:40px;border-top:1px solid var(--border);position:relative;flex-wrap:wrap}
+.footer-dev::before{content:"";position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:180px;height:1px;background:linear-gradient(90deg,transparent,var(--gold-l),transparent)}
 .dev-btn,.tg-btn{display:inline-flex;align-items:center;gap:9px;padding:10px 20px;border-radius:50px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .32s;border:1px solid}
-.dev-btn{background:linear-gradient(135deg,rgba(212,175,55,.18),rgba(184,134,11,.18));border-color:rgba(212,175,55,.4);color:var(--txt);position:relative;overflow:hidden}
-.dev-btn:hover{background:linear-gradient(135deg,rgba(212,175,55,.32),rgba(184,134,11,.32));border-color:#FFD700;transform:translateY(-2px);box-shadow:var(--sh-gold)}
-.dev-name b{background:linear-gradient(90deg,#FFD700,#FFF3B0,#D4AF37,#FFD700);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 3s linear infinite;font-weight:900;letter-spacing:.3px}
-.tg-btn{background:rgba(212,175,55,.12);border-color:rgba(212,175,55,.35);color:#FFD700}
-.tg-btn:hover{background:rgba(212,175,55,.24);border-color:#FFD700;color:#FFF3B0;transform:translateY(-2px);box-shadow:var(--sh-gold)}
-.swal-custom-popup{border:1px solid rgba(212,175,55,.4)!important;border-radius:22px!important;box-shadow:0 24px 70px rgba(0,0,0,.85),0 0 40px rgba(212,175,55,.2)!important;font-family:'Tajawal','Cairo',sans-serif!important;backdrop-filter:blur(20px)}
-.swal-custom-title{color:#f7f0dd!important;font-size:20px!important;font-weight:800!important;font-family:'Tajawal','Cairo',sans-serif!important}
-.swal-custom-input{background:rgba(15,12,7,.78)!important;border:1.5px solid rgba(212,175,55,.35)!important;color:#f7f0dd!important;border-radius:12px!important;font-family:'Tajawal','Cairo',sans-serif!important}
+.dev-btn{background:linear-gradient(135deg,var(--border2),var(--border));border-color:var(--border2);color:var(--txt);position:relative;overflow:hidden}
+.dev-btn:hover{background:linear-gradient(135deg,var(--border2),var(--border2));border-color:var(--gold-l);transform:translateY(-2px);box-shadow:var(--sh-gold)}
+.dev-name b{background:linear-gradient(90deg,var(--gold-l),#fff,var(--gold),var(--gold-l));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShine 3s linear infinite;font-weight:900;letter-spacing:.3px}
+.tg-btn{background:var(--border);border-color:var(--border2);color:var(--gold-l)}
+.tg-btn:hover{background:var(--border2);border-color:var(--gold-l);color:var(--gold-l);transform:translateY(-2px);box-shadow:var(--sh-gold)}
+.swal-custom-popup{border:1px solid var(--border2)!important;border-radius:22px!important;box-shadow:0 24px 70px rgba(0,0,0,.85),0 0 40px var(--border)!important;font-family:'Tajawal','Cairo',sans-serif!important;backdrop-filter:blur(20px)}
+.swal-custom-title{color:var(--txt)!important;font-size:20px!important;font-weight:800!important;font-family:'Tajawal','Cairo',sans-serif!important}
+.swal-custom-input{background:rgba(15,12,7,.78)!important;border:1.5px solid var(--border2)!important;color:var(--txt)!important;border-radius:12px!important;font-family:'Tajawal','Cairo',sans-serif!important}
 .swal-custom-confirm{border-radius:12px!important;font-weight:700!important;font-family:'Tajawal','Cairo',sans-serif!important;padding:10px 24px!important;background:var(--grad-gold)!important;color:#1a1206!important}
 .swal-custom-cancel{border-radius:12px!important;font-weight:700!important;font-family:'Tajawal','Cairo',sans-serif!important;padding:10px 24px!important}
 .access-toggle{display:flex;gap:8px;flex-wrap:wrap}
@@ -191,21 +203,49 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 .access-btn-free{background:rgba(34,197,94,.10);border-color:rgba(34,197,94,.28);color:#86efac}
 .access-btn-free:hover{background:rgba(34,197,94,.20);border-color:rgba(34,197,94,.5);transform:translateY(-1px)}
 .access-btn-free.active{background:linear-gradient(135deg,rgba(34,197,94,.32),rgba(34,197,94,.16));border-color:#22c55e;color:#d1fae5;box-shadow:0 0 20px rgba(34,197,94,.35)}
-.access-btn-paid{background:rgba(212,175,55,.10);border-color:rgba(212,175,55,.28);color:#d4c79a}
-.access-btn-paid:hover{background:rgba(212,175,55,.20);border-color:rgba(212,175,55,.5);transform:translateY(-1px)}
-.access-btn-paid.active{background:linear-gradient(135deg,rgba(212,175,55,.32),rgba(212,175,55,.16));border-color:#D4AF37;color:#FFF3B0;box-shadow:0 0 20px rgba(212,175,55,.4)}
+.access-btn-paid{background:var(--border);border-color:var(--border2);color:var(--txt2)}
+.access-btn-paid:hover{background:var(--border2);border-color:var(--gold);transform:translateY(-1px)}
+.access-btn-paid.active{background:linear-gradient(135deg,var(--border2),var(--border));border-color:var(--gold);color:var(--gold-l);box-shadow:0 0 20px var(--border2)}
 .access-btn .em{font-size:15px}
 .section-title{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;color:var(--gold);letter-spacing:.5px;text-transform:uppercase;margin:16px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-.section-title .ico{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:rgba(212,175,55,.12);font-size:14px;color:var(--gold);flex-shrink:0}
-.qbank-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:700;background:rgba(212,175,55,.12);color:var(--gold-soft);border:1px solid var(--border)}
+.section-title .ico{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--border);font-size:14px;color:var(--gold);flex-shrink:0}
+.qbank-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:700;background:var(--border);color:var(--gold-soft);border:1px solid var(--border)}
 .qbank-orphan{background:linear-gradient(135deg,rgba(239,68,68,.20),rgba(239,68,68,.08));color:#fca5a5;border:1px solid rgba(239,68,68,.35)}
 .qbank-used{background:linear-gradient(135deg,rgba(34,197,94,.20),rgba(34,197,94,.08));color:#86efac;border:1px solid rgba(34,197,94,.35)}
-.msg-card{background:rgba(212,175,55,.04);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;transition:.2s}
-.msg-card:hover{border-color:var(--border2);background:rgba(212,175,55,.07)}
-.msg-card.unread{border-inline-start:3px solid var(--gold);background:rgba(212,175,55,.08)}
+.msg-card{background:var(--border);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;transition:.2s}
+.msg-card:hover{border-color:var(--border2);background:var(--border2)}
+.msg-card.unread{border-inline-start:3px solid var(--gold);background:var(--border2)}
 .msg-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
-.msg-tab{padding:8px 16px;border-radius:20px;font-weight:700;font-size:12.5px;background:rgba(212,175,55,.06);border:1px solid var(--border);color:var(--txt2);transition:.2s;cursor:pointer}
-.msg-tab.active{background:rgba(212,175,55,.20);border-color:var(--gold);color:#FFD700}
+.msg-tab{padding:8px 16px;border-radius:20px;font-weight:700;font-size:12.5px;background:var(--border);border:1px solid var(--border);color:var(--txt2);transition:.2s;cursor:pointer}
+.msg-tab.active{background:var(--border2);border-color:var(--gold);color:var(--gold-l)}
+
+/* Focus Mode */
+body.focus-mode .sidebar { transform: translateX(-100%); position: fixed; }
+body.focus-mode .main { margin-inline-start: 0; }
+body.focus-mode .topbar { padding-inline-start: 20px; }
+body.focus-mode .mbar { display: flex !important; }
+
+/* Command Palette */
+.cmd-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 9999; display: flex; align-items: flex-start; justify-content: center; padding-top: 10vh; }
+.cmd-box { width: 100%; max-width: 600px; background: var(--bg2); border: 1px solid var(--border2); border-radius: 16px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.8); animation: pu .2s; }
+.cmd-input { width: 100%; padding: 16px 20px; background: transparent; border: none; border-bottom: 1px solid var(--border); font-size: 18px; color: var(--txt); outline: none; }
+.cmd-results { max-height: 400px; overflow-y: auto; padding: 8px; }
+.cmd-item { padding: 12px 16px; border-radius: 8px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.1s; }
+.cmd-item:hover, .cmd-item.selected { background: var(--border2); }
+.cmd-item-ico { width: 30px; height: 30px; border-radius: 8px; background: var(--border); display: grid; place-items: center; color: var(--gold); font-size: 14px; }
+.cmd-empty { padding: 20px; text-align: center; color: var(--muted); }
+
+/* Bulk Actions Floating Bar */
+.bulk-bar { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--bg2); border: 1px solid var(--gold); padding: 12px 24px; border-radius: 40px; display: flex; align-items: center; gap: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 20px var(--gold-glow); z-index: 999; animation: slideUp 0.3s; }
+@keyframes slideUp { from { bottom: -50px; opacity: 0; } to { bottom: 24px; opacity: 1; } }
+
+/* Timeline */
+.timeline { position: relative; padding-inline-start: 20px; border-inline-start: 2px solid var(--border2); margin-top: 16px; }
+.timeline-item { position: relative; margin-bottom: 20px; }
+.timeline-dot { position: absolute; inset-inline-start: -27px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--gold); border: 2px solid var(--bg); box-shadow: 0 0 10px var(--gold-glow); }
+.timeline-time { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.timeline-content { background: var(--border); padding: 10px 14px; border-radius: 10px; font-size: 13px; }
+
 @media(max-width:1080px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:860px){
 .sidebar{position:fixed;inset-inline-end:0;top:0;transform:translateX(-105%);transition:transform .34s;width:280px;max-width:85vw;box-shadow:-20px 0 60px rgba(0,0,0,.75);overflow-x:hidden}
@@ -270,7 +310,7 @@ const AppCtx=createContext(null);
 const useApp=()=>useContext(AppCtx);
 
 function AppProvider({children}){
-  const [db,setDb]=useState({users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[],polls:[],poll_votes:[],xp_shop_items:[],study_groups:[],study_group_members:[],study_plans:[],daily_challenges:[],practice_sessions:[],focus_sessions:[],flashcards:[]});
+  const [db,setDb]=useState({users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[],polls:[],poll_votes:[],xp_shop_items:[],study_groups:[],study_group_members:[],study_plans:[],daily_challenges:[],practice_sessions:[],focus_sessions:[],flashcards:[],audit_logs:[]});
   const [currentUser,setCurrentUser]=useState(null);
   const [loading,setLoading]=useState(true);
   const toast=useToast();
@@ -279,7 +319,7 @@ function AppProvider({children}){
     try{
       await DB.cleanupExpiredPolls();
       const data=await DB.loadAll();
-      const extra=['xp_shop_items','study_groups','study_group_members','study_plans','study_tasks','daily_challenges','practice_sessions','focus_sessions','flashcards','xp_purchases','video_progress','daily_reward'];
+      const extra=['xp_shop_items','study_groups','study_group_members','study_plans','study_tasks','daily_challenges','practice_sessions','focus_sessions','flashcards','xp_purchases','video_progress','daily_reward','audit_logs'];
       const sb=await DB.getClient();
       const extraResults=await Promise.all(extra.map(async(t)=>{try{const res=await sb.from(t).select('*').limit(2000);return{t,data:res.data||[]};}catch(e){return{t,data:[]};}}));
       extraResults.forEach(r=>{data[r.t]=r.data;});
@@ -295,30 +335,48 @@ function AppProvider({children}){
 
   const logout=useCallback(()=>{Swal.fire({title:'تسجيل الخروج',text:'هل أنت متأكد؟',icon:'question',showCancelButton:true,confirmButtonText:'نعم، خروج',cancelButtonText:'إلغاء',confirmButtonColor:'#D4AF37',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}}).then(r=>{if(r.isConfirmed){DB.clearSession();window.location.replace('/auth/login.html');}});},[]);
 
+  const logAudit = useCallback(async(action, target, details) => {
+    if(!currentUser) return;
+    try {
+      await DB.save('audit_logs', {
+        id: DB.uid('log_'),
+        admin_id: currentUser.id,
+        admin_name: currentUser.name,
+        action,
+        target,
+        details: details || {},
+        created_at: Date.now()
+      });
+    } catch(e) {}
+  }, [currentUser]);
+
   const save=useCallback(async (table,item)=>{
     const clean = SEC.sanitizeObject(item);
     if(!clean || typeof clean!=='object') throw new Error('بيانات غير صالحة');
     const saved=await DB.save(table,clean);
+    await logAudit('edit/create', `${table} : ${item.title || item.name || item.id}`, { table, id: item.id });
     await reload();
     return saved;
-  },[reload]);
+  },[reload, logAudit]);
 
   const remove=useCallback(async (table,id)=>{
     if(!id || typeof id!=='string' || id.length<3) throw new Error('معرف غير صالح');
     await DB.remove(table,id);
+    await logAudit('delete', `${table} : ${id}`, { table, id });
     await reload();
-  },[reload]);
+  },[reload, logAudit]);
 
   const removeMany=useCallback(async (table,ids)=>{
     const clean = (ids||[]).filter(x=>typeof x==='string'&&x.length>=3);
     if(!clean.length) return;
     await DB.removeMany(table,clean);
+    await logAudit('bulk_delete', `${table}`, { table, count: clean.length });
     await reload();
-  },[reload]);
+  },[reload, logAudit]);
 
   const getLevel=useCallback((xp)=>{const ls=[...db.levels].sort((a,b)=>a.xp-b.xp);if(ls.length===0)return {current:{level:1,name:'مبتدئ',xp:0},next:null};let cur=ls[0],next=null;for(let i=0;i<ls.length;i++){if(xp>=ls[i].xp){cur=ls[i];next=ls[i+1]||null;}}return {current:cur,next};},[db.levels]);
 
-  return <AppCtx.Provider value={{db,currentUser,loading,logout,reload,save,remove,removeMany,getLevel,toast,playSound,subject:id=>db.subjects.find(s=>s.id===id),unit:id=>db.units.find(u=>u.id===id),lesson:id=>db.lessons.find(l=>l.id===id),exam:id=>db.exams.find(e=>e.id===id),question:id=>db.questions.find(q=>q.id===id),grade:id=>db.grades.find(g=>g.id===id)}}>{children}</AppCtx.Provider>;
+  return <AppCtx.Provider value={{db,currentUser,loading,logout,reload,save,remove,removeMany,getLevel,toast,playSound,logAudit,subject:id=>db.subjects.find(s=>s.id===id),unit:id=>db.units.find(u=>u.id===id),lesson:id=>db.lessons.find(l=>l.id===id),exam:id=>db.exams.find(e=>e.id===id),question:id=>db.questions.find(q=>q.id===id),grade:id=>db.grades.find(g=>g.id===id)}}>{children}</AppCtx.Provider>;
 }
 
 const Icon=({name,size=18,color='currentColor'})=>{
@@ -370,7 +428,10 @@ const Icon=({name,size=18,color='currentColor'})=>{
     zapCircle:<><circle cx="12" cy="12" r="10"/><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/></>,
     flash:<><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></>,
     message:<><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></>,
-    flag:<><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></>
+    flag:<><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></>,
+    copy:<><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></>,
+    eye:<><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>,
+    maximize:<><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></>
   };
   return <svg {...p}>{paths[name]||paths.help}</svg>;
 };
@@ -388,12 +449,12 @@ function StudentAvatar({student, size=40}){
   if(safeImg){
     return <img src={safeImg} alt={SEC.esc(student.name||'')} loading="lazy"
       onError={e=>{e.currentTarget.style.display='none';}}
-      style={{width:size,height:size,borderRadius:12,objectFit:'cover',border:'2px solid var(--gold)',boxShadow:'0 4px 14px rgba(212,175,55,.4)',flexShrink:0}}/>;
+      style={{width:size,height:size,borderRadius:12,objectFit:'cover',border:'2px solid var(--gold)',boxShadow:'0 4px 14px var(--border)',flexShrink:0}}/>;
   }
   const isFemale = student?.gender==='female';
   const icon = isFemale ? '👧' : student?.gender==='male' ? '👦' : '👤';
   const bg = isFemale ? 'linear-gradient(135deg,#f472b6,#ec4899)' : 'linear-gradient(135deg,#60a5fa,#3b82f6)';
-  return <div style={{width:size,height:size,borderRadius:12,background:bg,display:'grid',placeItems:'center',fontSize:size*0.55,flexShrink:0,border:'2px solid rgba(212,175,55,.4)'}}>{icon}</div>;
+  return <div style={{width:size,height:size,borderRadius:12,background:bg,display:'grid',placeItems:'center',fontSize:size*0.55,flexShrink:0,border:'2px solid var(--border)'}}>{icon}</div>;
 }
 
 function VideoEditor({value,onChange}){
@@ -403,7 +464,7 @@ function VideoEditor({value,onChange}){
   const placeholder={youtube:'https://www.youtube.com/watch?v=xxxxx',vimeo:'https://vimeo.com/123456789',mp4:'https://example.com/video.mp4',external:'https://example.com/embed/xxxx'}[v.type];
   return <div className="glass-s" style={{padding:16,borderColor:'var(--border2)'}}>
     <div className="section-title" style={{margin:'0 0 12px'}}><span className="ico"><Icon name="video" size={14}/></span>إعدادات الفيديو</div>
-    <Field label="نوع الفيديو"><div className="flex wrap g6">{types.map(t=><button key={t.id} type="button" onClick={()=>set('type',t.id)} style={{padding:'8px 14px',borderRadius:30,background:v.type===t.id?'rgba(212,175,55,.20)':'rgba(212,175,55,.05)',border:`1px solid ${v.type===t.id?'var(--gold)':'var(--border)'}`,fontSize:12.5,fontWeight:700,color:v.type===t.id?'#FFD700':'var(--txt)'}}>{t.icon} {t.label}</button>)}</div></Field>
+    <Field label="نوع الفيديو"><div className="flex wrap g6">{types.map(t=><button key={t.id} type="button" onClick={()=>set('type',t.id)} style={{padding:'8px 14px',borderRadius:30,background:v.type===t.id?'var(--border2)':'var(--border)',border:`1px solid ${v.type===t.id?'var(--gold)':'var(--border)'}`,fontSize:12.5,fontWeight:700,color:v.type===t.id?'var(--gold-l)':'var(--txt)'}}>{t.icon} {t.label}</button>)}</div></Field>
     <Field label="الرابط" hint={types.find(t=>t.id===v.type)?.hint}><input className="input" value={v.url} onChange={e=>set('url',e.target.value)} placeholder={placeholder}/></Field>
     {(v.type==='youtube'||v.type==='vimeo'||v.type==='mp4')&&<Field label="صورة الغلاف (اختياري)"><input className="input" value={v.poster||''} onChange={e=>set('poster',e.target.value)} placeholder="https://..."/></Field>}
     <Field label="نوع الوصول للفيديو"><AccessToggle value={v.is_free} onChange={(isFree)=>set('is_free',isFree)}/></Field>
@@ -447,25 +508,108 @@ function Crud({title,collection,defaultItem,fields,columns}){
   </>;
 }
 
-function Sidebar({items,active,onNav,open,onClose,onLogout}){return <>{open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',zIndex:55}}/>}<aside className={`sidebar ${open?'open':''}`}><div className="brand"><div className="brand-logo"><Icon name="trophy" size={22} color="#1a1206"/></div><div><div className="brand-name">MISSION EDU</div><div className="brand-sub">لوحة الإدارة</div></div></div><div style={{flex:1,overflowY:'auto',overflowX:'hidden',display:'flex',flexDirection:'column',gap:'4px',marginInlineEnd:'-6px',paddingInlineEnd:'6px'}}>{items.map((g,gi)=><div key={gi}>{g.title&&<div className="nav-gt">{g.title}</div>}{g.items.map(it=><button key={it.id} className={`nav-i ${active===it.id?'on':''}`} onClick={()=>{onNav(it.id);onClose?.();}}><span className="nav-ico"><Icon name={it.icon} size={16}/></span><span>{it.label}</span>{it.badge!=null&&<span className="pill pill-b" style={{marginInlineStart:'auto'}}>{it.badge}</span>}</button>)}</div>)}</div><div style={{marginTop:'10px',paddingTop:'10px',borderTop:'1px solid var(--border)',flexShrink:0}}><button className="nav-i" onClick={onLogout} style={{color:'#fca5a5',width:'100%'}}><span className="nav-ico"><Icon name="logout" size={16}/></span><span>تسجيل الخروج</span></button></div></aside></>;}
+function Sidebar({items,active,onNav,open,onClose,onLogout, hidden}){return <>{open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',zIndex:55}}/>}<aside className={`sidebar ${open?'open':''} ${hidden?'hidden-sidebar':''}`}><div className="brand"><div className="brand-logo"><Icon name="trophy" size={22} color="#1a1206"/></div><div><div className="brand-name">MISSION EDU</div><div className="brand-sub">لوحة الإدارة</div></div></div><div style={{flex:1,overflowY:'auto',overflowX:'hidden',display:'flex',flexDirection:'column',gap:'4px',marginInlineEnd:'-6px',paddingInlineEnd:'6px'}}>{items.map((g,gi)=><div key={gi}>{g.title&&<div className="nav-gt">{g.title}</div>}{g.items.map(it=><button key={it.id} className={`nav-i ${active===it.id?'on':''}`} onClick={()=>{onNav(it.id);onClose?.();}}><span className="nav-ico"><Icon name={it.icon} size={16}/></span><span>{it.label}</span>{it.badge!=null&&<span className="pill pill-b" style={{marginInlineStart:'auto'}}>{it.badge}</span>}</button>)}</div>)}</div><div style={{marginTop:'10px',paddingTop:'10px',borderTop:'1px solid var(--border)',flexShrink:0}}><button className="nav-i" onClick={onLogout} style={{color:'#fca5a5',width:'100%'}}><span className="nav-ico"><Icon name="logout" size={16}/></span><span>تسجيل الخروج</span></button></div></aside></>;}
 
-function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick,theme,onToggleTheme,unreadNotifs=0,onOpenNotifications}){
+function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick,theme,onThemeChange,unreadNotifs=0,onOpenNotifications,onToggleFocus,focusMode}){
   const [q,setQ]=useState('');
   const [open,setOpen]=useState(false);
   useEffect(()=>{if(!q.trim()){setOpen(false);return;}setOpen(true);const t=setTimeout(()=>onSearch?.(q),150);return ()=>clearTimeout(t);},[q]);
   return <div className="topbar">
     <button className="icon-btn mbar" onClick={onMenu}><Icon name="menu" size={16}/></button>
     <div style={{position:'relative',flex:1,maxWidth:520}}>
-      <div className="search"><span style={{fontSize:15,opacity:.7,color:'var(--gold)'}}>🔍</span><input value={q} onChange={e=>setQ(e.target.value)} placeholder="ابحث..."/>{q&&<button onClick={()=>{setQ('');setOpen(false);}} style={{opacity:.6,color:'var(--txt)'}}>✕</button>}</div>
-      {open&&searchResults?.length>0&&<div className="glass" style={{position:'absolute',top:'calc(100% + 8px)',insetInline:0,padding:8,zIndex:80,maxHeight:340,overflowY:'auto'}}>{searchResults.slice(0,10).map((r,i)=><button key={i} className="nav-i" onClick={()=>{onResultClick(r);setQ('');setOpen(false);}}><span className="nav-ico">{r.icon}</span><div style={{flex:1,textAlign:'right'}}><div style={{fontSize:13.5}}>{r.title}</div><div className="xs muted">{r.type}</div></div></button>)}</div>}
+      <div className="search"><span style={{fontSize:15,opacity:.7,color:'var(--gold)'}}>🔍</span><input value={q} onChange={e=>setQ(e.target.value)} placeholder="ابحث... (Ctrl+K)" readOnly onClick={()=>document.dispatchEvent(new KeyboardEvent('keydown',{key:'k',ctrlKey:true}))}/></div>
     </div>
     <div className="flex center g8" style={{marginInlineStart:'auto'}}>
-      <button className="icon-btn" onClick={onOpenNotifications} title="الإشعارات"><Icon name="bell" size={16}/>{unreadNotifs > 0 && (<span style={{position:'absolute',top:-4,insetInlineEnd:-4,minWidth:18,height:18,borderRadius:9,background:'var(--grad-gold)',color:'#1a1206',fontSize:10,fontWeight:900,display:'grid',placeItems:'center',padding:'0 5px',boxShadow:'0 0 10px rgba(255,215,0,.7)',animation:'pulse 2s infinite'}}>{unreadNotifs > 9 ? '9+' : unreadNotifs}</span>)}</button>
-      <button className="icon-btn" onClick={onToggleTheme} title={theme==='dark'?'الوضع النهاري':'الوضع الليلي'}><Icon name={theme==='dark'?'sun':'moon'} size={16}/></button>
+      <button className="icon-btn" onClick={onToggleFocus} title="وضع التركيز"><Icon name="maximize" size={16}/></button>
+      <button className="icon-btn" onClick={onOpenNotifications} title="الإشعارات"><Icon name="bell" size={16}/>{unreadNotifs > 0 && (<span style={{position:'absolute',top:-4,insetInlineEnd:-4,minWidth:18,height:18,borderRadius:9,background:'var(--grad-gold)',color:'#1a1206',fontSize:10,fontWeight:900,display:'grid',placeItems:'center',padding:'0 5px',boxShadow:'0 0 10px var(--border)',animation:'pulse 2s infinite'}}>{unreadNotifs > 9 ? '9+' : unreadNotifs}</span>)}</button>
+      <div className="flex g6" style={{background:'rgba(0,0,0,0.2)', padding:'4px 8px', borderRadius:20, border:'1px solid var(--border)', marginInline:'8px'}}>
+        {['gold','blue','green','purple','red'].map(t=>(
+          <div key={t} onClick={()=>onThemeChange(t)} style={{width:16, height:16, borderRadius:'50%', cursor:'pointer', background: t==='gold'?'#D4AF37':t==='blue'?'#2f7dff':t==='green'?'#22c55e':t==='purple'?'#8b5cf6':'#ef4444', border: theme===t ? '2px solid #fff' : 'none'}} />
+        ))}
+      </div>
       <div className="glass-s" style={{padding:'5px 12px',display:'flex',alignItems:'center',gap:8,borderColor:'var(--border2)'}}><div className="avatar" style={{width:32,height:32,fontSize:15}}>{user.avatar||'👑'}</div></div>
       <button className="icon-btn" onClick={onLogout}><Icon name="logout" size={16}/></button>
     </div>
   </div>;
+}
+
+function CommandPalette({onClose, onNavigate}){
+  const app=useApp();
+  const [q, setQ] = useState('');
+  const [sel, setSel] = useState(0);
+  
+  const results = useMemo(()=>{
+    if(!q.trim()) return [];
+    const lc = q.toLowerCase();
+    const res = [];
+    
+    // Students
+    app.db.users.filter(u=>u.role==='student' && (u.name.toLowerCase().includes(lc) || (u.phone||'').includes(lc))).slice(0,4).forEach(u=>{
+      res.push({ id:'s_'+u.id, type:'طالب', title:u.name, sub:u.phone, nav:'students', icon:<Icon name="user" size={16}/> });
+    });
+    
+    // Lessons
+    app.db.lessons.filter(l=>l.title.toLowerCase().includes(lc)).slice(0,4).forEach(l=>{
+      res.push({ id:'l_'+l.id, type:'درس', title:l.title, sub:app.unit(l.unit_id)?.name, nav:'lessons', icon:<Icon name="file" size={16}/> });
+    });
+    
+    // Exams
+    app.db.exams.filter(e=>e.title.toLowerCase().includes(lc)).slice(0,4).forEach(e=>{
+      res.push({ id:'e_'+e.id, type:'اختبار', title:e.title, sub:app.subject(e.subject_id)?.name, nav:'exams', icon:<Icon name="clipboard" size={16}/> });
+    });
+    
+    // Subjects
+    app.db.subjects.filter(s=>s.name.toLowerCase().includes(lc)).slice(0,4).forEach(s=>{
+      res.push({ id:'sub_'+s.id, type:'مادة', title:s.name, sub:'', nav:'subjects', icon:<Icon name="book" size={16}/> });
+    });
+    
+    return res;
+  }, [q, app.db]);
+
+  useEffect(()=>{ setSel(0); }, [q]);
+  
+  useEffect(()=>{
+    const handleKey = (e) => {
+      if(e.key === 'ArrowDown'){ e.preventDefault(); setSel(s=>Math.min(s+1, results.length-1)); }
+      if(e.key === 'ArrowUp'){ e.preventDefault(); setSel(s=>Math.max(s-1, 0)); }
+      if(e.key === 'Enter' && results[sel]){ 
+        e.preventDefault(); 
+        onNavigate(results[sel].nav); 
+        onClose(); 
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return ()=>window.removeEventListener('keydown', handleKey);
+  }, [results, sel, onNavigate, onClose]);
+
+  return (
+    <div className="cmd-overlay" onClick={onClose}>
+      <div className="cmd-box" onClick={e=>e.stopPropagation()}>
+        <input className="cmd-input" autoFocus placeholder="ابحث عن طالب، درس، اختبار، مادة..." value={q} onChange={e=>setQ(e.target.value)}/>
+        {q.trim() && results.length===0 ? (
+          <div className="cmd-empty">لا توجد نتائج مطابقة</div>
+        ) : (
+          <div className="cmd-results">
+            {results.map((r,i)=>(
+              <div key={r.id} className={`cmd-item ${i===sel?'selected':''}`} onMouseEnter={()=>setSel(i)} onClick={()=>{onNavigate(r.nav);onClose();}}>
+                <div className="cmd-item-ico">{r.icon}</div>
+                <div style={{flex:1}}>
+                  <div className="sm" style={{fontWeight:700}}>{r.title}</div>
+                  <div className="xs muted">{r.type} {r.sub ? `• ${r.sub}` : ''}</div>
+                </div>
+                <div className="xs muted" style={{border:'1px solid var(--border)',padding:'2px 6px',borderRadius:4}}>↵</div>
+              </div>
+            ))}
+          </div>
+        )}
+        <div style={{padding:'10px 16px', background:'var(--border)', borderTop:'1px solid var(--border)', fontSize:11, color:'var(--muted)', display:'flex', gap:16}}>
+          <span><b>↑↓</b> للتنقل</span>
+          <span><b>Enter</b> للاختيار</span>
+          <span><b>Esc</b> للإغلاق</span>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function Dashboard(){
@@ -479,232 +623,426 @@ function Dashboard(){
   const avgProgress=students.length&&totalLessons?Math.round((totalDone/(students.length*totalLessons))*100):0;
   const top10=useMemo(()=>[...students].filter(s=>s.banned!==true).sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,10),[students]);
   const recentAct=(app.db.activity||[]).slice(0,8);
+  
+  // Subscriptions Insights
+  const expiringSoon = useMemo(()=>{
+    const now = Date.now();
+    const nextWeek = now + (7*24*60*60*1000);
+    return students.filter(s => {
+      if(s.subscription !== 'paid' || !s.subscription_until) return false;
+      const until = typeof s.subscription_until === 'number' ? s.subscription_until : new Date(s.subscription_until).getTime();
+      return until > now && until <= nextWeek;
+    });
+  },[students]);
+
   const actLabel={login:'تسجيل دخول',register:'تسجيل جديد',lesson_view:'فتح درس',lesson_complete:'أكمل درس',exam_start:'بدأ اختبار',exam_submit:'أنهى اختبار',video_play:'شاهد فيديو',mission_complete:'أكمل مهمة',poll_vote:'صوّت',report_user:'بلاغ',daily_reward:'مكافأة',practice_complete:'تدريب',daily_challenge:'تحدي يومي'};
   const chart1Ref=useRef(null);const chart2Ref=useRef(null);const chart3Ref=useRef(null);
   const chart1Instance=useRef(null);const chart2Instance=useRef(null);const chart3Instance=useRef(null);
-  useEffect(()=>{if(!chart1Ref.current||!window.Chart)return;const ctx=chart1Ref.current.getContext("2d");if(chart1Instance.current)chart1Instance.current.destroy();const g1=ctx.createLinearGradient(0,0,0,240);g1.addColorStop(0,"rgba(255,215,0,0.85)");g1.addColorStop(1,"rgba(139,105,20,0.5)");chart1Instance.current=new window.Chart(ctx,{type:"bar",data:{labels:top10.map(s=>s.name.split(" ")[0]),datasets:[{label:"XP",data:top10.map(s=>s.xp||0),backgroundColor:g1,borderColor:"#FFD700",borderWidth:2,borderRadius:10}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#d4c79a",font:{family:"Tajawal",size:12}},grid:{display:false}},y:{ticks:{color:"#d4c79a",font:{family:"Tajawal",size:12}},grid:{color:"rgba(212,175,55,0.08)"}}}}});return ()=>{if(chart1Instance.current)chart1Instance.current.destroy();};},[top10]);
-  useEffect(()=>{if(!chart2Ref.current||!window.Chart)return;const ctx=chart2Ref.current.getContext("2d");if(chart2Instance.current)chart2Instance.current.destroy();const levels=[...app.db.levels].sort((a,b)=>a.xp-b.xp);const distribution=levels.map(lv=>({name:`Lv ${lv.level} - ${lv.name}`,count:students.filter(s=>{const {current}=app.getLevel(s.xp||0);return current.level===lv.level;}).length}));chart2Instance.current=new window.Chart(ctx,{type:"doughnut",data:{labels:distribution.map(d=>d.name),datasets:[{data:distribution.map(d=>d.count),backgroundColor:["rgba(255,215,0,0.8)","rgba(212,175,55,0.8)","rgba(184,134,11,0.8)","rgba(139,105,20,0.8)","rgba(92,69,9,0.8)"],borderColor:"rgba(10,8,5,0.7)",borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{color:"#d4c79a",font:{family:"Tajawal",size:11},padding:12,boxWidth:14}}}}});return ()=>{if(chart2Instance.current)chart2Instance.current.destroy();};},[students,app.db.levels]);
-  useEffect(()=>{if(!chart3Ref.current||!window.Chart)return;const ctx=chart3Ref.current.getContext("2d");if(chart3Instance.current)chart3Instance.current.destroy();const govStats={};students.forEach(s=>{const gov=s.governorate||'بدون محافظة';govStats[gov]=(govStats[gov]||0)+1;});const sorted=Object.entries(govStats).sort((a,b)=>b[1]-a[1]).slice(0,10);if(sorted.length===0)return;const colors=["rgba(255,215,0,0.85)","rgba(212,175,55,0.85)","rgba(184,134,11,0.85)","rgba(245,222,110,0.85)","rgba(139,105,20,0.85)","rgba(255,237,78,0.85)","rgba(168,132,20,0.85)","rgba(220,190,80,0.85)","rgba(92,69,9,0.85)","rgba(255,240,150,0.85)"];chart3Instance.current=new window.Chart(ctx,{type:"doughnut",data:{labels:sorted.map(s=>s[0]),datasets:[{data:sorted.map(s=>s[1]),backgroundColor:colors.slice(0,sorted.length),borderColor:"rgba(10,8,5,0.7)",borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{color:"#d4c79a",font:{family:"Tajawal",size:11},padding:12,boxWidth:14}}}}});return ()=>{if(chart3Instance.current)chart3Instance.current.destroy();};},[students]);
+  
+  useEffect(()=>{
+    if(!chart1Ref.current||!window.Chart)return;
+    const ctx=chart1Ref.current.getContext("2d");
+    if(chart1Instance.current)chart1Instance.current.destroy();
+    const g1=ctx.createLinearGradient(0,0,0,240);
+    g1.addColorStop(0,"rgba(255,215,0,0.85)");
+    g1.addColorStop(1,"rgba(139,105,20,0.5)");
+    chart1Instance.current=new window.Chart(ctx,{
+      type:"bar",
+      data:{labels:top10.map(s=>s.name.split(" ")[0]),datasets:[{label:"XP",data:top10.map(s=>s.xp||0),backgroundColor:g1,borderColor:"#FFD700",borderWidth:2,borderRadius:6}]},
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{
+          x:{ticks:{color:"#d4c79a",font:{family:"Tajawal",size:10},maxRotation:90,minRotation:90,autoSkip:true},grid:{display:false}},
+          y:{ticks:{color:"#d4c79a",font:{family:"Tajawal",size:10}},grid:{color:"rgba(212,175,55,0.08)"}}
+        }
+      }
+    });
+    return ()=>{if(chart1Instance.current)chart1Instance.current.destroy();};
+  },[top10]);
+
+  useEffect(()=>{
+    if(!chart2Ref.current||!window.Chart)return;
+    const ctx=chart2Ref.current.getContext("2d");
+    if(chart2Instance.current)chart2Instance.current.destroy();
+    const levels=[...app.db.levels].sort((a,b)=>a.xp-b.xp);
+    const distribution=levels.map(lv=>({name:`Lv ${lv.level}`,count:students.filter(s=>{const {current}=app.getLevel(s.xp||0);return current.level===lv.level;}).length}));
+    chart2Instance.current=new window.Chart(ctx,{
+      type:"doughnut",
+      data:{labels:distribution.map(d=>d.name),datasets:[{data:distribution.map(d=>d.count),backgroundColor:["rgba(255,215,0,0.8)","rgba(212,175,55,0.8)","rgba(184,134,11,0.8)","rgba(139,105,20,0.8)","rgba(92,69,9,0.8)"],borderColor:"rgba(10,8,5,0.7)",borderWidth:2}]},
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{legend:{position:"bottom",labels:{color:"#d4c79a",font:{family:"Tajawal",size:10},padding:10,boxWidth:12}}}
+      }
+    });
+    return ()=>{if(chart2Instance.current)chart2Instance.current.destroy();};
+  },[students,app.db.levels]);
+
+  useEffect(()=>{
+    if(!chart3Ref.current||!window.Chart)return;
+    const ctx=chart3Ref.current.getContext("2d");
+    if(chart3Instance.current)chart3Instance.current.destroy();
+    const govStats={};
+    students.forEach(s=>{const gov=s.governorate||'بدون محافظة';govStats[gov]=(govStats[gov]||0)+1;});
+    const sorted=Object.entries(govStats).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    if(sorted.length===0)return;
+    const colors=["rgba(255,215,0,0.85)","rgba(212,175,55,0.85)","rgba(184,134,11,0.85)","rgba(245,222,110,0.85)","rgba(139,105,20,0.85)","rgba(255,237,78,0.85)","rgba(168,132,20,0.85)","rgba(220,190,80,0.85)"];
+    chart3Instance.current=new window.Chart(ctx,{
+      type:"doughnut",
+      data:{labels:sorted.map(s=>s[0]),datasets:[{data:sorted.map(s=>s[1]),backgroundColor:colors.slice(0,sorted.length),borderColor:"rgba(10,8,5,0.7)",borderWidth:2}]},
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{legend:{position:"bottom",labels:{color:"#d4c79a",font:{family:"Tajawal",size:10},padding:10,boxWidth:12}}}
+      }
+    });
+    return ()=>{if(chart3Instance.current)chart3Instance.current.destroy();};
+  },[students]);
+
   const exportToCSV=()=>{const headers=["الاسم","الهاتف","المحافظة","الجنس","XP","المستوى","سلسلة","الحالة","دروس","بلاغات","المدرسة"];const rows=students.map(s=>{const {current}=app.getLevel(s.xp||0);return [s.name,(s.country_code||"+20")+(s.phone||""),s.governorate||"—",s.gender==='female'?'بنت':s.gender==='male'?'ولد':'—',s.xp||0,`Lv ${current.level}`,s.streak||0,s.banned?"محظور":s.active===false?"موقوف":"نشط",(s.completed_lessons||[]).length,s.reports_count||0,s.school_name||"—"];});const csv=[headers,...rows].map(row=>row.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(",")).join("\n");const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`students_${new Date().toISOString().slice(0,10)}.csv`;a.click();URL.revokeObjectURL(url);app.toast.ok("تم تصدير البيانات");};
   return <>
     <div className="hero mb16"><div className="flex between center wrap g12"><div><div className="h2 mb6 grad">لوحة تحكم الأدمن</div><div className="sm txt2">إدارة كاملة لكل محتوى المنصة</div></div><button className="btn btn-p" onClick={exportToCSV}><Icon name="file" size={15}/> تصدير Excel</button></div></div>
     <div className="grid g4 mb16">
-      <Stat label="إجمالي الطلاب" value={DB.fmt(students.length)} icon="users" color="#FFD700"/>
+      <Stat label="إجمالي الطلاب" value={DB.fmt(students.length)} icon="users" color="var(--gold-l)"/>
       <Stat label="الطلاب النشطون" value={DB.fmt(active)} icon="check" color="#22c55e"/>
       <Stat label="المحظورون" value={DB.fmt(banned)} icon="lock" color="#ef4444" sub={banned>0?"راجع المحظورين":undefined}/>
-      <Stat label="عدد المواد" value={DB.fmt(app.db.subjects.length)} icon="book" color="#D4AF37"/>
-      <Stat label="عدد الدروس" value={DB.fmt(app.db.lessons.length)} icon="file" color="#B8860B"/>
-      <Stat label="الاختبارات" value={DB.fmt(app.db.exams.length)} icon="clipboard" color="#D4AF37"/>
-      <Stat label="الأسئلة" value={DB.fmt(app.db.questions.length)} icon="help" color="#FFD700"/>
-      <Stat label="متوسط التقدم" value={`${avgProgress}%`} icon="trend" color="#FFD700"/>
+      <Stat label="اشتراكات تنتهي قريباً" value={DB.fmt(expiringSoon.length)} icon="clock" color="#f59e0b" sub={expiringSoon.length>0?"خلال 7 أيام":undefined}/>
     </div>
     <div className="grid g2 mb16">
-      <div className="glass" style={{padding:18}}><div className="h4 mb12" style={{color:'var(--gold)'}}>📊 XP — أفضل 10 طلاب</div><div style={{height:240,position:'relative'}}><canvas ref={chart1Ref}></canvas></div></div>
-      <div className="glass" style={{padding:18}}><div className="h4 mb12" style={{color:'var(--gold)'}}>🎯 توزيع المستويات</div><div style={{height:240,position:'relative'}}><canvas ref={chart2Ref}></canvas></div></div>
+      <div className="glass" style={{padding:18}}><div className="h4 mb12" style={{color:'var(--gold)'}}>📊 XP — أفضل 10 طلاب</div><div style={{height:280,position:'relative'}}><canvas ref={chart1Ref}></canvas></div></div>
+      <div className="glass" style={{padding:18}}><div className="h4 mb12" style={{color:'var(--gold)'}}>🎯 توزيع المستويات</div><div style={{height:280,position:'relative'}}><canvas ref={chart2Ref}></canvas></div></div>
     </div>
     <div className="glass mb16" style={{padding:18}}>
       <div className="flex between center mb12 wrap g8"><div className="h4" style={{color:'var(--gold)'}}>📍 توزيع المحافظات</div><span className="pill pill-b">{students.filter(s=>s.governorate).length} طالب</span></div>
       <div style={{display:'grid',gridTemplateColumns:'minmax(0,1fr) minmax(0,1.2fr)',gap:16,alignItems:'center'}}>
-        <div style={{height:260,position:'relative'}}><canvas ref={chart3Ref}></canvas></div>
-        <div>{(()=>{const gs={};students.forEach(s=>{const g=s.governorate||'بدون';gs[g]=(gs[g]||0)+1;});const sorted=Object.entries(gs).sort((a,b)=>b[1]-a[1]);return sorted.map(([g,c],i)=><div key={g} className="flex between center" style={{padding:'8px 12px',borderBottom:'1px solid rgba(212,175,55,.08)'}}><div className="flex center g8"><span className="pill pill-b" style={{fontSize:10,padding:'2px 8px'}}>{i+1}</span><span className="sm">📍 {SEC.esc(g)}</span></div><div className="flex center g8"><div style={{width:'60px',height:'6px',background:'rgba(212,175,55,.12)',borderRadius:20,overflow:'hidden'}}><div style={{width:`${(c/students.length)*100}%`,height:'100%',background:'var(--grad-gold)'}}/></div><span className="pill pill-g" style={{fontSize:11}}>{c}</span></div></div>);})()}</div>
+        <div style={{height:280,position:'relative'}}><canvas ref={chart3Ref}></canvas></div>
+        <div>{(()=>{const gs={};students.forEach(s=>{const g=s.governorate||'بدون';gs[g]=(gs[g]||0)+1;});const sorted=Object.entries(gs).sort((a,b)=>b[1]-a[1]);return sorted.map(([g,c],i)=><div key={g} className="flex between center" style={{padding:'8px 12px',borderBottom:'1px solid var(--border)'}}><div className="flex center g8"><span className="pill pill-b" style={{fontSize:10,padding:'2px 8px'}}>{i+1}</span><span className="sm">📍 {SEC.esc(g)}</span></div><div className="flex center g8"><div style={{width:'60px',height:'6px',background:'var(--border)',borderRadius:20,overflow:'hidden'}}><div style={{width:`${(c/students.length)*100}%`,height:'100%',background:'var(--grad-gold)'}}/></div><span className="pill pill-g" style={{fontSize:11}}>{c}</span></div></div>);})()}</div>
       </div>
     </div>
     <div className="grid g2 mb16">
-      <div className="glass" style={{padding:18}}><div className="h4 mb12" style={{color:'var(--gold)'}}><Icon name="award" size={16}/> المتصدرون</div>{top10.length===0?<Empty icon="🏅" title="لا يوجد طلاب"/>:top10.map((s,i)=>{const {current}=app.getLevel(s.xp||0);return <div key={s.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid rgba(212,175,55,.08)'}}><div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div><StudentAvatar student={s} size={34}/><div style={{flex:1}}><div className="sm">{SEC.esc(s.name)} {s.governorate&&<span className="xs muted">— 📍 {SEC.esc(s.governorate)}</span>}</div><div className="xs muted">Lv {current.level} — {SEC.esc(current.name)}</div></div><span className="pill pill-b">{DB.fmt(s.xp||0)} XP</span></div>;})}</div>
-      <div className="glass" style={{padding:18}}><div className="flex between center mb12"><div className="h4" style={{color:'var(--gold)'}}><Icon name="activity" size={16}/> آخر الأنشطة</div><span className="pill pill-b">{app.db.activity?.length||0}</span></div>{recentAct.length===0?<div style={{padding:'24px',textAlign:'center'}}><div style={{fontSize:40,opacity:.3,marginBottom:8}}>📡</div><div className="sm muted">لا يوجد نشاط</div></div>:recentAct.map(a=><div key={a.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid rgba(212,175,55,.08)'}}><div className="act-ico"><Icon name="activity" size={16}/></div><div style={{flex:1}}><div className="sm">{SEC.esc(a.user_name||'غير معروف')}</div><div className="xs muted">{actLabel[a.type]||a.type}{a.target?` — ${SEC.esc(a.target)}`:''}</div></div><div className="xs muted">{DB.formatTime(a.at)}</div></div>)}</div>
+      <div className="glass" style={{padding:18}}><div className="h4 mb12" style={{color:'var(--gold)'}}><Icon name="award" size={16}/> المتصدرون</div>{top10.length===0?<Empty icon="🏅" title="لا يوجد طلاب"/>:top10.map((s,i)=>{const {current}=app.getLevel(s.xp||0);return <div key={s.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid var(--border)'}}><div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div><StudentAvatar student={s} size={34}/><div style={{flex:1}}><div className="sm">{SEC.esc(s.name)} {s.governorate&&<span className="xs muted">— 📍 {SEC.esc(s.governorate)}</span>}</div><div className="xs muted">Lv {current.level} — {SEC.esc(current.name)}</div></div><span className="pill pill-b">{DB.fmt(s.xp||0)} XP</span></div>;})}</div>
+      <div className="glass" style={{padding:18}}><div className="flex between center mb12"><div className="h4" style={{color:'var(--gold)'}}><Icon name="activity" size={16}/> آخر الأنشطة</div><span className="pill pill-b">{app.db.activity?.length||0}</span></div>{recentAct.length===0?<div style={{padding:'24px',textAlign:'center'}}><div style={{fontSize:40,opacity:.3,marginBottom:8}}>📡</div><div className="sm muted">لا يوجد نشاط</div></div>:recentAct.map(a=><div key={a.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid var(--border)'}}><div className="act-ico"><Icon name="activity" size={16}/></div><div style={{flex:1}}><div className="sm">{SEC.esc(a.user_name||'غير معروف')}</div><div className="xs muted">{actLabel[a.type]||a.type}{a.target?` — ${SEC.esc(a.target)}`:''}</div></div><div className="xs muted">{DB.formatTime(a.at)}</div></div>)}</div>
     </div>
   </>;
 }
 
-function ActivityLog(){
-  const app=useApp();
-  const [filter,setFilter]=useState('all');const [studentFilter,setStudentFilter]=useState('all');
-  const students=app.db.users.filter(u=>u.role==='student');
-  const typeFilters=[{id:'all',label:'الكل'},{id:'lesson_view',label:'دروس'},{id:'video_play',label:'فيديو'},{id:'exam_submit',label:'اختبارات'},{id:'mission_complete',label:'مهام'},{id:'poll_vote',label:'استطلاعات'},{id:'report_user',label:'بلاغات'},{id:'daily_reward',label:'مكافآت'},{id:'login',label:'دخول'}];
-  let list=[...(app.db.activity||[])];
-  if(filter!=='all') list=list.filter(a=>a.type===filter);
-  if(studentFilter!=='all') list=list.filter(a=>a.user_id===studentFilter);
-  const actLabel={login:'تسجيل دخول',register:'تسجيل جديد',lesson_view:'فتح درس',lesson_complete:'أكمل درس',exam_start:'بدأ اختبار',exam_submit:'أنهى اختبار',video_play:'شاهد فيديو',mission_complete:'أكمل مهمة',poll_vote:'صوّت',report_user:'بلاغ',daily_reward:'مكافأة يومية',practice_complete:'تدريب',daily_challenge:'تحدي يومي',shop_purchase:'شراء من المتجر',focus_complete:'جلسة تركيز'};
-  return <>
-    <div className="flex between center mb16 wrap g8"><div className="h2 grad">سجل النشاط</div><div className="flex g8 center"><span className="pill pill-b">{list.length} نشاط</span><select className="input" style={{maxWidth:220}} value={studentFilter} onChange={e=>setStudentFilter(e.target.value)}><option value="all">كل الطلاب</option>{students.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></div></div>
-    <div className="flex wrap g6 mb16">{typeFilters.map(f=><button key={f.id} onClick={()=>setFilter(f.id)} style={{padding:'8px 14px',borderRadius:30,background:filter===f.id?'rgba(212,175,55,.20)':'rgba(212,175,55,.05)',border:`1px solid ${filter===f.id?'var(--gold)':'var(--border)'}`,fontSize:12.5,fontWeight:700,color:filter===f.id?'#FFD700':'var(--txt)',cursor:'pointer'}}>{f.label}</button>)}</div>
-    <div className="glass" style={{padding:16}}>
-      {list.length===0?<div style={{padding:'40px 20px',textAlign:'center'}}><div style={{fontSize:48,opacity:.3,marginBottom:12}}>📡</div><div className="h4 txt2 mb8">لا يوجد نشاط</div></div>:<div className="flex col g8">{list.slice(0,200).map(a=><div key={a.id} className="act-row"><div className="act-ico"><Icon name="activity" size={16}/></div><div style={{flex:1,minWidth:0}}><div className="flex between center wrap g8"><div><div className="sm" style={{fontWeight:700}}>{SEC.esc(a.user_name||'غير معروف')}</div><div className="xs muted">{actLabel[a.type]||a.type}{a.target?` — ${SEC.esc(a.target)}`:''}</div></div><div className="xs muted">{DB.formatDateTime(a.at)}</div></div></div></div>)}</div>}
-    </div>
-  </>;
-}
+function AuditLogsPage(){
+  const app = useApp();
+  const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(()=>{
+    (async()=>{
+      try{
+        const sb = await DB.getClient();
+        const { data } = await sb.from('audit_logs').select('*').order('created_at',{ascending:false}).limit(200);
+        setLogs(data || []);
+      }catch(e){}
+      setLoading(false);
+    })();
+  },[]);
 
-function ExamResultsPage(){
-  const app=useApp();
-  const [loading,setLoading]=useState(true);const [attempts,setAttempts]=useState([]);
-  const [filterExam,setFilterExam]=useState('all');const [filterStudent,setFilterStudent]=useState('all');
-  const [filterStatus,setFilterStatus]=useState('all');const [sortBy,setSortBy]=useState('recent');const [q,setQ]=useState('');
-  const loadData=useCallback(async ()=>{try{const sb=await DB.getClient();const {data,error}=await sb.from('exam_attempts').select('*').order('at',{ascending:false}).limit(2000);if(error)throw error;setAttempts(data||[]);}catch(e){}setLoading(false);},[]);
-  useEffect(()=>{loadData();},[loadData]);
-  const enriched=useMemo(()=>{return attempts.map(a=>{const student=app.db.users.find(u=>u.id===a.user_id);const exam=app.db.exams.find(e=>e.id===a.exam_id);return {...a,student,exam,studentName:student?.name||'طالب محذوف',examTitle:exam?.title||'اختبار محذوف',atMs:Number(a.at)||0,durationSec:Number(a.duration_seconds)||0,correctCount:Number(a.score)||0,wrongCount:(Number(a.total)||0)-(Number(a.score)||0)};});},[attempts,app.db.users,app.db.exams]);
-  const filtered=useMemo(()=>{let list=[...enriched];if(filterExam!=='all')list=list.filter(x=>x.exam_id===filterExam);if(filterStudent!=='all')list=list.filter(x=>x.user_id===filterStudent);if(filterStatus!=='all'){if(filterStatus==='passed')list=list.filter(x=>x.status==='passed'||(x.passed&&x.status!=='cancelled'));else if(filterStatus==='failed')list=list.filter(x=>x.status==='failed'||(!x.passed&&x.status!=='cancelled'));else if(filterStatus==='cancelled')list=list.filter(x=>x.status==='cancelled');}if(q.trim()){const lc=q.toLowerCase();list=list.filter(x=>x.studentName.toLowerCase().includes(lc)||x.examTitle.toLowerCase().includes(lc));}if(sortBy==='recent')list.sort((a,b)=>b.atMs-a.atMs);else if(sortBy==='highest')list.sort((a,b)=>b.pct-a.pct);else if(sortBy==='lowest')list.sort((a,b)=>a.pct-b.pct);return list;},[enriched,filterExam,filterStudent,filterStatus,sortBy,q]);
-  const stats=useMemo(()=>{const total=enriched.length;const passed=enriched.filter(x=>x.passed).length;const failed=total-passed;const avgPct=total?Math.round(enriched.reduce((s,x)=>s+(x.pct||0),0)/total):0;const uniqueStudents=new Set(enriched.map(x=>x.user_id)).size;return {total,passed,failed,avgPct,uniqueStudents};},[enriched]);
-  const formatDuration=(sec)=>{if(!sec||sec<=0)return '—';if(sec<60)return `${sec} ث`;const m=Math.floor(sec/60);const s=sec%60;return s>0?`${m}د ${s}ث`:`${m}د`;};
   return <>
-    <div className="flex between center mb16 wrap g8"><div><div className="h2 grad">📊 نتايج الاختبارات</div></div><div className="flex g8"><button className="btn btn-s" onClick={loadData}>🔄</button></div></div>
-    <div className="grid g4 mb16"><Stat label="إجمالي المحاولات" value={DB.fmt(stats.total)} icon="clipboard" color="#FFD700"/><Stat label="طلاب" value={DB.fmt(stats.uniqueStudents)} icon="users" color="#5aa9ff"/><Stat label="ناجحون" value={DB.fmt(stats.passed)} icon="check" color="#22c55e"/><Stat label="راسبون" value={DB.fmt(stats.failed)} icon="close" color="#ef4444"/></div>
-    <div className="glass mb16" style={{padding:14}}>
-      <div className="grid g4" style={{gap:10}}>
-        <div><label className="lbl">الاختبار</label><select className="input" value={filterExam} onChange={e=>setFilterExam(e.target.value)}><option value="all">كل الاختبارات</option>{app.db.exams.map(e=><option key={e.id} value={e.id}>{e.title}</option>)}</select></div>
-        <div><label className="lbl">الطالب</label><select className="input" value={filterStudent} onChange={e=>setFilterStudent(e.target.value)}><option value="all">كل الطلاب</option>{app.db.users.filter(u=>u.role==='student').map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></div>
-        <div><label className="lbl">الحالة</label><select className="input" value={filterStatus} onChange={e=>setFilterStatus(e.target.value)}><option value="all">الكل</option><option value="passed">✓ ناجح</option><option value="failed">✗ راسب</option><option value="cancelled">⛔ ملغي</option></select></div>
-        <div><label className="lbl">الترتيب</label><select className="input" value={sortBy} onChange={e=>setSortBy(e.target.value)}><option value="recent">الأحدث</option><option value="highest">أعلى نسبة</option><option value="lowest">أقل نسبة</option></select></div>
-      </div>
-      <div className="mt12"><input className="input" placeholder="🔍 بحث..." value={q} onChange={e=>setQ(e.target.value)}/></div>
-    </div>
+    <div className="h2 mb16 grad">📜 سجل عمليات الأدمن (Audit Log)</div>
     <div className="glass" style={{padding:14}}>
-      {loading?<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>:filtered.length===0?<Empty icon="📊" title="لا نتائج"/>:
-      <div className="sx"><table className="tbl"><thead><tr><th>الطالب</th><th>الاختبار</th><th>التاريخ</th><th>المدة</th><th>النتيجة</th><th>النسبة</th><th>الحالة</th></tr></thead><tbody>
-        {filtered.map(x=><tr key={x.id}><td><div className="flex center g8">{x.student?<StudentAvatar student={x.student} size={28}/>:<div className="avatar" style={{width:28,height:28,fontSize:12}}>👤</div>}<span className="sm">{SEC.esc(x.studentName)}</span></div></td><td className="sm">{SEC.esc(x.examTitle)}</td><td className="xs muted">{x.atMs?new Date(x.atMs).toLocaleDateString('ar-EG'):'—'}</td><td className="sm">{formatDuration(x.durationSec)}</td><td><span className="pill pill-y">{x.score}/{x.total}</span></td><td><span className="sm" style={{fontWeight:800,color:x.passed?'#22c55e':'#ef4444'}}>{x.pct}%</span></td><td>{x.status==='cancelled'?<span className="pill pill-y">⛔</span>:x.passed?<span className="pill pill-g">✓</span>:<span className="pill pill-r">✗</span>}</td></tr>)}
-      </tbody></table></div>}
+      {loading ? (
+        <div className="flex col g8">
+          {[1,2,3,4,5].map(i=><div key={i} className="skeleton" style={{height:40, width:'100%'}}/>)}
+        </div>
+      ) : logs.length === 0 ? (
+        <Empty icon="📜" title="لا توجد عمليات مسجلة"/>
+      ) : (
+        <div className="sx">
+          <table className="tbl">
+            <thead><tr><th>التاريخ</th><th>الأدمن</th><th>الإجراء</th><th>التفاصيل</th></tr></thead>
+            <tbody>
+              {logs.map(l=>(
+                <tr key={l.id}>
+                  <td className="xs muted">{DB.formatDateTime(l.created_at)}</td>
+                  <td className="sm">{SEC.esc(l.admin_name)}</td>
+                  <td><span className="pill pill-b">{SEC.esc(l.action)}</span></td>
+                  <td className="sm">{SEC.esc(l.target)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   </>;
 }
 
-function ErrorsAnalyticsPage(){
+function StudentProfilePage({studentId,onClose}){
   const app=useApp();
-  const [loading,setLoading]=useState(true);const [allErrors,setAllErrors]=useState([]);const [sortBy,setSortBy]=useState('count');
-  useEffect(()=>{(async()=>{try{const sb=await DB.getClient();const {data}=await sb.from('user_errors').select('*').limit(2000);setAllErrors(data||[]);}catch(e){}setLoading(false);})();},[]);
-  const groupedByQuestion=useMemo(()=>{const map={};allErrors.forEach(err=>{const qid=err.question_id;if(!qid)return;if(!map[qid])map[qid]={question_id:qid,total_errors:0,unique_students:new Set(),last_error_at:0};map[qid].total_errors+=(err.count||1);map[qid].unique_students.add(err.user_id);if(err.at&&err.at>map[qid].last_error_at)map[qid].last_error_at=err.at;});return Object.values(map).map(item=>{const q=app.question(item.question_id);const lesson=q?app.lesson(q.lesson_id):null;const unit=lesson?app.unit(lesson.unit_id):null;const subject=unit?app.subject(unit.subject_id):null;return {...item,question:q,lesson,unit,subject,studentsCount:item.unique_students.size};}).filter(x=>x.question);},[allErrors,app.db.questions,app.db.lessons,app.db.units,app.db.subjects]);
-  const filtered=useMemo(()=>{let list=[...groupedByQuestion];if(sortBy==='count')list.sort((a,b)=>b.total_errors-a.total_errors);else if(sortBy==='students')list.sort((a,b)=>b.studentsCount-a.studentsCount);else list.sort((a,b)=>b.last_error_at-a.last_error_at);return list;},[groupedByQuestion,sortBy]);
-  const stats=useMemo(()=>{const totalErrors=groupedByQuestion.reduce((s,x)=>s+x.total_errors,0);const totalQuestions=groupedByQuestion.length;return {totalErrors,totalQuestions};},[groupedByQuestion]);
-  return <>
-    <div className="h2 mb16 grad">📊 تحليل أخطاء الطلاب</div>
-    <div className="grid g3 mb16"><Stat label="إجمالي الأخطاء" value={DB.fmt(stats.totalErrors)} icon="alert" color="#ef4444"/><Stat label="أسئلة فيها أخطاء" value={DB.fmt(stats.totalQuestions)} icon="help" color="#f59e0b"/><Stat label="الترتيب" value={sortBy==='count'?'عدد الأخطاء':sortBy==='students'?'عدد الطلاب':'الأحدث'} icon="trend" color="#B8860B"/></div>
-    <div className="glass mb16" style={{padding:14}}><select className="input" value={sortBy} onChange={e=>setSortBy(e.target.value)}><option value="count">عدد الأخطاء</option><option value="students">عدد الطلاب</option><option value="recent">الأحدث</option></select></div>
-    <div className="glass" style={{padding:14}}>
-      {loading?<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>:filtered.length===0?<Empty icon="✨" title="لا أخطاء"/>:
-      <div className="sx"><table className="tbl"><thead><tr><th>#</th><th>السؤال</th><th>المادة</th><th>الدرس</th><th>عدد الأخطاء</th><th>عدد الطلاب</th></tr></thead><tbody>{filtered.map((x,i)=><tr key={x.question_id}><td><span className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`} style={{width:28,height:28,fontSize:12}}>{i+1}</span></td><td style={{maxWidth:380}}><div className="sm" style={{fontWeight:700}}>{SEC.esc(x.question.text.slice(0,100))}{x.question.text.length>100?'...':''}</div></td><td>{x.subject?<span className="pill pill-b" style={{fontSize:11}}>{SEC.esc(x.subject.name)}</span>:'—'}</td><td className="sm">{SEC.esc(x.lesson?.title||'—')}</td><td><span className="pill pill-r" style={{fontWeight:800}}>{x.total_errors}</span></td><td><span className="pill pill-a">{x.studentsCount}</span></td></tr>)}</tbody></table></div>}
-    </div>
-  </>;
-}
+  const student=app.db.users.find(u=>u.id===studentId);
+  const [msgTitle,setMsgTitle]=useState('');
+  const [msgBody,setMsgBody]=useState('');
+  const [busy,setBusy]=useState(false);
+  const [reports,setReports]=useState([]);
+  const [reportsLoading,setReportsLoading]=useState(true);
+  const [tab, setTab] = useState('info'); // info | timeline
 
-function NotesPage(){
-  const app=useApp();
-  const [loading,setLoading]=useState(true);const [notes,setNotes]=useState([]);const [q,setQ]=useState('');
-  useEffect(()=>{(async()=>{try{const sb=await DB.getClient();const {data}=await sb.from('notes').select('*').order('updated_at',{ascending:false}).limit(500);setNotes(data||[]);}catch(e){}setLoading(false);})();},[]);
-  const filtered=useMemo(()=>{if(!q.trim())return notes;const lc=q.toLowerCase();return notes.filter(n=>(n.text||'').toLowerCase().includes(lc));},[notes,q]);
-  const del=async id=>{const r=await Swal.fire({title:'حذف؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{const sb=await DB.getClient();await sb.from('notes').delete().eq('id',id);setNotes(x=>x.filter(n=>n.id!==id));app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
-  return <>
-    <div className="flex between center mb16 wrap g8"><div className="h2 grad">📝 ملاحظات الطلاب</div><input className="input" style={{maxWidth:280}} placeholder="🔍..." value={q} onChange={e=>setQ(e.target.value)}/></div>
-    <div className="glass" style={{padding:14}}>
-      {loading?<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>:filtered.length===0?<Empty icon="📝" title="لا ملاحظات"/>:
-      <div className="flex col g8">{filtered.map(n=>{const u=app.db.users.find(x=>x.id===n.user_id);const l=app.lesson(n.lesson_id);return <div key={n.id} className="glass-s" style={{padding:14}}><div className="flex between center wrap g8 mb8"><div className="flex center g8">{u?<StudentAvatar student={u} size={28}/>:<div className="avatar" style={{width:28,height:28,fontSize:12}}>👤</div>}<span className="sm" style={{fontWeight:700}}>{SEC.esc(u?.name||'محذوف')}</span></div><span className="xs muted">{DB.formatDateTime(n.updated_at||n.created_at)}</span></div><div className="sm txt2 mb8" style={{background:'rgba(0,0,0,.20)',padding:10,borderRadius:10,borderInlineStart:'2px solid var(--gold)',whiteSpace:'pre-wrap'}}>{SEC.esc(n.text||'—')}</div><div className="flex between center wrap g6"><span className="xs muted">📖 {SEC.esc(l?.title||'محذوف')}</span><button className="btn btn-dn btn-sm" onClick={()=>del(n.id)}><Icon name="trash" size={12}/></button></div></div>;})}</div>}
-    </div>
-  </>;
-}
+  useEffect(()=>{(async()=>{
+    if(!studentId) return;
+    try{ const r = await DB.getUserReports(studentId); setReports(r||[]); }catch(e){}
+    setReportsLoading(false);
+  })();},[studentId]);
 
-function CertificatesPage(){
-  const app=useApp();
-  const [loading,setLoading]=useState(true);const [certs,setCerts]=useState([]);const [studentId,setStudentId]=useState('');const [subjectId,setSubjectId]=useState('');const [busy,setBusy]=useState(false);
-  useEffect(()=>{(async()=>{try{const sb=await DB.getClient();const {data}=await sb.from('certificates').select('*').order('issued_at',{ascending:false}).limit(200);setCerts(data||[]);}catch(e){}setLoading(false);})();},[]);
-  const students=app.db.users.filter(u=>u.role==='student');
-  const issueCertificate=async()=>{if(!studentId||!subjectId)return app.toast.warn('اختر الطالب والمادة');setBusy(true);try{const sb=await DB.getClient();const student=app.db.users.find(u=>u.id===studentId);const subject=app.db.subjects.find(s=>s.id===subjectId);const cert={id:DB.uid('cert_'),user_id:studentId,subject_id:subjectId,issued_at:Date.now(),created_at:Date.now()};const {error}=await sb.from('certificates').insert([cert]);if(error)throw new Error(error.message);const {data:fresh}=await sb.from('certificates').select('*').order('issued_at',{ascending:false}).limit(200);setCerts(fresh||[]);app.toast.ok('تم الإصدار');generatePDF(student,subject,cert);setStudentId('');setSubjectId('');}catch(e){app.toast.err(e.message);}setBusy(false);};
-  const generatePDF=async(student,subject,cert)=>{
-    const {jsPDF}=window.jspdf;
-    let logoBase64='';
-    try{const res=await fetch('/logo.png');const blob=await res.blob();logoBase64=await new Promise(r=>{const reader=new FileReader();reader.onloadend=()=>r(reader.result);reader.readAsDataURL(blob);});}catch(e){}
-    const certNumber=SEC.esc(cert.id.slice(-12).toUpperCase());
-    const issueDate=SEC.esc(new Date(cert.issued_at).toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'}));
-    const studentName=SEC.esc(student?.name||'الطالب');
-    const subjectName=SEC.esc(subject?.name||'المادة');
-    const subjectIcon=SEC.esc(subject?.icon||'📚');
-    const overlay=document.createElement('div');
-    overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:#0a1428;display:flex;align-items:center;justify-content:center;overflow:hidden;';
-    const container=document.createElement('div');
-    container.setAttribute('dir','rtl');
-    container.style.cssText='position:relative;width:1400px;height:990px;font-family:"Tajawal","Cairo",sans-serif;direction:rtl;background:radial-gradient(1400px 900px at 50% -10%,#1e2f5c 0%,#0d1a3a 45%,#050a18 100%);box-sizing:border-box;overflow:hidden;color:#f7f0dd;flex-shrink:0;';
-    container.innerHTML=`<div style="position:absolute;top:0;left:0;right:0;height:12px;background:linear-gradient(90deg,#8B6914,#FFD700,#D4AF37,#FFD700,#8B6914);"></div><div style="position:absolute;bottom:0;left:0;right:0;height:12px;background:linear-gradient(90deg,#8B6914,#FFD700,#D4AF37,#FFD700,#8B6914);"></div><div style="position:absolute;top:40px;left:40px;right:40px;bottom:40px;border:2.5px solid rgba(212,175,55,.75);border-radius:8px;"></div><div style="position:absolute;top:70px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:18px;">${logoBase64?`<img src="${logoBase64}" style="width:80px;height:80px;object-fit:contain;"/>`:`<div style="width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,#FFD700,#D4AF37);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:900;color:#1a1206;">M</div>`}<div style="text-align:right;"><div style="font-size:38px;font-weight:900;background:linear-gradient(100deg,#FFD700,#FFF3B0 50%,#D4AF37);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1.1;font-family:'Cairo',sans-serif;">MISSION EDU</div><div style="font-size:14px;color:#d4c79a;margin-top:6px;">منصة تعليمية متكاملة</div></div></div><div style="position:absolute;top:240px;left:0;right:0;text-align:center;"><div style="font-size:70px;font-weight:900;color:#FFD700;text-shadow:0 8px 32px rgba(255,215,0,.6);font-family:'Cairo','Tajawal',sans-serif;line-height:1.2;">شهادة إتمام</div><div style="font-size:14px;color:#d4c79a;margin-top:12px;letter-spacing:4px;">CERTIFICATE OF COMPLETION</div></div><div style="position:absolute;top:440px;left:0;right:0;text-align:center;"><div style="font-size:22px;color:#d4c79a;">تشهد المنصة بأن الطالب</div></div><div style="position:absolute;top:500px;left:0;right:0;text-align:center;padding:0 80px;"><div style="display:inline-block;font-size:56px;font-weight:900;color:#FFF3B0;padding:8px 70px 16px;border-bottom:3px solid #FFD700;">${studentName}</div></div><div style="position:absolute;top:640px;left:0;right:0;text-align:center;"><div style="font-size:22px;color:#d4c79a;">قد أتم بنجاح دراسة مادة</div></div><div style="position:absolute;top:700px;left:0;right:0;text-align:center;"><div style="display:inline-flex;align-items:center;gap:16px;padding:14px 44px;background:linear-gradient(135deg,rgba(212,175,55,.22),rgba(212,175,55,.08));border:2.5px solid rgba(212,175,55,.7);border-radius:18px;"><span style="font-size:36px;">${subjectIcon}</span><span style="font-size:32px;font-weight:900;color:#FFD700;">${subjectName}</span></div></div><div style="position:absolute;bottom:130px;left:130px;right:130px;display:flex;justify-content:space-between;"><div style="text-align:center;width:280px;"><div style="font-size:12px;color:#8a7d55;">تاريخ الإصدار</div><div style="font-size:17px;color:#d4c79a;font-weight:800;">${issueDate}</div></div><div style="text-align:center;width:280px;"><div style="font-size:12px;color:#8a7d55;">رقم الشهادة</div><div style="font-size:14px;color:#d4c79a;font-weight:800;font-family:monospace;direction:ltr;">${certNumber}</div></div></div>`;
-    overlay.appendChild(container);
-    document.body.appendChild(overlay);
-    try{await document.fonts.ready;await new Promise(r=>setTimeout(r,1200));const canvas=await window.html2canvas(container,{scale:2,backgroundColor:'#050a18',useCORS:true,logging:false,width:1400,height:990});const imgData=canvas.toDataURL('image/jpeg',0.95);const pdf=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});const pdfW=pdf.internal.pageSize.getWidth();const pdfH=pdf.internal.pageSize.getHeight();pdf.addImage(imgData,'JPEG',0,0,pdfW,pdfH);pdf.save(`شهادة_${subjectName}_${studentName}.pdf`);app.toast.ok('تم تحميل الشهادة');}catch(e){app.toast.err('فشل');}finally{document.body.removeChild(overlay);}
+  if(!student) return <div className="glass" style={{padding:20}}><Empty icon="👤" title="الطالب غير موجود"/><button className="btn btn-s btn-block mt16" onClick={onClose}>رجوع</button></div>;
+
+  const lvl=app.getLevel(student.xp||0);
+  const completed=(student.completed_lessons||[]).length;
+  const totalLessons=app.db.lessons.length;
+  const progress=totalLessons?Math.round((completed/totalLessons)*100):0;
+  const attempts=(app.db.activity||[]).filter(a=>a.user_id===studentId&&a.type==='exam_submit');
+  const timeline = (app.db.activity||[]).filter(a=>a.user_id===studentId).sort((a,b)=>b.at-a.at);
+
+  const sendMessage=async()=>{
+    if(!SEC.rateLimit('adm_msg_'+studentId, 2000)) return app.toast.warn('انتظر لحظة قبل الإرسال التالي');
+    const t = SEC.clean(SEC.maxLen(msgTitle,120));
+    const b = SEC.clean(SEC.maxLen(msgBody,2000));
+    if(!t || !b) return app.toast.warn('العنوان والنص مطلوبان');
+    setBusy(true);
+    try{
+      await app.save('notifications',{title:t,body:b,target:studentId,read_by:[],created_at:Date.now()});
+      app.toast.ok('تم إرسال الرسالة');
+      setMsgTitle('');setMsgBody('');
+    }catch(e){app.toast.err(e.message);}
+    setBusy(false);
   };
-  const del=async id=>{const r=await Swal.fire({title:'حذف الشهادة؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{const sb=await DB.getClient();await sb.from('certificates').delete().eq('id',id);setCerts(x=>x.filter(c=>c.id!==id));app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
-  const downloadAgain=cert=>{const student=app.db.users.find(u=>u.id===cert.user_id);const subject=app.db.subjects.find(s=>s.id===cert.subject_id);generatePDF(student,subject,cert);};
+
+  const toggleBan=async()=>{
+    const isBanned=student.banned===true;
+    const r=await Swal.fire({
+      title:isBanned?'فك الحظر؟':'حظر الطالب؟',
+      text:isBanned?'سيتم استعادة وصول الطالب للمنصة':'لن يستطيع الطالب الدخول',
+      icon:isBanned?'question':'warning',showCancelButton:true,
+      confirmButtonText:isBanned?'نعم، فك':'نعم، احظر',cancelButtonText:'إلغاء',
+      confirmButtonColor:isBanned?'#22c55e':'#ef4444',cancelButtonColor:'#64748b',
+      background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',
+      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+    });
+    if(!r.isConfirmed)return;
+    try{
+      await app.save('users',{...student, banned:!isBanned, ban_reason:isBanned?null:'حظر يدوي من الأدمن', banned_at:isBanned?null:Date.now()});
+      app.toast.ok(isBanned?'تم فك الحظر':'تم الحظر');
+    }catch(e){app.toast.err(e.message);}
+  };
+
+  const toggleActive=async()=>{
+    try{
+      await app.save('users',{...student, active:student.active===false});
+      app.toast.ok('تم');
+    }catch(e){app.toast.err(e.message);}
+  };
+
   return <>
-    <div className="h2 mb16 grad">🏆 إدارة الشهادات</div>
-    <div className="glass mb16" style={{padding:20}}>
-      <div className="section-title" style={{marginTop:0}}><span className="ico">➕</span> إصدار شهادة</div>
-      <div className="grid g2"><Field label="الطالب"><select className="input" value={studentId} onChange={e=>setStudentId(e.target.value)}><option value="">— اختر —</option>{students.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field><Field label="المادة"><select className="input" value={subjectId} onChange={e=>setSubjectId(e.target.value)}><option value="">— اختر —</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field></div>
-      <button className="btn btn-p btn-block" onClick={issueCertificate} disabled={busy}>{busy?'جارٍ...':'🏆 إصدار + PDF'}</button>
+    <div className="flex between center mb16 wrap g8">
+      <div className="h2 grad">👤 بروفايل الطالب</div>
+      <button className="btn btn-s" onClick={onClose}><Icon name="close" size={14}/> رجوع</button>
     </div>
-    <div className="glass" style={{padding:14}}>
-      <div className="h4 mb12" style={{color:'var(--gold)'}}>📜 الشهادات ({certs.length})</div>
-      {loading?<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>:certs.length===0?<Empty icon="🏆" title="لا شهادات"/>:
-      <div className="sx"><table className="tbl"><thead><tr><th>الطالب</th><th>المادة</th><th>التاريخ</th><th>الرقم</th><th>إجراءات</th></tr></thead><tbody>{certs.map(c=>{const u=app.db.users.find(x=>x.id===c.user_id);const s=app.db.subjects.find(x=>x.id===c.subject_id);return <tr key={c.id}><td>{SEC.esc(u?.name||'محذوف')}</td><td><span className="pill pill-b">{SEC.esc(s?.name||'—')}</span></td><td className="xs muted">{DB.formatDateTime(c.issued_at)}</td><td className="xs" dir="ltr" style={{fontFamily:'monospace'}}>{SEC.esc(c.id.slice(-12).toUpperCase())}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>downloadAgain(c)}><Icon name="download" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(c.id)}><Icon name="trash" size={13}/></button></div></td></tr>;})}</tbody></table></div>}
+
+    <div className="glass mb16" style={{padding:22}}>
+      <div className="flex center g16 wrap">
+        <StudentAvatar student={student} size={90}/>
+        <div style={{flex:1,minWidth:200}}>
+          <div className="h2 mb6">{SEC.esc(student.name)}</div>
+          <div className="sm muted mb8" dir="ltr">📱 {SEC.esc((student.country_code||'+20')+(student.phone||'—'))}</div>
+          <div className="flex wrap g6">
+            {student.governorate&&<span className="pill pill-b">📍 {SEC.esc(student.governorate)}</span>}
+            <span className="pill pill-b">🏆 Lv {lvl.current.level} — {SEC.esc(lvl.current.name)}</span>
+            {student.subscription==='vip'?<span className="pill pill-v">💎 VIP</span>:student.subscription==='paid'?<span className="pill pill-g">💳 مدفوع</span>:<span className="pill pill-y">🆓 مجاني</span>}
+            {student.banned?<span className="pill pill-r">⛔ محظور</span>:student.active===false?<span className="pill pill-y">موقوف</span>:<span className="pill pill-g">نشط</span>}
+          </div>
+        </div>
+      </div>
+      <div className="div"></div>
+      <div className="grid g4">
+        <Stat label="XP" value={DB.fmt(student.xp||0)} icon="trend" color="var(--gold-l)"/>
+        <Stat label="دروس مكتملة" value={DB.fmt(completed)} icon="book" color="#22c55e"/>
+        <Stat label="السلسلة" value={DB.fmt(student.streak||0)} icon="flash" color="#f59e0b"/>
+        <Stat label="بلاغات" value={DB.fmt(student.reports_count||0)} icon="alert" color={(student.reports_count||0)>0?'#ef4444':'var(--muted)'}/>
+      </div>
     </div>
+
+    <div className="msg-tabs mb16">
+      <button className={`msg-tab ${tab==='info'?'active':''}`} onClick={()=>setTab('info')}>⚙️ الإجراءات والبلاغات</button>
+      <button className={`msg-tab ${tab==='timeline'?'active':''}`} onClick={()=>setTab('timeline')}>📅 الخط الزمني (Timeline)</button>
+    </div>
+
+    {tab === 'info' && (
+      <>
+        <div className="grid g2 mb16">
+          <div className="glass" style={{padding:20}}>
+            <div className="section-title" style={{marginTop:0}}><span className="ico">✉️</span> إرسال رسالة</div>
+            <Field label="العنوان"><input className="input" maxLength={120} value={msgTitle} onChange={e=>setMsgTitle(e.target.value)} placeholder="مثال: تحفيز"/></Field>
+            <Field label="النص"><textarea className="input" rows="4" maxLength={2000} value={msgBody} onChange={e=>setMsgBody(e.target.value)}/></Field>
+            <button className="btn btn-p btn-block" onClick={sendMessage} disabled={busy}>{busy?'جارٍ...':'📤 إرسال'}</button>
+          </div>
+          <div className="glass" style={{padding:20}}>
+            <div className="section-title" style={{marginTop:0}}><span className="ico">⚙️</span> الإجراءات</div>
+            <button className={`btn btn-block mb12 ${student.banned?'btn-ok':'btn-dn'}`} onClick={toggleBan}>{student.banned?'✅ فك الحظر':'⛔ حظر الطالب'}</button>
+            <button className={`btn btn-block mb12 ${student.active===false?'btn-ok':'btn-dn'}`} onClick={toggleActive}>{student.active===false?'▶️ تفعيل الحساب':'⏸️ إيقاف الحساب'}</button>
+            <div className="glass-s" style={{padding:12,marginTop:12}}>
+              <div className="xs muted mb6">📅 انضم في</div>
+              <div className="sm">{student.created_at?DB.formatDateTime(student.created_at):'—'}</div>
+              {student.subscription_until&&<>
+                <div className="xs muted mt12 mb6">💳 ينتهي الاشتراك في</div>
+                <div className="sm">{DB.formatDate(student.subscription_until)}</div>
+              </>}
+            </div>
+          </div>
+        </div>
+
+        <div className="glass mb16" style={{padding:20}}>
+          <div className="h4 mb12" style={{color:'var(--gold)'}}>🚩 البلاغات على الطالب ({reports.length})</div>
+          {reportsLoading?<div className="sm muted">جارٍ التحميل...</div>:reports.length===0?<div className="sm muted">لا بلاغات</div>:
+          reports.map(r=><div key={r.id} className="glass-s mb8" style={{padding:12}}>
+            <div className="flex between center mb6"><span className="pill pill-r">{SEC.esc(r.reason||'بدون سبب')}</span><span className="xs muted">{DB.formatDateTime(r.created_at)}</span></div>
+            {r.details&&<div className="xs muted">"{SEC.esc(r.details)}"</div>}
+          </div>)}
+        </div>
+      </>
+    )}
+
+    {tab === 'timeline' && (
+      <div className="glass" style={{padding:20}}>
+        <div className="h4 mb12" style={{color:'var(--gold)'}}>📅 كل أنشطة الطالب ({timeline.length})</div>
+        {timeline.length === 0 ? (
+          <Empty icon="📭" title="لا يوجد نشاط لهذا الطالب"/>
+        ) : (
+          <div className="timeline">
+            {timeline.map((a,i)=>(
+              <div key={a.id||i} className="timeline-item">
+                <div className="timeline-dot" />
+                <div className="timeline-time">{DB.formatDateTime(a.at)}</div>
+                <div className="timeline-content">
+                  <b>{a.type === 'login' ? 'دخول' : a.type === 'lesson_view' ? 'فتح درس' : a.type === 'video_play' ? 'شاهد فيديو' : a.type === 'exam_submit' ? 'سلم امتحان' : a.type}</b>
+                  {a.target ? ` — ${SEC.esc(a.target)}` : ''}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    )}
   </>;
 }
 
-function CouponsPage(){
+function StudentsPage(){
   const app=useApp();
-  const [loading,setLoading]=useState(true);const [coupons,setCoupons]=useState([]);const [editing,setEditing]=useState(null);const [form,setForm]=useState({code:'',discount:'',max_uses:'',expires_at:'',active:true});const [busy,setBusy]=useState(false);
-  const loadCoupons=useCallback(async()=>{try{const sb=await DB.getClient();const {data}=await sb.from('coupons').select('*').order('created_at',{ascending:false});setCoupons(data||[]);}catch(e){}setLoading(false);},[]);
-  useEffect(()=>{loadCoupons();},[loadCoupons]);
-  const openNew=()=>{setForm({code:'',discount:'',max_uses:'',expires_at:'',active:true});setEditing('new');};
-  const openEdit=c=>{setForm({...c,expires_at:c.expires_at?new Date(c.expires_at).toISOString().slice(0,10):''});setEditing(c.id);};
-  const save=async()=>{if(!form.code||form.code.length<3)return app.toast.warn('كود قصير');setBusy(true);try{const sb=await DB.getClient();const record={id:editing==='new'?DB.uid('cpn_'):editing,code:SEC.clean(form.code.toUpperCase()).slice(0,20),discount:+form.discount||10,max_uses:+form.max_uses||100,used_count:form.used_count||0,expires_at:form.expires_at?new Date(form.expires_at).getTime():null,active:form.active!==false,created_at:form.created_at||Date.now()};const {error}=await sb.from('coupons').upsert(record);if(error)throw new Error(error.message);await loadCoupons();app.toast.ok('تم');setEditing(null);}catch(e){app.toast.err(e.message);}setBusy(false);};
-  const del=async id=>{const r=await Swal.fire({title:'حذف؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{const sb=await DB.getClient();await sb.from('coupons').delete().eq('id',id);setCoupons(x=>x.filter(c=>c.id!==id));app.toast.warn('تم');}catch(e){app.toast.err(e.message);}};
-  return <>
-    <div className="flex between center mb16 wrap g8"><div className="h2 grad">🎟️ الكوبونات</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> جديد</button></div>
-    <div className="glass" style={{padding:14}}>
-      {loading?<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>:coupons.length===0?<Empty icon="🎟️" title="لا كوبونات"/>:
-      <div className="sx"><table className="tbl"><thead><tr><th>الكود</th><th>الخصم</th><th>الاستخدامات</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>{coupons.map(c=>{const expired=c.expires_at&&c.expires_at<Date.now();return <tr key={c.id}><td><code style={{background:'rgba(212,175,55,.15)',padding:'4px 10px',borderRadius:8,fontWeight:900,color:'#FFD700',fontSize:13}}>{SEC.esc(c.code)}</code></td><td><span className="pill pill-g">{c.discount}%</span></td><td className="sm">{c.used_count||0} / {c.max_uses||100}</td><td>{!c.active?<span className="pill pill-y">معطّل</span>:expired?<span className="pill pill-r">منتهي</span>:<span className="pill pill-g">نشط</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(c)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(c.id)}><Icon name="trash" size={13}/></button></div></td></tr>;})}</tbody></table></div>}
-    </div>
-    {editing!==null&&<Modal title={editing==='new'?'كوبون جديد':'تعديل'} onClose={()=>setEditing(null)}>
-      <Field label="الكود"><input className="input" value={form.code} onChange={e=>setForm({...form,code:e.target.value.toUpperCase()})} placeholder="SUMMER2025" maxLength={20} style={{letterSpacing:2,fontWeight:900,textAlign:'center'}}/></Field>
-      <div className="grid g2"><Field label="الخصم %"><input type="number" className="input" value={form.discount??''} onChange={e=>setForm({...form,discount:e.target.value===''?'':+e.target.value})}/></Field><Field label="الحد الأقصى"><input type="number" className="input" value={form.max_uses??''} onChange={e=>setForm({...form,max_uses:e.target.value===''?'':+e.target.value})}/></Field></div>
-      <label className="flex center g8 mt12" style={{cursor:'pointer'}}><input type="checkbox" checked={form.active!==false} onChange={e=>setForm({...form,active:e.target.checked})}/><span className="sm">مفعّل</span></label>
-      <Field label="تاريخ الانتهاء"><input type="date" className="input" value={form.expires_at||''} onChange={e=>setForm({...form,expires_at:e.target.value})}/></Field>
-      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
-    </Modal>}
-  </>;
-}
+  const [editing,setEditing]=useState(null);
+  const [profileId,setProfileId]=useState(null);
+  const [form,setForm]=useState({});
+  const [q,setQ]=useState('');
+  const [govFilter,setGovFilter]=useState('all');
+  const [filterState,setFilterState]=useState('all');
+  const [busy,setBusy]=useState(false);
+  
+  // Bulk Selection State
+  const [selectedIds, setSelectedIds] = useState([]);
+  
+  const GOVERNORATES=["القاهرة","الجيزة","الإسكندرية","الدقهلية","الشرقية","المنوفية","القليوبية","البحيرة","الغربية","بورسعيد","دمياط","الإسماعيلية","السويس","كفر الشيخ","الفيوم","بني سويف","المنيا","أسيوط","سوهاج","قنا","الأقصر","أسوان","البحر الأحمر","الوادي الجديد","مطروح","شمال سيناء","جنوب سيناء"];
+  const allStudents=app.db.users.filter(u=>u.role==='student');
+  const list=allStudents.filter(u=>{const ms=u.name.toLowerCase().includes(q.toLowerCase())||(u.phone||'').includes(q);let mg=true;if(govFilter==='all')mg=true;else if(govFilter==='none')mg=!u.governorate;else mg=u.governorate===govFilter;let mst=true;if(filterState==='banned')mst=u.banned===true;else if(filterState==='active')mst=u.active!==false&&u.banned!==true;else if(filterState==='inactive')mst=u.active===false&&u.banned!==true;return ms&&mg&&mst;});
+  
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(x=>x!==id) : [...prev, id]);
+  };
+  
+  const toggleSelectAll = () => {
+    if(selectedIds.length === list.length) setSelectedIds([]);
+    else setSelectedIds(list.map(s=>s.id));
+  };
 
-function ReferralsPage(){
-  const app=useApp();
-  const [loading,setLoading]=useState(true);const [referrals,setReferrals]=useState([]);
-  const loadReferrals=useCallback(async()=>{try{const sb=await DB.getClient();const {data}=await sb.from('referrals').select('*').order('created_at',{ascending:false}).limit(500);setReferrals(data||[]);}catch(e){}setLoading(false);},[]);
-  useEffect(()=>{loadReferrals();},[loadReferrals]);
-  const stats=useMemo(()=>{const total=referrals.length;const rewarded=referrals.filter(r=>r.rewarded).length;const totalXp=referrals.reduce((s,r)=>s+(r.reward_xp||50),0);return {total,rewarded,totalXp};},[referrals]);
-  const markRewarded=async r=>{try{const sb=await DB.getClient();await sb.from('referrals').update({rewarded:true}).eq('id',r.id);setReferrals(x=>x.map(x=>x.id===r.id?{...x,rewarded:true}:x));const referrer=app.db.users.find(u=>u.id===r.referrer_id);const referred=app.db.users.find(u=>u.id===r.referred_id);const xp=r.reward_xp||50;if(referrer)await DB.updateUser(referrer.id,{xp:(referrer.xp||0)+xp});if(referred)await DB.updateUser(referred.id,{xp:(referred.xp||0)+xp});await app.reload();app.toast.ok(`✅ +${xp} XP`);}catch(e){app.toast.err(e.message);}};
-  return <>
-    <div className="flex between center mb16 wrap g8"><div className="h2 grad">🎁 الإحالات</div><button className="btn btn-s" onClick={loadReferrals}>🔄</button></div>
-    <div className="grid g3 mb16"><Stat label="إجمالي" value={DB.fmt(stats.total)} icon="share" color="#FFD700"/><Stat label="مكافأة" value={DB.fmt(stats.rewarded)} icon="check" color="#22c55e"/><Stat label="XP" value={DB.fmt(stats.totalXp)} icon="trend" color="#B8860B"/></div>
-    <div className="glass" style={{padding:14}}>
-      {loading?<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>:referrals.length===0?<Empty icon="🎁" title="لا إحالات"/>:
-      <div className="sx"><table className="tbl"><thead><tr><th>المُحيل</th><th>→</th><th>المدعو</th><th>التاريخ</th><th>المكافأة</th><th>إجراءات</th></tr></thead><tbody>{referrals.map(r=>{const referrer=app.db.users.find(x=>x.id===r.referrer_id);const referred=app.db.users.find(x=>x.id===r.referred_id);return <tr key={r.id}><td>{SEC.esc(referrer?.name||'محذوف')}</td><td>→</td><td>{SEC.esc(referred?.name||'محذوف')}</td><td className="xs muted">{DB.formatDateTime(r.created_at)}</td><td>{r.rewarded?<span className="pill pill-g">✓</span>:<span className="pill pill-a">⏳</span>}</td><td>{!r.rewarded&&<button className="btn btn-ok btn-sm" onClick={()=>markRewarded(r)}>✓ منح</button>}</td></tr>;})}</tbody></table></div>}
-    </div>
-  </>;
-}
+  const bulkAction = async (action) => {
+    if(!selectedIds.length) return;
+    const r = await Swal.fire({
+      title: `تأكيد الإجراء على ${selectedIds.length} طالب؟`,
+      text: `سيتم تنفيذ: ${action}`,
+      icon: 'warning', showCancelButton: true, confirmButtonText: 'نعم', cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#D4AF37', cancelButtonColor: '#64748b',
+      background:'linear-gradient(180deg,#1c160c,#0f0c07)', color:'#f7f0dd',
+      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
+    });
+    if(!r.isConfirmed) return;
+    
+    setBusy(true);
+    try {
+      const sb = await DB.getClient();
+      const patch = action === 'ban' ? {banned: true} : action === 'unban' ? {banned: false} : action === 'active' ? {active: true} : {active: false};
+      
+      // Update all selected
+      await Promise.all(selectedIds.map(id => DB.updateUser(id, patch)));
+      
+      app.toast.ok('تم تنفيذ الإجراء الجماعي');
+      setSelectedIds([]);
+      await app.reload();
+    } catch(e) {
+      app.toast.err(e.message);
+    }
+    setBusy(false);
+  };
 
-function PollsPage(){
-  const app=useApp();
-  const [loading,setLoading]=useState(true);const [polls,setPolls]=useState([]);const [votes,setVotes]=useState([]);const [editing,setEditing]=useState(null);const [form,setForm]=useState({question:'',options:['',''],active:true,ends_at:''});const [busy,setBusy]=useState(false);
-  const loadData=useCallback(async()=>{try{await DB.cleanupExpiredPolls();const sb=await DB.getClient();const [pRes,vRes]=await Promise.all([sb.from('polls').select('*').order('created_at',{ascending:false}),sb.from('poll_votes').select('*')]);setPolls(pRes.data||[]);setVotes(vRes.data||[]);}catch(e){}setLoading(false);},[]);
-  useEffect(()=>{loadData();},[loadData]);
-  const openNew=()=>{setForm({question:'',options:['',''],active:true,ends_at:''});setEditing('new');};
-  const openEdit=p=>{setForm({...p,options:Array.isArray(p.options)?[...p.options]:['',''],ends_at:p.ends_at?new Date(p.ends_at).toISOString().slice(0,10):''});setEditing(p.id);};
-  const addOption=()=>setForm(f=>({...f,options:[...f.options,'']}));
-  const removeOption=idx=>{if(form.options.length<=2)return app.toast.warn('لازم خيارين');setForm(f=>({...f,options:f.options.filter((_,i)=>i!==idx)}));};
-  const updateOption=(idx,val)=>setForm(f=>({...f,options:f.options.map((o,i)=>i===idx?val:o)}));
-  const save=async()=>{const q=SEC.clean(form.question||'');const opts=(form.options||[]).map(o=>SEC.clean(o)).filter(Boolean);if(!q||q.length<3)return app.toast.warn('سؤال قصير');if(opts.length<2)return app.toast.warn('خيارين على الأقل');setBusy(true);try{const sb=await DB.getClient();const record={id:editing==='new'?DB.uid('poll_'):editing,question:q,options:opts,active:form.active!==false,ends_at:form.ends_at?new Date(form.ends_at).getTime():null,created_at:form.created_at||Date.now()};const {error}=await sb.from('polls').upsert(record);if(error)throw new Error(error.message);await loadData();app.toast.ok('تم');setEditing(null);}catch(e){app.toast.err(e.message);}setBusy(false);};
-  const del=async id=>{const r=await Swal.fire({title:'حذف؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{const sb=await DB.getClient();await sb.from('poll_votes').delete().eq('poll_id',id);await sb.from('polls').delete().eq('id',id);await loadData();app.toast.warn('تم');}catch(e){app.toast.err(e.message);}};
-  const getStats=poll=>{const pv=votes.filter(v=>v.poll_id===poll.id);const total=pv.length;const counts=(poll.options||[]).map((_,i)=>pv.filter(v=>v.option_index===i).length);return {total,counts};};
+  const open=s=>{setForm(JSON.parse(JSON.stringify(s)));setEditing(s.id);};
+  const save=async()=>{setBusy(true);try{await DB.updateUser(editing,{name:form.name,phone:form.phone,xp:form.xp,grade_id:form.grade_id,governorate:form.governorate||null,gender:form.gender||null,all_subjects:form.all_subjects,access_subjects:form.access_subjects||[],subscription:form.subscription||'free',subscription_until:form.subscription_until||null});await app.reload();app.toast.ok('تم');setEditing(null);}catch(e){app.toast.err(e.message);}setBusy(false);};
+  const toggle=async s=>{const action=s.active!==false?'إيقاف':'تفعيل';const r=await Swal.fire({title:`${action}؟`,text:`${action} حساب ${s.name}?`,icon:'question',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:s.active!==false?'#ef4444':'#D4AF37',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{await DB.updateUser(s.id,{active:!s.active});await app.reload();app.toast.warn('تم');}catch(e){app.toast.err(e.message);}};
+  const govCounts={};allStudents.forEach(u=>{if(u.governorate){govCounts[u.governorate]=(govCounts[u.governorate]||0)+1;}});
+
+  if(profileId)return <StudentProfilePage studentId={profileId} onClose={()=>setProfileId(null)}/>;
+
   return <>
-    <div className="flex between center mb16 wrap g8"><div className="h2 grad">📊 الاستطلاعات</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> جديد</button></div>
-    {loading?<div className="glass" style={{padding:40,textAlign:'center'}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>:polls.length===0?<div className="glass" style={{padding:30}}><Empty icon="📊" title="لا استطلاعات"/></div>:
-    <div className="grid g2">{polls.map(p=>{const {total,counts}=getStats(p);const expired=p.ends_at&&p.ends_at<Date.now();return <div key={p.id} className="glass" style={{padding:20}}><div className="flex between center mb12 wrap g8"><div className="flex g6 center">{p.active&&!expired?<span className="pill pill-g">نشط</span>:expired?<span className="pill pill-r">منتهي</span>:<span className="pill pill-y">موقوف</span>}<span className="pill pill-b">{total} صوت</span></div><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(p)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(p.id)}><Icon name="trash" size={13}/></button></div></div><div className="h4 mb12">{SEC.esc(p.question)}</div><div className="flex col g8">{(p.options||[]).map((opt,i)=>{const cnt=counts[i]||0;const perc=total?Math.round((cnt/total)*100):0;return <div key={i}><div className="flex between center mb6"><span className="sm">{SEC.esc(opt)}</span><span className="xs muted">{cnt} ({perc}%)</span></div><div className="bar" style={{height:8}}><div className="bar-f bar-b" style={{width:`${perc}%`}}/></div></div>;})}</div></div>;})}</div>}
-    {editing!==null&&<Modal title={editing==='new'?'جديد':'تعديل'} onClose={()=>setEditing(null)} wide>
-      <Field label="السؤال"><textarea className="input" rows="2" value={form.question||''} onChange={e=>setForm({...form,question:e.target.value})}/></Field>
-      <Field label={`الخيارات (${form.options.length})`}><div className="flex col g8">{form.options.map((opt,i)=><div key={i} className="flex g8 center"><span className="pill pill-b" style={{minWidth:32,justifyContent:'center'}}>{i+1}</span><input className="input" value={opt} onChange={e=>updateOption(i,e.target.value)}/>{form.options.length>2&&<button className="btn btn-dn btn-sm" onClick={()=>removeOption(i)}><Icon name="trash" size={12}/></button>}</div>)}<button className="btn btn-s btn-sm" onClick={addOption} style={{alignSelf:'flex-start'}}><Icon name="plus" size={13}/> إضافة</button></div></Field>
-      <Field label="تاريخ الانتهاء"><input type="date" className="input" value={form.ends_at||''} onChange={e=>setForm({...form,ends_at:e.target.value})}/></Field>
-      <label className="flex center g8" style={{cursor:'pointer'}}><input type="checkbox" checked={form.active!==false} onChange={e=>setForm({...form,active:e.target.checked})}/><span className="sm">مفعّل</span></label>
+    <div className="flex between center mb16 wrap g8"><div className="h2 grad">إدارة الطلاب</div><div className="flex g8 wrap"><input className="input" style={{maxWidth:200}} placeholder="🔍" value={q} onChange={e=>setQ(e.target.value)}/><select className="input" style={{maxWidth:180}} value={filterState} onChange={e=>setFilterState(e.target.value)}><option value="all">الكل</option><option value="active">نشط</option><option value="inactive">موقوف</option><option value="banned">محظور</option></select><select className="input" style={{maxWidth:220}} value={govFilter} onChange={e=>setGovFilter(e.target.value)}><option value="all">كل المحافظات ({allStudents.length})</option>{GOVERNORATES.map(g=>{const c=govCounts[g]||0;if(c===0)return null;return <option key={g} value={g}>{g} ({c})</option>;})}<option value="none">— بدون ({allStudents.filter(u=>!u.governorate).length}) —</option></select></div></div>
+    <div className="glass" style={{padding:14}}>
+      <div className="sx">
+        <table className="tbl">
+          <thead>
+            <tr>
+              <th style={{width:40}}><input type="checkbox" checked={list.length>0 && selectedIds.length === list.length} onChange={toggleSelectAll}/></th>
+              <th>الطالب</th><th>النوع</th><th>الهاتف</th><th>📍</th><th>XP</th><th>الاشتراك</th><th>بلاغات</th><th>الحالة</th><th>إجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            {list.map(s=><tr key={s.id} style={{background: selectedIds.includes(s.id) ? 'var(--border2)' : 'transparent'}}>
+              <td><input type="checkbox" checked={selectedIds.includes(s.id)} onChange={()=>toggleSelect(s.id)}/></td>
+              <td><button onClick={()=>setProfileId(s.id)} className="flex center g8" style={{cursor:'pointer',background:'none',border:0,color:'inherit',textAlign:'right',padding:0}}>
+                <StudentAvatar student={s} size={32}/>
+                <span style={{fontWeight:700}}>{SEC.esc(s.name)}</span>
+              </button></td>
+              <td>{s.gender==='female'?<span className="pill" style={{background:'rgba(236,72,153,.15)',color:'#f9a8d4',borderColor:'rgba(236,72,153,.3)',border:'1px solid'}}>👧</span>:s.gender==='male'?<span className="pill pill-b">👦</span>:'—'}</td>
+              <td className="sm muted" dir="ltr">{(s.country_code||'+20')}{s.phone||''}</td>
+              <td>{s.governorate?<span className="pill pill-b" style={{fontSize:11}}>📍 {SEC.esc(s.governorate)}</span>:'—'}</td>
+              <td><b style={{color:'var(--gold)'}}>{DB.fmt(s.xp||0)}</b></td>
+              <td>{s.subscription==='vip'?<span className="pill pill-v">💎 VIP</span>:s.subscription==='paid'?<span className="pill pill-g">💳</span>:<span className="pill pill-y">🆓</span>}</td>
+              <td>{(s.reports_count||0)>=3?<span className="pill pill-r">🚨 {s.reports_count}</span>:(s.reports_count||0)>0?<span className="pill pill-a">{s.reports_count}</span>:'0'}</td>
+              <td>{s.banned?<span className="pill pill-r">⛔</span>:s.active!==false?<span className="pill pill-g">نشط</span>:<span className="pill pill-y">موقوف</span>}</td>
+              <td><div className="flex g6"><button className="btn btn-s btn-sm" title="بروفايل" onClick={()=>setProfileId(s.id)}><Icon name="user" size={13}/></button><button className="btn btn-s btn-sm" onClick={()=>open(s)}><Icon name="edit" size={13}/></button>{!s.banned&&<button className={`btn btn-sm ${s.active!==false?'btn-dn':'btn-ok'}`} onClick={()=>toggle(s)}>{s.active!==false?'إيقاف':'تفعيل'}</button>}</div></td>
+            </tr>)}
+          </tbody>
+        </table>
+      </div>
+      {list.length===0&&<Empty icon="🔍" title="لا طلاب"/>}
+    </div>
+    
+    {/* Bulk Actions Bar */}
+    {selectedIds.length > 0 && (
+      <div className="bulk-bar">
+        <span className="sm" style={{fontWeight:700}}>تم تحديد {selectedIds.length} طالب</span>
+        <div style={{width:1,height:24,background:'var(--border)'}}/>
+        <button className="btn btn-dn btn-sm" onClick={()=>bulkAction('ban')} disabled={busy}>⛔ حظر</button>
+        <button className="btn btn-s btn-sm" onClick={()=>bulkAction('unban')} disabled={busy}>✅ فك الحظر</button>
+        <button className="btn btn-s btn-sm" onClick={()=>bulkAction('active')} disabled={busy}>▶️ تفعيل</button>
+        <button className="btn btn-s btn-sm" onClick={()=>bulkAction('inactive')} disabled={busy}>⏸️ إيقاف</button>
+        <button className="icon-btn" onClick={()=>setSelectedIds([])}><Icon name="close" size={14}/></button>
+      </div>
+    )}
+
+    {editing&&<Modal title={`تعديل: ${SEC.esc(form.name)}`} onClose={()=>setEditing(null)} wide>
+      <div className="grid g2"><Field label="الاسم"><input className="input" value={form.name||''} onChange={e=>setForm({...form,name:e.target.value})}/></Field><Field label="الهاتف"><input className="input" value={form.phone||''} onChange={e=>setForm({...form,phone:e.target.value})}/></Field><Field label="النوع"><select className="input" value={form.gender||''} onChange={e=>setForm({...form,gender:e.target.value||null})}><option value="">—</option><option value="male">👦</option><option value="female">👧</option></select></Field><Field label="XP"><input type="number" className="input" value={form.xp??''} onChange={e=>setForm({...form,xp:e.target.value===''?'':+e.target.value})}/></Field><Field label="الصف"><select className="input" value={form.grade_id||''} onChange={e=>setForm({...form,grade_id:e.target.value})}><option value="">—</option>{app.db.grades.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></Field><Field label="📍 المحافظة"><select className="input" value={form.governorate||''} onChange={e=>setForm({...form,governorate:e.target.value})}><option value="">— بدون —</option>{GOVERNORATES.map(g=><option key={g} value={g}>{g}</option>)}</select></Field></div>
+      <div className="grid g2"><Field label="الاشتراك"><select className="input" value={form.subscription||'free'} onChange={e=>setForm({...form,subscription:e.target.value})}><option value="free">🆓</option><option value="paid">💳</option><option value="vip">💎</option></select></Field><Field label="تاريخ الانتهاء"><input type="date" className="input" value={form.subscription_until||''} onChange={e=>setForm({...form,subscription_until:e.target.value})}/></Field></div>
+      <Field label="الوصول"><label className="flex center g8 mb12" style={{cursor:'pointer'}}><input type="checkbox" checked={!!form.all_subjects} onChange={e=>setForm({...form,all_subjects:e.target.checked})}/><span className="sm">جميع المواد</span></label></Field>
       <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
     </Modal>}
   </>;
@@ -726,6 +1064,15 @@ function LessonsPage(){
   const openNew=()=>{setForm({title:'',desc:'',summary:'',video:{type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true},pdf_url:'',duration:'',xp:'',sort_order:'',unit_id:'',published:true,key_points:[],examples:[],notes:''});setLessonTestText('');setLessonTestTitle('');setLessonTestDuration(15);setLessonTestPassScore(50);setLessonTestXp(10);setLessonTestFree(true);setEditing('new');};
 
   const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(!c.video)c.video={type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true};if(c.video.is_free===undefined)c.video.is_free=true;if(!c.key_points)c.key_points=[];if(!c.pdf_url)c.pdf_url='';setForm(c);setLessonTestText('');setLessonTestTitle(`اختبار ${c.title||'الدرس'}`);setLessonTestDuration(15);setLessonTestPassScore(50);setLessonTestXp(10);setLessonTestFree(true);setEditing(it.id);};
+
+  const duplicate = (it) => {
+    const c = JSON.parse(JSON.stringify(it));
+    delete c.id;
+    c.title = `${c.title} (نسخة)`;
+    setForm(c);
+    setEditing('new');
+    app.toast.info('تم نسخ الدرس، راجع البيانات واحفظ.');
+  };
 
   const parseLessonQuestionsJSON = (raw) => {
     let parsed;
@@ -859,7 +1206,7 @@ function LessonsPage(){
             <td>{hasPdf?<a href={SEC.safeUrl(l.pdf_url)} target="_blank" rel="noopener noreferrer" className="pill pill-b" style={{textDecoration:'none'}}>📄 PDF</a>:<span className="pill pill-y">—</span>}</td>
             <td>{l.xp||'—'}</td>
             <td>{l.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td>
-            <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(l)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(l.id)}><Icon name="trash" size={13}/></button></div></td>
+            <td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>duplicate(l)} title="نسخ"><Icon name="copy" size={13}/></button><button className="btn btn-s btn-sm" onClick={()=>openEdit(l)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(l.id)}><Icon name="trash" size={13}/></button></div></td>
           </tr>;
         })}
       </tbody></table></div>}
@@ -932,7 +1279,7 @@ function LessonsPage(){
               <span className="sm" style={{flex:1}}>{SEC.esc(opt)}</span>
             </div>;})}
           </div>
-          {q.explanation&&<div className="xs" style={{background:'rgba(212,175,55,.08)',padding:8,borderRadius:8,borderInlineStart:'2px solid var(--gold)'}}>💡 {SEC.esc(q.explanation)}</div>}
+          {q.explanation&&<div className="xs" style={{background:'var(--border)',padding:8,borderRadius:8,borderInlineStart:'2px solid var(--gold)'}}>💡 {SEC.esc(q.explanation)}</div>}
         </div>)}
       </div>
       <button className="btn btn-p btn-block" onClick={()=>setPreviewQs(null)}>رجوع</button>
@@ -947,6 +1294,15 @@ function ExamsPage(){
 
   const openNew=()=>{setForm({title:'',subject_id:'',unit_id:'',lesson_ids:[],question_ids:[],duration:'',pass_score:'',max_attempts:'',xp:'',published:true,sort_order:'',is_free:true});setJsonText('');setEditing('new');};
   const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(c.is_free===undefined)c.is_free=true;if(c.max_attempts===undefined)c.max_attempts='';setForm(c);setJsonText('');setEditing(it.id);};
+  
+  const duplicate = (it) => {
+    const c = JSON.parse(JSON.stringify(it));
+    delete c.id;
+    c.title = `${c.title} (نسخة)`;
+    setForm(c);
+    setEditing('new');
+    app.toast.info('تم نسخ الاختبار، راجع البيانات واحفظ.');
+  };
 
   const parseQuestionJSON=raw=>{
     let parsed;try{parsed=JSON.parse(raw);}catch(e){throw new Error('صيغة JSON غير صحيحة. راجع الأقواس والفواصل وعلامات التنصيص.');}
@@ -1044,7 +1400,7 @@ function ExamsPage(){
 
   return <>
     <div className="flex between center mb16 wrap g8"><div className="h2 grad">📝 الاختبارات</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> جديد</button></div>
-    <div className="glass" style={{padding:14}}>{app.db.exams.length===0?<Empty title="لا اختبارات"/>:<div className="sx"><table className="tbl"><thead><tr><th>العنوان</th><th>المادة</th><th>الأسئلة</th><th>المحاولات</th><th>الوصول</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>{app.db.exams.map(e=><tr key={e.id}><td><b>{SEC.esc(e.title)}</b></td><td className="sm">{SEC.esc(app.subject(e.subject_id)?.name||'—')}</td><td>{(e.question_ids||[]).length}</td><td><span className="pill pill-b">{attemptsLabel(e)}</span></td><td><AccessBadge value={e.is_free}/></td><td>{e.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(e)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(e.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody></table></div>}</div>
+    <div className="glass" style={{padding:14}}>{app.db.exams.length===0?<Empty title="لا اختبارات"/>:<div className="sx"><table className="tbl"><thead><tr><th>العنوان</th><th>المادة</th><th>الأسئلة</th><th>المحاولات</th><th>الوصول</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>{app.db.exams.map(e=><tr key={e.id}><td><b>{SEC.esc(e.title)}</b></td><td className="sm">{SEC.esc(app.subject(e.subject_id)?.name||'—')}</td><td>{(e.question_ids||[]).length}</td><td><span className="pill pill-b">{attemptsLabel(e)}</span></td><td><AccessBadge value={e.is_free}/></td><td>{e.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>duplicate(e)} title="نسخ"><Icon name="copy" size={13}/></button><button className="btn btn-s btn-sm" onClick={()=>openEdit(e)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(e.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody></table></div>}</div>
 
     {editing!==null&&<Modal title={editing==='new'?'جديد':'تعديل'} onClose={()=>setEditing(null)} wide>
       <Field label="الاسم"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
@@ -1074,7 +1430,7 @@ function ExamsPage(){
           currentQuestions.map((q,idx)=>{
             const correctArr=Array.isArray(q.correct)?q.correct:[q.correct];
             const correctIdx=Number(correctArr[0])||0;
-            return <div key={q.id} style={{padding:10,borderBottom:'1px solid rgba(212,175,55,.08)'}}>
+            return <div key={q.id} style={{padding:10,borderBottom:'1px solid var(--border)'}}>
               <div className="flex between center mb6">
                 <span className="pill pill-b" style={{fontSize:10}}>{idx+1}</span>
                 <div className="flex g6">
@@ -1155,7 +1511,7 @@ function QuestionsBankPage(){
   const availableLessons=useMemo(()=>{if(filterSubject==='all')return app.db.lessons;return app.db.lessons.filter(l=>{const u=app.unit(l.unit_id);return u?.subject_id===filterSubject;});},[filterSubject,app.db.lessons]);
   return <>
     <div className="flex between center mb16 wrap g8"><div className="h2 grad">🗃️ بنك الأسئلة</div></div>
-    <div className="grid g4 mb16"><Stat label="إجمالي" value={DB.fmt(stats.total)} icon="help" color="#FFD700"/><Stat label="مستخدمة" value={DB.fmt(stats.used)} icon="check" color="#22c55e"/><Stat label="يتيمة" value={DB.fmt(stats.orphan)} icon="alert" color="#ef4444"/></div>
+    <div className="grid g4 mb16"><Stat label="إجمالي" value={DB.fmt(stats.total)} icon="help" color="var(--gold-l)"/><Stat label="مستخدمة" value={DB.fmt(stats.used)} icon="check" color="#22c55e"/><Stat label="يتيمة" value={DB.fmt(stats.orphan)} icon="alert" color="#ef4444"/></div>
     <div className="glass mb16" style={{padding:14}}>
       <div className="grid g3" style={{gap:10}}><div><label className="lbl">المادة</label><select className="input" value={filterSubject} onChange={e=>{setFilterSubject(e.target.value);setFilterLesson('all');}}><option value="all">كل المواد</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></div><div><label className="lbl">الدرس</label><select className="input" value={filterLesson} onChange={e=>setFilterLesson(e.target.value)}><option value="all">كل الدروس</option>{availableLessons.map(l=><option key={l.id} value={l.id}>{l.title}</option>)}</select></div><div><label className="lbl">بحث</label><input className="input" value={q} onChange={e=>{setQ(e.target.value);setPage(1);}} placeholder="🔍"/></div></div>
     </div>
@@ -1164,198 +1520,6 @@ function QuestionsBankPage(){
       <div className="sx"><table className="tbl"><thead><tr><th>السؤال</th><th>المادة</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>{paginated.map(x=><tr key={x.id}><td style={{maxWidth:400}}><div className="sm" style={{fontWeight:700}}>{SEC.esc(x.text.slice(0,120))}{x.text.length>120?'...':''}</div></td><td>{x.subject?<span className="pill pill-b">{SEC.esc(x.subject.name)}</span>:'—'}</td><td>{x.usedIn.length>0?<span className="pill qbank-used">✓ {x.usedIn.length}</span>:<span className="pill qbank-orphan">⚠️</span>}</td><td><button className="btn btn-dn btn-sm" onClick={()=>deleteOne(x.id)}><Icon name="trash" size={12}/></button></td></tr>)}</tbody></table></div>
       {totalPages>1&&<div className="flex between center mt16"><button className="btn btn-s btn-sm" onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page===1}>←</button><span className="sm muted">صفحة {page} من {totalPages}</span><button className="btn btn-s btn-sm" onClick={()=>setPage(p=>Math.min(totalPages,p+1))} disabled={page===totalPages}>→</button></div>}
     </>}</div>
-  </>;
-}
-
-function StudentProfilePage({studentId,onClose}){
-  const app=useApp();
-  const student=app.db.users.find(u=>u.id===studentId);
-  const [msgTitle,setMsgTitle]=useState('');
-  const [msgBody,setMsgBody]=useState('');
-  const [busy,setBusy]=useState(false);
-  const [reports,setReports]=useState([]);
-  const [reportsLoading,setReportsLoading]=useState(true);
-
-  useEffect(()=>{(async()=>{
-    if(!studentId) return;
-    try{ const r = await DB.getUserReports(studentId); setReports(r||[]); }catch(e){}
-    setReportsLoading(false);
-  })();},[studentId]);
-
-  if(!student) return <div className="glass" style={{padding:20}}><Empty icon="👤" title="الطالب غير موجود"/><button className="btn btn-s btn-block mt16" onClick={onClose}>رجوع</button></div>;
-
-  const lvl=app.getLevel(student.xp||0);
-  const completed=(student.completed_lessons||[]).length;
-  const totalLessons=app.db.lessons.length;
-  const progress=totalLessons?Math.round((completed/totalLessons)*100):0;
-  const isPaid=student.subscription==='paid'||student.subscription==='vip';
-  const attempts=(app.db.activity||[]).filter(a=>a.user_id===studentId&&a.type==='exam_submit');
-
-  const sendMessage=async()=>{
-    if(!SEC.rateLimit('adm_msg_'+studentId, 2000)) return app.toast.warn('انتظر لحظة قبل الإرسال التالي');
-    const t = SEC.clean(SEC.maxLen(msgTitle,120));
-    const b = SEC.clean(SEC.maxLen(msgBody,2000));
-    if(!t || !b) return app.toast.warn('العنوان والنص مطلوبان');
-    setBusy(true);
-    try{
-      await app.save('notifications',{title:t,body:b,target:studentId,read_by:[],created_at:Date.now()});
-      app.toast.ok('تم إرسال الرسالة');
-      setMsgTitle('');setMsgBody('');
-    }catch(e){app.toast.err(e.message);}
-    setBusy(false);
-  };
-
-  const toggleBan=async()=>{
-    const isBanned=student.banned===true;
-    const r=await Swal.fire({
-      title:isBanned?'فك الحظر؟':'حظر الطالب؟',
-      text:isBanned?'سيتم استعادة وصول الطالب للمنصة':'لن يستطيع الطالب الدخول',
-      icon:isBanned?'question':'warning',showCancelButton:true,
-      confirmButtonText:isBanned?'نعم، فك':'نعم، احظر',cancelButtonText:'إلغاء',
-      confirmButtonColor:isBanned?'#22c55e':'#ef4444',cancelButtonColor:'#64748b',
-      background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',
-      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
-    });
-    if(!r.isConfirmed)return;
-    try{
-      await DB.updateUser(student.id,{banned:!isBanned,ban_reason:isBanned?null:'حظر يدوي من الأدمن',banned_at:isBanned?null:Date.now()});
-      await app.reload();
-      app.toast.ok(isBanned?'تم فك الحظر':'تم الحظر');
-    }catch(e){app.toast.err(e.message);}
-  };
-
-  const toggleActive=async()=>{
-    try{
-      await DB.updateUser(student.id,{active:student.active===false});
-      await app.reload();
-      app.toast.ok('تم');
-    }catch(e){app.toast.err(e.message);}
-  };
-
-  return <>
-    <div className="flex between center mb16 wrap g8">
-      <div className="h2 grad">👤 بروفايل الطالب</div>
-      <button className="btn btn-s" onClick={onClose}><Icon name="close" size={14}/> رجوع</button>
-    </div>
-
-    <div className="glass mb16" style={{padding:22}}>
-      <div className="flex center g16 wrap">
-        <StudentAvatar student={student} size={90}/>
-        <div style={{flex:1,minWidth:200}}>
-          <div className="h2 mb6">{SEC.esc(student.name)}</div>
-          <div className="sm muted mb8" dir="ltr">📱 {SEC.esc((student.country_code||'+20')+(student.phone||'—'))}</div>
-          <div className="flex wrap g6">
-            {student.governorate&&<span className="pill pill-b">📍 {SEC.esc(student.governorate)}</span>}
-            <span className="pill pill-b">🏆 Lv {lvl.current.level} — {SEC.esc(lvl.current.name)}</span>
-            {student.subscription==='vip'?<span className="pill pill-v">💎 VIP</span>:student.subscription==='paid'?<span className="pill pill-g">💳 مدفوع</span>:<span className="pill pill-y">🆓 مجاني</span>}
-            {student.banned?<span className="pill pill-r">⛔ محظور</span>:student.active===false?<span className="pill pill-y">موقوف</span>:<span className="pill pill-g">نشط</span>}
-          </div>
-        </div>
-      </div>
-      <div className="div"></div>
-      <div className="grid g4">
-        <Stat label="XP" value={DB.fmt(student.xp||0)} icon="trend" color="#FFD700"/>
-        <Stat label="دروس مكتملة" value={DB.fmt(completed)} icon="book" color="#22c55e"/>
-        <Stat label="السلسلة" value={DB.fmt(student.streak||0)} icon="flash" color="#f59e0b"/>
-        <Stat label="بلاغات" value={DB.fmt(student.reports_count||0)} icon="alert" color={(student.reports_count||0)>0?'#ef4444':'#8a7d55'}/>
-      </div>
-      <div className="mt16">
-        <div className="flex between center mb8">
-          <span className="sm txt2">📊 التقدم</span>
-          <span className="sm" style={{fontWeight:900,color:'var(--gold)'}}>{progress}%</span>
-        </div>
-        <div className="bar" style={{height:10}}><div className="bar-f bar-b" style={{width:`${progress}%`}}/></div>
-        <div className="xs muted mt6">{completed} من {totalLessons} درس</div>
-      </div>
-    </div>
-
-    <div className="grid g2 mb16">
-      <div className="glass" style={{padding:20}}>
-        <div className="section-title" style={{marginTop:0}}><span className="ico">✉️</span> إرسال رسالة</div>
-        <Field label="العنوان"><input className="input" maxLength={120} value={msgTitle} onChange={e=>setMsgTitle(e.target.value)} placeholder="مثال: تحفيز"/></Field>
-        <Field label="النص"><textarea className="input" rows="4" maxLength={2000} value={msgBody} onChange={e=>setMsgBody(e.target.value)}/></Field>
-        <button className="btn btn-p btn-block" onClick={sendMessage} disabled={busy}>{busy?'جارٍ...':'📤 إرسال'}</button>
-      </div>
-      <div className="glass" style={{padding:20}}>
-        <div className="section-title" style={{marginTop:0}}><span className="ico">⚙️</span> الإجراءات</div>
-        <button className={`btn btn-block mb12 ${student.banned?'btn-ok':'btn-dn'}`} onClick={toggleBan}>{student.banned?'✅ فك الحظر':'⛔ حظر الطالب'}</button>
-        <button className={`btn btn-block mb12 ${student.active===false?'btn-ok':'btn-dn'}`} onClick={toggleActive}>{student.active===false?'▶️ تفعيل الحساب':'⏸️ إيقاف الحساب'}</button>
-        <div className="glass-s" style={{padding:12,marginTop:12}}>
-          <div className="xs muted mb6">📅 انضم في</div>
-          <div className="sm">{student.created_at?DB.formatDateTime(student.created_at):'—'}</div>
-          {student.subscription_until&&<>
-            <div className="xs muted mt12 mb6">💳 ينتهي الاشتراك في</div>
-            <div className="sm">{DB.formatDate(student.subscription_until)}</div>
-          </>}
-        </div>
-      </div>
-    </div>
-
-    <div className="glass mb16" style={{padding:20}}>
-      <div className="h4 mb12" style={{color:'var(--gold)'}}>🚩 البلاغات على الطالب ({reports.length})</div>
-      {reportsLoading?<div className="sm muted">جارٍ التحميل...</div>:reports.length===0?<div className="sm muted">لا بلاغات</div>:
-      reports.map(r=><div key={r.id} className="glass-s mb8" style={{padding:12}}>
-        <div className="flex between center mb6"><span className="pill pill-r">{SEC.esc(r.reason||'بدون سبب')}</span><span className="xs muted">{DB.formatDateTime(r.created_at)}</span></div>
-        {r.details&&<div className="xs muted">"{SEC.esc(r.details)}"</div>}
-      </div>)}
-      {(student.reports_count||0)>=3&&<div className="xs" style={{color:'#fca5a5',marginTop:8}}>⚠️ الطالب لديه {student.reports_count} بلاغ — تم/سيتم حظره تلقائيًا</div>}
-    </div>
-
-    <div className="glass" style={{padding:20}}>
-      <div className="h4 mb12" style={{color:'var(--gold)'}}>📝 آخر الأنشطة</div>
-      {attempts.length===0?<div className="sm muted">لا نشاط بعد</div>:
-      attempts.slice(-5).reverse().map(a=><div key={a.id} className="flex between center mb6" style={{padding:'8px 0',borderBottom:'1px solid rgba(212,175,55,.08)'}}>
-        <div className="sm">📋 {SEC.esc(a.target||'اختبار')}</div>
-        <div className="xs muted">{DB.formatDateTime(a.at)}</div>
-      </div>)}
-    </div>
-  </>;
-}
-
-function StudentsPage(){
-  const app=useApp();
-  const [editing,setEditing]=useState(null);
-  const [profileId,setProfileId]=useState(null);
-  const [form,setForm]=useState({});
-  const [q,setQ]=useState('');
-  const [govFilter,setGovFilter]=useState('all');
-  const [filterState,setFilterState]=useState('all');
-  const [busy,setBusy]=useState(false);
-  const GOVERNORATES=["القاهرة","الجيزة","الإسكندرية","الدقهلية","الشرقية","المنوفية","القليوبية","البحيرة","الغربية","بورسعيد","دمياط","الإسماعيلية","السويس","كفر الشيخ","الفيوم","بني سويف","المنيا","أسيوط","سوهاج","قنا","الأقصر","أسوان","البحر الأحمر","الوادي الجديد","مطروح","شمال سيناء","جنوب سيناء"];
-  const allStudents=app.db.users.filter(u=>u.role==='student');
-  const list=allStudents.filter(u=>{const ms=u.name.toLowerCase().includes(q.toLowerCase())||(u.phone||'').includes(q);let mg=true;if(govFilter==='all')mg=true;else if(govFilter==='none')mg=!u.governorate;else mg=u.governorate===govFilter;let mst=true;if(filterState==='banned')mst=u.banned===true;else if(filterState==='active')mst=u.active!==false&&u.banned!==true;else if(filterState==='inactive')mst=u.active===false&&u.banned!==true;return ms&&mg&&mst;});
-  const open=s=>{setForm(JSON.parse(JSON.stringify(s)));setEditing(s.id);};
-  const save=async()=>{setBusy(true);try{await DB.updateUser(editing,{name:form.name,phone:form.phone,xp:form.xp,grade_id:form.grade_id,governorate:form.governorate||null,gender:form.gender||null,all_subjects:form.all_subjects,access_subjects:form.access_subjects||[],subscription:form.subscription||'free',subscription_until:form.subscription_until||null});await app.reload();app.toast.ok('تم');setEditing(null);}catch(e){app.toast.err(e.message);}setBusy(false);};
-  const toggle=async s=>{const action=s.active!==false?'إيقاف':'تفعيل';const r=await Swal.fire({title:`${action}؟`,text:`${action} حساب ${s.name}?`,icon:'question',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:s.active!==false?'#ef4444':'#D4AF37',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{await DB.updateUser(s.id,{active:!s.active});await app.reload();app.toast.warn('تم');}catch(e){app.toast.err(e.message);}};
-  const govCounts={};allStudents.forEach(u=>{if(u.governorate){govCounts[u.governorate]=(govCounts[u.governorate]||0)+1;}});
-
-  if(profileId)return <StudentProfilePage studentId={profileId} onClose={()=>setProfileId(null)}/>;
-
-  return <>
-    <div className="flex between center mb16 wrap g8"><div className="h2 grad">إدارة الطلاب</div><div className="flex g8 wrap"><input className="input" style={{maxWidth:200}} placeholder="🔍" value={q} onChange={e=>setQ(e.target.value)}/><select className="input" style={{maxWidth:180}} value={filterState} onChange={e=>setFilterState(e.target.value)}><option value="all">الكل</option><option value="active">نشط</option><option value="inactive">موقوف</option><option value="banned">محظور</option></select><select className="input" style={{maxWidth:220}} value={govFilter} onChange={e=>setGovFilter(e.target.value)}><option value="all">كل المحافظات ({allStudents.length})</option>{GOVERNORATES.map(g=>{const c=govCounts[g]||0;if(c===0)return null;return <option key={g} value={g}>{g} ({c})</option>;})}<option value="none">— بدون ({allStudents.filter(u=>!u.governorate).length}) —</option></select></div></div>
-    <div className="glass" style={{padding:14}}>
-      <div className="sx"><table className="tbl"><thead><tr><th>الطالب</th><th>النوع</th><th>الهاتف</th><th>📍</th><th>XP</th><th>الاشتراك</th><th>بلاغات</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>{list.map(s=><tr key={s.id}>
-        <td><button onClick={()=>setProfileId(s.id)} className="flex center g8" style={{cursor:'pointer',background:'none',border:0,color:'inherit',textAlign:'right',padding:0}}>
-          <StudentAvatar student={s} size={32}/>
-          <span style={{fontWeight:700}}>{SEC.esc(s.name)}</span>
-        </button></td>
-        <td>{s.gender==='female'?<span className="pill" style={{background:'rgba(236,72,153,.15)',color:'#f9a8d4',borderColor:'rgba(236,72,153,.3)',border:'1px solid'}}>👧</span>:s.gender==='male'?<span className="pill pill-b">👦</span>:'—'}</td>
-        <td className="sm muted" dir="ltr">{(s.country_code||'+20')}{s.phone||''}</td>
-        <td>{s.governorate?<span className="pill pill-b" style={{fontSize:11}}>📍 {SEC.esc(s.governorate)}</span>:'—'}</td>
-        <td><b style={{color:'var(--gold)'}}>{DB.fmt(s.xp||0)}</b></td>
-        <td>{s.subscription==='vip'?<span className="pill pill-v">💎 VIP</span>:s.subscription==='paid'?<span className="pill pill-g">💳</span>:<span className="pill pill-y">🆓</span>}</td>
-        <td>{(s.reports_count||0)>=3?<span className="pill pill-r">🚨 {s.reports_count}</span>:(s.reports_count||0)>0?<span className="pill pill-a">{s.reports_count}</span>:'0'}</td>
-        <td>{s.banned?<span className="pill pill-r">⛔</span>:s.active!==false?<span className="pill pill-g">نشط</span>:<span className="pill pill-y">موقوف</span>}</td>
-        <td><div className="flex g6"><button className="btn btn-s btn-sm" title="بروفايل" onClick={()=>setProfileId(s.id)}><Icon name="user" size={13}/></button><button className="btn btn-s btn-sm" onClick={()=>open(s)}><Icon name="edit" size={13}/></button>{!s.banned&&<button className={`btn btn-sm ${s.active!==false?'btn-dn':'btn-ok'}`} onClick={()=>toggle(s)}>{s.active!==false?'إيقاف':'تفعيل'}</button>}</div></td>
-      </tr>)}</tbody></table></div>
-      {list.length===0&&<Empty icon="🔍" title="لا طلاب"/>}
-    </div>
-    {editing&&<Modal title={`تعديل: ${SEC.esc(form.name)}`} onClose={()=>setEditing(null)} wide>
-      <div className="grid g2"><Field label="الاسم"><input className="input" value={form.name||''} onChange={e=>setForm({...form,name:e.target.value})}/></Field><Field label="الهاتف"><input className="input" value={form.phone||''} onChange={e=>setForm({...form,phone:e.target.value})}/></Field><Field label="النوع"><select className="input" value={form.gender||''} onChange={e=>setForm({...form,gender:e.target.value||null})}><option value="">—</option><option value="male">👦</option><option value="female">👧</option></select></Field><Field label="XP"><input type="number" className="input" value={form.xp??''} onChange={e=>setForm({...form,xp:e.target.value===''?'':+e.target.value})}/></Field><Field label="الصف"><select className="input" value={form.grade_id||''} onChange={e=>setForm({...form,grade_id:e.target.value})}><option value="">—</option>{app.db.grades.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></Field><Field label="📍 المحافظة"><select className="input" value={form.governorate||''} onChange={e=>setForm({...form,governorate:e.target.value})}><option value="">— بدون —</option>{GOVERNORATES.map(g=><option key={g} value={g}>{g}</option>)}</select></Field></div>
-      <div className="grid g2"><Field label="الاشتراك"><select className="input" value={form.subscription||'free'} onChange={e=>setForm({...form,subscription:e.target.value})}><option value="free">🆓</option><option value="paid">💳</option><option value="vip">💎</option></select></Field><Field label="تاريخ الانتهاء"><input type="date" className="input" value={form.subscription_until||''} onChange={e=>setForm({...form,subscription_until:e.target.value})}/></Field></div>
-      <Field label="الوصول"><label className="flex center g8 mb12" style={{cursor:'pointer'}}><input type="checkbox" checked={!!form.all_subjects} onChange={e=>setForm({...form,all_subjects:e.target.checked})}/><span className="sm">جميع المواد</span></label></Field>
-      <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
-    </Modal>}
   </>;
 }
 
@@ -1403,7 +1567,7 @@ function XPShopPage(){
     <div className="glass" style={{padding:14}}>
       {items.length===0?<Empty icon="🛒" title="لا منتجات" desc="اضغط على 'منتج جديد' لإضافة أول منتج"/>:
         <div className="sx"><table className="tbl"><thead><tr><th></th><th>الاسم</th><th>الوصف</th><th>السعر (XP)</th><th>المخزون</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>
-          {items.map(it=><tr key={it.id}><td style={{fontSize:24}}>{SEC.esc(it.icon||'🎁')}</td><td><b>{SEC.esc(it.name)}</b></td><td className="sm muted">{SEC.esc(it.description||'—')}</td><td><b style={{color:'#FFD700'}}>⚡ {it.xp_cost}</b></td><td>{it.stock!=null?it.stock:'∞'}</td><td>{it.active?<span className="pill pill-g">نشط</span>:<span className="pill pill-y">معطّل</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(it)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(it.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}
+          {items.map(it=><tr key={it.id}><td style={{fontSize:24}}>{SEC.esc(it.icon||'🎁')}</td><td><b>{SEC.esc(it.name)}</b></td><td className="sm muted">{SEC.esc(it.description||'—')}</td><td><b style={{color:'var(--gold-l)'}}>⚡ {it.xp_cost}</b></td><td>{it.stock!=null?it.stock:'∞'}</td><td>{it.active?<span className="pill pill-g">نشط</span>:<span className="pill pill-y">معطّل</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(it)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(it.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}
         </tbody></table></div>
       }
     </div>
@@ -1426,7 +1590,7 @@ function StudyGroupsPage(){
   const members=app.db.study_group_members||[];
   return <>
     <div className="h2 mb16 grad">👥 مجموعات الدراسة</div>
-    <div className="grid g3 mb16"><Stat label="إجمالي الجروبات" value={DB.fmt(groups.length)} icon="users" color="#FFD700"/><Stat label="إجمالي الأعضاء" value={DB.fmt(members.length)} icon="user" color="#22c55e"/><Stat label="نشطة" value={DB.fmt(groups.filter(g=>g.active!==false).length)} icon="check" color="#B8860B"/></div>
+    <div className="grid g3 mb16"><Stat label="إجمالي الجروبات" value={DB.fmt(groups.length)} icon="users" color="var(--gold-l)"/><Stat label="إجمالي الأعضاء" value={DB.fmt(members.length)} icon="user" color="#22c55e"/><Stat label="نشطة" value={DB.fmt(groups.filter(g=>g.active!==false).length)} icon="check" color="var(--gold-d)"/></div>
     <div className="glass" style={{padding:14}}>{groups.length===0?<Empty icon="👥" title="لا جروبات"/>:<div className="sx"><table className="tbl"><thead><tr><th>الاسم</th><th>المادة</th><th>الأعضاء</th><th>القائد</th><th>إجراءات</th></tr></thead><tbody>{groups.map(g=>{const gm=members.filter(m=>m.group_id===g.id);const leader=app.db.users.find(u=>u.id===g.leader_id);return <tr key={g.id}><td><b>{SEC.esc(g.name)}</b></td><td className="sm">{g.subject_id?SEC.esc(app.subject(g.subject_id)?.name||'—'):'—'}</td><td><span className="pill pill-b">{gm.length}/{g.max_members}</span></td><td className="sm">{SEC.esc(leader?.name||'—')}</td><td><button className="btn btn-dn btn-sm" onClick={async()=>{const r=await Swal.fire({title:'حذف الجروب؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{const sb=await DB.getClient();await sb.from('study_group_members').delete().eq('group_id',g.id);await sb.from('study_groups').delete().eq('id',g.id);await app.reload();app.toast.warn('تم');}catch(e){app.toast.err(e.message);}}}><Icon name="trash" size={13}/></button></td></tr>;})}</tbody></table></div>}</div>
   </>;
 }
@@ -1436,7 +1600,7 @@ function StudyPlansPage(){
   const plans=app.db.study_plans||[];
   return <>
     <div className="h2 mb16 grad">📅 خطط المذاكرة</div>
-    <div className="grid g3 mb16"><Stat label="إجمالي الخطط" value={DB.fmt(plans.length)} icon="calendar" color="#FFD700"/><Stat label="نشطة" value={DB.fmt(plans.filter(p=>p.status==='active').length)} icon="check" color="#22c55e"/><Stat label="مكتملة" value={DB.fmt(plans.filter(p=>p.status==='completed').length)} icon="award" color="#B8860B"/></div>
+    <div className="grid g3 mb16"><Stat label="إجمالي الخطط" value={DB.fmt(plans.length)} icon="calendar" color="var(--gold-l)"/><Stat label="نشطة" value={DB.fmt(plans.filter(p=>p.status==='active').length)} icon="check" color="#22c55e"/><Stat label="مكتملة" value={DB.fmt(plans.filter(p=>p.status==='completed').length)} icon="award" color="var(--gold-d)"/></div>
     <div className="glass" style={{padding:14}}>{plans.length===0?<Empty icon="📅" title="لا خطط"/>:<div className="sx"><table className="tbl"><thead><tr><th>العنوان</th><th>المادة</th><th>الامتحان</th><th>الأيام</th><th>الحالة</th></tr></thead><tbody>{plans.map(p=>{const student=app.db.users.find(u=>u.id===p.user_id);const daysLeft=Math.max(0,Math.ceil((p.exam_date-Date.now())/86400000));return <tr key={p.id}><td><b>{SEC.esc(p.title)}</b><div className="xs muted">{SEC.esc(student?.name||'—')}</div></td><td className="sm">{p.subject_id?SEC.esc(app.subject(p.subject_id)?.name||'—'):'—'}</td><td className="sm">{DB.formatDate(p.exam_date)}</td><td><span className="pill pill-b">{daysLeft} يوم</span></td><td>{p.status==='active'?<span className="pill pill-g">نشط</span>:<span className="pill pill-y">{p.status}</span>}</td></tr>;})}</tbody></table></div>}</div>
   </>;
 }
@@ -1449,7 +1613,7 @@ function DailyChallengesPage(){
   useEffect(()=>{(async()=>{try{const sb=await DB.getClient();const {data}=await sb.from('daily_challenge_attempts').select('*').order('completed_at',{ascending:false}).limit(200);setAttempts(data||[]);}catch(e){}setLoading(false);})();},[]);
   return <>
     <div className="h2 mb16 grad">🏆 التحديات اليومية</div>
-    <div className="grid g3 mb16"><Stat label="عدد التحديات" value={DB.fmt(challenges.length)} icon="trophy" color="#FFD700"/><Stat label="المحاولات" value={DB.fmt(attempts.length)} icon="activity" color="#22c55e"/><Stat label="متوسط XP" value={`${attempts.length>0?Math.round(attempts.reduce((s,a)=>s+(a.xp_earned||0),0)/attempts.length):0}`} icon="flash" color="#B8860B"/></div>
+    <div className="grid g3 mb16"><Stat label="عدد التحديات" value={DB.fmt(challenges.length)} icon="trophy" color="var(--gold-l)"/><Stat label="المحاولات" value={DB.fmt(attempts.length)} icon="activity" color="#22c55e"/><Stat label="متوسط XP" value={`${attempts.length>0?Math.round(attempts.reduce((s,a)=>s+(a.xp_earned||0),0)/attempts.length):0}`} icon="flash" color="var(--gold-d)"/></div>
     <div className="glass" style={{padding:14}}><div className="h4 mb12" style={{color:'var(--gold)'}}>📊 آخر المحاولات</div>{loading?<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>:attempts.length===0?<Empty icon="🏆" title="لا محاولات"/>:<div className="sx"><table className="tbl"><thead><tr><th>الطالب</th><th>التاريخ</th><th>النتيجة</th><th>XP</th></tr></thead><tbody>{attempts.map(a=>{const student=app.db.users.find(u=>u.id===a.user_id);return <tr key={a.id}><td>{SEC.esc(student?.name||'—')}</td><td className="xs muted">{DB.formatDate(a.challenge_date)}</td><td><span className="pill pill-b">{a.score}/{a.total}</span></td><td><span className="pill pill-g">+{a.xp_earned}</span></td></tr>;})}</tbody></table></div>}</div>
   </>;
 }
@@ -1461,7 +1625,7 @@ function PracticeSessionsPage(){
   const app=useApp();
   return <>
     <div className="h2 mb16 grad">🎯 جلسات التدريب</div>
-    <div className="grid g3 mb16"><Stat label="إجمالي الجلسات" value={DB.fmt(sessions.length)} icon="target" color="#FFD700"/><Stat label="متوسط النسبة" value={`${sessions.length>0?Math.round(sessions.reduce((s,x)=>s+(x.pct||0),0)/sessions.length):0}%`} icon="trend" color="#22c55e"/><Stat label="متوسط XP" value={DB.fmt(Math.round(sessions.reduce((s,x)=>s+(x.score||0),0)/Math.max(1,sessions.length)))} icon="flash" color="#B8860B"/></div>
+    <div className="grid g3 mb16"><Stat label="إجمالي الجلسات" value={DB.fmt(sessions.length)} icon="target" color="var(--gold-l)"/><Stat label="متوسط النسبة" value={`${sessions.length>0?Math.round(sessions.reduce((s,x)=>s+(x.pct||0),0)/sessions.length):0}%`} icon="trend" color="#22c55e"/><Stat label="متوسط XP" value={DB.fmt(Math.round(sessions.reduce((s,x)=>s+(x.score||0),0)/Math.max(1,sessions.length)))} icon="flash" color="var(--gold-d)"/></div>
     <div className="glass" style={{padding:14}}>{loading?<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>:sessions.length===0?<Empty icon="🎯" title="لا جلسات"/>:<div className="sx"><table className="tbl"><thead><tr><th>الطالب</th><th>المادة</th><th>النتيجة</th><th>النسبة</th><th>التاريخ</th></tr></thead><tbody>{sessions.map(s=>{const student=app.db.users.find(u=>u.id===s.user_id);return <tr key={s.id}><td>{SEC.esc(student?.name||'—')}</td><td className="sm">{s.subject_id?SEC.esc(app.subject(s.subject_id)?.name||'—'):'—'}</td><td><span className="pill pill-b">{s.score}/{s.total}</span></td><td><span className="sm" style={{fontWeight:800,color:s.pct>=70?'#22c55e':'#f59e0b'}}>{s.pct}%</span></td><td className="xs muted">{DB.formatDateTime(s.completed_at)}</td></tr>;})}</tbody></table></div>}</div>
   </>;
 }
@@ -1474,7 +1638,7 @@ function FocusSessionsPage(){
   const totalMinutes=sessions.reduce((s,x)=>s+(x.actual_minutes||x.duration_minutes||0),0);
   return <>
     <div className="h2 mb16 grad">🎯 جلسات التركيز</div>
-    <div className="grid g3 mb16"><Stat label="إجمالي الجلسات" value={DB.fmt(sessions.length)} icon="clock" color="#FFD700"/><Stat label="إجمالي الدقائق" value={DB.fmt(totalMinutes)} icon="activity" color="#22c55e"/><Stat label="متوسط المدة" value={`${sessions.length>0?Math.round(totalMinutes/sessions.length):0}د`} icon="trend" color="#B8860B"/></div>
+    <div className="grid g3 mb16"><Stat label="إجمالي الجلسات" value={DB.fmt(sessions.length)} icon="clock" color="var(--gold-l)"/><Stat label="إجمالي الدقائق" value={DB.fmt(totalMinutes)} icon="activity" color="#22c55e"/><Stat label="متوسط المدة" value={`${sessions.length>0?Math.round(totalMinutes/sessions.length):0}د`} icon="trend" color="var(--gold-d)"/></div>
     <div className="glass" style={{padding:14}}>{loading?<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>:sessions.length===0?<Empty icon="🎯" title="لا جلسات"/>:<div className="sx"><table className="tbl"><thead><tr><th>الطالب</th><th>الاسم</th><th>المدة</th><th>XP</th><th>التاريخ</th></tr></thead><tbody>{sessions.map(s=>{const student=app.db.users.find(u=>u.id===s.user_id);return <tr key={s.id}><td>{SEC.esc(student?.name||'—')}</td><td className="sm">{SEC.esc(s.label||'جلسة')}</td><td><span className="pill pill-b">{s.actual_minutes||s.duration_minutes}د</span></td><td><span className="pill pill-g">+{s.xp_awarded}</span></td><td className="xs muted">{DB.formatDateTime(s.started_at)}</td></tr>;})}</tbody></table></div>}</div>
   </>;
 }
@@ -1486,7 +1650,7 @@ function FlashcardsPage(){
   useEffect(()=>{(async()=>{try{const sb=await DB.getClient();const {data}=await sb.from('flashcards').select('*').order('created_at',{ascending:false}).limit(500);setCards(data||[]);}catch(e){}setLoading(false);})();},[]);
   return <>
     <div className="h2 mb16 grad">🃏 Flashcards</div>
-    <div className="grid g3 mb16"><Stat label="إجمالي البطاقات" value={DB.fmt(cards.length)} icon="layers" color="#FFD700"/><Stat label="للمراجعة" value={DB.fmt(cards.filter(c=>c.next_review_at<=Date.now()).length)} icon="clock" color="#f59e0b"/><Stat label="متقنة" value={DB.fmt(cards.filter(c=>c.repetitions>=3).length)} icon="award" color="#22c55e"/></div>
+    <div className="grid g3 mb16"><Stat label="إجمالي البطاقات" value={DB.fmt(cards.length)} icon="layers" color="var(--gold-l)"/><Stat label="للمراجعة" value={DB.fmt(cards.filter(c=>c.next_review_at<=Date.now()).length)} icon="clock" color="#f59e0b"/><Stat label="متقنة" value={DB.fmt(cards.filter(c=>c.repetitions>=3).length)} icon="award" color="#22c55e"/></div>
     <div className="glass" style={{padding:14}}>{loading?<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>:cards.length===0?<Empty icon="🃏" title="لا بطاقات"/>:<div className="sx"><table className="tbl"><thead><tr><th>السؤال</th><th>الطالب</th><th>المراجعات</th><th>التالي</th></tr></thead><tbody>{cards.slice(0,100).map(c=>{const student=app.db.users.find(u=>u.id===c.user_id);return <tr key={c.id}><td className="sm" style={{maxWidth:300}}>{SEC.esc(c.front?.slice(0,80))}</td><td className="sm">{SEC.esc(student?.name||'—')}</td><td><span className="pill pill-b">{c.repetitions||0}</span></td><td className="xs muted">{DB.formatDate(c.next_review_at)}</td></tr>;})}</tbody></table></div>}</div>
   </>;
 }
@@ -1526,7 +1690,6 @@ function ReportsPage(){
 setReports(data || []);
       if(data){ setReports(data); }
       else{
-        // fallback: قراءة مباشرة (تشتغل لو الأدمن عنده RLS access)
         const sb=await DB.getClient();
         const {data:rows}=await sb.from('reports').select('*').order('created_at',{ascending:false}).limit(500);
         setReports(rows||[]);
@@ -1722,207 +1885,37 @@ function Footer(){
   return <div className="footer-dev"><button className="dev-btn" onClick={()=>window.open("https://wa.me/201128351702","_blank")}><span className="dev-name">Developed by <b>EL-sayed Hasan</b></span></button><button className="tg-btn" onClick={sendReport}>بلاغ</button></div>;
 }
 
-function AdvancedStatsPage(){
-  const app=useApp();
-  const [range,setRange]=useState('30');
-  const [loading,setLoading]=useState(true);
-  const [attempts,setAttempts]=useState([]);
-  const [newUsers,setNewUsers]=useState([]);
-
-  useEffect(()=>{(async()=>{
-    try{
-      const sb=await DB.getClient();
-      const since=Date.now()-(parseInt(range)*24*60*60*1000);
-      const [aRes,uRes]=await Promise.all([
-        sb.from('exam_attempts').select('*').gte('at',since),
-        sb.from('users').select('id,role,created_at').eq('role','student').gte('created_at',since)
-      ]);
-      setAttempts(aRes.data||[]);
-      setNewUsers(uRes.data||[]);
-    }catch(e){}
-    setLoading(false);
-  })();},[range]);
-
-  const students=useMemo(()=>app.db.users.filter(u=>u.role==='student'),[app.db.users]);
-  const activeStudents=useMemo(()=>{
-    const since=Date.now()-(parseInt(range)*24*60*60*1000);
-    const activeIds=new Set((app.db.activity||[]).filter(a=>a.at>=since&&a.user_id).map(a=>a.user_id));
-    return students.filter(s=>activeIds.has(s.id));
-  },[students,app.db.activity,range]);
-
-  const dailyAttempts=useMemo(()=>{
-    const days=parseInt(range);
-    const buckets={};
-    for(let i=days-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);d.setHours(0,0,0,0);buckets[d.getTime()]=0;}
-    attempts.forEach(a=>{const d=new Date(a.at);d.setHours(0,0,0,0);const k=d.getTime();if(k in buckets)buckets[k]++;});
-    return Object.entries(buckets).map(([ts,count])=>({date:new Date(parseInt(ts)),count}));
-  },[attempts,range]);
-
-  const dailyUsers=useMemo(()=>{
-    const days=parseInt(range);
-    const buckets={};
-    for(let i=days-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);d.setHours(0,0,0,0);buckets[d.getTime()]=0;}
-    newUsers.forEach(u=>{if(!u.created_at)return;const d=new Date(u.created_at);d.setHours(0,0,0,0);const k=d.getTime();if(k in buckets)buckets[k]++;});
-    return Object.entries(buckets).map(([ts,count])=>({date:new Date(parseInt(ts)),count}));
-  },[newUsers,range]);
-
-  const subjectPerf=useMemo(()=>{
-    const map={};
-    attempts.forEach(a=>{
-      const exam=app.db.exams.find(e=>e.id===a.exam_id);
-      if(!exam||!exam.subject_id)return;
-      if(!map[exam.subject_id])map[exam.subject_id]={attempts:0,passed:0,totalPct:0};
-      map[exam.subject_id].attempts++;
-      if(a.passed)map[exam.subject_id].passed++;
-      map[exam.subject_id].totalPct+=(a.pct||0);
-    });
-    return Object.entries(map).map(([sid,data])=>{
-      const sub=app.subject(sid);
-      return {id:sid,name:sub?.name||'—',icon:sub?.icon||'📚',attempts:data.attempts,passed:data.passed,passRate:data.attempts?Math.round((data.passed/data.attempts)*100):0,avgPct:data.attempts?Math.round(data.totalPct/data.attempts):0};
-    }).sort((a,b)=>b.attempts-a.attempts);
-  },[attempts,app.db.exams,app.db.subjects]);
-
-  const hourlyActivity=useMemo(()=>{
-    const hours=new Array(24).fill(0);
-    (app.db.activity||[]).forEach(a=>{if(!a.at)return;const h=new Date(a.at).getHours();hours[h]++;});
-    return hours;
-  },[app.db.activity]);
-
-  const retention=useMemo(()=>{
-    const weekAgo=Date.now()-7*24*60*60*1000;
-    const activeLastWeek=new Set((app.db.activity||[]).filter(a=>a.at>=weekAgo&&a.user_id).map(a=>a.user_id));
-    const returned=students.filter(s=>activeLastWeek.has(s.id)&&s.created_at&&s.created_at<weekAgo);
-    const olderStudents=students.filter(s=>s.created_at&&s.created_at<weekAgo);
-    return olderStudents.length?Math.round((returned.length/olderStudents.length)*100):0;
-  },[students,app.db.activity]);
-
-  const chart1Ref=useRef(null);const chart2Ref=useRef(null);const chart3Ref=useRef(null);const chart4Ref=useRef(null);
-  const c1=useRef(null),c2=useRef(null),c3=useRef(null),c4=useRef(null);
-
-  useEffect(()=>{
-    if(!chart1Ref.current||!window.Chart)return;
-    const ctx=chart1Ref.current.getContext('2d');
-    if(c1.current)c1.current.destroy();
-    const grad=ctx.createLinearGradient(0,0,0,240);
-    grad.addColorStop(0,'rgba(255,215,0,0.85)');
-    grad.addColorStop(1,'rgba(139,105,20,0.4)');
-    c1.current=new window.Chart(ctx,{type:'line',data:{labels:dailyAttempts.map(d=>d.date.toLocaleDateString('ar-EG',{day:'numeric',month:'short'})),datasets:[{label:'محاولات اختبارات',data:dailyAttempts.map(d=>d.count),borderColor:'#FFD700',backgroundColor:grad,fill:true,tension:.4,borderWidth:3,pointRadius:3,pointBackgroundColor:'#FFD700',pointBorderColor:'#1a1206',pointBorderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#d4c79a',font:{family:'Tajawal',size:10},maxRotation:45},grid:{display:false}},y:{ticks:{color:'#d4c79a',font:{family:'Tajawal',size:11}},grid:{color:'rgba(212,175,55,0.08)'}}}}});
-    return()=>{if(c1.current)c1.current.destroy();};
-  },[dailyAttempts]);
-
-  useEffect(()=>{
-    if(!chart2Ref.current||!window.Chart)return;
-    const ctx=chart2Ref.current.getContext('2d');
-    if(c2.current)c2.current.destroy();
-    const grad=ctx.createLinearGradient(0,0,0,240);
-    grad.addColorStop(0,'rgba(34,197,94,0.85)');
-    grad.addColorStop(1,'rgba(34,197,94,0.3)');
-    c2.current=new window.Chart(ctx,{type:'line',data:{labels:dailyUsers.map(d=>d.date.toLocaleDateString('ar-EG',{day:'numeric',month:'short'})),datasets:[{label:'مستخدمون جدد',data:dailyUsers.map(d=>d.count),borderColor:'#22c55e',backgroundColor:grad,fill:true,tension:.4,borderWidth:3,pointRadius:3,pointBackgroundColor:'#22c55e',pointBorderColor:'#0a0805',pointBorderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#d4c79a',font:{family:'Tajawal',size:10},maxRotation:45},grid:{display:false}},y:{ticks:{color:'#d4c79a',font:{family:'Tajawal',size:11}},grid:{color:'rgba(212,175,55,0.08)'}}}}});
-    return()=>{if(c2.current)c2.current.destroy();};
-  },[dailyUsers]);
-
-  useEffect(()=>{
-    if(!chart3Ref.current||!window.Chart)return;
-    const ctx=chart3Ref.current.getContext('2d');
-    if(c3.current)c3.current.destroy();
-    c3.current=new window.Chart(ctx,{type:'bar',data:{labels:subjectPerf.map(s=>s.name),datasets:[{label:'نسبة النجاح %',data:subjectPerf.map(s=>s.passRate),backgroundColor:'rgba(212,175,55,0.7)',borderColor:'#D4AF37',borderWidth:2,borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#d4c79a',font:{family:'Tajawal',size:12}},grid:{display:false}},y:{ticks:{color:'#d4c79a',font:{family:'Tajawal',size:11}},grid:{color:'rgba(212,175,55,0.08)'},max:100,beginAtZero:true}}}});
-    return()=>{if(c3.current)c3.current.destroy();};
-  },[subjectPerf]);
-
-  useEffect(()=>{
-    if(!chart4Ref.current||!window.Chart)return;
-    const ctx=chart4Ref.current.getContext('2d');
-    if(c4.current)c4.current.destroy();
-    c4.current=new window.Chart(ctx,{type:'polarArea',data:{labels:Array.from({length:24},(_,i)=>`${i}:00`),datasets:[{data:hourlyActivity,backgroundColor:hourlyActivity.map((_,i)=>{const h=i/24;return `hsla(${45+h*30},80%,${55-hourlyActivity[i]*2}%,0.75)`;}),borderColor:'#0a0805',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{ticks:{display:false},grid:{color:'rgba(212,175,55,0.08)'}}}}});
-    return()=>{if(c4.current)c4.current.destroy();};
-  },[hourlyActivity]);
-
-  return <>
-    <div className="flex between center mb16 wrap g8">
-      <div className="h2 grad">📊 الإحصائيات المتقدمة</div>
-      <div className="flex g6">
-        {[{id:'7',label:'7 أيام'},{id:'30',label:'30 يوم'},{id:'90',label:'90 يوم'}].map(r=>
-          <button key={r.id} onClick={()=>setRange(r.id)} className={`msg-tab ${range===r.id?'active':''}`}>{r.label}</button>
-        )}
-      </div>
-    </div>
-    <div className="grid g4 mb16">
-      <Stat label="مستخدمون جدد" value={DB.fmt(newUsers.length)} icon="user" color="#22c55e" sub={`خلال ${range} يوم`}/>
-      <Stat label="نشطون" value={DB.fmt(activeStudents.length)} icon="activity" color="#FFD700" sub={`من ${students.length}`}/>
-      <Stat label="محاولات اختبارات" value={DB.fmt(attempts.length)} icon="clipboard" color="#D4AF37"/>
-      <Stat label="معدل العودة" value={`${retention}%`} icon="trend" color="#B8860B" sub="عادوا بعد أسبوع"/>
-    </div>
-    <div className="grid g2 mb16">
-      <div className="glass" style={{padding:18}}>
-        <div className="flex between center mb12"><div className="h4" style={{color:'var(--gold)'}}>📈 نشاط الاختبارات اليومي</div><span className="pill pill-b">{attempts.length} محاولة</span></div>
-        <div style={{height:260,position:'relative'}}><canvas ref={chart1Ref}></canvas></div>
-      </div>
-      <div className="glass" style={{padding:18}}>
-        <div className="flex between center mb12"><div className="h4" style={{color:'var(--gold)'}}>👥 تسجيلات جديدة</div><span className="pill pill-g">{newUsers.length} جديد</span></div>
-        <div style={{height:260,position:'relative'}}><canvas ref={chart2Ref}></canvas></div>
-      </div>
-    </div>
-    <div className="grid g2 mb16">
-      <div className="glass" style={{padding:18}}>
-        <div className="h4 mb12" style={{color:'var(--gold)'}}>🎯 أداء المواد</div>
-        {subjectPerf.length===0?<div className="sm muted" style={{textAlign:'center',padding:40}}>لا بيانات</div>:<div style={{height:280,position:'relative'}}><canvas ref={chart3Ref}></canvas></div>}
-      </div>
-      <div className="glass" style={{padding:18}}>
-        <div className="h4 mb12" style={{color:'var(--gold)'}}>🕐 أوقات النشاط (24 ساعة)</div>
-        <div style={{height:280,position:'relative'}}><canvas ref={chart4Ref}></canvas></div>
-      </div>
-    </div>
-    <div className="glass mb16" style={{padding:18}}>
-      <div className="flex between center mb12"><div className="h4" style={{color:'var(--gold)'}}>📚 تفاصيل المواد</div></div>
-      {subjectPerf.length===0?<Empty icon="📊" title="لا بيانات"/>:<div className="sx"><table className="tbl"><thead><tr><th>المادة</th><th>محاولات</th><th>ناجحون</th><th>معدل النجاح</th><th>متوسط النسبة</th><th>الأداء</th></tr></thead><tbody>
-        {subjectPerf.map(s=><tr key={s.id}>
-          <td><span style={{fontSize:20,marginInlineEnd:6}}>{s.icon}</span><b>{SEC.esc(s.name)}</b></td>
-          <td><span className="pill pill-b">{s.attempts}</span></td>
-          <td><span className="pill pill-g">{s.passed}</span></td>
-          <td><b style={{color:s.passRate>=70?'#22c55e':s.passRate>=40?'#f59e0b':'#ef4444'}}>{s.passRate}%</b></td>
-          <td><span className="pill pill-b">{s.avgPct}%</span></td>
-          <td><div className="bar" style={{width:100}}><div className="bar-f" style={{width:`${s.passRate}%`,background:s.passRate>=70?'linear-gradient(90deg,#16a34a,#22c55e)':s.passRate>=40?'linear-gradient(90deg,#d97706,#f59e0b)':'linear-gradient(90deg,#dc2626,#ef4444)'}}/></div></td>
-        </tr>)}
-      </tbody></table></div>}
-    </div>
-    <div className="glass" style={{padding:18}}>
-      <div className="h4 mb12" style={{color:'var(--gold)'}}>🏆 أفضل الطلاب في الفترة</div>
-      {activeStudents.length===0?<div className="sm muted" style={{textAlign:'center',padding:30}}>لا نشاط</div>:
-      (()=>{
-        const since=Date.now()-(parseInt(range)*24*60*60*1000);
-        const activityCount={};
-        (app.db.activity||[]).forEach(a=>{if(a.at>=since&&a.user_id)activityCount[a.user_id]=(activityCount[a.user_id]||0)+1;});
-        const top=[...activeStudents].sort((a,b)=>(activityCount[b.id]||0)-(activityCount[a.id]||0)).slice(0,10);
-        return <div className="sx"><table className="tbl"><thead><tr><th>#</th><th>الطالب</th><th>XP</th><th>نشاط</th><th>دروس</th><th>المستوى</th></tr></thead><tbody>
-          {top.map((s,i)=>{const lvl=app.getLevel(s.xp||0);return <tr key={s.id}>
-            <td><span className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`} style={{width:28,height:28,fontSize:12}}>{i+1}</span></td>
-            <td><div className="flex center g8"><StudentAvatar student={s} size={28}/><span className="sm">{SEC.esc(s.name)}</span></div></td>
-            <td><b style={{color:'var(--gold)'}}>{DB.fmt(s.xp||0)}</b></td>
-            <td><span className="pill pill-a">{activityCount[s.id]||0}</span></td>
-            <td><span className="pill pill-b">{(s.completed_lessons||[]).length}</span></td>
-            <td><span className="pill pill-b">Lv {lvl.current.level}</span></td>
-          </tr>;})}
-        </tbody></table></div>;
-      })()}
-    </div>
-  </>;
-}
-
 function AdminApp(){
   const app=useApp();
   const [tab,setTab]=useState(()=>{try{return localStorage.getItem('admin_tab')||'dashboard'}catch(e){return 'dashboard'}});
   const [sidebarOpen,setSidebarOpen]=useState(false);
   const [searchResults,setSearchResults]=useState([]);
-  const [theme,setTheme]=useState(()=>{try{return localStorage.getItem('admin_theme')||'dark'}catch(e){return 'dark'}});
+  const [theme,setTheme]=useState(()=>{try{return localStorage.getItem('admin_theme')||'gold'}catch(e){return 'gold'}});
+  const [focusMode, setFocusMode] = useState(false);
+  const [showCmd, setShowCmd] = useState(false);
   const user=app.currentUser;
+  
   useEffect(()=>{try{localStorage.setItem('admin_tab',tab)}catch(e){}},[tab]);
-  useEffect(()=>{try{localStorage.setItem('admin_theme',theme)}catch(e){}},[theme]);
+  useEffect(()=>{
+    document.body.setAttribute('data-theme', theme);
+    try{localStorage.setItem('admin_theme', theme)}catch(e){}
+  },[theme]);
+
+  useEffect(()=>{
+    const handleKeyDown = (e) => {
+      if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k'){ e.preventDefault(); setShowCmd(true); }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const unreadNotifs=useMemo(()=>{return (app.db.notifications||[]).filter(n=>{if(!n.created_at)return false;const created=new Date(n.created_at).getTime();const lastSeen=Number(localStorage.getItem('admin_last_notif_seen')||0);return created>lastSeen;}).length;},[app.db.notifications]);
   useEffect(()=>{document.title=unreadNotifs>0?`(${unreadNotifs}) MISSION EDU — لوحة الإدارة`:'MISSION EDU — لوحة الإدارة';},[unreadNotifs]);
   useEffect(()=>{if(tab==='notifications'){try{localStorage.setItem('admin_last_notif_seen',Date.now().toString())}catch(e){}}},[tab]);
+  
   const bannedCount=(app.db.users||[]).filter(u=>u.role==='student'&&u.banned===true).length;
   const items=[
-    {title:'الرئيسية',items:[{id:'dashboard',icon:'dashboard',label:'لوحة التحكم'},{id:'advanced-stats',icon:'trend',label:'إحصائيات متقدمة'},{id:'activity',icon:'activity',label:'سجل النشاط'},{id:'exam-results',icon:'clipboard',label:'نتايج الاختبارات'},{id:'errors',icon:'alert',label:'تحليل الأخطاء'}]},
+    {title:'الرئيسية',items:[{id:'dashboard',icon:'dashboard',label:'لوحة التحكم'},{id:'advanced-stats',icon:'trend',label:'إحصائيات متقدمة'},{id:'activity',icon:'activity',label:'سجل النشاط'},{id:'exam-results',icon:'clipboard',label:'نتايج الاختبارات'},{id:'errors',icon:'alert',label:'تحليل الأخطاء'},{id:'audit-logs',icon:'lock',label:'سجل العمليات'}]},
     {title:'المحتوى',items:[{id:'grades',icon:'school',label:'الصفوف'},{id:'subjects',icon:'book',label:'المواد'},{id:'units',icon:'folder',label:'الوحدات'},{id:'lessons',icon:'file',label:'الدروس'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'questions-bank',icon:'database',label:'بنك الأسئلة'},{id:'missions',icon:'target',label:'المهام'}]},
     {title:'التحفيز',items:[{id:'achievements',icon:'trophy',label:'الإنجازات'},{id:'levels',icon:'trend',label:'المستويات'},{id:'certificates',icon:'award',label:'الشهادات'},{id:'xp-shop',icon:'shoppingBag',label:'متجر XP'},{id:'daily-challenges',icon:'zapCircle',label:'التحديات اليومية'}]},
     {title:'الطلاب',items:[{id:'students',icon:'users',label:'الطلاب'},{id:'banned',icon:'lock',label:'المحظورون',badge:bannedCount||null},{id:'notes',icon:'note',label:'ملاحظات'},{id:'notifications',icon:'bell',label:'الإشعارات',badge:unreadNotifs||null},{id:'reports',icon:'link',label:'البلاغات'}]},
@@ -1931,16 +1924,31 @@ function AdminApp(){
     {title:'النظام',items:[{id:'settings',icon:'settings',label:'الإعدادات'}]}
   ];
   const onSearch=q=>{const lc=q.toLowerCase(),res=[];app.db.users.filter(x=>x.name.toLowerCase().includes(lc)||(x.phone||'').includes(lc)).slice(0,5).forEach(s=>res.push({type:'مستخدم',icon:<Icon name="user" size={16}/>,title:s.name,nav:'students'}));app.db.subjects.filter(s=>s.name.toLowerCase().includes(lc)).forEach(s=>res.push({type:'مادة',icon:'📚',title:s.name,nav:'subjects'}));app.db.lessons.filter(l=>l.title.toLowerCase().includes(lc)).slice(0,5).forEach(l=>res.push({type:'درس',icon:<Icon name="file" size={16}/>,title:l.title,nav:'lessons'}));setSearchResults(res);};
+  
   return <div className="app">
-    <Sidebar items={items} active={tab} onNav={id=>{setTab(id);try{localStorage.setItem('admin_tab',id)}catch(e){}}} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} onLogout={app.logout}/>
+    <Sidebar items={items} active={tab} onNav={id=>{setTab(id);try{localStorage.setItem('admin_tab',id)}catch(e){}}} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} onLogout={app.logout} hidden={focusMode}/>
     <div className="main">
-      <Topbar user={user} onMenu={()=>setSidebarOpen(true)} onLogout={app.logout} onSearch={onSearch} searchResults={searchResults} onResultClick={r=>setTab(r.nav)} theme={theme} onToggleTheme={()=>setTheme(t=>t==='dark'?'light':'dark')} unreadNotifs={unreadNotifs} onOpenNotifications={()=>setTab('notifications')}/>
+      <Topbar 
+        user={user} 
+        onMenu={()=>setSidebarOpen(true)} 
+        onLogout={app.logout} 
+        onSearch={onSearch} 
+        searchResults={searchResults} 
+        onResultClick={r=>setTab(r.nav)} 
+        theme={theme} 
+        onThemeChange={setTheme} 
+        unreadNotifs={unreadNotifs} 
+        onOpenNotifications={()=>setTab('notifications')}
+        onToggleFocus={()=>setFocusMode(!focusMode)}
+        focusMode={focusMode}
+      />
       <div className="content">
         {tab==='dashboard'&&<Dashboard/>}
         {tab==='advanced-stats'&&<AdvancedStatsPage/>}
         {tab==='activity'&&<ActivityLog/>}
         {tab==='exam-results'&&<ExamResultsPage/>}
         {tab==='errors'&&<ErrorsAnalyticsPage/>}
+        {tab==='audit-logs'&&<AuditLogsPage/>}
         {tab==='grades'&&<GradesPage/>}
         {tab==='subjects'&&<SubjectsPage/>}
         {tab==='units'&&<UnitsPage/>}
@@ -1970,6 +1978,7 @@ function AdminApp(){
         <Footer/>
       </div>
     </div>
+    {showCmd && <CommandPalette onClose={()=>setShowCmd(false)} onNavigate={(nav)=>{setTab(nav);setShowCmd(false);}}/>}
   </div>;
 }
 
