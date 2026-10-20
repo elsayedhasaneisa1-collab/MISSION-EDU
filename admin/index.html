@@ -649,13 +649,96 @@ function AuditLogsPage(){
   const app = useApp();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
-  useEffect(()=>{(async()=>{try{const sb = await DB.getClient();const { data } = await sb.from('audit_logs').select('*').order('created_at',{ascending:false}).limit(200);setLogs(data || []);}catch(e){}setLoading(false);})();},[]);
+  const [error, setError] = useState(null);
+  
+  // حالات الفلترة والبحث
+  const [search, setSearch] = useState('');
+  const [adminFilter, setAdminFilter] = useState('all');
+
+  useEffect(()=>{
+    (async()=>{
+      try{
+        const sb = await DB.getClient();
+        const { data, error } = await sb.from('audit_logs').select('*').order('created_at',{ascending:false}).limit(500);
+        if (error) throw error;
+        setLogs(data || []);
+      }catch(e){
+        setError(e.message || 'حدث خطأ في تحميل السجل');
+      }
+      setLoading(false);
+    })();
+  },[]);
+
+  // استخراج أسماء الأدمنز الفريدة عشان نحطها في الفلتر
+  const uniqueAdmins = useMemo(() => {
+    const admins = new Set();
+    logs.forEach(l => { if(l.admin_name) admins.add(l.admin_name); });
+    return Array.from(admins);
+  }, [logs]);
+
+  // تطبيق الفلترة والبحث
+  const filteredLogs = useMemo(() => {
+    return logs.filter(l => {
+      const matchAdmin = adminFilter === 'all' || l.admin_name === adminFilter;
+      const lc = search.toLowerCase();
+      const matchSearch = !search.trim() || 
+        (l.admin_name||'').toLowerCase().includes(lc) || 
+        (l.action||'').toLowerCase().includes(lc) || 
+        (l.target||'').toLowerCase().includes(lc);
+      return matchAdmin && matchSearch;
+    });
+  }, [logs, adminFilter, search]);
+
   return <>
-    <div className="h2 mb16 grad">📜 سجل عمليات الأدمن (Audit Log)</div>
+    <div className="flex between center mb16 wrap g8">
+      <div className="h2 grad">📜 سجل عمليات الأدمن (Audit Log)</div>
+      <span className="pill pill-b">{filteredLogs.length} عملية</span>
+    </div>
+
+    {/* شريط البحث والفلترة */}
+    <div className="glass mb16" style={{padding:14}}>
+      <div className="flex wrap g12">
+        <select className="input" style={{maxWidth:250}} value={adminFilter} onChange={e=>setAdminFilter(e.target.value)}>
+          <option value="all">كل الأدمنز ({logs.length})</option>
+          {uniqueAdmins.map(name => (
+            <option key={name} value={name}>{name}</option>
+          ))}
+        </select>
+        <input className="input" style={{maxWidth:300}} value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍 ابحث في الإجراءات أو التفاصيل..."/>
+      </div>
+    </div>
+
     <div className="glass" style={{padding:14}}>
-      {loading ? (<div className="flex col g8">{[1,2,3,4,5].map(i=><div key={i} className="skeleton" style={{height:40, width:'100%'}}/>)}</div>) : logs.length === 0 ? (<Empty icon="📜" title="لا توجد عمليات مسجلة"/>) : (
-        <div className="sx"><table className="tbl"><thead><tr><th>التاريخ</th><th>الأدمن</th><th>الإجراء</th><th>التفاصيل</th></tr></thead>
-        <tbody>{logs.map(l=>(<tr key={l.id}><td className="xs muted">{DB.formatDateTime(l.created_at)}</td><td className="sm">{SEC.esc(l.admin_name)}</td><td><span className="pill pill-b">{SEC.esc(l.action)}</span></td><td className="sm">{SEC.esc(l.target)}</td></tr>))}</tbody></table></div>
+      {loading ? (
+        <div className="flex col g8">{[1,2,3,4,5].map(i=><div key={i} className="skeleton" style={{height:40, width:'100%'}}/>)}</div>
+      ) : error ? (
+        <div className="empty">
+          <div className="empty-ico">⚠️</div>
+          <div className="h4 txt2 mb8">خطأ في الاتصال</div>
+          <div className="sm" style={{color:'#ef4444'}}>{error}</div>
+        </div>
+      ) : filteredLogs.length === 0 ? (
+        <Empty icon="📜" title="لا توجد عمليات مسجلة" desc="جرب تغير الفلتر أو ابحث بكلمة تانية"/>
+      ) : (
+        <div className="sx">
+          <table className="tbl">
+            <thead><tr><th>التاريخ</th><th>الأدمن</th><th>الإجراء</th><th>التفاصيل</th></tr></thead>
+            <tbody>
+              {filteredLogs.map(l=>(
+                <tr key={l.id}>
+                  <td className="xs muted" style={{whiteSpace:'nowrap'}}>{DB.formatDateTime(l.created_at)}</td>
+                  <td>
+                    <span className="pill pill-b" style={{background:'rgba(212,175,55,0.15)', color:'var(--gold-l)'}}>
+                      👤 {SEC.esc(l.admin_name || 'غير معروف')}
+                    </span>
+                  </td>
+                  <td><span className="pill pill-g">{SEC.esc(l.action)}</span></td>
+                  <td className="sm muted">{SEC.esc(l.target)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   </>;
