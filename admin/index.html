@@ -823,7 +823,7 @@ function LessonsPage(){
   const [previewQs,setPreviewQs]=useState(null);
   const openNew=()=>{setForm({title:'',desc:'',summary:'',video:{type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true},pdf_url:'',duration:'',xp:'',sort_order:'',unit_id:'',published:true,key_points:[],examples:[],notes:''});setLessonTestText('');setLessonTestTitle('');setLessonTestDuration(15);setLessonTestPassScore(50);setLessonTestXp(10);setLessonTestFree(true);setEditing('new');};
   const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(!c.video)c.video={type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true};if(c.video.is_free===undefined)c.video.is_free=true;if(!c.key_points)c.key_points=[];if(!c.pdf_url)c.pdf_url='';setForm(c);setLessonTestText('');setLessonTestTitle(`اختبار ${c.title||'الدرس'}`);setLessonTestDuration(15);setLessonTestPassScore(50);setLessonTestXp(10);setLessonTestFree(true);setEditing(it.id);};
-  const duplicate = (it) => {const c = JSON.parse(JSON.stringify(it));delete c.id;c.title = `${c.title} (نسخة)`;setForm(c);setEditing('new');app.toast.info('تم نسخ الدرس، راجع البيانات واحفظ.');};
+  const duplicate = (it) => {const c = JSON.parse(JSON.stringify(it));delete c.id;c.title = `${c.title} (نسخة)`;setForm(c);setEditing('new');app.toast.info('تم نسخ الدرس.');};
   const parseLessonQuestionsJSON = (raw) => {
     let parsed;
     try { parsed = JSON.parse(raw); }catch(e) { throw new Error('صيغة JSON غير صحيحة.'); }
@@ -937,7 +937,7 @@ function ExamsPage(){
   const [editingQ,setEditingQ]=useState(null);const [qForm,setQForm]=useState({text:'',options:['','','',''],correct:0,explanation:''});const [qBusy,setQBusy]=useState(false);
   const openNew=()=>{setForm({title:'',subject_id:'',unit_id:'',lesson_ids:[],question_ids:[],duration:'',pass_score:'',max_attempts:'',xp:'',published:true,sort_order:'',is_free:true});setJsonText('');setEditing('new');};
   const openEdit=it=>{const c=JSON.parse(JSON.stringify(it));if(c.is_free===undefined)c.is_free=true;if(c.max_attempts===undefined)c.max_attempts='';setForm(c);setJsonText('');setEditing(it.id);};
-  const duplicate = (it) => {const c = JSON.parse(JSON.stringify(it));delete c.id;c.title = `${c.title} (نسخة)`;setForm(c);setEditing('new');app.toast.info('تم نسخ الاختبار.');};
+  const duplicate = (it) => {const c=JSON.parse(JSON.stringify(it));delete c.id;c.title = `${c.title} (نسخة)`;setForm(c);setEditing('new');app.toast.info('تم نسخ الاختبار.');};
   const parseQuestionJSON=raw=>{
     let parsed;try{parsed=JSON.parse(raw);}catch(e){throw new Error('صيغة JSON غير صحيحة.');}
     const list=Array.isArray(parsed)?parsed:(Array.isArray(parsed?.questions)?parsed.questions:(Array.isArray(parsed?.data)?parsed.data:null));
@@ -1047,26 +1047,104 @@ function MissionsPage(){
 
 function QuestionsBankPage(){
   const app=useApp();
-  const [filterSubject,setFilterSubject]=useState('all');const [filterLesson,setFilterLesson]=useState('all');const [filterType,setFilterType]=useState('all');const [q,setQ]=useState('');const [page,setPage]=useState(1);const perPage=50;
+  const [filterSubject,setFilterSubject]=useState('all');
+  const [filterLesson,setFilterLesson]=useState('all');
+  const [filterType,setFilterType]=useState('all');
+  const [q,setQ]=useState('');
+  const [page,setPage]=useState(1);
+  const [attempts,setAttempts]=useState([]);
+  const perPage=50;
+  useEffect(()=>{(async()=>{
+    try{const sb=await DB.getClient();const {data}=await sb.from('exam_attempts').select('answers,total').limit(2000);setAttempts(data||[]);}catch(e){}
+  })();},[]);
+  const qualityMap=useMemo(()=>{
+    const stats={};
+    attempts.forEach(a=>{
+      const answers=a.answers||{};
+      Object.keys(answers).forEach(qid=>{
+        if(!stats[qid])stats[qid]={total:0,wrong:0,skipped:0};
+        stats[qid].total++;
+        const question=app.db.questions.find(x=>x.id===qid);
+        if(!question)return;
+        const correct=Array.isArray(question.correct)?question.correct[0]:question.correct;
+        const ans=answers[qid];
+        if(ans===null||ans===undefined||ans==='')stats[qid].skipped++;
+        else if(Number(ans)!==Number(correct))stats[qid].wrong++;
+      });
+    });
+    return stats;
+  },[attempts,app.db.questions]);
   const usageMap=useMemo(()=>{const map={};(app.db.exams||[]).forEach(ex=>{(ex.question_ids||[]).forEach(qid=>{if(!map[qid])map[qid]=[];map[qid].push({id:ex.id,title:ex.title});});});return map;},[app.db.exams]);
-  const enriched=useMemo(()=>{return (app.db.questions||[]).map(q=>{const lesson=q.lesson_id?app.lesson(q.lesson_id):null;const unit=q.unit_id?app.unit(q.unit_id):(lesson?app.unit(lesson.unit_id):null);const subject=q.subject_id?app.subject(q.subject_id):(unit?app.subject(unit.subject_id):null);const usedIn=usageMap[q.id]||[];return {...q,lesson,unit,subject,usedIn,isOrphan:usedIn.length===0};});},[app.db.questions,app.db.lessons,app.db.units,app.db.subjects,usageMap]);
-  const filtered=useMemo(()=>{let list=[...enriched];if(filterSubject!=='all')list=list.filter(x=>x.subject?.id===filterSubject);if(filterLesson!=='all')list=list.filter(x=>x.lesson?.id===filterLesson);if(filterType==='used')list=list.filter(x=>!x.isOrphan);if(filterType==='orphan')list=list.filter(x=>x.isOrphan);if(q.trim()){const lc=q.toLowerCase();list=list.filter(x=>(x.text||'').toLowerCase().includes(lc));}return list;},[enriched,filterSubject,filterLesson,filterType,q]);
+  const enriched=useMemo(()=>{
+    return (app.db.questions||[]).map(q=>{
+      const lesson=q.lesson_id?app.lesson(q.lesson_id):null;
+      const unit=q.unit_id?app.unit(q.unit_id):(lesson?app.unit(lesson.unit_id):null);
+      const subject=q.subject_id?app.subject(q.subject_id):(unit?app.subject(unit.subject_id):null);
+      const usedIn=usageMap[q.id]||[];
+      const st=qualityMap[q.id];
+      let quality='unknown',qualityColor='var(--muted)',qualityLabel='غير مقيّم';
+      if(st&&st.total>=5){
+        const wrongPct=(st.wrong/st.total)*100;
+        if(wrongPct>=90){quality='bad';qualityColor='#ef4444';qualityLabel='⚠️ صعب جداً';}
+        else if(wrongPct>=70){quality='hard';qualityColor='#f59e0b';qualityLabel='🔶 صعب';}
+        else if(wrongPct>=30){quality='good';qualityColor='#22c55e';qualityLabel='✅ متوازن';}
+        else if(wrongPct<=10){quality='easy';qualityColor='#60a5fa';qualityLabel='💧 سهل';}
+      }
+      return {...q,lesson,unit,subject,usedIn,isOrphan:usedIn.length===0,quality,qualityColor,qualityLabel,stats:st};
+    });
+  },[app.db.questions,app.db.lessons,app.db.units,app.db.subjects,usageMap,qualityMap]);
+  const filtered=useMemo(()=>{
+    let list=[...enriched];
+    if(filterSubject!=='all')list=list.filter(x=>x.subject?.id===filterSubject);
+    if(filterLesson!=='all')list=list.filter(x=>x.lesson?.id===filterLesson);
+    if(filterType==='used')list=list.filter(x=>!x.isOrphan);
+    if(filterType==='orphan')list=list.filter(x=>x.isOrphan);
+    if(filterType==='bad')list=list.filter(x=>x.quality==='bad'||x.quality==='hard');
+    if(q.trim()){const lc=q.toLowerCase();list=list.filter(x=>(x.text||'').toLowerCase().includes(lc));}
+    return list;
+  },[enriched,filterSubject,filterLesson,filterType,q]);
   const totalPages=Math.ceil(filtered.length/perPage)||1;
   const paginated=filtered.slice((page-1)*perPage,page*perPage);
-  const stats=useMemo(()=>{const total=enriched.length;const orphan=enriched.filter(x=>x.isOrphan).length;return {total,orphan,used:total-orphan};},[enriched]);
+  const stats=useMemo(()=>{const total=enriched.length;const orphan=enriched.filter(x=>x.isOrphan).length;const bad=enriched.filter(x=>x.quality==='bad').length;return {total,orphan,used:total-orphan,bad};},[enriched]);
   const deleteOne=async id=>{const r=await Swal.fire({title:'حذف السؤال؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{const result=await DB.deleteQuestion(id);await app.reload();app.toast.ok(`تم${result.examsUpdated?` وتحديث ${result.examsUpdated} امتحان`:''}`);}catch(e){app.toast.err(e.message);}};
   const availableLessons=useMemo(()=>{if(filterSubject==='all')return app.db.lessons;return app.db.lessons.filter(l=>{const u=app.unit(l.unit_id);return u?.subject_id===filterSubject;});},[filterSubject,app.db.lessons]);
   return <>
-    <div className="flex between center mb16 wrap g8"><div className="h2 grad">🗃️ بنك الأسئلة</div></div>
-    <div className="grid g4 mb16"><Stat label="إجمالي" value={DB.fmt(stats.total)} icon="help" color="var(--gold-l)"/><Stat label="مستخدمة" value={DB.fmt(stats.used)} icon="check" color="#22c55e"/><Stat label="يتيمة" value={DB.fmt(stats.orphan)} icon="alert" color="#ef4444"/></div>
-    <div className="glass mb16" style={{padding:14}}>
-      <div className="grid g3" style={{gap:10}}><div><label className="lbl">المادة</label><select className="input" value={filterSubject} onChange={e=>{setFilterSubject(e.target.value);setFilterLesson('all');}}><option value="all">كل المواد</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></div><div><label className="lbl">الدرس</label><select className="input" value={filterLesson} onChange={e=>setFilterLesson(e.target.value)}><option value="all">كل الدروس</option>{availableLessons.map(l=><option key={l.id} value={l.id}>{l.title}</option>)}</select></div><div><label className="lbl">بحث</label><input className="input" value={q} onChange={e=>{setQ(e.target.value);setPage(1);}} placeholder="🔍"/></div></div>
+    <div className="h2 mb16 grad">🗃️ بنك الأسئلة</div>
+    <div className="grid g4 mb16">
+      <Stat label="إجمالي" value={DB.fmt(stats.total)} icon="help" color="var(--gold-l)"/>
+      <Stat label="مستخدمة" value={DB.fmt(stats.used)} icon="check" color="#22c55e"/>
+      <Stat label="يتيمة" value={DB.fmt(stats.orphan)} icon="alert" color="#ef4444"/>
+      <Stat label="مشكوك فيها" value={DB.fmt(stats.bad)} icon="alert" color="#f59e0b" sub="≥70% خطأ"/>
     </div>
-    <div className="glass" style={{padding:14}}>{filtered.length===0?<Empty icon="🗃️" title="لا أسئلة"/>:<>
-      <div className="flex between center mb12"><span className="pill pill-b">{filtered.length} سؤال — صفحة {page} من {totalPages}</span></div>
-      <div className="sx"><table className="tbl"><thead><tr><th>السؤال</th><th>المادة</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>{paginated.map(x=><tr key={x.id}><td style={{maxWidth:400}}><div className="sm" style={{fontWeight:700}}>{SEC.esc(x.text.slice(0,120))}{x.text.length>120?'...':''}</div></td><td>{x.subject?<span className="pill pill-b">{SEC.esc(x.subject.name)}</span>:'—'}</td><td>{x.usedIn.length>0?<span className="pill qbank-used">✓ {x.usedIn.length}</span>:<span className="pill qbank-orphan">⚠️</span>}</td><td><button className="btn btn-dn btn-sm" onClick={()=>deleteOne(x.id)}><Icon name="trash" size={12}/></button></td></tr>)}</tbody></table></div>
-      {totalPages>1&&<div className="flex between center mt16"><button className="btn btn-s btn-sm" onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page===1}>←</button><span className="sm muted">صفحة {page} من {totalPages}</span><button className="btn btn-s btn-sm" onClick={()=>setPage(p=>Math.min(totalPages,p+1))} disabled={page===totalPages}>→</button></div>}
-    </>}</div>
+    <div className="glass mb16" style={{padding:14}}>
+      <div className="grid g4" style={{gap:10}}>
+        <div><label className="lbl">المادة</label><select className="input" value={filterSubject} onChange={e=>{setFilterSubject(e.target.value);setFilterLesson('all');}}><option value="all">كل المواد</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></div>
+        <div><label className="lbl">الدرس</label><select className="input" value={filterLesson} onChange={e=>setFilterLesson(e.target.value)}><option value="all">كل الدروس</option>{availableLessons.map(l=><option key={l.id} value={l.id}>{l.title}</option>)}</select></div>
+        <div><label className="lbl">النوع</label><select className="input" value={filterType} onChange={e=>setFilterType(e.target.value)}><option value="all">الكل</option><option value="used">✅ مستخدمة</option><option value="orphan">⚠️ يتيمة</option><option value="bad">🔶 مشكوك فيها</option></select></div>
+        <div><label className="lbl">بحث</label><input className="input" value={q} onChange={e=>{setQ(e.target.value);setPage(1);}} placeholder="🔍"/></div>
+      </div>
+    </div>
+    <div className="glass" style={{padding:14}}>
+      {filtered.length===0?<Empty icon="🗃️" title="لا أسئلة"/>:<>
+        <div className="flex between center mb12"><span className="pill pill-b">{filtered.length} سؤال — صفحة {page} من {totalPages}</span></div>
+        <div className="sx"><table className="tbl">
+          <thead><tr><th>السؤال</th><th>المادة</th><th>الجودة</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+          <tbody>{paginated.map(x=><tr key={x.id}>
+            <td style={{maxWidth:400}}><div className="sm" style={{fontWeight:700}}>{SEC.esc(x.text.slice(0,120))}{x.text.length>120?'...':''}</div></td>
+            <td>{x.subject?<span className="pill pill-b">{SEC.esc(x.subject.name)}</span>:'—'}</td>
+            <td>
+              <div style={{display:'flex',flexDirection:'column',gap:4}}>
+                <span className="pill" style={{background:`${x.qualityColor}22`,color:x.qualityColor,border:`1px solid ${x.qualityColor}55`,fontSize:10}}>{x.qualityLabel}</span>
+                {x.stats&&x.stats.total>0&&<span className="xs muted">{x.stats.wrong}/{x.stats.total} خطأ</span>}
+              </div>
+            </td>
+            <td>{x.usedIn.length>0?<span className="pill qbank-used">✓ {x.usedIn.length}</span>:<span className="pill qbank-orphan">⚠️</span>}</td>
+            <td><button className="btn btn-dn btn-sm" onClick={()=>deleteOne(x.id)}><Icon name="trash" size={12}/></button></td>
+          </tr>)}</tbody>
+        </table></div>
+        {totalPages>1&&<div className="flex between center mt16"><button className="btn btn-s btn-sm" onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page===1}>←</button><span className="sm muted">صفحة {page} من {totalPages}</span><button className="btn btn-s btn-sm" onClick={()=>setPage(p=>Math.min(totalPages,p+1))} disabled={page===totalPages}>→</button></div>}
+      </>}
+    </div>
   </>;
 }
 
@@ -1208,13 +1286,68 @@ function NotificationsPage(){
   const app=useApp();
   const [form,setForm]=useState({title:'',body:'',target:'all'});
   const [busy,setBusy]=useState(false);
-  const send=async ()=>{if(!SEC.rateLimit('adm_notif_send',1500)) return app.toast.warn('انتظر لحظة');const t=SEC.clean(SEC.maxLen(form.title,120));const b=SEC.clean(SEC.maxLen(form.body,2000));if(!t||!b)return app.toast.warn('العنوان والنص مطلوبان');setBusy(true);try{await app.save('notifications',{title:t,body:b,target:form.target,read_by:[],created_at:Date.now()});app.toast.ok('تم');setForm({title:'',body:'',target:'all'});}catch(e){app.toast.err(e.message);}setBusy(false);};
+  const [templates,setTemplates]=useState([]);
+  useEffect(()=>{(async()=>{
+    try{const sb=await DB.getClient();const {data}=await sb.from('admin_templates').select('*').order('created_at',{ascending:false});setTemplates(data||[]);}catch(e){}
+  })();},[]);
+  const saveTemplate=async()=>{
+    if(!form.title.trim()||!form.body.trim())return app.toast.warn('العنوان والنص مطلوبان');
+    const name=await Swal.fire({title:'اسم القالب',input:'text',inputPlaceholder:'مثال: تهنئة',showCancelButton:true,confirmButtonText:'حفظ',cancelButtonText:'إلغاء',confirmButtonColor:'#D4AF37',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title',input:'swal-custom-input'}});
+    if(!name.isConfirmed||!name.value)return;
+    try{
+      const sb=await DB.getClient();
+      const row={id:DB.uid('tpl_'),name:SEC.clean(name.value),title:SEC.clean(form.title),body:SEC.clean(form.body),created_at:Date.now()};
+      await sb.from('admin_templates').insert(row);
+      setTemplates([row,...templates]);
+      app.toast.ok('تم حفظ القالب');
+    }catch(e){app.toast.err(e.message);}
+  };
+  const delTemplate=async id=>{
+    try{const sb=await DB.getClient();await sb.from('admin_templates').delete().eq('id',id);setTemplates(templates.filter(t=>t.id!==id));app.toast.ok('تم');}catch(e){app.toast.err(e.message);}
+  };
+  const applyTemplate=t=>{setForm(f=>({...f,title:t.title,body:t.body}));app.toast.info('تم تطبيق القالب');};
+  const send=async ()=>{
+    if(!SEC.rateLimit('adm_notif_send',1500)) return app.toast.warn('انتظر لحظة');
+    const t=SEC.clean(SEC.maxLen(form.title,120)),b=SEC.clean(SEC.maxLen(form.body,2000));
+    if(!t||!b)return app.toast.warn('العنوان والنص مطلوبان');
+    setBusy(true);
+    try{await app.save('notifications',{title:t,body:b,target:form.target,read_by:[],created_at:Date.now()});app.toast.ok('تم');setForm({title:'',body:'',target:'all'});}catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
   const del=async id=>{const r=await Swal.fire({title:'حذف؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{await app.remove('notifications',id);app.toast.warn('تم');}catch(e){app.toast.err(e.message);}};
   return <>
     <div className="h2 mb16 grad">الإشعارات</div>
-    <div className="grid g2">
-      <div className="glass" style={{padding:20}}><div className="h4 mb12" style={{color:'var(--gold)'}}>📤 إرسال</div><Field label="العنوان"><input className="input" maxLength={120} value={form.title} onChange={e=>setForm({...form,title:e.target.value})}/></Field><Field label="النص"><textarea className="input" maxLength={2000} value={form.body} onChange={e=>setForm({...form,body:e.target.value})}/></Field><Field label="المستهدف"><select className="input" value={form.target} onChange={e=>setForm({...form,target:e.target.value})}><option value="all">كل الطلاب</option>{app.db.users.filter(u=>u.role==='student').map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field><button className="btn btn-p btn-block" onClick={send} disabled={busy}>{busy?'جارٍ...':'📤 إرسال'}</button></div>
-      <div className="glass" style={{padding:20}}><div className="h4 mb12" style={{color:'var(--gold)'}}>آخر الإشعارات</div>{app.db.notifications.slice(0,10).map(n=><div key={n.id} className="glass-s mb8" style={{padding:12,display:'flex',gap:10}}><div style={{flex:1}}><div className="h4" style={{fontSize:14}}>{SEC.esc(n.title)}</div><div className="xs muted">{SEC.esc(n.body)}</div></div><button className="btn btn-dn btn-sm" onClick={()=>del(n.id)}><Icon name="trash" size={13}/></button></div>)}</div>
+    <div className="grid g2 mb16">
+      <div className="glass" style={{padding:20}}>
+        <div className="h4 mb12" style={{color:'var(--gold)'}}>📤 إرسال</div>
+        <Field label="العنوان"><input className="input" maxLength={120} value={form.title} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
+        <Field label="النص"><textarea className="input" maxLength={2000} value={form.body} onChange={e=>setForm({...form,body:e.target.value})}/></Field>
+        <Field label="المستهدف"><select className="input" value={form.target} onChange={e=>setForm({...form,target:e.target.value})}><option value="all">كل الطلاب</option>{app.db.users.filter(u=>u.role==='student').map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></Field>
+        <div className="flex g8">
+          <button className="btn btn-p" onClick={send} disabled={busy} style={{flex:2}}>{busy?'جارٍ...':'📤 إرسال'}</button>
+          <button className="btn btn-s" onClick={saveTemplate} style={{flex:1}}>💾 حفظ كقالب</button>
+        </div>
+      </div>
+      <div className="glass" style={{padding:20}}>
+        <div className="h4 mb12" style={{color:'var(--gold)'}}>📋 القوالب ({templates.length})</div>
+        {templates.length===0?<div className="sm muted">لا قوالب بعد — احفظ رسالة كقالب للاستخدام السريع</div>:
+        <div style={{maxHeight:400,overflowY:'auto'}}>{templates.map(t=>(
+          <div key={t.id} className="glass-s mb8" style={{padding:10}}>
+            <div className="flex between center mb6">
+              <b className="sm" style={{color:'var(--gold-l)'}}>{SEC.esc(t.name)}</b>
+              <div className="flex g6">
+                <button className="btn btn-s btn-sm" onClick={()=>applyTemplate(t)}>تطبيق</button>
+                <button className="btn btn-dn btn-sm" onClick={()=>delTemplate(t.id)}><Icon name="trash" size={11}/></button>
+              </div>
+            </div>
+            <div className="xs muted">{SEC.esc(t.title)}</div>
+          </div>
+        ))}</div>}
+      </div>
+    </div>
+    <div className="glass" style={{padding:20}}>
+      <div className="h4 mb12" style={{color:'var(--gold)'}}>آخر الإشعارات</div>
+      {app.db.notifications.slice(0,10).map(n=><div key={n.id} className="glass-s mb8" style={{padding:12,display:'flex',gap:10}}><div style={{flex:1}}><div className="h4" style={{fontSize:14}}>{SEC.esc(n.title)}</div><div className="xs muted">{SEC.esc(n.body)}</div></div><button className="btn btn-dn btn-sm" onClick={()=>del(n.id)}><Icon name="trash" size={13}/></button></div>)}
     </div>
   </>;
 }
@@ -1470,8 +1603,250 @@ function ErrorsAnalyticsPage(){
   </>;
 }
 
-function CertificatesPage(){
-  return <Crud title="🏅 الشهادات" collection="certificates" defaultItem={()=>({title:'',desc:'',template:'default',icon:'🏅',active:true})} fields={[{key:'title',label:'الاسم'},{key:'icon',label:'الأيقونة'},{key:'desc',label:'الوصف',type:'textarea'},{key:'template',label:'القالب'}]} columns={[{render:c=><span style={{fontSize:20}}>{SEC.esc(c.icon||'🏅')}</span>,label:''},{key:'title',label:'الاسم'},{key:'template',label:'القالب'}]}/>;
+function CertificatesGenPage(){
+  const app=useApp();
+  const [studentId,setStudentId]=useState('');
+  const [courseName,setCourseName]=useState('');
+  const [date,setDate]=useState(new Date().toISOString().slice(0,10));
+  const [busy,setBusy]=useState(false);
+  const previewRef=useRef(null);
+  const student=app.db.users.find(u=>u.id===studentId);
+  const generate=async()=>{
+    if(!student)return app.toast.warn('اختر طالب');
+    if(!courseName.trim())return app.toast.warn('اكتب اسم الكورس');
+    setBusy(true);
+    try{
+      const canvas=await window.html2canvas(previewRef.current,{scale:2,backgroundColor:'#0a0805',useCORS:true});
+      const link=document.createElement('a');
+      link.download=`certificate_${student.name}_${Date.now()}.png`;
+      link.href=canvas.toDataURL('image/png');
+      link.click();
+      app.toast.ok('تم توليد الشهادة');
+    }catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
+  return <>
+    <div className="h2 mb16 grad">🏅 مولّد الشهادات</div>
+    <div className="grid g2 mb16">
+      <div className="glass" style={{padding:20}}>
+        <Field label="الطالب">
+          <select className="input" value={studentId} onChange={e=>setStudentId(e.target.value)}>
+            <option value="">— اختر طالب —</option>
+            {app.db.users.filter(u=>u.role==='student').map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
+          </select>
+        </Field>
+        <Field label="اسم الكورس / الإنجاز">
+          <input className="input" value={courseName} onChange={e=>setCourseName(e.target.value)} placeholder="مثال: إتمام كورس الفيزياء"/>
+        </Field>
+        <Field label="التاريخ">
+          <input type="date" className="input" value={date} onChange={e=>setDate(e.target.value)}/>
+        </Field>
+        <button className="btn btn-p btn-block" onClick={generate} disabled={busy||!student}>
+          {busy?'⏳ جارٍ...':'📸 تحميل الشهادة PNG'}
+        </button>
+      </div>
+      <div className="glass" style={{padding:20}}>
+        <div className="h4 mb12" style={{color:'var(--gold)'}}>معاينة</div>
+        <div style={{overflow:'auto',maxHeight:500}}>
+          <div ref={previewRef} style={{
+            width:600,height:420,background:'linear-gradient(135deg,#0a0805 0%,#1c160c 50%,#0a0805 100%)',
+            border:'4px solid #D4AF37',borderRadius:12,padding:30,position:'relative',
+            display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',
+            fontFamily:'Tajawal,sans-serif',color:'#FFD700'
+          }}>
+            <div style={{position:'absolute',inset:12,border:'1px solid rgba(212,175,55,.4)',borderRadius:8,pointerEvents:'none'}}/>
+            <div style={{fontSize:14,letterSpacing:8,color:'#D4AF37',marginBottom:12}}>MISSION EDU</div>
+            <div style={{fontSize:11,color:'#d4c79a',marginBottom:20}}>CERTIFICATE OF ACHIEVEMENT</div>
+            <div style={{fontSize:16,color:'#d4c79a',marginBottom:8}}>شهادة إتمام</div>
+            <div style={{fontSize:32,fontWeight:900,color:'#FFD700',marginBottom:8,textShadow:'0 0 20px rgba(255,215,0,.5)'}}>
+              {student?.name||'اسم الطالب'}
+            </div>
+            <div style={{fontSize:13,color:'#d4c79a',marginBottom:20,maxWidth:450}}>{courseName||'اسم الكورس'}</div>
+            <div style={{fontSize:11,color:'#8a7d55',marginTop:'auto'}}>{date}</div>
+            <div style={{position:'absolute',bottom:20,left:30,fontSize:10,color:'#8a7d55'}}>🏆</div>
+            <div style={{position:'absolute',bottom:20,right:30,fontSize:10,color:'#8a7d55'}}>🏆</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </>;
+}
+
+function BackupPage(){
+  const app=useApp();
+  const [importing,setImporting]=useState(false);
+  const exportAll=()=>{
+    const data={exported_at:Date.now(),version:'1.0',...app.db};
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;
+    a.download=`backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();URL.revokeObjectURL(url);
+    app.toast.ok('تم تصدير النسخة الاحتياطية');
+  };
+  const importAll=async(e)=>{
+    const file=e.target.files?.[0];if(!file)return;
+    const r=await Swal.fire({title:'استعادة نسخة احتياطية؟',text:'سيتم دمج البيانات الحالية',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});
+    if(!r.isConfirmed){e.target.value='';return;}
+    setImporting(true);
+    try{
+      const data=JSON.parse(await file.text());
+      if(!data.users||!data.lessons)throw new Error('ملف غير صالح');
+      const tables=['users','grades','subjects','units','lessons','questions','exams','missions','achievements','levels','notifications','activity','polls','poll_votes','xp_shop_items','study_groups','study_group_members','study_plans','daily_challenges','practice_sessions','focus_sessions','flashcards'];
+      let total=0,failed=0;
+      for(const t of tables){
+        if(!Array.isArray(data[t]))continue;
+        for(const row of data[t]){
+          try{await DB.save(t,row);total++;}catch(_){failed++;}
+        }
+      }
+      app.toast.ok(`تم ${total} عنصر${failed?` (${failed} فشل)`:''}`);
+      await app.reload();
+    }catch(err){app.toast.err(err.message);}
+    setImporting(false);e.target.value='';
+  };
+  return <>
+    <div className="h2 mb16 grad">💾 النسخ الاحتياطي</div>
+    <div className="grid g2 mb16">
+      <div className="glass" style={{padding:20}}>
+        <div className="h4 mb12" style={{color:'var(--gold)'}}>📤 تصدير</div>
+        <p className="sm muted mb16">ملف JSON كامل بكل بيانات المنصة.</p>
+        <button className="btn btn-p btn-block" onClick={exportAll}>
+          <Icon name="download" size={15}/> تصدير كل البيانات
+        </button>
+      </div>
+      <div className="glass" style={{padding:20}}>
+        <div className="h4 mb12" style={{color:'var(--gold)'}}>📥 استعادة</div>
+        <p className="sm muted mb16">ارفع ملف JSON سابق لاستعادة البيانات.</p>
+        <input type="file" accept="application/json" onChange={importAll} style={{display:'none'}} id="bk-input"/>
+        <label htmlFor="bk-input" className="btn btn-s btn-block" style={{cursor:'pointer'}}>
+          {importing?'⏳ جارٍ...':'📂 اختار ملف'}
+        </label>
+      </div>
+    </div>
+    <div className="glass" style={{padding:16}}>
+      <div className="h4 mb12" style={{color:'var(--gold)'}}>📊 إحصائيات سريعة</div>
+      <div className="grid g4">
+        <div className="glass-s" style={{padding:12}}><div className="xs muted">طلاب</div><div className="h3">{DB.fmt((app.db.users||[]).filter(u=>u.role==='student').length)}</div></div>
+        <div className="glass-s" style={{padding:12}}><div className="xs muted">دروس</div><div className="h3">{DB.fmt((app.db.lessons||[]).length)}</div></div>
+        <div className="glass-s" style={{padding:12}}><div className="xs muted">أسئلة</div><div className="h3">{DB.fmt((app.db.questions||[]).length)}</div></div>
+        <div className="glass-s" style={{padding:12}}><div className="xs muted">اختبارات</div><div className="h3">{DB.fmt((app.db.exams||[]).length)}</div></div>
+      </div>
+    </div>
+  </>;
+}
+
+function BulkImportPage(){
+  const app=useApp();
+  const [type,setType]=useState('students');
+  const [rows,setRows]=useState([]);
+  const [busy,setBusy]=useState(false);
+  const [fileName,setFileName]=useState('');
+  const onFile=async(e)=>{
+    const file=e.target.files?.[0];if(!file)return;
+    setFileName(file.name);
+    try{
+      const buf=await file.arrayBuffer();
+      const wb=window.XLSX.read(buf,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const data=window.XLSX.utils.sheet_to_json(ws,{defval:''});
+      setRows(data);
+      app.toast.ok(`تم تحميل ${data.length} صف`);
+    }catch(err){app.toast.err('ملف غير صالح: '+err.message);}
+    e.target.value='';
+  };
+  const downloadTemplate=()=>{
+    const headers=type==='students'
+      ?['name','phone','country_code','gender','governorate','grade','xp','subscription']
+      :['question','optionA','optionB','optionC','optionD','correct','explanation','subject','unit','difficulty'];
+    const sample=type==='students'
+      ?[['أحمد محمد','1001234567','+20','male','القاهرة','الصف الأول',0,'free']]
+      :[['ما ناتج 2+2؟','3','4','5','6','B','لأن 2+2=4','الرياضيات','الوحدة 1','easy']];
+    const ws=window.XLSX.utils.aoa_to_sheet([headers,...sample]);
+    const wb=window.XLSX.utils.book_new();
+    window.XLSX.utils.book_append_sheet(wb,ws,'Template');
+    window.XLSX.writeFile(wb,`template_${type}.xlsx`);
+  };
+  const doImport=async()=>{
+    if(!rows.length)return app.toast.warn('ارفع ملف أولاً');
+    setBusy(true);
+    let ok=0,fail=0;
+    try{
+      for(const r of rows){
+        try{
+          if(type==='students'){
+            if(!r.name||!r.phone)throw new Error('بيانات ناقصة');
+            const grade=app.db.grades.find(g=>g.name===String(r.grade).trim());
+            await DB.save('users',{
+              id:DB.uid('u_'),role:'student',
+              name:SEC.clean(String(r.name)),
+              phone:SEC.clean(String(r.phone)).replace(/[^0-9]/g,''),
+              country_code:String(r.country_code||'+20'),
+              gender:['male','female'].includes(String(r.gender))?String(r.gender):null,
+              governorate:SEC.clean(String(r.governorate||''))||null,
+              grade_id:grade?.id||null,
+              xp:Number(r.xp)||0,
+              subscription:['free','paid','vip'].includes(String(r.subscription))?String(r.subscription):'free',
+              active:true,created_at:Date.now(),
+              completed_lessons:[],reports_count:0,streak:0
+            });
+          } else {
+            if(!r.question||!r.optionA||!r.optionB)throw new Error('بيانات ناقصة');
+            const correctLetter=String(r.correct||'A').toUpperCase();
+            const correctIdx='ABCD'.indexOf(correctLetter);
+            if(correctIdx<0)throw new Error('correct يجب A/B/C/D');
+            const subj=app.db.subjects.find(s=>s.name===String(r.subject).trim());
+            const unit=app.db.units.find(u=>u.name===String(r.unit).trim()&&(!subj||u.subject_id===subj.id));
+            await DB.save('questions',{
+              id:DB.uid('q_'),
+              text:SEC.clean(String(r.question)),
+              options:[r.optionA,r.optionB,r.optionC,r.optionD].map(o=>SEC.clean(String(o||''))),
+              correct:[correctIdx],
+              explanation:SEC.clean(String(r.explanation||'')),
+              subject_id:subj?.id||null,
+              unit_id:unit?.id||null,
+              difficulty:String(r.difficulty||'medium'),
+              type:'mcq',xp:0,lesson_id:null
+            });
+          }
+          ok++;
+        }catch(_){fail++;}
+      }
+      app.toast.ok(`✅ نجح: ${ok}${fail?` | ❌ فشل: ${fail}`:''}`);
+      setRows([]);setFileName('');
+      await app.reload();
+    }catch(e){app.toast.err(e.message);}
+    setBusy(false);
+  };
+  return <>
+    <div className="h2 mb16 grad">📥 استيراد جماعي</div>
+    <div className="glass mb16" style={{padding:20}}>
+      <div className="flex wrap g12 mb16">
+        <button className={`btn ${type==='students'?'btn-p':'btn-s'}`} onClick={()=>{setType('students');setRows([]);}}>👥 طلاب</button>
+        <button className={`btn ${type==='questions'?'btn-p':'btn-s'}`} onClick={()=>{setType('questions');setRows([]);}}>❓ أسئلة</button>
+        <button className="btn btn-s" onClick={downloadTemplate}>📥 تحميل قالب</button>
+      </div>
+      <input type="file" accept=".xlsx,.xls,.csv" onChange={onFile} style={{display:'none'}} id="bulk-input"/>
+      <label htmlFor="bulk-input" className="btn btn-p btn-block" style={{cursor:'pointer'}}>
+        📂 اختار ملف Excel / CSV
+      </label>
+      {fileName&&<div className="sm muted mt12">📄 {fileName} — {rows.length} صف</div>}
+    </div>
+    {rows.length>0&&<>
+      <div className="glass mb16" style={{padding:14}}>
+        <div className="h4 mb12" style={{color:'var(--gold)'}}>معاينة أول 5 صفوف</div>
+        <div className="sx">
+          <table className="tbl">
+            <thead><tr>{Object.keys(rows[0]).slice(0,6).map(k=><th key={k}>{k}</th>)}</tr></thead>
+            <tbody>{rows.slice(0,5).map((r,i)=><tr key={i}>{Object.keys(rows[0]).slice(0,6).map(k=><td key={k} className="sm">{String(r[k]).slice(0,50)}</td>)}</tr>)}</tbody>
+          </table>
+        </div>
+      </div>
+      <button className="btn btn-p btn-block" onClick={doImport} disabled={busy}>
+        {busy?'⏳ جارٍ الاستيراد...':`⚡ استيراد ${rows.length} صف`}
+      </button>
+    </>}
+  </>;
 }
 
 function NotesPage(){
@@ -1726,11 +2101,11 @@ function AdminApp(){
   const items=[
     {title:'الرئيسية',items:[{id:'dashboard',icon:'dashboard',label:'لوحة التحكم'},{id:'advanced-stats',icon:'trend',label:'إحصائيات متقدمة'},{id:'activity',icon:'activity',label:'سجل النشاط'},{id:'exam-results',icon:'clipboard',label:'نتايج الاختبارات'},{id:'errors',icon:'alert',label:'تحليل الأخطاء'},{id:'audit-logs',icon:'lock',label:'سجل العمليات'}]},
     {title:'المحتوى',items:[{id:'grades',icon:'school',label:'الصفوف'},{id:'subjects',icon:'book',label:'المواد'},{id:'units',icon:'folder',label:'الوحدات'},{id:'lessons',icon:'file',label:'الدروس'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'questions-bank',icon:'database',label:'بنك الأسئلة'},{id:'missions',icon:'target',label:'المهام'}]},
-    {title:'التحفيز',items:[{id:'achievements',icon:'trophy',label:'الإنجازات'},{id:'levels',icon:'trend',label:'المستويات'},{id:'certificates',icon:'award',label:'الشهادات'},{id:'xp-shop',icon:'shoppingBag',label:'متجر XP'},{id:'daily-challenges',icon:'zapCircle',label:'التحديات اليومية'}]},
+    {title:'التحفيز',items:[{id:'achievements',icon:'trophy',label:'الإنجازات'},{id:'levels',icon:'trend',label:'المستويات'},{id:'certificates',icon:'award',label:'مولّد الشهادات'},{id:'xp-shop',icon:'shoppingBag',label:'متجر XP'},{id:'daily-challenges',icon:'zapCircle',label:'التحديات اليومية'}]},
     {title:'الطلاب',items:[{id:'students',icon:'users',label:'الطلاب'},{id:'banned',icon:'lock',label:'المحظورون',badge:bannedCount||null},{id:'notes',icon:'note',label:'ملاحظات'},{id:'notifications',icon:'bell',label:'الإشعارات',badge:unreadNotifs||null},{id:'reports',icon:'link',label:'البلاغات'}]},
     {title:'الأنشطة',items:[{id:'practice-sessions',icon:'target',label:'جلسات التدريب'},{id:'focus-sessions',icon:'clock',label:'جلسات التركيز'},{id:'study-groups',icon:'handshake',label:'مجموعات الدراسة'},{id:'study-plans',icon:'calendar',label:'خطط المذاكرة'},{id:'flashcards',icon:'layers',label:'Flashcards'}]},
     {title:'النمو',items:[{id:'coupons',icon:'coupon',label:'الكوبونات'},{id:'referrals',icon:'share',label:'الإحالات'},{id:'polls',icon:'activity',label:'الاستطلاعات'}]},
-    {title:'النظام',items:[{id:'settings',icon:'settings',label:'الإعدادات'}]}
+    {title:'النظام',items:[{id:'backup',icon:'database',label:'النسخ الاحتياطي'},{id:'bulk-import',icon:'download',label:'استيراد جماعي'},{id:'settings',icon:'settings',label:'الإعدادات'}]}
   ];
   const onSearch=q=>{const lc=q.toLowerCase(),res=[];app.db.users.filter(x=>x.name.toLowerCase().includes(lc)||(x.phone||'').includes(lc)).slice(0,5).forEach(s=>res.push({type:'مستخدم',icon:<Icon name="user" size={16}/>,title:s.name,nav:'students'}));app.db.subjects.filter(s=>s.name.toLowerCase().includes(lc)).forEach(s=>res.push({type:'مادة',icon:'📚',title:s.name,nav:'subjects'}));app.db.lessons.filter(l=>l.title.toLowerCase().includes(lc)).slice(0,5).forEach(l=>res.push({type:'درس',icon:<Icon name="file" size={16}/>,title:l.title,nav:'lessons'}));setSearchResults(res);};
   return <div className="app">
@@ -1753,7 +2128,7 @@ function AdminApp(){
         {tab==='missions'&&<MissionsPage/>}
         {tab==='achievements'&&<AchievementsPage/>}
         {tab==='levels'&&<LevelsPage/>}
-        {tab==='certificates'&&<CertificatesPage/>}
+        {tab==='certificates'&&<CertificatesGenPage/>}
         {tab==='xp-shop'&&<XPShopPage/>}
         {tab==='daily-challenges'&&<DailyChallengesPage/>}
         {tab==='students'&&<StudentsPage/>}
@@ -1769,6 +2144,8 @@ function AdminApp(){
         {tab==='coupons'&&<CouponsPage/>}
         {tab==='referrals'&&<ReferralsPage/>}
         {tab==='polls'&&<PollsPage/>}
+        {tab==='backup'&&<BackupPage/>}
+        {tab==='bulk-import'&&<BulkImportPage/>}
         {tab==='settings'&&<SettingsPage/>}
         <Footer/>
       </div>
