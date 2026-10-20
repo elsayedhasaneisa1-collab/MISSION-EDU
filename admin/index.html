@@ -490,34 +490,26 @@ function Crud({title,collection,defaultItem,fields,columns}){
   </>;
 }
 
-function Sidebar({items,active,onNav,open,onClose,onLogout, hidden}){return <>{open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',zIndex:55}}/>}<aside className={`sidebar ${open?'open':''} ${hidden?'hidden-sidebar':''}`}><div className="brand"><div className="brand-logo"><Icon name="trophy" size={22} color="#1a1206"/></div><div><div className="brand-name">MISSION EDU</div><div className="brand-sub">لوحة الإدارة</div></div></div><div style={{flex:1,overflowY:'auto',overflowX:'hidden',display:'flex',flexDirection:'column',gap:'4px',marginInlineEnd:'-6px',paddingInlineEnd:'6px'}}>{items.map((g,gi)=><div key={gi}>{g.title&&<div className="nav-gt">{g.title}</div>}{g.items.map(it=><button key={it.id} className={`nav-i ${active===it.id?'on':''}`} onClick={()=>{onNav(it.id);onClose?.();}}><span className="nav-ico"><Icon name={it.icon} size={16}/></span><span>{it.label}</span>{it.badge!=null&&<span className="pill pill-b" style={{marginInlineStart:'auto'}}>{it.badge}</span>}</button>)}</div>)}</div><div style={{marginTop:'10px',paddingTop:'10px',borderTop:'1px solid var(--border)',flexShrink:0}}><button className="nav-i" onClick={onLogout} style={{color:'#fca5a5',width:'100%'}}><span className="nav-ico"><Icon name="logout" size={16}/></span><span>تسجيل الخروج</span></button></div></aside></>;}
+function Sidebar({items,active,onNav,open,onClose,onLogout, hidden, theme, onThemeChange}){return <>{open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',zIndex:55}}/>}<aside className={`sidebar ${open?'open':''} ${hidden?'hidden-sidebar':''}`}><div className="brand"><div className="brand-logo"><Icon name="trophy" size={22} color="#1a1206"/></div><div><div className="brand-name">MISSION EDU</div><div className="brand-sub">لوحة الإدارة</div></div></div><div style={{flex:1,overflowY:'auto',overflowX:'hidden',display:'flex',flexDirection:'column',gap:'4px',marginInlineEnd:'-6px',paddingInlineEnd:'6px'}}>{items.map((g,gi)=><div key={gi}>{g.title&&<div className="nav-gt">{g.title}</div>}{g.items.map(it=><button key={it.id} className={`nav-i ${active===it.id?'on':''}`} onClick={()=>{onNav(it.id);onClose?.();}}><span className="nav-ico"><Icon name={it.icon} size={16}/></span><span>{it.label}</span>{it.badge!=null&&<span className="pill pill-b" style={{marginInlineStart:'auto'}}>{it.badge}</span>}</button>)}</div>)}</div><div style={{marginTop:'10px',paddingTop:'10px',borderTop:'1px solid var(--border)',flexShrink:0}}><div className="flex center g8 mb12" style={{padding:'0 10px', flexWrap:'wrap'}}>{['gold','blue','green','purple','red'].map(t=>(<div key={t} onClick={()=>onThemeChange(t)} style={{width:24,height:24,borderRadius:'50%',cursor:'pointer',background:t==='gold'?'#D4AF37':t==='blue'?'#2f7dff':t==='green'?'#22c55e':t==='purple'?'#8b5cf6':'#ef4444',border:theme===t?'3px solid #fff':'2px solid transparent',boxShadow:'0 0 10px rgba(0,0,0,0.5)'}}/>))}</div><button className="nav-i" onClick={onLogout} style={{color:'#fca5a5',width:'100%'}}><span className="nav-ico"><Icon name="logout" size={16}/></span><span>تسجيل الخروج</span></button></div></aside></>;}
 
-function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick,theme,onThemeChange,unreadNotifs=0,onOpenNotifications,onToggleFocus,focusMode}){
+function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick,unreadNotifs=0,onOpenNotifications,onToggleFocus,focusMode}){
   const [q,setQ]=useState('');
   const [open,setOpen]=useState(false);
   useEffect(()=>{if(!q.trim()){setOpen(false);return;}setOpen(true);const t=setTimeout(()=>onSearch?.(q),150);return ()=>clearTimeout(t);},[q]);
   return <div className="topbar">
     <button className="icon-btn mbar" onClick={onMenu}><Icon name="menu" size={16}/></button>
-    
     <div style={{position:'relative',flex:1,maxWidth:520,minWidth:0}}>
       <div className="search"><span style={{fontSize:15,opacity:.7,color:'var(--gold)'}}>🔍</span><input value={q} onChange={e=>setQ(e.target.value)} placeholder="ابحث... (Ctrl+K)" readOnly onClick={()=>document.dispatchEvent(new KeyboardEvent('keydown',{key:'k',ctrlKey:true}))}/></div>
     </div>
-    
     <div className="flex center g8" style={{marginInlineStart:'auto', flexShrink: 0}}>
       <button className="icon-btn" onClick={onToggleFocus} title="وضع التركيز"><Icon name="maximize" size={16}/></button>
       <button className="icon-btn" onClick={onOpenNotifications} title="الإشعارات"><Icon name="bell" size={16}/>{unreadNotifs > 0 && (<span style={{position:'absolute',top:-4,insetInlineEnd:-4,minWidth:18,height:18,borderRadius:9,background:'var(--grad-gold)',color:'#1a1206',fontSize:10,fontWeight:900,display:'grid',placeItems:'center',padding:'0 5px',boxShadow:'0 0 10px var(--border)',animation:'pulse 2s infinite'}}>{unreadNotifs > 9 ? '9+' : unreadNotifs}</span>)}</button>
-      
-      <div className="flex g6 hide-mobile" style={{background:'rgba(0,0,0,0.2)', padding:'4px 8px', borderRadius:20, border:'1px solid var(--border)', marginInline:'8px'}}>
-        {['gold','blue','green','purple','red'].map(t=>(
-          <div key={t} onClick={()=>onThemeChange(t)} style={{width:16, height:16, borderRadius:'50%', cursor:'pointer', background: t==='gold'?'#D4AF37':t==='blue'?'#2f7dff':t==='green'?'#22c55e':t==='purple'?'#8b5cf6':'#ef4444', border: theme===t ? '2px solid #fff' : 'none'}} />
-        ))}
-      </div>
-      
       <div className="glass-s" style={{padding:'5px 12px',display:'flex',alignItems:'center',gap:8,borderColor:'var(--border2)'}}><div className="avatar" style={{width:32,height:32,fontSize:15}}>{user.avatar||'👑'}</div></div>
       <button className="icon-btn" onClick={onLogout}><Icon name="logout" size={16}/></button>
     </div>
   </div>;
 }
+
 function CommandPalette({onClose, onNavigate}){
   const app=useApp();
   const [q, setQ] = useState('');
@@ -1644,7 +1636,6 @@ function CertificatesGenPage(){
     <div className="h2 mb16 grad">🏅 مولّد الشهادات</div>
     <div className="grid g2 mb16">
       
-      {/* فورم البيانات */}
       <div className="glass" style={{padding:20}}>
         <Field label="الطالب">
           <select className="input" value={studentId} onChange={e=>setStudentId(e.target.value)}>
@@ -1663,13 +1654,11 @@ function CertificatesGenPage(){
         </button>
       </div>
 
-      {/* المعاينة */}
       <div className="glass" style={{padding:20, minWidth:0}}>
         <div className="h4 mb12" style={{color:'var(--gold)'}}>معاينة حية (اسحب في الموبايل)</div>
         
         <div style={{overflowX:'auto', width:'100%', paddingBottom:20}}>
           
-          {/* التصميم الجديد بالكامل بالكود */}
           <div ref={previewRef} style={{
             width: 900, height: 630, flexShrink:0, position:'relative', overflow:'hidden',
             background: 'radial-gradient(circle at center, #0b224a 0%, #05122b 100%)',
@@ -1678,13 +1667,11 @@ function CertificatesGenPage(){
             boxShadow: 'inset 0 0 0 2px #00d2ff, inset 0 0 50px rgba(0, 210, 255, 0.1)'
           }}>
             
-            {/* زخارف الزوايا (الخطوط الزرقاء) */}
             <div style={{position:'absolute', top:10, left:10, width:40, height:40, borderTop:'4px solid #00d2ff', borderLeft:'4px solid #00d2ff'}}/>
             <div style={{position:'absolute', top:10, right:10, width:40, height:40, borderTop:'4px solid #00d2ff', borderRight:'4px solid #00d2ff'}}/>
             <div style={{position:'absolute', bottom:10, left:10, width:40, height:40, borderBottom:'4px solid #00d2ff', borderLeft:'4px solid #00d2ff'}}/>
             <div style={{position:'absolute', bottom:10, right:10, width:40, height:40, borderBottom:'4px solid #00d2ff', borderRight:'4px solid #00d2ff'}}/>
 
-            {/* الهيدر والشعار */}
             <div style={{textAlign:'center', marginTop:40}}>
               <div style={{display:'flex', justifyContent:'center', alignItems:'center', gap:8}}>
                 <span style={{fontSize:30}}>🎓</span>
@@ -1695,7 +1682,6 @@ function CertificatesGenPage(){
               <p style={{fontSize:14, color:'#a0b3d6', margin:'5px 0 0 0'}}>منصة تعليمية متكاملة</p>
             </div>
 
-            {/* شريط الشهادة */}
             <div style={{position:'relative', textAlign:'center', marginTop:30}}>
               <div style={{
                 background:'linear-gradient(90deg, #0f3b7a, #1e5cb3, #0f3b7a)', 
@@ -1709,7 +1695,6 @@ function CertificatesGenPage(){
               </div>
             </div>
 
-            {/* بيانات الطالب */}
             <div style={{textAlign:'center', marginTop:40}}>
               <p style={{fontSize:18, color:'#fff', marginBottom:15}}>تشهد المنصة بأن الطالب</p>
               <h3 style={{fontSize:55, color:'#FFD700', margin:'0 0 15px 0', fontWeight:900, textShadow:'0 0 25px rgba(255,215,0,0.5)', fontFamily:'Cairo, sans-serif'}}>{student?.name || 'اسم الطالب'}</h3>
@@ -1720,7 +1705,6 @@ function CertificatesGenPage(){
               <div style={{width:150, height:4, background:'#00d2ff', margin:'20px auto', borderRadius:2, boxShadow:'0 0 10px #00d2ff'}}/>
             </div>
 
-            {/* الفوتر (التاريخ ورقم الشهادة والتوقيع) */}
             <div style={{position:'absolute', bottom:40, left:50, right:50, display:'flex', justifyContent:'space-between', alignItems:'flex-end'}}>
               
               <div style={{textAlign:'center'}}>
@@ -2189,9 +2173,9 @@ function AdminApp(){
   ];
   const onSearch=q=>{const lc=q.toLowerCase(),res=[];app.db.users.filter(x=>x.name.toLowerCase().includes(lc)||(x.phone||'').includes(lc)).slice(0,5).forEach(s=>res.push({type:'مستخدم',icon:<Icon name="user" size={16}/>,title:s.name,nav:'students'}));app.db.subjects.filter(s=>s.name.toLowerCase().includes(lc)).forEach(s=>res.push({type:'مادة',icon:'📚',title:s.name,nav:'subjects'}));app.db.lessons.filter(l=>l.title.toLowerCase().includes(lc)).slice(0,5).forEach(l=>res.push({type:'درس',icon:<Icon name="file" size={16}/>,title:l.title,nav:'lessons'}));setSearchResults(res);};
   return <div className="app">
-    <Sidebar items={items} active={tab} onNav={id=>{setTab(id);try{localStorage.setItem('admin_tab',id)}catch(e){}}} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} onLogout={app.logout} hidden={focusMode}/>
+    <Sidebar items={items} active={tab} onNav={id=>{setTab(id);try{localStorage.setItem('admin_tab',id)}catch(e){}}} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} onLogout={app.logout} hidden={focusMode} theme={theme} onThemeChange={setTheme}/>
     <div className="main">
-      <Topbar user={user} onMenu={()=>setSidebarOpen(true)} onLogout={app.logout} onSearch={onSearch} searchResults={searchResults} onResultClick={r=>setTab(r.nav)} theme={theme} onThemeChange={setTheme} unreadNotifs={unreadNotifs} onOpenNotifications={()=>setTab('notifications')} onToggleFocus={()=>setFocusMode(!focusMode)} focusMode={focusMode}/>
+      <Topbar user={user} onMenu={()=>setSidebarOpen(true)} onLogout={app.logout} onSearch={onSearch} searchResults={searchResults} onResultClick={r=>setTab(r.nav)} unreadNotifs={unreadNotifs} onOpenNotifications={()=>setTab('notifications')} onToggleFocus={()=>setFocusMode(!focusMode)} focusMode={focusMode}/>
       <div className="content">
         {tab==='dashboard'&&<Dashboard/>}
         {tab==='advanced-stats'&&<AdvancedStatsPage/>}
