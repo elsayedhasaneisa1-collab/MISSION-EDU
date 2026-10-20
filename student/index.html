@@ -29,12 +29,20 @@
 --grad-gold:linear-gradient(135deg,#00ffff 0%,#00d4ff 45%,#0088cc 100%);
 --grad-gold-soft:linear-gradient(135deg,rgba(0,255,255,.18),rgba(0,212,255,.08));
 }
+
+/* Themes */
+body[data-theme="cyber"] { --gold:#00d4ff;--gold-l:#00ffff;--bg:#050a14;--grad-gold:linear-gradient(135deg,#00ffff 0%,#00d4ff 45%,#0088cc 100%); --border:rgba(0,212,255,.18); --border2:rgba(0,212,255,.38); }
+body[data-theme="purple"] { --gold:#a855f7;--gold-l:#d8b4fe;--bg:#0f0518;--grad-gold:linear-gradient(135deg,#d8b4fe 0%,#a855f7 45%,#7e22ce 100%); --border:rgba(168,85,247,.18); --border2:rgba(168,85,247,.38); }
+body[data-theme="green"] { --gold:#22c55e;--gold-l:#4ade80;--bg:#05140a;--grad-gold:linear-gradient(135deg,#4ade80 0%,#22c55e 45%,#16a34a 100%); --border:rgba(34,197,94,.18); --border2:rgba(34,197,94,.38); }
+body[data-theme="orange"] { --gold:#f59e0b;--gold-l:#fcd34d;--bg:#140d05;--grad-gold:linear-gradient(135deg,#fcd34d 0%,#f59e0b 45%,#d97706 100%); --border:rgba(245,158,11,.18); --border2:rgba(245,158,11,.38); }
+body[data-theme="pink"] { --gold:#ec4899;--gold-l:#f9a8d4;--bg:#14050c;--grad-gold:linear-gradient(135deg,#f9a8d4 0%,#ec4899 45%,#be185d 100%); --border:rgba(236,72,153,.18); --border2:rgba(236,72,153,.38); }
+
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{overflow-x:hidden;max-width:100vw;width:100%}
-body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(0,212,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(0,150,255,.14),transparent 60%),radial-gradient(700px 400px at 50% 110%,rgba(0,255,255,.08),transparent 70%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;line-height:1.7}
+body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,rgba(0,212,255,.20),transparent 62%),radial-gradient(950px 520px at -8% 18%,rgba(0,150,255,.14),transparent 60%),radial-gradient(700px 400px at 50% 110%,rgba(0,255,255,.08),transparent 70%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;line-height:1.7;transition:background 0.3s;}
 ::-webkit-scrollbar{width:10px;height:10px}
 ::-webkit-scrollbar-track{background:rgba(0,212,255,.05)}
-::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#00d4ff,#0088cc);border-radius:20px}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--gold),var(--gold-d));border-radius:20px}
 button,input,select,textarea{font-family:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none}
 ul{list-style:none}
@@ -44,7 +52,7 @@ ul{list-style:none}
 .hv{transition:.28s cubic-bezier(.2,.8,.3,1)}
 .hv:hover{transform:translateY(-4px);border-color:var(--border2);box-shadow:var(--sh-gold)}
 .app{display:flex;min-height:100vh}
-.sidebar{width:264px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow:hidden;padding:18px 12px;display:flex;flex-direction:column;gap:6px;background:linear-gradient(180deg,rgba(10,18,32,.96),rgba(5,10,20,.92));border-inline-start:1px solid var(--border);z-index:60}
+.sidebar{width:264px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow:hidden;padding:18px 12px;display:flex;flex-direction:column;gap:6px;background:linear-gradient(180deg,rgba(10,18,32,.96),rgba(5,10,20,.92));border-inline-start:1px solid var(--border);z-index:60;transition:transform 0.3s;}
 .main{flex:1;min-width:0;display:flex;flex-direction:column}
 .content{padding:22px 26px 100px;max-width:1440px;width:100%;margin:0 auto;animation:fu .5s}
 @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -65,7 +73,7 @@ ul{list-style:none}
 .nav-i{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:13px;color:var(--txt2);font-size:14px;font-weight:600;transition:.22s;width:100%;text-align:right;position:relative}
 .nav-i:hover{background:rgba(0,212,255,.10);color:var(--txt)}
 .nav-i.on{background:linear-gradient(90deg,rgba(0,212,255,.24),rgba(0,212,255,.03));color:#a0e8ff}
-.nav-i.on::before{content:'';position:absolute;inset-inline-end:0;top:22%;height:56%;width:3px;border-radius:4px;background:linear-gradient(180deg,#00ffff,#00d4ff);box-shadow:0 0 12px rgba(0,255,255,.7)}
+.nav-i.on::before{content:'';position:absolute;inset-inline-end:0;top:22%;height:56%;width:3px;border-radius:4px;background:linear-gradient(180deg,var(--gold-l),var(--gold));box-shadow:0 0 12px var(--gold)}
 .nav-ico{font-size:16px;width:22px;text-align:center;display:flex;justify-content:center}
 .nav-gt{font-size:10.5px;font-weight:800;color:var(--gold);letter-spacing:1px;padding:14px 14px 4px;opacity:.75}
 .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:8px;padding:8px 18px;background:rgba(5,10,20,.78);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);min-height:52px}
@@ -287,8 +295,14 @@ const useToast=()=>useContext(ToastCtx);
 const AppCtx=createContext(null);
 const useApp=()=>useContext(AppCtx);
 const EMPTY_DB={users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[],polls:[],poll_votes:[],direct_messages:[],reports:[],friendships:[],xp_shop_items:[],xp_purchases:[],study_groups:[],study_group_members:[],study_plans:[],study_tasks:[],daily_challenges:[],daily_challenge_attempts:[],practice_sessions:[],focus_sessions:[],flashcards:[],video_progress:[],daily_reward:[]};
+
 function AppProvider({children}){
-  const [db,setDb]=useState(EMPTY_DB);
+  const [db,setDb]=useState(()=>{
+    try {
+      const cached = localStorage.getItem('student_db_cache');
+      return cached ? JSON.parse(cached) : EMPTY_DB;
+    } catch(e) { return EMPTY_DB; }
+  });
   const [currentUser,setCurrentUser]=useState(null);
   const [loading,setLoading]=useState(true);
   const toast=useToast();
@@ -317,6 +331,7 @@ function AppProvider({children}){
       const extraResults=await Promise.all(extra.map(async(t)=>{try{const res=await sb2.from(t).select('*').limit(2000);return{t,data:res.data||[]};}catch(e){return{t,data:data[t]||[]};}}));
       extraResults.forEach(r=>{data[r.t]=r.data;});
       setDb(data);
+      try { localStorage.setItem('student_db_cache', JSON.stringify(data)); } catch(e) {}
       setCurrentUser(prev => {
         if (!prev) return null;
         const fresh = data.users.find(u => u.id === prev.id);
@@ -347,7 +362,7 @@ function AppProvider({children}){
     }, 30000);
     return ()=>clearInterval(interval);
   },[currentUser?.id]);
-  const logout=useCallback(()=>{Swal.fire({title:'تسجيل الخروج',text:'هل أنت متأكد؟',icon:'question',showCancelButton:true,confirmButtonText:'نعم، خروج',cancelButtonText:'إلغاء',confirmButtonColor:'#00d4ff',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #0a1220, #050a14)',color:'#e0f7ff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}}).then(r=>{if(r.isConfirmed){DB.clearSession();window.location.replace('../auth/login.html');}});},[]);
+  const logout=useCallback(()=>{Swal.fire({title:'تسجيل الخروج',text:'هل أنت متأكد؟',icon:'question',showCancelButton:true,confirmButtonText:'نعم، خروج',cancelButtonText:'إلغاء',confirmButtonColor:'#00d4ff',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #0a1220, #050a14)',color:'#e0f7ff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}}).then(r=>{if(r.isConfirmed){DB.clearSession();localStorage.removeItem('student_db_cache');window.location.replace('../auth/login.html');}});},[]);
   const save=useCallback(async (table,item)=>{
     const clean = SEC.sanitizeObject(item);
     if(!clean || typeof clean!=='object') throw new Error('بيانات غير صالحة');
@@ -435,7 +450,8 @@ function StudentAvatar({student, size=40}){
   const bg = isFemale ? 'linear-gradient(135deg,#f472b6,#ec4899)' : 'linear-gradient(135deg,#60a5fa,#3b82f6)';
   return <div style={{width:size,height:size,borderRadius:12,background:bg,display:'grid',placeItems:'center',fontSize:size*0.55,flexShrink:0,border:'2px solid rgba(0,212,255,.4)'}}>{icon}</div>;
 }
-function Sidebar({items,active,onNav,open,onClose,onLogout}){return <>{open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',zIndex:55}}/>}<aside className={`sidebar ${open?'open':''}`}><div className="brand"><div className="brand-logo"><Icon name="trophy" size={22} color="#050a14"/></div><div><div className="brand-name">MISSION EDU</div><div className="brand-sub">المنصة التعليمية</div></div></div><div style={{flex:1,overflowY:'auto',overflowX:'hidden',display:'flex',flexDirection:'column',gap:'4px',marginInlineEnd:'-6px',paddingInlineEnd:'6px'}}>{items.map((g,gi)=><div key={gi}>{g.title&&<div className="nav-gt">{g.title}</div>}{g.items.map(it=><button key={it.id} className={`nav-i ${active===it.id?'on':''}`} onClick={()=>{onNav(it.id);onClose?.();}}><span className="nav-ico"><Icon name={it.icon} size={16}/></span><span>{it.label}</span>{it.badge!=null&&it.badge>0&&<span className="pill pill-b" style={{marginInlineStart:'auto'}}>{it.badge}</span>}</button>)}</div>)}</div><div style={{marginTop:'10px',paddingTop:'10px',borderTop:'1px solid var(--border)',flexShrink:0}}><button className="nav-i" onClick={onLogout} style={{color:'#fca5a5',width:'100%'}}><span className="nav-ico"><Icon name="logout" size={16}/></span><span>تسجيل الخروج</span></button></div></aside></>;}
+function Sidebar({items,active,onNav,open,onClose,onLogout,theme,onThemeChange}){return <>{open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',zIndex:55}}/>}<aside className={`sidebar ${open?'open':''}`}><div className="brand"><div className="brand-logo"><Icon name="trophy" size={22} color="#050a14"/></div><div><div className="brand-name">MISSION EDU</div><div className="brand-sub">المنصة التعليمية</div></div></div><div style={{flex:1,overflowY:'auto',overflowX:'hidden',display:'flex',flexDirection:'column',gap:'4px',marginInlineEnd:'-6px',paddingInlineEnd:'6px'}}>{items.map((g,gi)=><div key={gi}>{g.title&&<div className="nav-gt">{g.title}</div>}{g.items.map(it=><button key={it.id} className={`nav-i ${active===it.id?'on':''}`} onClick={()=>{onNav(it.id);onClose?.();}}><span className="nav-ico"><Icon name={it.icon} size={16}/></span><span>{it.label}</span>{it.badge!=null&&it.badge>0&&<span className="pill pill-b" style={{marginInlineStart:'auto'}}>{it.badge}</span>}</button>)}</div>)}</div><div style={{marginTop:'10px',paddingTop:'10px',borderTop:'1px solid var(--border)',flexShrink:0}}><div className="flex center g8 mb12" style={{padding:'0 10px', flexWrap:'wrap'}}>{['cyber','purple','green','orange','pink'].map(t=>(<div key={t} onClick={()=>onThemeChange(t)} style={{width:24,height:24,borderRadius:'50%',cursor:'pointer',background:t==='cyber'?'#00d4ff':t==='purple'?'#a855f7':t==='green'?'#22c55e':t==='orange'?'#f59e0b':'#ec4899',border:theme===t?'3px solid #fff':'2px solid transparent',boxShadow:'0 0 10px rgba(0,0,0,0.5)'}}/>))}</div><button className="nav-i" onClick={onLogout} style={{color:'#fca5a5',width:'100%'}}><span className="nav-ico"><Icon name="logout" size={16}/></span><span>تسجيل الخروج</span></button></div></aside></>;}
+
 function Topbar({user,onMenu,onLogout,unreadNotifs=0,unreadMsgs=0,onOpenNotifications,onOpenMessages,onOpenProfile,onEnablePush,pushEnabled,onToggleTheme,isLight}){
   return <div className="topbar">
     <button className="icon-btn mbar" onClick={onMenu}><Icon name="menu" size={16}/></button>
@@ -514,11 +530,12 @@ function HomePage({onNavigate}){
   const user=app.currentUser;
   const lvl=app.getLevel(user.xp||0);
   const totalLessons=app.db.lessons.filter(l=>l.published!==false).length;
-  const completed=(user.completed_lessons||[]).length;
+  const toArray = (v) => { if (!v) return []; if (Array.isArray(v)) return v; if (typeof v === 'string') { try { const p = JSON.parse(v); return Array.isArray(p) ? p : []; } catch(e) { return []; } } return []; };
+const completed=toArray(user.completed_lessons).length;
   const progress=totalLessons?Math.round((completed/totalLessons)*100):0;
   const recentExams=app.db.exams.slice(0,3);
   const today = new Date().toLocaleDateString('en-CA');
-  const todayReward = (app.db.daily_reward || []).find(r => r.user_id === user.id && String(r.date).includes(today));
+  const todayReward = (app.db.daily_reward || []).find(r => r.user_id === user.id && r.date === today);
   const [claiming, setClaiming] = useState(false);
   const claimDailyReward = async () => {
     if (todayReward) return app.toast.info('استلمت مكافأة اليوم بالفعل');
@@ -526,7 +543,7 @@ function HomePage({onNavigate}){
     setClaiming(true);
     try {
       const sb = await DB.getClient();
-      const { data, error } = await sb.rpc('claim_daily_reward', { p_user_id: user.id });
+      const { data, error } = await sb.rpc('claim_daily_reward');
       if (error) throw new Error(error.message);
       if (!data.claimed) { app.toast.info('استلمت مكافأة اليوم بالفعل'); await app.reload(); return; }
       playSound('success');
@@ -582,7 +599,7 @@ function HomePage({onNavigate}){
     </div>}
     <div className="grid g2 mb16">
       <div className="glass" style={{padding:18}}>
-        <div className="flex between center mb12"><div className="h4" style={{color:'var(--gold)'}}>📖 مواصلة التعلم</div><button className="btn btn-s btn-sm" onClick={()=>onNavigate('lessons')}>الكل</button></div>
+        <div className="flex between center mb12"><div className="h4" style={{color:'var(--gold)'}}>📚 المواد الدراسية</div><button className="btn btn-s btn-sm" onClick={()=>onNavigate('lessons')}>الكل</button></div>
         {app.db.lessons.filter(l=>l.published!==false).slice(0,3).map(l=><div key={l.id} className="flex center g12 mb8" style={{padding:10,background:'rgba(0,212,255,.04)',borderRadius:10,border:'1px solid var(--border)',cursor:'pointer'}} onClick={()=>window.location.href=`lesson.html?id=${l.id}`}>
           <div style={{width:40,height:40,borderRadius:10,background:'var(--grad-gold)',display:'grid',placeItems:'center',color:'#050a14',fontSize:18}}>📖</div>
           <div style={{flex:1,minWidth:0}}><div className="sm" style={{fontWeight:700}}>{SEC.esc(l.title)}</div><div className="xs muted">{SEC.esc(app.unit(l.unit_id)?.name||'')}</div></div>
@@ -616,16 +633,16 @@ function LessonsPage(){
   const user=app.currentUser;
   const [selectedSubject,setSelectedSubject]=useState(null);
 
-  const toArray = (v) => {
-    if (!v) return [];
-    if (Array.isArray(v)) return v;
-    if (typeof v === 'string') {
-      try { const p = JSON.parse(v); return Array.isArray(p) ? p : []; } catch(e) { return []; }
+  const getCompletedArr = () => {
+    const v = user?.completed_lessons;
+    if(!v) return [];
+    if(Array.isArray(v)) return v;
+    if(typeof v === 'string'){
+      try{ const p = JSON.parse(v); return Array.isArray(p)?p:[]; }catch(e){ return []; }
     }
     return [];
   };
-
-  const completedArr = toArray(user.completed_lessons);
+  const completedArr = getCompletedArr();
 
   if(!selectedSubject){
     const subjects = app.db.subjects || [];
@@ -784,7 +801,6 @@ function LessonsPage(){
     )}
   </>;
 }
-
 function ExamsPage(){
   const app=useApp();
   const exams=app.db.exams.filter(e=>e.published!==false);
@@ -846,8 +862,7 @@ function PracticePage(){
       const sb=await DB.getClient();
       const {data,error}=await sb.rpc('practice_answer',{
         p_question_id:session[qIndex].id,
-        p_answer_index:oi,
-        p_user_id:app.currentUser.id
+        p_answer_index:oi
       });
       if(error) throw new Error(error.message);
       setAnswers(a=>({...a,[qIndex]:{selected:oi,is_correct:data.is_correct,correct_index:data.correct_index,explanation:data.explanation}}));
@@ -868,8 +883,7 @@ function PracticePage(){
         const {data,error}=await sb.rpc('practice_complete',{
           p_subject_id:filterSubject==='all'?null:filterSubject,
           p_score:score,
-          p_total:session.length,
-          p_user_id:app.currentUser.id
+          p_total:session.length
         });
         if(error) throw new Error(error.message);
         app.toast.ok(`🎉 انتهى التدريب! +${data.xp_gained} XP (${score}/${session.length})`);
@@ -956,7 +970,7 @@ function XPShopPage(){
     setBusy(true);
     try{
       const sb=await DB.getClient();
-      const {data,error}=await sb.rpc('purchase_shop_item',{p_item_id:item.id, p_user_id: user.id});
+      const {data,error}=await sb.rpc('purchase_shop_item',{p_item_id:item.id});
       if(error) throw new Error(error.message);
       playSound('success');
       app.toast.ok(`🎉 تم شراء "${SEC.esc(data.item_name)}" مقابل ${data.xp_cost} XP`);
@@ -1336,8 +1350,7 @@ function FocusModePage(){
       const {data,error}=await sb.rpc('focus_complete',{
         p_label:label,
         p_duration:duration,
-        p_started_at:startedAt,
-        p_user_id:user.id
+        p_started_at:startedAt
       });
       if(error) throw new Error(error.message);
       playSound('success');
@@ -1405,15 +1418,7 @@ function ProfilePage(){
   const app=useApp();
   const user=app.currentUser;
   const lvl=app.getLevel(user.xp||0);
-  const isPaid = (() => {
-  if (user.subscription === 'vip') return true;
-  if (user.subscription === 'paid') {
-    if (!user.subscription_until) return true;
-    const until = typeof user.subscription_until === 'number' ? user.subscription_until : new Date(user.subscription_until).getTime();
-    return !isNaN(until) && until > Date.now();
-  }
-  return false;
-})();
+  const isPaid=user.subscription==='paid'||user.subscription==='vip';
   const [uploading,setUploading]=useState(false);
   const uploadAvatar=async file=>{
     if(!file)return;
@@ -1447,10 +1452,7 @@ function ProfilePage(){
           <div className="sm muted mb8" dir="ltr">📱 {(user.country_code||'+20')}{(user.phone||'').replace(/(\d{3})\d{4}(\d{3})/,'$1****$2')}</div>
           <div className="flex wrap g6">
             <span className="pill pill-b">🏆 Lv {lvl.current.level} — {SEC.esc(lvl.current.name)}</span>
-            {user.subscription==='vip' ? <span className="pill pill-v">💎 VIP</span> :
- (user.subscription==='paid' && isPaid) ? <span className="pill pill-g">💳 مدفوع</span> :
- (user.subscription==='paid' && !isPaid) ? <span className="pill pill-r">🔒 اشتراك منتهي</span> :
- <span className="pill pill-y">🆓 مجاني</span>}
+            {user.subscription==='vip'?<span className="pill pill-v">💎 VIP</span>:user.subscription==='paid'?<span className="pill pill-g">💳 مدفوع</span>:<span className="pill pill-y">🆓 مجاني</span>}
             {user.governorate&&<span className="pill pill-b">📍 {SEC.esc(user.governorate)}</span>}
             {user.school_name&&<span className="pill pill-b">🏫 {SEC.esc(user.school_name)}</span>}
           </div>
@@ -1511,23 +1513,22 @@ function StudentsDirectoryPage({onOpenChat}){
     });
     if(!r.isConfirmed)return;
     try{
-      const sb=await DB.getClient();
-      await sb.rpc('submit_user_report', {
-        p_reporter_id: app.currentUser.id,
-        p_target_id: target.id,
-        p_reason: SEC.clean(r.value.reason),
-        p_details: SEC.clean(SEC.maxLen(r.value.details, 500))
-      });
-      await app.reload();
-      app.toast.ok('تم إرسال البلاغ — سيتم مراجعته من الإدارة');
-    }catch(e){
-      if(e.message.includes('already') || e.message.includes('من قبل')) {
-        app.toast.warn('لقد أبلغت عن هذا المستخدم من قبل');
-      } else {
-        app.toast.err(e.message);
-      }
-    }
-  };
+  const sb = await DB.getClient();
+  await sb.rpc('submit_user_report', {
+    p_reporter_id: app.currentUser.id,
+    p_target_id: target.id,
+    p_reason: SEC.clean(r.value.reason),
+    p_details: SEC.clean(SEC.maxLen(r.value.details, 500))
+  });
+  await app.reload();
+  app.toast.ok('تم إرسال البلاغ — سيتم مراجعته من الإدارة');
+}catch(e){
+  if(e.message.includes('already') || e.message.includes('من قبل')) {
+    app.toast.warn('لقد أبلغت عن هذا المستخدم من قبل');
+  } else {
+    app.toast.err(e.message);
+  }
+}
   return <>
     <div className="h2 mb16 grad">👥 الطلاب</div>
     <div className="glass mb16" style={{padding:14}}>
@@ -1625,159 +1626,6 @@ function NotificationsPage(){
   </>;
 }
 
-function MyNotesPage(){
-  const app = useApp();
-  const user = app.currentUser;
-  const [notes, setNotes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [q, setQ] = useState('');
-
-  const loadNotes = useCallback(async ()=>{
-    setLoading(true);
-    try{
-      const data = await DB.getUserNotes(user.id);
-      setNotes(data || []);
-    }catch(e){
-      app.toast.err?.('تعذر تحميل الملاحظات');
-    }
-    setLoading(false);
-  },[user.id]);
-
-  useEffect(()=>{ loadNotes(); },[loadNotes]);
-
-  const del = async (id)=>{
-    const r = await Swal.fire({
-      title:'حذف الملاحظة؟',
-      text:'لا يمكن التراجع',
-      icon:'warning',
-      showCancelButton:true,
-      confirmButtonText:'نعم، احذف',
-      cancelButtonText:'إلغاء',
-      confirmButtonColor:'#ef4444',
-      cancelButtonColor:'#64748b',
-      background:'linear-gradient(180deg,#0a1220,#050a14)',
-      color:'#e0f7ff',
-      customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}
-    });
-    if(!r.isConfirmed) return;
-    try{
-      await DB.deleteUserNote(id, user.id);
-      setNotes(prev=>prev.filter(n=>n.id!==id));
-      app.toast.warn('تم الحذف');
-    }catch(e){
-      app.toast.err(e.message||'فشل الحذف');
-    }
-  };
-
-  const filtered = useMemo(()=>{
-    if(!q.trim()) return notes;
-    const lc = q.toLowerCase();
-    return notes.filter(n=>(n.text||'').toLowerCase().includes(lc));
-  },[notes,q]);
-
-  const grouped = useMemo(()=>{
-    const map = {};
-    filtered.forEach(n=>{
-      const key = n.lesson_id || '_none';
-      if(!map[key]) map[key] = [];
-      map[key].push(n);
-    });
-    return map;
-  },[filtered]);
-
-  return <>
-    <div className="flex between center mb16 wrap g8">
-      <div>
-        <div className="h2 grad">📝 ملاحظاتي</div>
-        <div className="sm muted mt6">{notes.length} ملاحظة موزعة على {Object.keys(grouped).length} درس</div>
-      </div>
-      <button className="btn btn-s btn-sm" onClick={loadNotes}>🔄 تحديث</button>
-    </div>
-
-    <div className="glass mb16" style={{padding:14}}>
-      <input
-        className="input"
-        placeholder="🔍 ابحث في ملاحظاتك..."
-        value={q}
-        onChange={e=>setQ(e.target.value)}
-      />
-    </div>
-
-    {loading ? (
-      <div className="glass" style={{padding:40,textAlign:'center'}}>
-        <div className="spinner" style={{margin:'0 auto 14px'}}></div>
-        <div className="sm muted">جارٍ التحميل...</div>
-      </div>
-    ) : filtered.length===0 ? (
-      <div className="glass" style={{padding:40}}>
-        <Empty
-          icon="📝"
-          title={q ? 'لا نتائج للبحث' : 'لا ملاحظات بعد'}
-          desc={q ? 'جرّب كلمة تانية' : 'افتح أي درس واكتب ملاحظاتك هناك — هتظهر هنا'}
-        />
-      </div>
-    ) : (
-      Object.entries(grouped).map(([lessonId, lessonNotes])=>{
-        const lesson = lessonId!=='_none' ? app.lesson(lessonId) : null;
-        const unit = lesson ? app.unit(lesson.unit_id) : null;
-        const subject = unit ? app.subject(unit.subject_id) : null;
-
-        return (
-          <div key={lessonId} className="glass mb16" style={{padding:16}}>
-            <div className="flex between center mb12 wrap g8">
-              <div className="flex center g8" style={{flex:1,minWidth:0}}>
-                <div style={{width:36,height:36,borderRadius:10,background:'rgba(0,212,255,.15)',display:'grid',placeItems:'center',fontSize:16,flexShrink:0}}>
-                  📖
-                </div>
-                <div style={{minWidth:0}}>
-                  <div className="sm" style={{fontWeight:700,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
-                    {lesson ? SEC.esc(lesson.title) : 'درس محذوف'}
-                  </div>
-                  <div className="xs muted">
-                    {subject ? SEC.esc(subject.name) : ''}
-                    {unit ? ` • ${SEC.esc(unit.name)}` : ''}
-                  </div>
-                </div>
-              </div>
-              <div className="flex g6">
-                <span className="pill pill-b">{lessonNotes.length}</span>
-                {lesson && (
-                  <button
-                    className="btn btn-s btn-sm"
-                    onClick={()=>window.location.href=`lesson.html?id=${lessonId}`}>
-                    فتح ←
-                  </button>
-                )}
-              </div>
-            </div>
-
-            <div className="flex col g8">
-              {lessonNotes.map(n=>(
-                <div key={n.id} className="glass-s" style={{padding:12,borderInlineStart:'3px solid var(--gold)'}}>
-                  <div className="flex between center mb6">
-                    <span className="xs muted">
-                      {n.updated_at ? DB.formatDateTime(n.updated_at) : DB.formatDateTime(n.created_at)}
-                    </span>
-                    <button
-                      className="btn btn-dn btn-sm"
-                      onClick={()=>del(n.id)}
-                      title="حذف">
-                      ✕
-                    </button>
-                  </div>
-                  <div className="sm txt2" style={{whiteSpace:'pre-wrap',lineHeight:1.7}}>
-                    {SEC.esc(n.text||'')}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      })
-    )}
-  </>;
-}
-
 function Footer(){
   const app=useApp();
   const user=app.currentUser;
@@ -1792,11 +1640,16 @@ function StudentApp(){
   const [sidebarOpen,setSidebarOpen]=useState(false);
   const [pushEnabled,setPushEnabled]=useState(PUSH_MANAGER.isEnabled());
   const [isLight,setIsLight]=useState(()=>document.body.classList.contains('light-mode'));
+  const [theme,setTheme]=useState(()=>{try{return localStorage.getItem('student_theme')||'cyber'}catch(e){return 'cyber'}});
   const user=app.currentUser;
+  
   useEffect(()=>{try{localStorage.setItem('student_tab',tab)}catch(e){}},[tab]);
+  useEffect(()=>{document.body.setAttribute('data-theme', theme);try{localStorage.setItem('student_theme', theme)}catch(e){}},[theme]);
+
   const unreadMsgs=(app.db.direct_messages||[]).filter(m=>m.to_id===user.id&&!m.read).length;
   const unreadNotifs=(app.db.notifications||[]).filter(n=>{if(n.target!=='all'&&n.target!==user.id)return false;const created=Number(n.created_at)||0;const lastSeen=Number(localStorage.getItem('notif_read_'+user.id)||0);return created>lastSeen;}).length;
   useEffect(()=>{if(!user) return;const loop=async ()=>{await NOTIF_TRACKER.check(user);};loop();const iv=setInterval(loop,25000);return ()=>clearInterval(iv);},[user?.id]);
+  
   const enablePush=async ()=>{
     const ok = await PUSH_MANAGER.requestPermission();
     if(ok){ setPushEnabled(true); PUSH_MANAGER.show('MISSION EDU','تم تفعيل الإشعارات بنجاح ✅'); app.toast.ok('تم تفعيل الإشعارات'); }
@@ -1807,9 +1660,10 @@ function StudentApp(){
     setIsLight(!isLight);
   };
   useEffect(()=>{if(PUSH_MANAGER.isEnabled()){PUSH_MANAGER.show('MISSION EDU', 'أهلاً بك في المنصة 🎓');}},[]);
+  
   const items=[
     {title:'الرئيسية',items:[{id:'home',icon:'home',label:'الرئيسية'},{id:'analytics',icon:'chart',label:'تحليلاتي'}]},
-    {title:'التعلم',items:[{id:'lessons',icon:'book',label:'المواد'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'practice',icon:'target',label:'وضع التدريب'},{id:'flashcards',icon:'layers',label:'Flashcards'},{id:'notes',icon:'note',label:'ملاحظاتي'}]},
+    {title:'التعلم',items:[{id:'lessons',icon:'book',label:'المواد'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'practice',icon:'target',label:'وضع التدريب'},{id:'flashcards',icon:'layers',label:'Flashcards'}]},
     {title:'الأنشطة',items:[
       {id:'focus',icon:'clock',label:'وضع التركيز'},
       {id:'calendar',icon:'calendar',label:'تقويم المذاكرة'},
@@ -1819,6 +1673,7 @@ function StudentApp(){
     {title:'التواصل',items:[{id:'leaderboard',icon:'trophy',label:'المتصدرين'},{id:'school-lb',icon:'school',label:'ترتيب المدارس'},{id:'students',icon:'users',label:'الطلاب'},{id:'messages',icon:'message',label:'الرسائل',badge:unreadMsgs||null},{id:'notifications',icon:'bell',label:'الإشعارات',badge:unreadNotifs||null}]},
     {title:'الحساب',items:[{id:'xp-shop',icon:'shoppingBag',label:'متجر XP'},{id:'profile',icon:'user',label:'ملفي'}]}
   ];
+  
   const navigate=(id)=>{
     if(id === 'friend-challenge'){
       window.location.href = 'sv.html';
@@ -1826,8 +1681,9 @@ function StudentApp(){
     }
     setTab(id);setSidebarOpen(false);
   };
+  
   return <div className="app">
-    <Sidebar items={items} active={tab} onNav={navigate} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} onLogout={app.logout}/>
+    <Sidebar items={items} active={tab} onNav={navigate} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} onLogout={app.logout} theme={theme} onThemeChange={setTheme}/>
     <div className="main">
       <Topbar user={user} onMenu={()=>setSidebarOpen(true)} onLogout={app.logout} unreadNotifs={unreadNotifs} unreadMsgs={unreadMsgs} onOpenNotifications={()=>navigate('notifications')} onOpenMessages={()=>navigate('messages')} onOpenProfile={()=>navigate('profile')} pushEnabled={pushEnabled} onEnablePush={enablePush} onToggleTheme={toggleTheme} isLight={isLight}/>
       <div className="content">
@@ -1837,7 +1693,6 @@ function StudentApp(){
         {tab==='exams'&&<ExamsPage/>}
         {tab==='practice'&&<PracticePage/>}
         {tab==='flashcards'&&<FlashcardsPage/>}
-        {tab==='notes'&&<MyNotesPage/>}
         {tab==='focus'&&<FocusModePage/>}
         {tab==='calendar'&&<StudyCalendarPage/>}
         {tab==='groups'&&<StudyGroupsPage/>}
@@ -1853,12 +1708,14 @@ function StudentApp(){
     </div>
   </div>;
 }
+
 function Root(){
   const app=useApp();
   if(app.loading)return <div className="loading"><div className="spinner"></div>جارٍ التحميل...</div>;
   if(!app.currentUser)return null;
   return <StudentApp/>;
 }
+
 function App(){return <ToastProvider><AppProvider><Root/></AppProvider></ToastProvider>;}
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
