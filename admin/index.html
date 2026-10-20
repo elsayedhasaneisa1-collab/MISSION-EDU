@@ -19,6 +19,7 @@
 <meta name="apple-mobile-web-app-title" content="MISSION EDU">
 <meta name="mobile-web-app-capable" content="yes">
 <style>
+/* [نفس كود الـ CSS اللي أنت بعته بالظبط من غير أي تغيير] */
 :root{
 --bg:#0a0805;--bg2:#0f0c07;
 --gold:#D4AF37;--gold-l:#FFD700;--gold-xl:#FFED4E;--gold-d:#8B6914;--gold-dd:#5c4509;
@@ -34,13 +35,11 @@
 --grad-gold:linear-gradient(135deg,#FFD700 0%,#D4AF37 45%,#B8860B 100%);
 --grad-gold-soft:linear-gradient(135deg,rgba(255,215,0,.18),rgba(212,175,55,.08));
 }
-
 body[data-theme="gold"] { --gold:#D4AF37; --gold-l:#FFD700; --gold-d:#8B6914; --bg:#0a0805; --grad-gold:linear-gradient(135deg,#FFD700 0%,#D4AF37 45%,#B8860B 100%); --border:rgba(212,175,55,.18); --border2:rgba(212,175,55,.38); }
 body[data-theme="blue"] { --gold:#2f7dff; --gold-l:#5aa9ff; --gold-d:#1f5fd6; --bg:#04060e; --grad-gold:linear-gradient(135deg,#5aa9ff 0%,#2f7dff 45%,#1f5fd6 100%); --border:rgba(47,125,255,.18); --border2:rgba(47,125,255,.38); }
 body[data-theme="green"] { --gold:#22c55e; --gold-l:#4ade80; --gold-d:#16a34a; --bg:#040a06; --grad-gold:linear-gradient(135deg,#4ade80 0%,#22c55e 45%,#16a34a 100%); --border:rgba(34,197,94,.18); --border2:rgba(34,197,94,.38); }
 body[data-theme="purple"] { --gold:#8b5cf6; --gold-l:#a78bfa; --gold-d:#7c3aed; --bg:#06040e; --grad-gold:linear-gradient(135deg,#a78bfa 0%,#8b5cf6 45%,#7c3aed 100%); --border:rgba(139,92,246,.18); --border2:rgba(139,92,246,.38); }
 body[data-theme="red"] { --gold:#ef4444; --gold-l:#f87171; --gold-d:#dc2626; --bg:#0e0404; --grad-gold:linear-gradient(135deg,#f87171 0%,#ef4444 45%,#dc2626 100%); --border:rgba(239,68,68,.18); --border2:rgba(239,68,68,.38); }
-
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{overflow-x:hidden;max-width:100vw;width:100%}
 body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 620px at 85% -12%,var(--border),transparent 62%),radial-gradient(950px 520px at -8% 18%,var(--border),transparent 60%),radial-gradient(700px 400px at 50% 110%,var(--border),transparent 70%),var(--bg);background-attachment:fixed;color:var(--txt);min-height:100vh;line-height:1.7;transition: background-color 0.3s;}
@@ -69,9 +68,7 @@ ul{list-style:none}
 @keyframes goldShine{0%{background-position:0% 50%}100%{background-position:300% 50%}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
-
 .skeleton { background: #1c160c; background-image: linear-gradient(90deg, #1c160c 0px, #2a2012 40px, #1c160c 80px); background-size: 1000px 100%; animation: shimmer 1.5s infinite linear; border-radius: 8px; }
-
 .brand{display:flex;align-items:center;gap:11px;padding:8px 10px 16px}
 .brand-logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--grad-gold);box-shadow:0 8px 26px var(--gold-glow),0 0 0 1px rgba(255,237,78,.3) inset;position:relative}
 .brand-logo::after{content:'';position:absolute;inset:0;border-radius:14px;background:linear-gradient(135deg,rgba(255,255,255,.35),transparent 45%);pointer-events:none}
@@ -218,14 +215,10 @@ textarea.input{resize:vertical;min-height:80px;font-family:inherit}
 .msg-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
 .msg-tab{padding:8px 16px;border-radius:20px;font-weight:700;font-size:12.5px;background:var(--border);border:1px solid var(--border);color:var(--txt2);transition:.2s;cursor:pointer}
 .msg-tab.active{background:var(--border2);border-color:var(--gold);color:var(--gold-l)}
-
-/* Focus Mode */
 body.focus-mode .sidebar { transform: translateX(-100%); position: fixed; }
 body.focus-mode .main { margin-inline-start: 0; }
 body.focus-mode .topbar { padding-inline-start: 20px; }
 body.focus-mode .mbar { display: flex !important; }
-
-/* Command Palette */
 .cmd-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 9999; display: flex; align-items: flex-start; justify-content: center; padding-top: 10vh; }
 .cmd-box { width: 100%; max-width: 600px; background: var(--bg2); border: 1px solid var(--border2); border-radius: 16px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.8); animation: pu .2s; }
 .cmd-input { width: 100%; padding: 16px 20px; background: transparent; border: none; border-bottom: 1px solid var(--border); font-size: 18px; color: var(--txt); outline: none; }
@@ -234,18 +227,13 @@ body.focus-mode .mbar { display: flex !important; }
 .cmd-item:hover, .cmd-item.selected { background: var(--border2); }
 .cmd-item-ico { width: 30px; height: 30px; border-radius: 8px; background: var(--border); display: grid; place-items: center; color: var(--gold); font-size: 14px; }
 .cmd-empty { padding: 20px; text-align: center; color: var(--muted); }
-
-/* Bulk Actions Floating Bar */
 .bulk-bar { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--bg2); border: 1px solid var(--gold); padding: 12px 24px; border-radius: 40px; display: flex; align-items: center; gap: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 20px var(--gold-glow); z-index: 999; animation: slideUp 0.3s; }
 @keyframes slideUp { from { bottom: -50px; opacity: 0; } to { bottom: 24px; opacity: 1; } }
-
-/* Timeline */
 .timeline { position: relative; padding-inline-start: 20px; border-inline-start: 2px solid var(--border2); margin-top: 16px; }
 .timeline-item { position: relative; margin-bottom: 20px; }
 .timeline-dot { position: absolute; inset-inline-start: -27px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--gold); border: 2px solid var(--bg); box-shadow: 0 0 10px var(--gold-glow); }
 .timeline-time { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
 .timeline-content { background: var(--border); padding: 10px 14px; border-radius: 10px; font-size: 13px; }
-
 @media(max-width:1080px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:860px){
 .sidebar{position:fixed;inset-inline-end:0;top:0;transform:translateX(-105%);transition:transform .34s;width:280px;max-width:85vw;box-shadow:-20px 0 60px rgba(0,0,0,.75);overflow-x:hidden}
@@ -274,7 +262,6 @@ if (window.Babel) { Babel.registerPreset('react-classic', { presets: [[Babel.ava
 <script type="text/babel" data-presets="react-classic">
 const {useState,useEffect,useMemo,useCallback,useRef,createContext,useContext}=React;
 const DB=window.MissionDB;
-
 const SEC = {
   esc: s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),
   safeUrl: u => /^https?:\/\//i.test(String(u || '')) ? u : '#',
@@ -295,26 +282,21 @@ const SEC = {
     return out;
   }
 };
-
 let _audioCtx = null;
 function getAudioCtx(){if(!_audioCtx){try{_audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}}return _audioCtx;}
 function beep(frequency,duration,type='sine',volume=0.15){try{const ctx=getAudioCtx();if(!ctx)return;if(ctx.state==='suspended')ctx.resume();const osc=ctx.createOscillator();const gain=ctx.createGain();osc.type=type;osc.frequency.value=frequency;osc.connect(gain);gain.connect(ctx.destination);gain.gain.setValueAtTime(volume,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+duration/1000);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+duration/1000);}catch(e){}}
 function playSound(type='notify'){switch(type){case 'success':beep(523,100,'sine',0.18);setTimeout(()=>beep(659,100,'sine',0.18),100);setTimeout(()=>beep(784,200,'sine',0.18),200);break;case 'err':beep(392,120,'square',0.15);setTimeout(()=>beep(311,200,'square',0.15),120);break;case 'warn':beep(440,150,'triangle',0.18);setTimeout(()=>beep(440,150,'triangle',0.18),180);break;default:beep(880,100,'sine',0.15);setTimeout(()=>beep(1175,120,'sine',0.15),100);}}
-
 const ToastCtx=createContext(null);
 function ToastProvider({children}){const [items,setItems]=useState([]);const push=useCallback((msg,type='info',title,duration=3800)=>{const id=DB.uid('t_');const titles={ok:'تم بنجاح',err:'خطأ',warn:'تنبيه',info:'معلومة'};setItems(x=>[...x,{id,msg,type,title:title||titles[type]||'',duration}]);if(type==='ok')playSound('success');else if(type==='err')playSound('err');else if(type==='warn')playSound('warn');else playSound('notify');},[]);const remove=useCallback(id=>setItems(x=>x.filter(t=>t.id!==id)),[]);return <ToastCtx.Provider value={{ok:(m,t)=>push(m,'ok',t),err:(m,t)=>push(m,'err',t),warn:(m,t)=>push(m,'warn',t),info:(m,t)=>push(m,'info',t)}}>{children}<div className="toast-host">{items.map(t=><Toast key={t.id} data={t} onClose={()=>remove(t.id)}/>)}</div></ToastCtx.Provider>;}
 function Toast({data,onClose}){const [out,setOut]=useState(false);const [progress,setProgress]=useState(100);useEffect(()=>{const start=Date.now();const t=setInterval(()=>{const p=Math.max(0,100-((Date.now()-start)/data.duration)*100);setProgress(p);if(p<=0){clearInterval(t);setOut(true);setTimeout(onClose,280);}},40);return()=>clearInterval(t);},[]);const icons={ok:'✓',err:'✕',warn:'!',info:'i'};return <div className={`toast ${data.type} ${out?'out':''}`}><div className="toast-ico">{icons[data.type]}</div><div className="toast-body">{data.title&&<div className="toast-title">{data.title}</div>}<div className="toast-msg">{data.msg}</div></div><button className="toast-close" onClick={()=>{setOut(true);setTimeout(onClose,280);}}>✕</button><div className="toast-bar"><div className="toast-bar-f" style={{width:`${progress}%`,transitionDuration:'40ms'}}/></div></div>;}
 const useToast=()=>useContext(ToastCtx);
-
 const AppCtx=createContext(null);
 const useApp=()=>useContext(AppCtx);
-
 function AppProvider({children}){
   const [db,setDb]=useState({users:[],grades:[],subjects:[],units:[],lessons:[],questions:[],exams:[],missions:[],achievements:[],levels:[],notifications:[],activity:[],polls:[],poll_votes:[],xp_shop_items:[],study_groups:[],study_group_members:[],study_plans:[],daily_challenges:[],practice_sessions:[],focus_sessions:[],flashcards:[],audit_logs:[]});
   const [currentUser,setCurrentUser]=useState(null);
   const [loading,setLoading]=useState(true);
   const toast=useToast();
-
   const reload=useCallback(async ()=>{
     try{
       await DB.cleanupExpiredPolls();
@@ -326,15 +308,10 @@ function AppProvider({children}){
       setDb(data);
     }catch(e){console.warn(e);}
   },[]);
-
   useEffect(()=>{(async ()=>{try{const sid=DB.getSessionId();if(!sid){window.location.replace('/auth/login.html');return;}const u=await DB.getUser(sid);if(!u||u.active===false){DB.clearSession();window.location.replace('/auth/login.html');return;}if(u.role!=='admin'){window.location.replace('/student/index.html');return;}setCurrentUser(u);await reload();}catch(e){console.warn(e);}setLoading(false);})();},[]);
-
   useEffect(()=>{const interval=setInterval(async ()=>{const count=await DB.cleanupExpiredPolls();if(count>0){await reload();}},5*60*1000);return ()=>clearInterval(interval);},[reload]);
-
   useEffect(()=>{const unlock=()=>{const ctx=getAudioCtx();if(ctx&&ctx.state==='suspended')ctx.resume();document.removeEventListener('click',unlock);document.removeEventListener('touchstart',unlock);};document.addEventListener('click',unlock,{once:true});document.addEventListener('touchstart',unlock,{once:true});return ()=>{document.removeEventListener('click',unlock);document.removeEventListener('touchstart',unlock);};},[]);
-
   const logout=useCallback(()=>{Swal.fire({title:'تسجيل الخروج',text:'هل أنت متأكد؟',icon:'question',showCancelButton:true,confirmButtonText:'نعم، خروج',cancelButtonText:'إلغاء',confirmButtonColor:'#D4AF37',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}}).then(r=>{if(r.isConfirmed){DB.clearSession();window.location.replace('/auth/login.html');}});},[]);
-
   const logAudit = useCallback(async(action, target, details) => {
     if(!currentUser) return;
     try {
@@ -349,7 +326,6 @@ function AppProvider({children}){
       });
     } catch(e) {}
   }, [currentUser]);
-
   const save=useCallback(async (table,item)=>{
     const clean = SEC.sanitizeObject(item);
     if(!clean || typeof clean!=='object') throw new Error('بيانات غير صالحة');
@@ -358,14 +334,12 @@ function AppProvider({children}){
     await reload();
     return saved;
   },[reload, logAudit]);
-
   const remove=useCallback(async (table,id)=>{
     if(!id || typeof id!=='string' || id.length<3) throw new Error('معرف غير صالح');
     await DB.remove(table,id);
     await logAudit('delete', `${table} : ${id}`, { table, id });
     await reload();
   },[reload, logAudit]);
-
   const removeMany=useCallback(async (table,ids)=>{
     const clean = (ids||[]).filter(x=>typeof x==='string'&&x.length>=3);
     if(!clean.length) return;
@@ -373,12 +347,9 @@ function AppProvider({children}){
     await logAudit('bulk_delete', `${table}`, { table, count: clean.length });
     await reload();
   },[reload, logAudit]);
-
   const getLevel=useCallback((xp)=>{const ls=[...db.levels].sort((a,b)=>a.xp-b.xp);if(ls.length===0)return {current:{level:1,name:'مبتدئ',xp:0},next:null};let cur=ls[0],next=null;for(let i=0;i<ls.length;i++){if(xp>=ls[i].xp){cur=ls[i];next=ls[i+1]||null;}}return {current:cur,next};},[db.levels]);
-
   return <AppCtx.Provider value={{db,currentUser,loading,logout,reload,save,remove,removeMany,getLevel,toast,playSound,logAudit,subject:id=>db.subjects.find(s=>s.id===id),unit:id=>db.units.find(u=>u.id===id),lesson:id=>db.lessons.find(l=>l.id===id),exam:id=>db.exams.find(e=>e.id===id),question:id=>db.questions.find(q=>q.id===id),grade:id=>db.grades.find(g=>g.id===id)}}>{children}</AppCtx.Provider>;
 }
-
 const Icon=({name,size=18,color='currentColor'})=>{
   const p={width:size,height:size,viewBox:'0 0 24 24',fill:'none',stroke:color,strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round'};
   const paths={
@@ -435,14 +406,12 @@ const Icon=({name,size=18,color='currentColor'})=>{
   };
   return <svg {...p}>{paths[name]||paths.help}</svg>;
 };
-
 function Modal({title,children,onClose,wide}){return <div className="modal-bg" onClick={e=>e.target===e.currentTarget&&onClose()}><div className={`glass modal ${wide?'wide':''}`}><div className="flex between center mb16"><div className="h3">{title}</div><button className="icon-btn" onClick={onClose}><Icon name="close" size={16}/></button></div>{children}</div></div>;}
 function Stat({label,value,icon,color='var(--gold)',sub}){return <div className="glass-s hv" style={{padding:16}}><div className="flex between center mb8"><div className="stat-l">{label}</div><div style={{color}}>{typeof icon==='string'?<Icon name={icon} size={20}/>:icon}</div></div><div className="stat-n" style={{color}}>{value}</div>{sub&&<div className="xs muted mt8">{sub}</div>}</div>;}
 function Field({label,children,hint}){return <div className="mb12"><label className="lbl">{label}</label>{children}{hint&&<div className="xs muted mt8">{hint}</div>}</div>;}
 function Empty({icon='📭',title,desc}){return <div className="empty"><div className="empty-ico">{icon}</div><div className="h4 txt2 mb8">{title}</div>{desc&&<div className="sm">{desc}</div>}</div>;}
 function AccessToggle({value,onChange}){const isFree=value!==false&&value!=='paid';return <div className="access-toggle"><button type="button" className={`access-btn access-btn-free ${isFree?'active':''}`} onClick={()=>onChange(true)}><span className="em">🆓</span> مجاني</button><button type="button" className={`access-btn access-btn-paid ${!isFree?'active':''}`} onClick={()=>onChange(false)}><span className="em">🔒</span> مدفوع</button></div>;}
 function AccessBadge({value}){const isFree=value!==false&&value!=='paid';if(isFree)return <span className="pill pill-free">🆓 مجاني</span>;return <span className="pill pill-paid">🔒 مدفوع</span>;}
-
 function StudentAvatar({student, size=40}){
   const isPaid = student?.subscription==='paid' || student?.subscription==='vip';
   const safeImg = isPaid ? SEC.safeImg(student?.avatar_url) : null;
@@ -456,7 +425,6 @@ function StudentAvatar({student, size=40}){
   const bg = isFemale ? 'linear-gradient(135deg,#f472b6,#ec4899)' : 'linear-gradient(135deg,#60a5fa,#3b82f6)';
   return <div style={{width:size,height:size,borderRadius:12,background:bg,display:'grid',placeItems:'center',fontSize:size*0.55,flexShrink:0,border:'2px solid var(--border)'}}>{icon}</div>;
 }
-
 function VideoEditor({value,onChange}){
   const v=value||{type:'youtube',url:'',poster:'',allowDownload:false,allowExternal:true,is_free:true};
   const set=(k,val)=>onChange({...v,[k]:val});
@@ -472,7 +440,6 @@ function VideoEditor({value,onChange}){
     {v.url&&<div className="vid-preview">{v.type==='youtube'&&(()=>{const id=DB.ytId(v.url);return id?<iframe src={`https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1`} allowFullScreen/>:<div style={{color:'#666',display:'grid',placeItems:'center',height:'100%'}}>رابط غير صالح</div>;})()}{v.type==='vimeo'&&(()=>{const id=DB.vimeoId(v.url);return id?<iframe src={`https://player.vimeo.com/video/${id}?byline=0&portrait=0`} allowFullScreen/>:<div style={{color:'#666',display:'grid',placeItems:'center',height:'100%'}}>رابط غير صالح</div>;})()}{v.type==='mp4'&&<video src={SEC.safeUrl(v.url)} poster={v.poster} controls playsInline/>}{v.type==='external'&&<iframe src={SEC.safeUrl(v.url)} allowFullScreen/>}</div>}
   </div>;
 }
-
 function Crud({title,collection,defaultItem,fields,columns}){
   const app=useApp();
   const [editing,setEditing]=useState(null);
@@ -507,9 +474,7 @@ function Crud({title,collection,defaultItem,fields,columns}){
     </Modal>}
   </>;
 }
-
 function Sidebar({items,active,onNav,open,onClose,onLogout, hidden}){return <>{open&&<div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',zIndex:55}}/>}<aside className={`sidebar ${open?'open':''} ${hidden?'hidden-sidebar':''}`}><div className="brand"><div className="brand-logo"><Icon name="trophy" size={22} color="#1a1206"/></div><div><div className="brand-name">MISSION EDU</div><div className="brand-sub">لوحة الإدارة</div></div></div><div style={{flex:1,overflowY:'auto',overflowX:'hidden',display:'flex',flexDirection:'column',gap:'4px',marginInlineEnd:'-6px',paddingInlineEnd:'6px'}}>{items.map((g,gi)=><div key={gi}>{g.title&&<div className="nav-gt">{g.title}</div>}{g.items.map(it=><button key={it.id} className={`nav-i ${active===it.id?'on':''}`} onClick={()=>{onNav(it.id);onClose?.();}}><span className="nav-ico"><Icon name={it.icon} size={16}/></span><span>{it.label}</span>{it.badge!=null&&<span className="pill pill-b" style={{marginInlineStart:'auto'}}>{it.badge}</span>}</button>)}</div>)}</div><div style={{marginTop:'10px',paddingTop:'10px',borderTop:'1px solid var(--border)',flexShrink:0}}><button className="nav-i" onClick={onLogout} style={{color:'#fca5a5',width:'100%'}}><span className="nav-ico"><Icon name="logout" size={16}/></span><span>تسجيل الخروج</span></button></div></aside></>;}
-
 function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick,theme,onThemeChange,unreadNotifs=0,onOpenNotifications,onToggleFocus,focusMode}){
   const [q,setQ]=useState('');
   const [open,setOpen]=useState(false);
@@ -532,42 +497,29 @@ function Topbar({user,onMenu,onLogout,onSearch,searchResults,onResultClick,theme
     </div>
   </div>;
 }
-
 function CommandPalette({onClose, onNavigate}){
   const app=useApp();
   const [q, setQ] = useState('');
   const [sel, setSel] = useState(0);
-  
   const results = useMemo(()=>{
     if(!q.trim()) return [];
     const lc = q.toLowerCase();
     const res = [];
-    
-    // Students
     app.db.users.filter(u=>u.role==='student' && (u.name.toLowerCase().includes(lc) || (u.phone||'').includes(lc))).slice(0,4).forEach(u=>{
       res.push({ id:'s_'+u.id, type:'طالب', title:u.name, sub:u.phone, nav:'students', icon:<Icon name="user" size={16}/> });
     });
-    
-    // Lessons
     app.db.lessons.filter(l=>l.title.toLowerCase().includes(lc)).slice(0,4).forEach(l=>{
       res.push({ id:'l_'+l.id, type:'درس', title:l.title, sub:app.unit(l.unit_id)?.name, nav:'lessons', icon:<Icon name="file" size={16}/> });
     });
-    
-    // Exams
     app.db.exams.filter(e=>e.title.toLowerCase().includes(lc)).slice(0,4).forEach(e=>{
       res.push({ id:'e_'+e.id, type:'اختبار', title:e.title, sub:app.subject(e.subject_id)?.name, nav:'exams', icon:<Icon name="clipboard" size={16}/> });
     });
-    
-    // Subjects
     app.db.subjects.filter(s=>s.name.toLowerCase().includes(lc)).slice(0,4).forEach(s=>{
       res.push({ id:'sub_'+s.id, type:'مادة', title:s.name, sub:'', nav:'subjects', icon:<Icon name="book" size={16}/> });
     });
-    
     return res;
   }, [q, app.db]);
-
   useEffect(()=>{ setSel(0); }, [q]);
-  
   useEffect(()=>{
     const handleKey = (e) => {
       if(e.key === 'ArrowDown'){ e.preventDefault(); setSel(s=>Math.min(s+1, results.length-1)); }
@@ -581,7 +533,6 @@ function CommandPalette({onClose, onNavigate}){
     window.addEventListener('keydown', handleKey);
     return ()=>window.removeEventListener('keydown', handleKey);
   }, [results, sel, onNavigate, onClose]);
-
   return (
     <div className="cmd-overlay" onClick={onClose}>
       <div className="cmd-box" onClick={e=>e.stopPropagation()}>
@@ -611,7 +562,6 @@ function CommandPalette({onClose, onNavigate}){
     </div>
   );
 }
-
 function Dashboard(){
   const app=useApp();
   const students=app.db.users.filter(u=>u.role==='student');
@@ -623,8 +573,6 @@ function Dashboard(){
   const avgProgress=students.length&&totalLessons?Math.round((totalDone/(students.length*totalLessons))*100):0;
   const top10=useMemo(()=>[...students].filter(s=>s.banned!==true).sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,10),[students]);
   const recentAct=(app.db.activity||[]).slice(0,8);
-  
-  // Subscriptions Insights
   const expiringSoon = useMemo(()=>{
     const now = Date.now();
     const nextWeek = now + (7*24*60*60*1000);
@@ -634,11 +582,9 @@ function Dashboard(){
       return until > now && until <= nextWeek;
     });
   },[students]);
-
   const actLabel={login:'تسجيل دخول',register:'تسجيل جديد',lesson_view:'فتح درس',lesson_complete:'أكمل درس',exam_start:'بدأ اختبار',exam_submit:'أنهى اختبار',video_play:'شاهد فيديو',mission_complete:'أكمل مهمة',poll_vote:'صوّت',report_user:'بلاغ',daily_reward:'مكافأة',practice_complete:'تدريب',daily_challenge:'تحدي يومي'};
   const chart1Ref=useRef(null);const chart2Ref=useRef(null);const chart3Ref=useRef(null);
   const chart1Instance=useRef(null);const chart2Instance=useRef(null);const chart3Instance=useRef(null);
-  
   useEffect(()=>{
     if(!chart1Ref.current||!window.Chart)return;
     const ctx=chart1Ref.current.getContext("2d");
@@ -661,7 +607,6 @@ function Dashboard(){
     });
     return ()=>{if(chart1Instance.current)chart1Instance.current.destroy();};
   },[top10]);
-
   useEffect(()=>{
     if(!chart2Ref.current||!window.Chart)return;
     const ctx=chart2Ref.current.getContext("2d");
@@ -679,7 +624,6 @@ function Dashboard(){
     });
     return ()=>{if(chart2Instance.current)chart2Instance.current.destroy();};
   },[students,app.db.levels]);
-
   useEffect(()=>{
     if(!chart3Ref.current||!window.Chart)return;
     const ctx=chart3Ref.current.getContext("2d");
@@ -700,7 +644,6 @@ function Dashboard(){
     });
     return ()=>{if(chart3Instance.current)chart3Instance.current.destroy();};
   },[students]);
-
   const exportToCSV=()=>{const headers=["الاسم","الهاتف","المحافظة","الجنس","XP","المستوى","سلسلة","الحالة","دروس","بلاغات","المدرسة"];const rows=students.map(s=>{const {current}=app.getLevel(s.xp||0);return [s.name,(s.country_code||"+20")+(s.phone||""),s.governorate||"—",s.gender==='female'?'بنت':s.gender==='male'?'ولد':'—',s.xp||0,`Lv ${current.level}`,s.streak||0,s.banned?"محظور":s.active===false?"موقوف":"نشط",(s.completed_lessons||[]).length,s.reports_count||0,s.school_name||"—"];});const csv=[headers,...rows].map(row=>row.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(",")).join("\n");const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`students_${new Date().toISOString().slice(0,10)}.csv`;a.click();URL.revokeObjectURL(url);app.toast.ok("تم تصدير البيانات");};
   return <>
     <div className="hero mb16"><div className="flex between center wrap g12"><div><div className="h2 mb6 grad">لوحة تحكم الأدمن</div><div className="sm txt2">إدارة كاملة لكل محتوى المنصة</div></div><button className="btn btn-p" onClick={exportToCSV}><Icon name="file" size={15}/> تصدير Excel</button></div></div>
@@ -727,7 +670,6 @@ function Dashboard(){
     </div>
   </>;
 }
-
 function AuditLogsPage(){
   const app = useApp();
   const [logs, setLogs] = useState([]);
