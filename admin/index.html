@@ -446,8 +446,8 @@ function Modal({title,children,onClose,wide}){return <div className="modal-bg" o
 function Stat({label,value,icon,color='var(--gold)',sub}){return <div className="glass-s hv" style={{padding:16}}><div className="flex between center mb8"><div className="stat-l">{label}</div><div style={{color}}>{typeof icon==='string'?<Icon name={icon} size={20}/>:icon}</div></div><div className="stat-n" style={{color}}>{value}</div>{sub&&<div className="xs muted mt8">{sub}</div>}</div>;}
 function Field({label,children,hint}){return <div className="mb12"><label className="lbl">{label}</label>{children}{hint&&<div className="xs muted mt8">{hint}</div>}</div>;}
 function Empty({icon='📭',title,desc}){return <div className="empty"><div className="empty-ico">{icon}</div><div className="h4 txt2 mb8">{title}</div>{desc&&<div className="sm">{desc}</div>}</div>;}
-function AccessToggle({value,onChange}){const isFree=value!==false&&value!=='paid';return <div className="access-toggle"><button type="button" className={`access-btn access-btn-free ${isFree?'active':''}`} onClick={()=>onChange(true)}><span className="em">🆓</span> مجاني</button><button type="button" className={`access-btn access-btn-paid ${!isFree?'active':''}`} onClick={()=>onChange(false)}><span className="em">🔒</span> مدفوع</button></div>;}
-function AccessBadge({value}){const isFree=value!==false&&value!=='paid';if(isFree)return <span className="pill pill-free">🆓 مجاني</span>;return <span className="pill pill-paid">🔒 مدفوع</span>;}
+function AccessToggle({value,onChange}){const isFree=value!==false&&value!=='paid';return <div className="access-toggle"><button type="button" className={`access-btn access-btn-free ${isFree?'active':''}`} onClick={()=>onChange(true)}><span className="em">✓</span> مجاني</button><button type="button" className={`access-btn access-btn-paid ${!isFree?'active':''}`} onClick={()=>onChange(false)}><span className="em">🔒</span> مدفوع</button></div>;}
+function AccessBadge({value}){const isFree=value!==false&&value!=='paid';if(isFree)return <span className="pill pill-free">✓ مجاني</span>;return <span className="pill pill-paid">🔒 مدفوع</span>;}
 
 function StudentAvatar({student, size=40}){
   const isPaid = student?.subscription==='paid' || student?.subscription==='vip';
@@ -544,6 +544,7 @@ function CommandPalette({onClose, onNavigate}){
   useEffect(()=>{ setSel(0); }, [q]);
   useEffect(()=>{
     const handleKey = (e) => {
+      if(e.key === 'Escape'){ e.preventDefault(); onClose(); return; }
       if(e.key === 'ArrowDown'){ e.preventDefault(); setSel(s=>Math.min(s+1, results.length-1)); }
       if(e.key === 'ArrowUp'){ e.preventDefault(); setSel(s=>Math.max(s-1, 0)); }
       if(e.key === 'Enter' && results[sel]){ e.preventDefault(); onNavigate(results[sel].nav); onClose(); }
@@ -656,7 +657,7 @@ function Dashboard(){
       </div>
     </div>
     <div className="grid g2 mb16">
-      <div className="glass" style={{padding:18}}><div className="h4 mb12" style={{color:'var(--gold)'}}><Icon name="award" size={16}/> المتصدرون</div>{top10.length===0?<Empty icon="🏅" title="لا يوجد طلاب"/>:top10.map((s,i)=>{const {current}=app.getLevel(s.xp||0);return <div key={s.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid var(--border)'}}><div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div><StudentAvatar student={s} size={34}/><div style={{flex:1}}><div className="sm">{SEC.esc(s.name)} {s.governorate&&<span className="xs muted">— 📍 {SEC.esc(s.governorate)}</span>}</div><div className="xs muted">Lv {current.level} — {SEC.esc(current.name)}</div></div><span className="pill pill-b">{DB.fmt(s.xp||0)} XP</span></div>;})}</div>
+      <div className="glass" style={{padding:18}}><div className="h4 mb12" style={{color:'var(--gold)'}}><Icon name="award" size={16}/> المتصدرون</div>{top10.length===0?<Empty icon="🥇" title="لا يوجد طلاب"/>:top10.map((s,i)=>{const {current}=app.getLevel(s.xp||0);return <div key={s.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid var(--border)'}}><div className={`rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-x'}`}>{i+1}</div><StudentAvatar student={s} size={34}/><div style={{flex:1}}><div className="sm">{SEC.esc(s.name)} {s.governorate&&<span className="xs muted">— 📍 {SEC.esc(s.governorate)}</span>}</div><div className="xs muted">Lv {current.level} — {SEC.esc(current.name)}</div></div><span className="pill pill-b">{DB.fmt(s.xp||0)} XP</span></div>;})}</div>
       <div className="glass" style={{padding:18}}><div className="flex between center mb12"><div className="h4" style={{color:'var(--gold)'}}><Icon name="activity" size={16}/> آخر الأنشطة</div><span className="pill pill-b">{app.db.activity?.length||0}</span></div>{recentAct.length===0?<div style={{padding:'24px',textAlign:'center'}}><div style={{fontSize:40,opacity:.3,marginBottom:8}}>📡</div><div className="sm muted">لا يوجد نشاط</div></div>:recentAct.map(a=><div key={a.id} className="flex center g12" style={{padding:'8px 0',borderBottom:'1px solid var(--border)'}}><div className="act-ico"><Icon name="activity" size={16}/></div><div style={{flex:1}}><div className="sm">{SEC.esc(a.user_name||'غير معروف')}</div><div className="xs muted">{actLabel[a.type]||a.type}{a.target?` — ${SEC.esc(a.target)}`:''}</div></div><div className="xs muted">{DB.formatTime(a.at)}</div></div>)}</div>
     </div>
   </>;
@@ -725,7 +726,7 @@ function AuditLogsPage(){
         <div className="flex col g8">{[1,2,3,4,5].map(i=><div key={i} className="skeleton" style={{height:40, width:'100%'}}/>)}</div>
       ) : error ? (
         <div className="empty">
-          <div className="empty-ico">⚠️</div>
+          <div className="empty-ico">⚠</div>
           <div className="h4 txt2 mb8">خطأ في الاتصال</div>
           <div className="sm" style={{color:'#ef4444'}}>{error}</div>
         </div>
@@ -741,7 +742,7 @@ function AuditLogsPage(){
                   <td className="xs muted" style={{whiteSpace:'nowrap'}}>{DB.formatDateTime(l.created_at)}</td>
                   <td>
                     <span className="pill pill-b" style={{background:'rgba(212,175,55,0.15)', color:'var(--gold-l)'}}>
-                      👤 {SEC.esc(l.admin_name || 'غير معروف')}
+                      {SEC.esc(l.admin_name || 'غير معروف')}
                     </span>
                   </td>
                   <td><span className="pill pill-g">{SEC.esc(l.action)}</span></td>
@@ -813,7 +814,7 @@ function StudentProfilePage({studentId,onClose}){
         </div>
         <div className="glass" style={{padding:20}}>
           <div className="section-title" style={{marginTop:0}}><span className="ico">⚙️</span> الإجراءات</div>
-          <button className={`btn btn-block mb12 ${student.banned?'btn-ok':'btn-dn'}`} onClick={toggleBan}>{student.banned?'✅ فك الحظر':'⛔ حظر الطالب'}</button>
+          <button className={`btn btn-block mb12 ${student.banned?'btn-ok':'btn-dn'}`} onClick={toggleBan}>{student.banned?'✓ فك الحظر':'⛔ حظر الطالب'}</button>
           <button className={`btn btn-block mb12 ${student.active===false?'btn-ok':'btn-dn'}`} onClick={toggleActive}>{student.active===false?'▶️ تفعيل الحساب':'⏸️ إيقاف الحساب'}</button>
           <div className="glass-s" style={{padding:12,marginTop:12}}>
             <div className="xs muted mb6">📅 انضم في</div>
@@ -870,7 +871,7 @@ function StudentsPage(){
   };
   const open=s=>{setForm(JSON.parse(JSON.stringify(s)));setEditing(s.id);};
   const save=async()=>{setBusy(true);try{await DB.updateUser(editing,{name:form.name,phone:form.phone,xp:form.xp,grade_id:form.grade_id,governorate:form.governorate||null,gender:form.gender||null,all_subjects:form.all_subjects,access_subjects:form.access_subjects||[],subscription:form.subscription||'free',subscription_until:form.subscription_until||null});await app.reload();app.toast.ok('تم');setEditing(null);}catch(e){app.toast.err(e.message);}setBusy(false);};
-  const toggle=async s=>{const action=s.active!==false?'إيقاف':'تفعيل';const r=await Swal.fire({title:`${action}؟`,text:`${action} حساب ${s.name}?`,icon:'question',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:s.active!==false?'#ef4444':'#D4AF37',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{await DB.updateUser(s.id,{active:!s.active});await app.reload();app.toast.warn('تم');}catch(e){app.toast.err(e.message);}};
+  const toggle=async s=>{const action=s.active!==false?'إيقاف':'تفعيل';const r=await Swal.fire({title:`${action}؟`,text:`${action} حساب ${s.name}?`,icon:'question',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:s.active!==false?'#ef4444':'#D4AF37',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{await DB.updateUser(s.id,{active: s.active === false});await app.reload();app.toast.warn('تم');}catch(e){app.toast.err(e.message);}};
   const govCounts={};allStudents.forEach(u=>{if(u.governorate){govCounts[u.governorate]=(govCounts[u.governorate]||0)+1;}});
   if(profileId)return <StudentProfilePage studentId={profileId} onClose={()=>setProfileId(null)}/>;
   return <>
@@ -884,17 +885,17 @@ function StudentsPage(){
           <td className="sm muted" dir="ltr">{(s.country_code||'+20')}{s.phone||''}</td>
           <td>{s.governorate?<span className="pill pill-b" style={{fontSize:11}}>📍 {SEC.esc(s.governorate)}</span>:'—'}</td>
           <td><b style={{color:'var(--gold)'}}>{DB.fmt(s.xp||0)}</b></td>
-          <td>{s.subscription==='vip'?<span className="pill pill-v">💎 VIP</span>:s.subscription==='paid'?<span className="pill pill-g">💳</span>:<span className="pill pill-y">🆓</span>}</td>
+          <td>{s.subscription==='vip'?<span className="pill pill-v">💎 VIP</span>:s.subscription==='paid'?<span className="pill pill-g">💳</span>:<span className="pill pill-y">✓</span>}</td>
           <td>{(s.reports_count||0)>=3?<span className="pill pill-r">🚨 {s.reports_count}</span>:(s.reports_count||0)>0?<span className="pill pill-a">{s.reports_count}</span>:'0'}</td>
           <td>{s.banned?<span className="pill pill-r">⛔</span>:s.active!==false?<span className="pill pill-g">نشط</span>:<span className="pill pill-y">موقوف</span>}</td>
           <td><div className="flex g6"><button className="btn btn-s btn-sm" title="بروفايل" onClick={()=>setProfileId(s.id)}><Icon name="user" size={13}/></button><button className="btn btn-s btn-sm" onClick={()=>open(s)}><Icon name="edit" size={13}/></button>{!s.banned&&<button className={`btn btn-sm ${s.active!==false?'btn-dn':'btn-ok'}`} onClick={()=>toggle(s)}>{s.active!==false?'إيقاف':'تفعيل'}</button>}</div></td>
         </tr>)}</tbody></table></div>
       {list.length===0&&<Empty icon="🔍" title="لا طلاب"/>}
     </div>
-    {selectedIds.length > 0 && (<div className="bulk-bar"><span className="sm" style={{fontWeight:700}}>تم تحديد {selectedIds.length} طالب</span><div style={{width:1,height:24,background:'var(--border)'}}/><button className="btn btn-dn btn-sm" onClick={()=>bulkAction('ban')} disabled={busy}>⛔ حظر</button><button className="btn btn-s btn-sm" onClick={()=>bulkAction('unban')} disabled={busy}>✅ فك الحظر</button><button className="btn btn-s btn-sm" onClick={()=>bulkAction('active')} disabled={busy}>▶️ تفعيل</button><button className="btn btn-s btn-sm" onClick={()=>bulkAction('inactive')} disabled={busy}>⏸️ إيقاف</button><button className="icon-btn" onClick={()=>setSelectedIds([])}><Icon name="close" size={14}/></button></div>)}
+    {selectedIds.length > 0 && (<div className="bulk-bar"><span className="sm" style={{fontWeight:700}}>تم تحديد {selectedIds.length} طالب</span><div style={{width:1,height:24,background:'var(--border)'}}/><button className="btn btn-dn btn-sm" onClick={()=>bulkAction('ban')} disabled={busy}>⛔ حظر</button><button className="btn btn-s btn-sm" onClick={()=>bulkAction('unban')} disabled={busy}>✓ فك الحظر</button><button className="btn btn-s btn-sm" onClick={()=>bulkAction('active')} disabled={busy}>▶️ تفعيل</button><button className="btn btn-s btn-sm" onClick={()=>bulkAction('inactive')} disabled={busy}>⏸️ إيقاف</button><button className="icon-btn" onClick={()=>setSelectedIds([])}><Icon name="close" size={14}/></button></div>)}
     {editing&&<Modal title={`تعديل: ${SEC.esc(form.name)}`} onClose={()=>setEditing(null)} wide>
       <div className="grid g2"><Field label="الاسم"><input className="input" value={form.name||''} onChange={e=>setForm({...form,name:e.target.value})}/></Field><Field label="الهاتف"><input className="input" value={form.phone||''} onChange={e=>setForm({...form,phone:e.target.value})}/></Field><Field label="النوع"><select className="input" value={form.gender||''} onChange={e=>setForm({...form,gender:e.target.value||null})}><option value="">—</option><option value="male">👦</option><option value="female">👧</option></select></Field><Field label="XP"><input type="number" className="input" value={form.xp??''} onChange={e=>setForm({...form,xp:e.target.value===''?'':+e.target.value})}/></Field><Field label="الصف"><select className="input" value={form.grade_id||''} onChange={e=>setForm({...form,grade_id:e.target.value})}><option value="">—</option>{app.db.grades.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></Field><Field label="📍 المحافظة"><select className="input" value={form.governorate||''} onChange={e=>setForm({...form,governorate:e.target.value})}><option value="">— بدون —</option>{GOVERNORATES.map(g=><option key={g} value={g}>{g}</option>)}</select></Field></div>
-      <div className="grid g2"><Field label="الاشتراك"><select className="input" value={form.subscription||'free'} onChange={e=>setForm({...form,subscription:e.target.value})}><option value="free">🆓</option><option value="paid">💳</option><option value="vip">💎</option></select></Field><Field label="تاريخ الانتهاء"><input type="date" className="input" value={form.subscription_until||''} onChange={e=>setForm({...form,subscription_until:e.target.value})}/></Field></div>
+      <div className="grid g2"><Field label="الاشتراك"><select className="input" value={form.subscription||'free'} onChange={e=>setForm({...form,subscription:e.target.value})}><option value="free">✓ مجاني</option><option value="paid">💳 مدفوع</option><option value="vip">💎 VIP</option></select></Field><Field label="تاريخ الانتهاء"><input type="date" className="input" value={form.subscription_until||''} onChange={e=>setForm({...form,subscription_until:e.target.value})}/></Field></div>
       <Field label="الوصول"><label className="flex center g8 mb12" style={{cursor:'pointer'}}><input type="checkbox" checked={!!form.all_subjects} onChange={e=>setForm({...form,all_subjects:e.target.checked})}/><span className="sm">جميع المواد</span></label></Field>
       <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
     </Modal>}
@@ -969,7 +970,7 @@ function LessonsPage(){
   const currentLessonExams=editing&&editing!=='new'?getLessonExams(editing):[];
   return <>
     <div className="flex between center mb16 wrap g8"><div className="h2 grad">📖 إدارة الدروس</div><div className="flex g8"><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> درس جديد</button></div></div>
-    <div className="glass mb16" style={{padding:14}}><div className="flex wrap g12"><div style={{flex:'1 1 240px'}}><label className="lbl">الوحدة</label><select className="input" value={filterUnit} onChange={e=>setFilterUnit(e.target.value)}><option value="all">كل الوحدات ({sortedLessons.length})</option>{app.db.units.map(u=><option key={u.id} value={u.id}>{app.subject(u.subject_id)?.name} — {u.name}</option>)}</select></div><div style={{flex:'1 1 240px'}}><label className="lbl">الوصول</label><select className="input" value={filterAccess} onChange={e=>setFilterAccess(e.target.value)}><option value="all">الكل</option><option value="free">🆓 مجاني</option><option value="paid">🔒 مدفوع</option></select></div></div></div>
+    <div className="glass mb16" style={{padding:14}}><div className="flex wrap g12"><div style={{flex:'1 1 240px'}}><label className="lbl">الوحدة</label><select className="input" value={filterUnit} onChange={e=>setFilterUnit(e.target.value)}><option value="all">كل الوحدات ({sortedLessons.length})</option>{app.db.units.map(u=><option key={u.id} value={u.id}>{app.subject(u.subject_id)?.name} — {u.name}</option>)}</select></div><div style={{flex:'1 1 240px'}}><label className="lbl">الوصول</label><select className="input" value={filterAccess} onChange={e=>setFilterAccess(e.target.value)}><option value="all">الكل</option><option value="free">✓ مجاني</option><option value="paid">🔒 مدفوع</option></select></div></div></div>
     <div className="glass" style={{padding:14}}>
       {filteredLessons.length===0?<Empty title="لا دروس"/>:
       <div className="sx"><table className="tbl"><thead><tr><th>الدرس</th><th>الوحدة</th><th>الوصول</th><th>اختبار</th><th>PDF</th><th>XP</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>
@@ -998,7 +999,7 @@ function LessonsPage(){
       <div className="section-title"><span className="ico">📝</span> اختبار الدرس</div>
       {editing==='new'?<div className="glass-s" style={{padding:12,marginBottom:12}}><div className="sm">احفظ الدرس أولاً</div></div>:<>
         {currentLessonExams.length>0&&<div className="glass-s" style={{padding:14,marginBottom:12,borderColor:'rgba(34,197,94,.4)'}}>
-          <div className="flex between center mb12"><div className="sm" style={{fontWeight:800,color:'#6ee7a0'}}>✅ اختبارات ({currentLessonExams.length})</div></div>
+          <div className="flex between center mb12"><div className="sm" style={{fontWeight:800,color:'#6ee7a0'}}>✓ اختبارات ({currentLessonExams.length})</div></div>
           {currentLessonExams.map(e=><div key={e.id} className="flex between center mb6" style={{padding:'8px 12px',background:'rgba(34,197,94,.06)',borderRadius:10,border:'1px solid rgba(34,197,94,.20)'}}>
             <div style={{flex:1,minWidth:0}}><div className="sm" style={{fontWeight:700}}>📋 {SEC.esc(e.title)}</div><div className="xs muted">⏱ {e.duration}د • 🎯 {e.pass_score}% • ❓ {(e.question_ids||[]).length}</div></div>
             <button className="btn btn-dn btn-sm" onClick={async()=>{const r=await Swal.fire({title:'حذف؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;const qIds=e.question_ids||[];if(qIds.length>0)await DB.removeMany('questions',qIds);await DB.remove('exams',e.id);await app.reload();app.toast.ok('تم');}}><Icon name="trash" size={12}/></button>
@@ -1177,10 +1178,10 @@ function QuestionsBankPage(){
       let quality='unknown',qualityColor='var(--muted)',qualityLabel='غير مقيّم';
       if(st&&st.total>=5){
         const wrongPct=(st.wrong/st.total)*100;
-        if(wrongPct>=90){quality='bad';qualityColor='#ef4444';qualityLabel='⚠️ صعب جداً';}
-        else if(wrongPct>=70){quality='hard';qualityColor='#f59e0b';qualityLabel='🔶 صعب';}
-        else if(wrongPct>=30){quality='good';qualityColor='#22c55e';qualityLabel='✅ متوازن';}
-        else if(wrongPct<=10){quality='easy';qualityColor='#60a5fa';qualityLabel='💧 سهل';}
+        if(wrongPct>=90){quality='bad';qualityColor='#ef4444';qualityLabel='⚠ صعب جداً';}
+        else if(wrongPct>=70){quality='hard';qualityColor='#f59e0b';qualityLabel='◆ صعب';}
+        else if(wrongPct>=30){quality='good';qualityColor='#22c55e';qualityLabel='✓ متوازن';}
+        else if(wrongPct<=10){quality='easy';qualityColor='#60a5fa';qualityLabel='◇ سهل';}
       }
       return {...q,lesson,unit,subject,usedIn,isOrphan:usedIn.length===0,quality,qualityColor,qualityLabel,stats:st};
     });
@@ -1212,7 +1213,7 @@ function QuestionsBankPage(){
       <div className="grid g4" style={{gap:10}}>
         <div><label className="lbl">المادة</label><select className="input" value={filterSubject} onChange={e=>{setFilterSubject(e.target.value);setFilterLesson('all');}}><option value="all">كل المواد</option>{app.db.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></div>
         <div><label className="lbl">الدرس</label><select className="input" value={filterLesson} onChange={e=>setFilterLesson(e.target.value)}><option value="all">كل الدروس</option>{availableLessons.map(l=><option key={l.id} value={l.id}>{l.title}</option>)}</select></div>
-        <div><label className="lbl">النوع</label><select className="input" value={filterType} onChange={e=>setFilterType(e.target.value)}><option value="all">الكل</option><option value="used">✅ مستخدمة</option><option value="orphan">⚠️ يتيمة</option><option value="bad">🔶 مشكوك فيها</option></select></div>
+        <div><label className="lbl">النوع</label><select className="input" value={filterType} onChange={e=>setFilterType(e.target.value)}><option value="all">الكل</option><option value="used">✓ مستخدمة</option><option value="orphan">⚠ يتيمة</option><option value="bad">◆ مشكوك فيها</option></select></div>
         <div><label className="lbl">بحث</label><input className="input" value={q} onChange={e=>{setQ(e.target.value);setPage(1);}} placeholder="🔍"/></div>
       </div>
     </div>
@@ -1230,7 +1231,7 @@ function QuestionsBankPage(){
                 {x.stats&&x.stats.total>0&&<span className="xs muted">{x.stats.wrong}/{x.stats.total} خطأ</span>}
               </div>
             </td>
-            <td>{x.usedIn.length>0?<span className="pill qbank-used">✓ {x.usedIn.length}</span>:<span className="pill qbank-orphan">⚠️</span>}</td>
+            <td>{x.usedIn.length>0?<span className="pill qbank-used">✓ {x.usedIn.length}</span>:<span className="pill qbank-orphan">⚠</span>}</td>
             <td><button className="btn btn-dn btn-sm" onClick={()=>deleteOne(x.id)}><Icon name="trash" size={12}/></button></td>
           </tr>)}</tbody>
         </table></div>
@@ -1246,11 +1247,11 @@ function BannedUsersPage(){
   const load=useCallback(async()=>{setLoading(true);try{const sb=await DB.getClient();const {data}=await sb.from('users').select('*').eq('banned',true).order('banned_at',{ascending:false});setBanned(data||[]);}catch(e){}setLoading(false);},[]);
   useEffect(()=>{load();},[load]);
   const showReports=async userId=>{if(expanded===userId){setExpanded(null);return;}try{const list=await DB.getUserReports(userId);setReports(prev=>({...prev,[userId]:list}));setExpanded(userId);}catch(e){app.toast.err(e.message);}};
-  const unban=async u=>{const r=await Swal.fire({title:`فك حظر ${SEC.esc(u.name)}؟`,text:'سيتم حذف كل البلاغات',icon:'question',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#22c55e',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;setBusy(true);try{await DB.unbanUser(u.id);app.toast.ok('✅ تم');await load();await app.reload();}catch(e){app.toast.err(e.message);}setBusy(false);};
+  const unban=async u=>{const r=await Swal.fire({title:`فك حظر ${SEC.esc(u.name)}؟`,text:'سيتم حذف كل البلاغات',icon:'question',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#22c55e',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;setBusy(true);try{await DB.unbanUser(u.id);app.toast.ok('✓ تم');await load();await app.reload();}catch(e){app.toast.err(e.message);}setBusy(false);};
   return <>
     <div className="flex between center mb16 wrap g8"><div><div className="h2 grad">⛔ المحظورون</div><div className="sm muted mt6">حظر تلقائي بعد 3 بلاغات</div></div><div className="flex g8"><span className="pill pill-r">{banned.length}</span><button className="btn btn-s" onClick={load}>🔄</button></div></div>
-    {loading?<div className="glass" style={{padding:40,textAlign:'center'}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>:banned.length===0?<div className="glass" style={{padding:40}}><Empty icon="✅" title="لا محظورين"/></div>:
-    <div className="flex col g12">{banned.map(u=>{const isExpanded=expanded===u.id;const userReports=reports[u.id]||[];return <div key={u.id} className="glass" style={{padding:16,borderColor:'rgba(239,68,68,.35)'}}><div className="flex between center wrap g8 mb12"><div className="flex center g12"><StudentAvatar student={u} size={44}/><div><div className="h4">{SEC.esc(u.name)}</div><div className="xs muted" dir="ltr">{(u.country_code||'+20')}{u.phone}</div></div></div><div className="flex g6 wrap"><span className="pill pill-r">{u.reports_count||0} بلاغ</span></div></div><div className="xs muted mb12">🔒 {SEC.esc(u.ban_reason||'حظر تلقائي')}</div><div className="flex g8 wrap"><button className="btn btn-s btn-sm" onClick={()=>showReports(u.id)}>{isExpanded?'إخفاء':'📋 البلاغات'}</button><button className="btn btn-ok btn-sm" onClick={()=>unban(u)} disabled={busy}>✅ فك الحظر</button></div>{isExpanded&&<div className="mt12">{userReports.length===0?<div className="sm muted">لا بلاغات</div>:userReports.map(r=><div key={r.id} className="glass-s mb8" style={{padding:12}}><div className="flex between center mb6"><span className="pill pill-r">{SEC.esc(r.reason)}</span><span className="xs muted">{DB.formatDateTime(r.created_at)}</span></div>{r.details&&<div className="xs muted">"{SEC.esc(r.details)}"</div>}</div>)}</div>}</div>;})}</div>}
+    {loading?<div className="glass" style={{padding:40,textAlign:'center'}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>:banned.length===0?<div className="glass" style={{padding:40}}><Empty icon="✓" title="لا محظورين"/></div>:
+    <div className="flex col g12">{banned.map(u=>{const isExpanded=expanded===u.id;const userReports=reports[u.id]||[];return <div key={u.id} className="glass" style={{padding:16,borderColor:'rgba(239,68,68,.35)'}}><div className="flex between center wrap g8 mb12"><div className="flex center g12"><StudentAvatar student={u} size={44}/><div><div className="h4">{SEC.esc(u.name)}</div><div className="xs muted" dir="ltr">{(u.country_code||'+20')}{u.phone}</div></div></div><div className="flex g6 wrap"><span className="pill pill-r">{u.reports_count||0} بلاغ</span></div></div><div className="xs muted mb12">🔒 {SEC.esc(u.ban_reason||'حظر تلقائي')}</div><div className="flex g8 wrap"><button className="btn btn-s btn-sm" onClick={()=>showReports(u.id)}>{isExpanded?'إخفاء':'📋 البلاغات'}</button><button className="btn btn-ok btn-sm" onClick={()=>unban(u)} disabled={busy}>✓ فك الحظر</button></div>{isExpanded&&<div className="mt12">{userReports.length===0?<div className="sm muted">لا بلاغات</div>:userReports.map(r=><div key={r.id} className="glass-s mb8" style={{padding:12}}><div className="flex between center mb6"><span className="pill pill-r">{SEC.esc(r.reason)}</span><span className="xs muted">{DB.formatDateTime(r.created_at)}</span></div>{r.details&&<div className="xs muted">"{SEC.esc(r.details)}"</div>}</div>)}</div>}</div>;})}</div>}
   </>;
 }
 
@@ -1289,7 +1290,7 @@ function XPShopPage(){
         <div className="grid g2"><Field label="اسم المنتج"><input className="input" value={form.name||''} onChange={e=>setForm({...form,name:e.target.value})}/></Field><Field label="الأيقونة"><input className="input" value={form.icon||''} onChange={e=>setForm({...form,icon:e.target.value})}/></Field></div>
         <Field label="الوصف"><textarea className="input" rows="2" value={form.description||''} onChange={e=>setForm({...form,description:e.target.value})}/></Field>
         <div className="grid g2"><Field label="السعر (XP) *"><input type="number" min="1" className="input" value={form.xp_cost??''} onChange={e=>setForm({...form,xp_cost:e.target.value})}/></Field><Field label="المخزون"><input type="number" min="0" className="input" value={form.stock??''} onChange={e=>setForm({...form,stock:e.target.value})} placeholder="فارغ = غير محدود"/></Field></div>
-        <Field label="النوع"><select className="input" value={form.type||'reward'} onChange={e=>setForm({...form,type:e.target.value})}><option value="reward">🎁 مكافأة</option><option value="coupon">🎟️ كوبون</option><option value="content">📚 محتوى</option></select></Field>
+        <Field label="النوع"><select className="input" value={form.type||'reward'} onChange={e=>setForm({...form,type:e.target.value})}><option value="reward">🎁 مكافأة</option><option value="coupon">🎫 كوبون</option><option value="content">📚 محتوى</option></select></Field>
         <label className="flex center g8 mt12" style={{cursor:'pointer'}}><input type="checkbox" checked={form.active!==false} onChange={e=>setForm({...form,active:e.target.checked})}/><span className="sm">مفعّل</span></label>
         <div className="flex g8 mt16"><button className="btn btn-p" onClick={save} disabled={busy} style={{flex:1}}>{busy?'جارٍ...':'💾 حفظ'}</button><button className="btn btn-s" onClick={()=>setEditing(null)}>إلغاء</button></div>
       </Modal>
@@ -1494,7 +1495,7 @@ function ReportsPage(){
       const sb=await DB.getClient();
       const {data,error}=await sb.rpc('admin_review_report',{p_report_id: reportId,p_admin_id: app.currentUser.id,p_status: status,p_action: action || null,p_notes: null,p_ban_target: !!banTarget,p_ban_reason: banReason || null});
       if(error)throw new Error(error.message);
-      app.toast.ok(banTarget?'✅ تم الحظر':'✅ تم تحديث البلاغ');
+      app.toast.ok(banTarget?'✓ تم الحظر':'✓ تم تحديث البلاغ');
       await loadReports();
       await app.reload();
     }catch(e){app.toast.err(e.message||'فشل');}
@@ -1508,7 +1509,7 @@ function ReportsPage(){
   const dismiss=async(r)=>{await review(r.id,'dismissed','dismissed',false,null);};
   const takeAction=async(r)=>{await review(r.id,'action_taken','warning_sent',false,null);};
   const statusBadge=(s)=>{
-    if(s==='pending') return <span className="pill pill-a">⏳ معلق</span>;
+    if(s==='pending') return <span className="pill pill-a">⏱ معلق</span>;
     if(s==='dismissed') return <span className="pill pill-y">⊘ مرفوض</span>;
     if(s==='action_taken') return <span className="pill pill-r">⚡ تم إجراء</span>;
     return <span className="pill pill-g">✓ مراجع</span>;
@@ -1533,7 +1534,7 @@ function ReportsPage(){
       <div>
         <div className="h2 grad">📨 مركز البلاغات</div>
         <div className="sm muted mt6">
-          {tab === 'students' ? (pendingCount>0 ? `⚠️ ${pendingCount} بلاغ في انتظار المراجعة` : '✅ لا بلاغات معلقة') : `✉️ ${footerMsgs.length} رسالة من الفوتر`}
+          {tab === 'students' ? (pendingCount>0 ? `⚠ ${pendingCount} بلاغ في انتظار المراجعة` : '✓ لا بلاغات معلقة') : `✉️ ${footerMsgs.length} رسالة من الفوتر`}
         </div>
       </div>
       <div className="flex g8">
@@ -1549,12 +1550,12 @@ function ReportsPage(){
     {tab === 'students' && (
       <>
         <div className="msg-tabs mb16" style={{marginTop:-10}}>
-          {[{id:'pending',label:'⏳ معلق'},{id:'action_taken',label:'⚡ إجراء'},{id:'dismissed',label:'⊘ مرفوض'},{id:'all',label:'الكل'}].map(f=>(
+          {[{id:'pending',label:'⏱ معلق'},{id:'action_taken',label:'⚡ إجراء'},{id:'dismissed',label:'⊘ مرفوض'},{id:'all',label:'الكل'}].map(f=>(
             <button key={f.id} className={`msg-tab ${filter===f.id?'active':''}`} onClick={()=>setFilter(f.id)}>{f.label}</button>
           ))}
         </div>
         <div className="glass" style={{padding:14}}>
-          {loading ? (<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>) : filtered.length===0 ? (<Empty icon="✅" title="لا بلاغات"/>) : (
+          {loading ? (<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>) : filtered.length===0 ? (<Empty icon="✓" title="لا بلاغات"/>) : (
             <div className="flex col g8">{filtered.map(r=>{
               const isPending=(r.status||'pending')==='pending';
               const isBusy=busy===r.id;
@@ -1622,7 +1623,7 @@ function SettingsPage(){
 function Footer(){
   const app=useApp();
   const user=app.currentUser;
-  const sendReport=async()=>{const {value:msg}=await Swal.fire({title:'🚨 بلاغ',input:'textarea',inputPlaceholder:'اكتب رسالتك',showCancelButton:true,confirmButtonText:'📤 إرسال',cancelButtonText:'إلغاء',confirmButtonColor:'#D4AF37',cancelButtonColor:'#64748b',inputValidator:v=>{if(!v||v.trim().length<5)return 'رسالة قصيرة'},customClass:{popup:'swal-custom-popup',title:'swal-custom-title',input:'swal-custom-input'}});if(msg){const sent=await DB.reportIssue({userName:user?.name||'أدمن',userPhone:(user?.country_code||'+20')+(user?.phone||'—'),message:SEC.clean(SEC.maxLen(msg,2000))});Swal.fire({icon:sent?'success':'error',title:sent?'✅':'❌',confirmButtonColor:'#D4AF37',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});}};
+  const sendReport=async()=>{const {value:msg}=await Swal.fire({title:'🚨 بلاغ',input:'textarea',inputPlaceholder:'اكتب رسالتك',showCancelButton:true,confirmButtonText:'📤 إرسال',cancelButtonText:'إلغاء',confirmButtonColor:'#D4AF37',cancelButtonColor:'#64748b',inputValidator:v=>{if(!v||v.trim().length<5)return 'رسالة قصيرة'},customClass:{popup:'swal-custom-popup',title:'swal-custom-title',input:'swal-custom-input'}});if(msg){const sent=await DB.reportIssue({userName:user?.name||'أدمن',userPhone:(user?.country_code||'+20')+(user?.phone||'—'),message:SEC.clean(SEC.maxLen(msg,2000))});Swal.fire({icon:sent?'success':'error',title:sent?'✓':'✕',confirmButtonColor:'#D4AF37',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});}};
   return <div className="footer-dev"><button className="dev-btn" onClick={()=>window.open("https://wa.me/201128351702","_blank")}><span className="dev-name">Developed by <b>EL-sayed Hasan</b></span></button><button className="tg-btn" onClick={sendReport}>بلاغ</button></div>;
 }
 
@@ -1770,7 +1771,7 @@ function ErrorsAnalyticsPage(){
     <div className="glass" style={{padding:14}}>
       <div className="h4 mb12" style={{color:'var(--gold)'}}>أكثر الأسئلة خطأً</div>
       {loading?<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>:
-      top.length===0?<Empty icon="✅" title="لا بيانات كافية"/>:
+      top.length===0?<Empty icon="✓" title="لا بيانات كافية"/>:
       <div className="flex col g8">{top.map(([qid,count],i)=>{
         const q=app.db.questions.find(x=>x.id===qid);
         if(!q)return null;
@@ -1794,9 +1795,7 @@ function CertificatesGenPage(){
   const [busy,setBusy]=useState(false);
   const previewRef=useRef(null);
   const student=app.db.users.find(u=>u.id===studentId);
-  
   const [certId] = useState(() => 'QC' + Math.random().toString(36).substring(2, 12).toUpperCase());
-
   const generate=async()=>{
     if(!student)return app.toast.warn('اختر طالب');
     if(!courseName.trim())return app.toast.warn('اكتب اسم الكورس');
@@ -1811,17 +1810,14 @@ function CertificatesGenPage(){
     }catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
-
   const formatDateAr = (d) => {
     const dateObj = new Date(d);
     dateObj.setHours(dateObj.getHours() + 2); 
     return dateObj.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
   };
-
   return <>
     <div className="h2 mb16 grad">🏅 مولّد الشهادات</div>
     <div className="grid g2 mb16">
-      
       <div className="glass" style={{padding:20}}>
         <Field label="الطالب">
           <select className="input" value={studentId} onChange={e=>setStudentId(e.target.value)}>
@@ -1839,12 +1835,9 @@ function CertificatesGenPage(){
           {busy?'⏳ جارٍ التحميل...':'📸 تحميل الشهادة PNG'}
         </button>
       </div>
-
       <div className="glass" style={{padding:20, minWidth:0}}>
         <div className="h4 mb12" style={{color:'var(--gold)'}}>معاينة حية (اسحب في الموبايل)</div>
-        
         <div style={{overflowX:'auto', width:'100%', paddingBottom:20}}>
-          
           <div ref={previewRef} style={{
             width: 900, height: 630, flexShrink:0, position:'relative', overflow:'hidden',
             background: 'radial-gradient(circle at center, #0b224a 0%, #05122b 100%)',
@@ -1852,12 +1845,10 @@ function CertificatesGenPage(){
             border: '12px solid #0a1f44',
             boxShadow: 'inset 0 0 0 2px #00d2ff, inset 0 0 50px rgba(0, 210, 255, 0.1)'
           }}>
-            
             <div style={{position:'absolute', top:10, left:10, width:40, height:40, borderTop:'4px solid #00d2ff', borderLeft:'4px solid #00d2ff'}}/>
             <div style={{position:'absolute', top:10, right:10, width:40, height:40, borderTop:'4px solid #00d2ff', borderRight:'4px solid #00d2ff'}}/>
             <div style={{position:'absolute', bottom:10, left:10, width:40, height:40, borderBottom:'4px solid #00d2ff', borderLeft:'4px solid #00d2ff'}}/>
             <div style={{position:'absolute', bottom:10, right:10, width:40, height:40, borderBottom:'4px solid #00d2ff', borderRight:'4px solid #00d2ff'}}/>
-
             <div style={{textAlign:'center', marginTop:40}}>
               <div style={{display:'flex', justifyContent:'center', alignItems:'center', gap:8}}>
                 <span style={{fontSize:30}}>🎓</span>
@@ -1867,7 +1858,6 @@ function CertificatesGenPage(){
               </div>
               <p style={{fontSize:14, color:'#a0b3d6', margin:'5px 0 0 0'}}>منصة تعليمية متكاملة</p>
             </div>
-
             <div style={{position:'relative', textAlign:'center', marginTop:30}}>
               <div style={{
                 background:'linear-gradient(90deg, #0f3b7a, #1e5cb3, #0f3b7a)', 
@@ -1880,43 +1870,34 @@ function CertificatesGenPage(){
                 <div style={{position:'absolute', top:'50%', right:-30, transform:'translateY(-50%)', fontSize:40, color:'#FFD700'}}>❮</div>
               </div>
             </div>
-
             <div style={{textAlign:'center', marginTop:40}}>
               <p style={{fontSize:18, color:'#fff', marginBottom:15}}>تشهد المنصة بأن الطالب</p>
               <h3 style={{fontSize:55, color:'#FFD700', margin:'0 0 15px 0', fontWeight:900, textShadow:'0 0 25px rgba(255,215,0,0.5)', fontFamily:'Cairo, sans-serif'}}>{student?.name || 'اسم الطالب'}</h3>
-              
               <p style={{fontSize:18, color:'#fff', marginBottom:15}}>قد أتم بنجاح دراسة مادة</p>
               <h4 style={{fontSize:38, color:'#fff', margin:'0 0 10px 0', fontWeight:700, fontFamily:'Cairo, sans-serif'}}>{courseName || 'اسم المادة'}</h4>
-              
               <div style={{width:150, height:4, background:'#00d2ff', margin:'20px auto', borderRadius:2, boxShadow:'0 0 10px #00d2ff'}}/>
             </div>
-
             <div style={{position:'absolute', bottom:40, left:50, right:50, display:'flex', justifyContent:'space-between', alignItems:'flex-end'}}>
-              
               <div style={{textAlign:'center'}}>
                 <p style={{fontSize:12, color:'#a0b3d6', margin:'0 0 6px 0'}}>تاريخ الإصدار</p>
                 <div style={{background:'rgba(0,0,0,0.3)', border:'1px solid #00d2ff', padding:'10px 20px', borderRadius:10, fontSize:18, color:'#fff', fontWeight:700}}>
                   {formatDateAr(date)}
                 </div>
               </div>
-
               <div style={{textAlign:'center', flex:1}}>
                 <div style={{fontSize:16, fontWeight:900, fontStyle:'italic', color:'#00d2ff', marginBottom:8}}>MISSION EDU</div>
                 <div style={{width:150, height:1, background:'#a0b3d6', margin:'0 auto'}}/>
                 <p style={{fontSize:12, color:'#a0b3d6', margin:'6px 0 0 0'}}>التوقيع الرسمي</p>
               </div>
-
               <div style={{textAlign:'center'}}>
                 <p style={{fontSize:12, color:'#a0b3d6', margin:'0 0 6px 0'}}>رقم الشهادة</p>
                 <div style={{background:'rgba(0,0,0,0.3)', border:'1px solid #00d2ff', padding:'10px 20px', borderRadius:10, fontSize:16, color:'#fff', fontWeight:700, fontFamily:'monospace'}}>
                   {certId}
                 </div>
               </div>
-
             </div>
           </div>
         </div>
-        
       </div>
     </div>
   </>;
@@ -2062,7 +2043,7 @@ function BulkImportPage(){
           ok++;
         }catch(_){fail++;}
       }
-      app.toast.ok(`✅ نجح: ${ok}${fail?` | ❌ فشل: ${fail}`:''}`);
+      app.toast.ok(`✓ نجح: ${ok}${fail?` | ✕ فشل: ${fail}`:''}`);
       setRows([]);setFileName('');
       await app.reload();
     }catch(e){app.toast.err(e.message);}
@@ -2192,7 +2173,7 @@ function CouponsPage(){
     try{const sb=await DB.getClient();await sb.from('coupons').delete().eq('id',id);await load();app.toast.ok('تم');}catch(e){app.toast.err(e.message);}
   };
   return <>
-    <div className="h2 mb16 grad">🎟️ الكوبونات</div>
+    <div className="h2 mb16 grad">🎫 الكوبونات</div>
     <div className="glass mb16" style={{padding:20}}>
       <div className="grid g2">
         <Field label="الكود"><input className="input" value={form.code} onChange={e=>setForm({...form,code:e.target.value})} placeholder="SALE10"/></Field>
@@ -2204,7 +2185,7 @@ function CouponsPage(){
     </div>
     <div className="glass" style={{padding:14}}>
       {loading?<div style={{textAlign:'center',padding:40}}><div className="spinner" style={{margin:'0 auto 14px'}}></div></div>:
-      coupons.length===0?<Empty icon="🎟️" title="لا كوبونات"/>:
+      coupons.length===0?<Empty icon="🎫" title="لا كوبونات"/>:
       <div className="sx"><table className="tbl"><thead><tr><th>الكود</th><th>الخصم</th><th>الاستخدامات</th><th>الانتهاء</th><th>الحالة</th><th></th></tr></thead>
       <tbody>{coupons.map(c=>{
         const expired=c.expires_at&&c.expires_at<Date.now();
@@ -2250,7 +2231,7 @@ function ReferralsPage(){
         return <tr key={r.id}>
           <td className="sm">{SEC.esc(referrer?.name||'—')}</td>
           <td className="sm">{SEC.esc(referred?.name||'—')}</td>
-          <td>{r.completed?<span className="pill pill-g">✓ مكتمل</span>:<span className="pill pill-a">⏳ معلق</span>}</td>
+          <td>{r.completed?<span className="pill pill-g">✓ مكتمل</span>:<span className="pill pill-a">⏱ معلق</span>}</td>
           <td className="xs muted">{r.created_at?DB.formatDateTime(r.created_at):'—'}</td>
         </tr>;
       })}</tbody></table></div>}
@@ -2337,6 +2318,7 @@ function AdminApp(){
   const user=app.currentUser;
   useEffect(()=>{try{localStorage.setItem('admin_tab',tab)}catch(e){}},[tab]);
   useEffect(()=>{document.body.setAttribute('data-theme', theme);try{localStorage.setItem('admin_theme', theme)}catch(e){}},[theme]);
+  useEffect(()=>{document.body.classList.toggle('focus-mode', focusMode);}, [focusMode]);
   useEffect(()=>{
     const handleKeyDown = (e) => {
       if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k'){ e.preventDefault(); setShowCmd(true); }
