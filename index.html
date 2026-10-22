@@ -192,7 +192,7 @@ async function sendReport(){
       return goLogin();
     }
 
-    if (user.role === "admin") {
+    if (user.role === "admin" || user.role === "owner") {
       statusEl.textContent = "جارٍ فتح لوحة الإدارة...";
       window.location.replace("/admin/index.html");
       return;
