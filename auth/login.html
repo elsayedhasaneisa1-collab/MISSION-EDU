@@ -147,14 +147,17 @@ body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 
     }catch(e){ return null; }
   }
   function setLockout(duration){ try{ localStorage.setItem(LOCKOUT_KEY, JSON.stringify({until: Date.now() + duration})); }catch(e){} }
+  
   const form = document.getElementById('loginForm');
   const phoneInput = document.getElementById('phone');
   const passInput = document.getElementById('password');
   const submitBtn = document.getElementById('submitBtn');
   const btnText = document.getElementById('btnText');
   const errorMsg = document.getElementById('errorMsg');
+  
   function showError(msg){ errorMsg.textContent = SECURITY.clean(msg); errorMsg.classList.add('show'); setTimeout(()=>errorMsg.classList.remove('show'), 6000); }
   function setLoading(l){ submitBtn.disabled = l; btnText.textContent = l ? 'جارٍ الدخول...' : 'دخول'; if(l && !document.getElementById('btnSpinner')){ const sp = document.createElement('span'); sp.className = 'spinner'; sp.id = 'btnSpinner'; submitBtn.prepend(sp); } else if(!l){ const sp = document.getElementById('btnSpinner'); if(sp) sp.remove(); } }
+  
   const lockout = getLockout();
   if(lockout){
     form.style.display = 'none';
@@ -165,11 +168,22 @@ body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 
     const timerInterval = setInterval(()=>{ const l = getLockout(); if(!l){ clearInterval(timerInterval); window.location.reload(); return; } const r = Math.ceil((l.until - Date.now()) / 1000); const el = document.getElementById('timerDisplay'); if(el) el.textContent = `${Math.floor(r/60)}:${String(r%60).padStart(2,'0')}`; }, 1000);
     return;
   }
+  
   const existing = MissionDB.getSessionId();
   if(existing){
-    MissionDB.getUser(existing).then(u => { if(u && u.active !== false && !u.banned){ window.location.replace(u.role === 'admin' ? '/index.html' : '/student/index.html'); } }).catch(() => {});
+    MissionDB.getUser(existing).then(u => { 
+      if(u && u.active !== false && !u.banned){ 
+        if(u.role === 'admin' || u.role === 'owner') {
+          window.location.replace('/admin/index.html'); 
+        } else {
+          window.location.replace('/student/index.html'); 
+        }
+      } 
+    }).catch(() => {});
   }
+  
   phoneInput.addEventListener('input', e => { e.target.value = e.target.value.replace(/[^\d+]/g, '').slice(0, 15); });
+  
   form.addEventListener('submit', async e => {
     e.preventDefault();
     errorMsg.classList.remove('show');
@@ -192,8 +206,13 @@ body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 
       localStorage.removeItem(RATE_LIMIT_KEY);
       localStorage.removeItem(LOCKOUT_KEY);
       MissionDB.setSession(user.id);
-      if(user.role === 'admin'){ window.location.replace('/index.html'); }
-      else { window.location.replace('/student/index.html'); }
+      
+      if(user.role === 'admin' || user.role === 'owner'){ 
+        window.location.replace('/admin/index.html'); 
+      } else { 
+        window.location.replace('/student/index.html'); 
+      }
+      
     } catch(err) {
       setLoading(false);
       const newAttempt = recordAttempt(phone);
