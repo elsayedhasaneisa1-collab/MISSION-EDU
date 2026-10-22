@@ -2,7 +2,7 @@
   "name": "MISSION EDU — منصة تعليمية متكاملة",
   "short_name": "MISSION EDU",
   "description": "منصة تعليمية عربية متكاملة للطلاب — دروس، اختبارات، شهادات، وتحديات",
-  "start_url": "/auth/login.html",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -14,82 +14,20 @@
   "prefer_related_applications": false,
   "categories": ["education", "productivity"],
   "icons": [
-    {
-      "src": "/logo.png",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.png",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.png",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.png",
-      "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.png",
-      "sizes": "256x256",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.png",
-      "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
+    { "src": "/logo.png", "sizes": "72x72", "type": "image/png", "purpose": "any" },
+    { "src": "/logo.png", "sizes": "96x96", "type": "image/png", "purpose": "any" },
+    { "src": "/logo.png", "sizes": "128x128", "type": "image/png", "purpose": "any" },
+    { "src": "/logo.png", "sizes": "144x144", "type": "image/png", "purpose": "any" },
+    { "src": "/logo.png", "sizes": "152x152", "type": "image/png", "purpose": "any" },
+    { "src": "/logo.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/logo.png", "sizes": "256x256", "type": "image/png", "purpose": "any" },
+    { "src": "/logo.png", "sizes": "384x384", "type": "image/png", "purpose": "any" },
+    { "src": "/logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/logo.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "screenshots": [
-    {
-      "src": "/logo.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "الرئيسية"
-    },
-    {
-      "src": "/logo.png",
-      "sizes": "1920x1080",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "الدروس"
-    }
+    { "src": "/logo.png", "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "الرئيسية" },
+    { "src": "/logo.png", "sizes": "1920x1080", "type": "image/png", "form_factor": "wide", "label": "الدروس" }
   ],
   "shortcuts": [
     {
@@ -117,15 +55,9 @@
   "share_target": {
     "action": "/student/index.html",
     "method": "GET",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
-    }
+    "params": { "title": "title", "text": "text", "url": "url" }
   },
   "protocol_handlers": [],
   "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
-  "launch_handler": {
-    "client_mode": "navigate-existing"
-  }
+  "launch_handler": { "client_mode": "navigate-existing" }
 }
