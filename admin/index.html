@@ -324,7 +324,33 @@ function AppProvider({children}){
     }catch(e){console.warn(e);}
   },[]);
 
-  useEffect(()=>{(async ()=>{try{const sid=DB.getSessionId();if(!sid){window.location.replace('/auth/login.html');return;}const u=await DB.getUser(sid);if(!u||u.active===false){DB.clearSession();window.location.replace('/auth/login.html');return;}if(u.role!=='admin' && u.role!=='owner'){window.location.replace('/student/index.html');return;}setCurrentUser(u);await reload();}catch(e){console.warn(e);}setLoading(false);})();},[]);
+  useEffect(()=>{(async ()=>{
+  try{
+    const sid=DB.getSessionId();
+    if(!sid){window.location.replace('/auth/login.html');return;}
+    const u=await DB.getUser(sid);
+    if(!u||u.active===false){DB.clearSession();window.location.replace('/auth/login.html');return;}
+    
+    // 🌟 السر كله هنا: بنشوف الرتبة بأي شكل (owner أو role_owner أو غيرها)
+    const rawRole = String(u.role || u.role_id || '').toLowerCase();
+    const isOwner = rawRole.includes('owner');
+    const isAdmin = rawRole.includes('admin');
+
+    if(!isAdmin && !isOwner){
+      window.location.replace('/student/index.html');
+      return;
+    }
+
+    // بنجبر الكود يفهم إنه أونر عشان يفتح السجل
+    u.role = isOwner ? 'owner' : 'admin';
+
+    setCurrentUser(u);
+    await reload();
+  }catch(e){
+    console.warn(e);
+  }
+  setLoading(false);
+})();},[]);
 
   useEffect(()=>{const interval=setInterval(async ()=>{const count=await DB.cleanupExpiredPolls();if(count>0){await reload();}},5*60*1000);return ()=>clearInterval(interval);},[reload]);
 
