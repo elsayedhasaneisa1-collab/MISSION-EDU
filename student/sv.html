@@ -328,14 +328,20 @@ function App() {
     if (busy) return;
     setBusy(true);
     try {
-      const count = parseInt(selQCount);
-      let qQuery = sb.from('questions_public').select('id');
-      if (selSubj) qQuery = qQuery.eq('subject_id', selSubj);
-      const { data: qs } = await qQuery.limit(200);
-      if (!qs || qs.length < count) {
-        Swal.fire('خطأ', 'الأسئلة غير كافية لهذا الاختبار', 'warning');
-        return;
-      }
+      let count = parseInt(selQCount);
+let qQuery = sb.from('questions_public').select('id');
+if (selSubj) qQuery = qQuery.eq('subject_id', selSubj);
+const { data: qs } = await qQuery.limit(200);
+
+if (!qs || qs.length === 0) {
+  Swal.fire('خطأ', 'لا توجد أسئلة في قاعدة البيانات حالياً. يرجى إضافة أسئلة أولاً.', 'warning');
+  return;
+}
+
+// لو عدد الأسئلة المتاح أقل من اللي إنت طالبه، هنستخدم المتاح
+if (qs.length < count) {
+  count = qs.length;
+}
       const shuffled = [...qs].sort(() => 0.5 - Math.random()).slice(0, count).map(q => q.id);
       const ch = {
         id: DB.uid('sv_'),
