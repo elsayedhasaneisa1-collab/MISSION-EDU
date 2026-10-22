@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mission-edu-v2';
+const CACHE_NAME = 'mission-edu-v4'; // غيرت الإصدار عشان يمسح الكاش القديم فوراً
 const PRECACHE = [
   '/',
   '/index.html',
@@ -13,10 +13,13 @@ const PRECACHE = [
   '/logo.png'
 ];
 
+// ضفنا هنا الصفحات الرئيسية عشان نضمن إنها تيجي من السيرفر الأول
 const NETWORK_FIRST = [
   'supabase.co',
   'supabase.in',
-  '/auth/'
+  '/auth/',
+  '/index.html',
+  '/' 
 ];
 
 self.addEventListener('install', (event) => {
@@ -41,7 +44,9 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
 
   const url = req.url;
-  const isNetworkFirst = NETWORK_FIRST.some((p) => url.includes(p));
+  // تحديث مهم: لو الطلب لصفحة HTML، اعتبرها Network First
+  const isHtml = req.mode === 'navigate' || (req.headers.get('accept') && req.headers.get('accept').includes('text/html'));
+  const isNetworkFirst = NETWORK_FIRST.some((p) => url.includes(p)) || isHtml;
 
   if (isNetworkFirst) {
     event.respondWith(
