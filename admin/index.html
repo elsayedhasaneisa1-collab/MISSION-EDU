@@ -324,7 +324,7 @@ function AppProvider({children}){
     }catch(e){console.warn(e);}
   },[]);
 
-  useEffect(()=>{(async ()=>{try{const sid=DB.getSessionId();if(!sid){window.location.replace('/auth/login.html');return;}const u=await DB.getUser(sid);if(!u||u.active===false){DB.clearSession();window.location.replace('/auth/login.html');return;}if(u.role!=='admin'){window.location.replace('/student/index.html');return;}setCurrentUser(u);await reload();}catch(e){console.warn(e);}setLoading(false);})();},[]);
+  useEffect(()=>{(async ()=>{try{const sid=DB.getSessionId();if(!sid){window.location.replace('/auth/login.html');return;}const u=await DB.getUser(sid);if(!u||u.active===false){DB.clearSession();window.location.replace('/auth/login.html');return;}if(u.role!=='admin' && u.role!=='owner'){window.location.replace('/student/index.html');return;}setCurrentUser(u);await reload();}catch(e){console.warn(e);}setLoading(false);})();},[]);
 
   useEffect(()=>{const interval=setInterval(async ()=>{const count=await DB.cleanupExpiredPolls();if(count>0){await reload();}},5*60*1000);return ()=>clearInterval(interval);},[reload]);
 
@@ -338,6 +338,59 @@ function AppProvider({children}){
       await DB.save('audit_logs', { id: DB.uid('log_'), admin_id: currentUser.id, admin_name: currentUser.name, action, target, details: details || {}, created_at: Date.now() });
     } catch(e) {}
   }, [currentUser]);
+
+  const origDBRef = useRef(null);
+  if (origDBRef.current === null && DB) {
+    origDBRef.current = {
+      save: DB.save?.bind(DB),
+      remove: DB.remove?.bind(DB),
+      removeMany: DB.removeMany?.bind(DB),
+      updateUser: DB.updateUser?.bind(DB),
+      unbanUser: DB.unbanUser?.bind(DB),
+      deleteQuestion: DB.deleteQuestion?.bind(DB),
+    };
+  }
+
+  useEffect(() => {
+    if (!currentUser || !origDBRef.current) return;
+    const orig = origDBRef.current;
+    if (orig.save) DB.save = async (table, item) => {
+      const r = await orig.save(table, item);
+      if (table !== 'audit_logs' && table !== 'activity') {
+        logAudit('save', `${table} — ${item?.title || item?.name || item?.id || ''}`, {table, id: item?.id}).catch(()=>{});
+      }
+      return r;
+    };
+    if (orig.remove) DB.remove = async (table, id) => {
+      const r = await orig.remove(table, id);
+      if (table !== 'audit_logs' && table !== 'activity') {
+        logAudit('delete', `${table} — ${id}`, {table, id}).catch(()=>{});
+      }
+      return r;
+    };
+    if (orig.removeMany) DB.removeMany = async (table, ids) => {
+      const r = await orig.removeMany(table, ids);
+      if (table !== 'audit_logs' && table !== 'activity') {
+        logAudit('bulk_delete', `${table} — ${ids?.length || 0} عنصر`, {table, count: ids?.length}).catch(()=>{});
+      }
+      return r;
+    };
+    if (orig.updateUser) DB.updateUser = async (id, patch) => {
+      const r = await orig.updateUser(id, patch);
+      logAudit('update_user', `مستخدم ${id}`, {id, patch}).catch(()=>{});
+      return r;
+    };
+    if (orig.unbanUser) DB.unbanUser = async (id) => {
+      const r = await orig.unbanUser(id);
+      logAudit('unban_user', `مستخدم ${id}`, {id}).catch(()=>{});
+      return r;
+    };
+    if (orig.deleteQuestion) DB.deleteQuestion = async (id) => {
+      const r = await orig.deleteQuestion(id);
+      logAudit('delete_question', `سؤال ${id}`, {id}).catch(()=>{});
+      return r;
+    };
+  }, [currentUser, logAudit]);
 
   const save=useCallback(async (table,item)=>{
     const clean = SEC.sanitizeObject(item);
@@ -353,23 +406,21 @@ function AppProvider({children}){
       try { localStorage.setItem('admin_db_cache', JSON.stringify(newDb)); } catch(e) {}
       return newDb;
     });
-    await logAudit('edit/create', `${table} : ${item.title || item.name || item.id}`, { table, id: item.id });
     return saved;
   },[logAudit]);
 
   const remove=useCallback(async (table,id)=>{
-    if(!id || typeof id!=='string' || id.length<3) throw new Error('معرف غير صالح');
+    if(!id || typeof id!=='string' || id.trim() === '') throw new Error('معرف غير صالح');
     await DB.remove(table,id);
     setDb(prev => {
       const newDb = { ...prev, [table]: (prev[table]||[]).filter(x => x.id !== id) };
       try { localStorage.setItem('admin_db_cache', JSON.stringify(newDb)); } catch(e) {}
       return newDb;
     });
-    await logAudit('delete', `${table} : ${id}`, { table, id });
   },[logAudit]);
 
   const removeMany=useCallback(async (table,ids)=>{
-    const clean = (ids||[]).filter(x=>typeof x==='string'&&x.length>=3);
+    const clean = (ids||[]).filter(x=>typeof x==='string' && x.trim() !== '');
     if(!clean.length) return;
     await DB.removeMany(table,clean);
     setDb(prev => {
@@ -377,7 +428,6 @@ function AppProvider({children}){
       try { localStorage.setItem('admin_db_cache', JSON.stringify(newDb)); } catch(e) {}
       return newDb;
     });
-    await logAudit('bulk_delete', `${table}`, { table, count: clean.length });
   },[logAudit]);
 
   const getLevel=useCallback((xp)=>{const ls=[...db.levels].sort((a,b)=>a.xp-b.xp);if(ls.length===0)return {current:{level:1,name:'مبتدئ',xp:0},next:null};let cur=ls[0],next=null;for(let i=0;i<ls.length;i++){if(xp>=ls[i].xp){cur=ls[i];next=ls[i+1]||null;}}return {current:cur,next};},[db.levels]);
@@ -670,7 +720,6 @@ function AuditLogsPage(){
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [adminFilter, setAdminFilter] = useState('all');
-
   useEffect(()=>{
     (async()=>{
       try{
@@ -684,13 +733,11 @@ function AuditLogsPage(){
       setLoading(false);
     })();
   },[]);
-
   const uniqueAdmins = useMemo(() => {
     const admins = new Set();
     logs.forEach(l => { if(l.admin_name) admins.add(l.admin_name); });
     return Array.from(admins);
   }, [logs]);
-
   const filteredLogs = useMemo(() => {
     return logs.filter(l => {
       const matchAdmin = adminFilter === 'all' || l.admin_name === adminFilter;
@@ -702,13 +749,11 @@ function AuditLogsPage(){
       return matchAdmin && matchSearch;
     });
   }, [logs, adminFilter, search]);
-
   return <>
     <div className="flex between center mb16 wrap g8">
       <div className="h2 grad">📜 سجل عمليات الأدمن</div>
       <span className="pill pill-b">{filteredLogs.length} عملية</span>
     </div>
-
     <div className="glass mb16" style={{padding:14}}>
       <div className="flex wrap g12">
         <select className="input" style={{maxWidth:250}} value={adminFilter} onChange={e=>setAdminFilter(e.target.value)}>
@@ -720,7 +765,6 @@ function AuditLogsPage(){
         <input className="input" style={{maxWidth:300}} value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍 ابحث في الإجراءات أو التفاصيل..."/>
       </div>
     </div>
-
     <div className="glass" style={{padding:14}}>
       {loading ? (
         <div className="flex col g8">{[1,2,3,4,5].map(i=><div key={i} className="skeleton" style={{height:40, width:'100%'}}/>)}</div>
@@ -773,7 +817,7 @@ function StudentProfilePage({studentId,onClose}){
   const totalLessons=app.db.lessons.length;
   const progress=totalLessons?Math.round((completed/totalLessons)*100):0;
   const timeline = (app.db.activity||[]).filter(a=>a.user_id===studentId).sort((a,b)=>b.at-a.at);
-  const sendMessage=async()=>{if(!SEC.rateLimit('adm_msg_'+studentId, 2000)) return app.toast.warn('انتظر لحظة قبل الإرسال التالي');const t = SEC.clean(SEC.maxLen(msgTitle,120));const b = SEC.clean(SEC.maxLen(msgBody,2000));if(!t || !b) return app.toast.warn('العنوان والنص مطلوبان');setBusy(true);try{await app.save('notifications',{title:t,body:b,target:studentId,read_by:[],created_at:Date.now()});app.toast.ok('تم إرسال الرسالة');setMsgTitle('');setMsgBody('');}catch(e){app.toast.err(e.message);}setBusy(false);};
+  const sendMessage=async()=>{if(!SEC.rateLimit('adm_msg_'+studentId, 2000)) return app.toast.warn('انتظر لحظة قبل الإرسال التالي');const t = SEC.clean(SEC.maxLen(msgTitle,120));const b = SEC.clean(SEC.maxLen(msgBody,2000));if(!t || !b) return app.toast.warn('العنوان والنص مطلوبان');setBusy(true);try{await app.save('notifications',{id: DB.uid('notif_'), title:t,body:b,target:studentId,read_by:[],created_at:Date.now()});app.toast.ok('تم إرسال الرسالة');setMsgTitle('');setMsgBody('');}catch(e){app.toast.err(e.message);}setBusy(false);};
   const toggleBan=async()=>{const isBanned=student.banned===true;const r=await Swal.fire({title:isBanned?'فك الحظر؟':'حظر الطالب؟',text:isBanned?'سيتم استعادة وصول الطالب للمنصة':'لن يستطيع الطالب الدخول',icon:isBanned?'question':'warning',showCancelButton:true,confirmButtonText:isBanned?'نعم، فك':'نعم، احظر',cancelButtonText:'إلغاء',confirmButtonColor:isBanned?'#22c55e':'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{await app.save('users',{...student, banned:!isBanned, ban_reason:isBanned?null:'حظر يدوي من الأدمن', banned_at:isBanned?null:Date.now()});app.toast.ok(isBanned?'تم فك الحظر':'تم الحظر');}catch(e){app.toast.err(e.message);}};
   const toggleActive=async()=>{try{await app.save('users',{...student, active:student.active===false});app.toast.ok('تم');}catch(e){app.toast.err(e.message);}};
   return <>
@@ -1404,7 +1448,7 @@ function NotificationsPage(){
     const t=SEC.clean(SEC.maxLen(form.title,120)),b=SEC.clean(SEC.maxLen(form.body,2000));
     if(!t||!b)return app.toast.warn('العنوان والنص مطلوبان');
     setBusy(true);
-    try{await app.save('notifications',{title:t,body:b,target:form.target,read_by:[],created_at:Date.now()});app.toast.ok('تم');setForm({title:'',body:'',target:'all'});}catch(e){app.toast.err(e.message);}
+    try{await app.save('notifications',{id: DB.uid('notif_'), title:t,body:b,target:form.target,read_by:[],created_at:Date.now()});app.toast.ok('تم');setForm({title:'',body:'',target:'all'});}catch(e){app.toast.err(e.message);}
     setBusy(false);
   };
   const del=async id=>{const r=await Swal.fire({title:'حذف؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{await app.remove('notifications',id);app.toast.warn('تم');}catch(e){app.toast.err(e.message);}};
@@ -1495,6 +1539,7 @@ function ReportsPage(){
       const sb=await DB.getClient();
       const {data,error}=await sb.rpc('admin_review_report',{p_report_id: reportId,p_admin_id: app.currentUser.id,p_status: status,p_action: action || null,p_notes: null,p_ban_target: !!banTarget,p_ban_reason: banReason || null});
       if(error)throw new Error(error.message);
+      await app.logAudit('review_report', `بلاغ ${reportId} → ${status}${banTarget?' [حظر]':''}`, { reportId, status, action, banTarget, banReason });
       app.toast.ok(banTarget?'✓ تم الحظر':'✓ تم تحديث البلاغ');
       await loadReports();
       await app.reload();
@@ -2331,7 +2376,14 @@ function AdminApp(){
   useEffect(()=>{if(tab==='notifications'){try{localStorage.setItem('admin_last_notif_seen',Date.now().toString())}catch(e){}}},[tab]);
   const bannedCount=(app.db.users||[]).filter(u=>u.role==='student'&&u.banned===true).length;
   const items=[
-    {title:'الرئيسية',items:[{id:'dashboard',icon:'dashboard',label:'لوحة التحكم'},{id:'advanced-stats',icon:'trend',label:'إحصائيات متقدمة'},{id:'activity',icon:'activity',label:'سجل النشاط'},{id:'exam-results',icon:'clipboard',label:'نتايج الاختبارات'},{id:'errors',icon:'alert',label:'تحليل الأخطاء'},{id:'audit-logs',icon:'lock',label:'سجل العمليات'}]},
+    {title:'الرئيسية',items:[
+      {id:'dashboard',icon:'dashboard',label:'لوحة التحكم'},
+      {id:'advanced-stats',icon:'trend',label:'إحصائيات متقدمة'},
+      {id:'activity',icon:'activity',label:'سجل النشاط'},
+      {id:'exam-results',icon:'clipboard',label:'نتايج الاختبارات'},
+      {id:'errors',icon:'alert',label:'تحليل الأخطاء'},
+      ...(user?.role === 'owner' ? [{id:'audit-logs',icon:'lock',label:'سجل العمليات'}] : []),
+    ]},
     {title:'المحتوى',items:[{id:'grades',icon:'school',label:'الصفوف'},{id:'subjects',icon:'book',label:'المواد'},{id:'units',icon:'folder',label:'الوحدات'},{id:'lessons',icon:'file',label:'الدروس'},{id:'exams',icon:'clipboard',label:'الاختبارات'},{id:'questions-bank',icon:'database',label:'بنك الأسئلة'},{id:'missions',icon:'target',label:'المهام'}]},
     {title:'التحفيز',items:[{id:'achievements',icon:'trophy',label:'الإنجازات'},{id:'levels',icon:'trend',label:'المستويات'},{id:'certificates',icon:'award',label:'مولّد الشهادات'},{id:'xp-shop',icon:'shoppingBag',label:'متجر XP'},{id:'daily-challenges',icon:'zapCircle',label:'التحديات اليومية'}]},
     {title:'الطلاب',items:[{id:'students',icon:'users',label:'الطلاب'},{id:'banned',icon:'lock',label:'المحظورون',badge:bannedCount||null},{id:'notes',icon:'note',label:'ملاحظات'},{id:'notifications',icon:'bell',label:'الإشعارات',badge:unreadNotifs||null},{id:'reports',icon:'link',label:'البلاغات'}]},
@@ -2350,7 +2402,7 @@ function AdminApp(){
         {tab==='activity'&&<ActivityLog/>}
         {tab==='exam-results'&&<ExamResultsPage/>}
         {tab==='errors'&&<ErrorsAnalyticsPage/>}
-        {tab==='audit-logs'&&<AuditLogsPage/>}
+        {tab==='audit-logs'&&user?.role==='owner'&&<AuditLogsPage/>}
         {tab==='grades'&&<GradesPage/>}
         {tab==='subjects'&&<SubjectsPage/>}
         {tab==='units'&&<UnitsPage/>}
@@ -2390,7 +2442,7 @@ function Root(){
   const app=useApp();
   if(app.loading)return <div className="loading"><div className="spinner"></div>جارٍ التحميل...</div>;
   if(!app.currentUser)return null;
-  if(app.currentUser.role!=='admin')return null;
+  if(app.currentUser.role!=='admin' && app.currentUser.role!=='owner')return null;
   return <AdminApp/>;
 }
 
