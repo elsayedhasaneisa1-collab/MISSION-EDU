@@ -304,11 +304,12 @@ function App() {
     const timeTaken = (Date.now() - qStartTime) / 1000;
     try {
       const { data, error } = await sb.rpc('sv_submit_answer', {
-        p_challenge_id: challenge.id,
-        p_question_index: qIndex,
-        p_answer_index: optIdx,
-        p_time_taken: timeTaken
-      });
+  p_challenge_id: challenge.id,
+  p_question_index: qIndex,
+  p_answer_index: optIdx,
+  p_time_taken: timeTaken,
+  p_user_id: user.id
+});
       if (error) throw new Error(error.message);
       setAnswerResult(data);
       if (data.is_correct) playSound('correct');
