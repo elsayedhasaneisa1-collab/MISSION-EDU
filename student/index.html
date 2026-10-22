@@ -527,7 +527,7 @@ const completed=toArray(user.completed_lessons).length;
     setClaiming(true);
     try {
       const sb = await DB.getClient();
-      const { data, error } = await sb.rpc('claim_daily_reward');
+      const { data, error } = await sb.rpc('claim_daily_reward', { p_user_id: user.id });
       if (error) throw new Error(error.message);
       if (!data.claimed) { app.toast.info('استلمت مكافأة اليوم بالفعل'); await app.reload(); return; }
       playSound('success');
