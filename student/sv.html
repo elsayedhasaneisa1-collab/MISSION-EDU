@@ -254,7 +254,7 @@ function App() {
     if (view === 'game' && challenge && questions.length === 0) {
       const qIds = parseQuestionIds(challenge.question_ids);
       if (qIds.length === 0) return;
-      sb.from('questions_public').select('id,text,options').in('id', qIds).then(({ data }) => {
+      sb.from('questions').select('id,text,options').in('id', qIds).then(({ data }) => {
         const ordered = qIds.map(id => (data || []).find(q => q.id === id)).filter(Boolean);
         setQuestions(ordered);
       });
@@ -329,20 +329,24 @@ function App() {
     setBusy(true);
     try {
       let count = parseInt(selQCount);
-let qQuery = sb.from('questions_public').select('id');
-if (selSubj) qQuery = qQuery.eq('subject_id', selSubj);
-const { data: qs } = await qQuery.limit(200);
+      let qQuery = sb.from('questions').select('id');
+      if (selSubj) qQuery = qQuery.eq('subject_id', selSubj);
+      
+      const { data: qs, error } = await qQuery.limit(500);
+      if (error) throw new Error(error.message);
+      
+      if (!qs || qs.length === 0) {
+        Swal.fire('تنبيه', 'لا توجد أسئلة كافية في هذه المادة. جرب تختار "كل المواد".', 'warning');
+        setBusy(false);
+        return;
+      }
 
-if (!qs || qs.length === 0) {
-  Swal.fire('خطأ', 'لا توجد أسئلة في قاعدة البيانات حالياً. يرجى إضافة أسئلة أولاً.', 'warning');
-  return;
-}
-
-// لو عدد الأسئلة المتاح أقل من اللي إنت طالبه، هنستخدم المتاح
-if (qs.length < count) {
-  count = qs.length;
-}
+      if (qs.length < count) {
+        count = qs.length;
+      }
+      
       const shuffled = [...qs].sort(() => 0.5 - Math.random()).slice(0, count).map(q => q.id);
+      
       const ch = {
         id: DB.uid('sv_'),
         host_id: user.id,
@@ -355,8 +359,10 @@ if (qs.length < count) {
         total_questions: count,
         created_at: Date.now()
       };
-      const { error } = await sb.from('sv_challenges').insert([ch]);
-      if (error) throw new Error(error.message);
+      
+      const { error: insErr } = await sb.from('sv_challenges').insert([ch]);
+      if (insErr) throw new Error(insErr.message);
+      
       setChallenge(ch);
       setView('waiting');
     } catch (e) {
@@ -404,7 +410,13 @@ if (qs.length < count) {
 
   const finishGame = async () => {
     if (!challenge || !sb) return;
-    try { await sb.from('sv_challenges').delete().eq('id', challenge.id); } catch (e) {}
+    try { 
+      await sb.from('sv_answers').delete().eq('challenge_id', challenge.id);
+      await sb.from('sv_messages').delete().eq('challenge_id', challenge.id);
+      await sb.from('sv_challenges').delete().eq('id', challenge.id); 
+    } catch (e) {
+      console.log('Cleanup error:', e);
+    }
     window.location.href = '/student/index.html';
   };
 
