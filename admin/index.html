@@ -542,7 +542,22 @@ function Crud({title,collection,defaultItem,fields,columns}){
   const rows=app.db[collection]||[];
   const openNew=()=>{setForm(defaultItem());setEditing('new');};
   const openEdit=it=>{setForm(JSON.parse(JSON.stringify(it)));setEditing(it.id);};
-  const save=async ()=>{setBusy(true);try{await app.save(collection,form);app.toast.ok('تم الحفظ');setEditing(null);}catch(e){app.toast.err(e.message);}setBusy(false);};
+  const save=async ()=>{
+  setBusy(true);
+  try{
+    const cleanForm = {...form};
+    // حماية عامة: تحويل أي حقل فاضي (نص) لـ null عشان الداتابيز متضربش إيرور
+    Object.keys(cleanForm).forEach(key => {
+      if (cleanForm[key] === '') cleanForm[key] = null;
+    });
+    await app.save(collection, cleanForm);
+    app.toast.ok('تم الحفظ');
+    setEditing(null);
+  }catch(e){
+    app.toast.err(e.message);
+  }
+  setBusy(false);
+};
   const del=async id=>{const r=await Swal.fire({title:'حذف العنصر؟',text:'لا يمكن التراجع',icon:'warning',showCancelButton:true,confirmButtonText:'نعم، احذف',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #1c160c, #0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{await app.remove(collection,id);app.toast.warn('تم الحذف');}catch(e){app.toast.err(e.message);}};
   return <>
     <div className="flex between center mb16 wrap g8"><div className="h2 grad">{title}</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> جديد</button></div>
