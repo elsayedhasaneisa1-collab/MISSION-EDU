@@ -47,8 +47,10 @@ body{font-family:'Tajawal','Cairo',sans-serif;background:radial-gradient(1200px 
 .tug-host{left:50%;background:#2f7dff}
 .tug-guest{right:50%;background:#ef4444}
 .question-card{padding:30px;text-align:center;margin-bottom:20px;position:relative}
-.timer-ring{position:absolute;top:-20px;right:20px;width:50px;height:50px;display:grid;place-items:center;background:#0b1122;border-radius:50%;border:2px solid #fbbf24;font-weight:900;font-size:18px;color:#fbbf24;font-variant-numeric:tabular-nums}
-.question-text{font-size:22px;font-weight:800;line-height:1.6;margin-bottom:24px;margin-top:10px}
+.total-timer{position:absolute;top:-20px;right:20px;min-width:80px;height:50px;display:flex;align-items:center;justify-content:center;gap:6px;background:#0b1122;border-radius:50px;border:2px solid #fbbf24;font-weight:900;font-size:18px;color:#fbbf24;font-variant-numeric:tabular-nums;padding:0 15px}
+.total-timer.warning{border-color:#ef4444;color:#fca5a5;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.question-text{font-size:22px;font-weight:800;line-height:1.6;margin-bottom:24px;margin-top:20px}
 .options{display:flex;flex-direction:column;gap:12px}
 .opt{padding:16px 20px;border-radius:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(90,140,230,.2);cursor:pointer;text-align:right;font-size:16px;font-weight:600;transition:.2s;display:flex;align-items:center;gap:14px}
 .opt:hover{background:rgba(47,125,255,.1);border-color:#2f7dff}
@@ -99,6 +101,12 @@ function parseQuestionIds(raw) {
   return [];
 }
 
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
+
 function App() {
   const [sb, setSb] = useState(null);
   const [user, setUser] = useState(null);
@@ -106,13 +114,13 @@ function App() {
   const [subjects, setSubjects] = useState([]);
   const [selSubj, setSelSubj] = useState('');
   const [selQCount, setSelQCount] = useState(10);
+  const [selDuration, setSelDuration] = useState(15);
   const [challenge, setChallenge] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [qIndex, setQIndex] = useState(0);
   const [myAnswer, setMyAnswer] = useState(null);
   const [answerResult, setAnswerResult] = useState(null);
-  const [timer, setTimer] = useState(15);
-  const [qStartTime, setQStartTime] = useState(0);
+  const [totalTimeLeft, setTotalTimeLeft] = useState(0);
   const [isVsShowing, setIsVsShowing] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -122,7 +130,6 @@ function App() {
   const [busy, setBusy] = useState(false);
   const [disconnected, setDisconnected] = useState(false);
 
-  const timerRef = useRef(null);
   const lastUpdateRef = useRef(Date.now());
   const msgRateRef = useRef(0);
   const gameStartedRef = useRef(false);
@@ -164,7 +171,6 @@ function App() {
     setTimeout(() => {
       setIsVsShowing(false);
       setView('game');
-      setQStartTime(Date.now());
       lastUpdateRef.current = Date.now();
     }, 3000);
   }, []);
@@ -193,12 +199,12 @@ function App() {
         if (ch && ch.host_id !== u.id) {
           const { data: hostUser } = await client.from('users').select('name').eq('id', ch.host_id).maybeSingle();
           if (hostUser) setOpponentName(hostUser.name || 'الخصم');
-          const { error: updateErr } = await client.from('sv_challenges').update({ guest_id: u.id, status: 'playing' }).eq('id', ch.id).eq('status', 'waiting');
+          const { error: updateErr } = await client.from('sv_challenges').update({ guest_id: u.id, status: 'playing', started_at: Date.now() }).eq('id', ch.id).eq('status', 'waiting');
           if (updateErr) {
             Swal.fire('خطأ', 'تعذر الانضمام للتحدي', 'error').then(() => window.location.href = '/student/index.html');
             return;
           }
-          setChallenge({ ...ch, guest_id: u.id, status: 'playing' });
+          setChallenge({ ...ch, guest_id: u.id, status: 'playing', started_at: Date.now() });
           setView('waiting');
           triggerStart();
         } else if (ch && ch.host_id === u.id) {
@@ -230,8 +236,6 @@ function App() {
           setQIndex(newData.current_question);
           setMyAnswer(null);
           setAnswerResult(null);
-          setTimer(15);
-          setQStartTime(Date.now());
         }
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'sv_messages', filter: `challenge_id=eq.${challenge.id}` }, payload => {
@@ -262,14 +266,25 @@ function App() {
   }, [view, challenge, questions.length, sb]);
 
   useEffect(() => {
-    if (view !== 'game' || isVsShowing) return;
-    if (timer <= 0) {
-      if (challenge && challenge.host_id === user?.id) checkAdvance(true);
-      return;
-    }
-    timerRef.current = setTimeout(() => setTimer(t => t - 1), 1000);
-    return () => clearTimeout(timerRef.current);
-  }, [timer, view, challenge, user, isVsShowing]);
+    if (view !== 'game' || !challenge || !challenge.started_at) return;
+    
+    const interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - challenge.started_at) / 1000);
+      const remaining = (challenge.duration || 900) - elapsed;
+      
+      if (remaining <= 0) {
+        clearInterval(interval);
+        setTotalTimeLeft(0);
+        if (challenge.host_id === user?.id) {
+          sb.from('sv_challenges').update({ status: 'finished' }).eq('id', challenge.id);
+        }
+      } else {
+        setTotalTimeLeft(remaining);
+      }
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [view, challenge?.started_at, challenge?.duration, user, sb]);
 
   useEffect(() => {
     if (view !== 'game') return;
@@ -298,18 +313,17 @@ function App() {
   };
 
   const handleAnswer = async (optIdx) => {
-    if (myAnswer !== null || isVsShowing || busy) return;
+    if (myAnswer !== null || isVsShowing || busy || totalTimeLeft <= 0) return;
     setBusy(true);
     setMyAnswer(optIdx);
-    const timeTaken = (Date.now() - qStartTime) / 1000;
     try {
-      const { data, error } = await sb.rpc('sv_submit_answer', {
-  p_challenge_id: challenge.id,
-  p_question_index: qIndex,
-  p_answer_index: optIdx,
-  p_time_taken: timeTaken,
-  p_user_id: user.id
-});
+      const { data, error } = await sb.rpc('sv_submit_answer_v2', {
+        p_challenge_id: challenge.id,
+        p_question_index: qIndex,
+        p_answer_index: optIdx,
+        p_time_taken: 0,
+        p_user_id: user.id
+      });
       if (error) throw new Error(error.message);
       setAnswerResult(data);
       if (data.is_correct) playSound('correct');
@@ -359,6 +373,8 @@ function App() {
         guest_score: 0,
         current_question: 0,
         total_questions: count,
+        duration: parseInt(selDuration) * 60,
+        started_at: null,
         created_at: Date.now()
       };
       
@@ -491,6 +507,17 @@ function App() {
               <option value="5">5 أسئلة (سريع)</option>
               <option value="10">10 أسئلة (متوسط)</option>
               <option value="15">15 سؤال (تحدي)</option>
+              <option value="20">20 سؤال (ماراثون)</option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label className="lbl">وقت المباراة الإجمالي</label>
+            <select className="input" value={selDuration} onChange={e => setSelDuration(e.target.value)}>
+              <option value="5">5 دقائق (سريع جداً)</option>
+              <option value="10">10 دقائق (سريع)</option>
+              <option value="15">15 دقيقة (متوسط)</option>
+              <option value="20">20 دقيقة (طويل)</option>
+              <option value="30">30 دقيقة (ماراثون)</option>
             </select>
           </div>
           <button className="btn btn-p" style={{ width: '100%', marginTop: 10 }} onClick={createChallenge} disabled={busy}>
@@ -520,7 +547,9 @@ function App() {
           )}
           <div className="game-header">
             <div className="score-box mine"><span>أنت</span><b>{score.mine}</b></div>
-            <div style={{ fontSize: 28, fontWeight: 900, color: timer <= 5 ? '#fca5a5' : '#fbbf24', minWidth: 50, textAlign: 'center', fontVariantNumeric: 'tabular-nums' }}>{timer}</div>
+            <div className={`total-timer ${totalTimeLeft <= 60 ? 'warning' : ''}`}>
+              ⏳ {formatTime(totalTimeLeft)}
+            </div>
             <div className="score-box theirs"><b>{score.theirs}</b><span>{opponentName}</span></div>
           </div>
           <div className="tug-bar">
@@ -528,7 +557,6 @@ function App() {
             <div className="tug-guest" style={{ width: `${getTugWidth()}%` }}></div>
           </div>
           <div className="glass question-card">
-            <div className="timer-ring" style={{ borderColor: timer <= 5 ? '#ef4444' : '#fbbf24', color: timer <= 5 ? '#fca5a5' : '#fbbf24' }}>{timer}</div>
             <div style={{ color: '#7f93b8', marginBottom: 10, fontWeight: 700 }}>سؤال {qIndex + 1} من {totalQ}</div>
             <div className="question-text">{questions[qIndex]?.text || ''}</div>
             <div className="options">
@@ -553,6 +581,11 @@ function App() {
                 {answerResult
                   ? (answerResult.is_correct ? '✅ إجابة صحيحة! بانتظار الخصم...' : '❌ إجابة خاطئة. بانتظار الخصم...')
                   : 'جارٍ التحقق...'}
+              </div>
+            )}
+            {totalTimeLeft <= 0 && (
+              <div style={{ marginTop: 20, color: '#ef4444', fontWeight: 800 }}>
+                ⏰ انتهى الوقت!
               </div>
             )}
           </div>
