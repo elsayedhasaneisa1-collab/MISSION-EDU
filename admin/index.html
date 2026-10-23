@@ -1030,7 +1030,34 @@ function LessonsPage(){
     } catch(e) {app.toast.err('فشل: ' + (e.message || 'خطأ'));}
     setLessonTestBusy(false);
   };
-  const save=async()=>{if(!form.title)return app.toast.warn('العنوان مطلوب');if(!form.unit_id)return app.toast.warn('اختر الوحدة');setBusy(true);try{const saved=await app.save('lessons',form);if(editing==='new'){const lesson=saved||form;setForm(lesson);setEditing(lesson.id);setLessonTestTitle(`اختبار ${lesson.title||'الدرس'}`);app.toast.ok('تم حفظ الدرس.');}else{app.toast.ok('تم الحفظ');setEditing(null);}}catch(e){app.toast.err(e.message);}setBusy(false);};
+  const save=async()=>{
+  if(!form.title)return app.toast.warn('العنوان مطلوب');
+  if(!form.unit_id)return app.toast.warn('اختر الوحدة');
+  
+  // فحص أمان: نتأكد إن الوحدة موجودة فعلاً قبل الحفظ
+  const unitExists = app.db.units.some(u => u.id === form.unit_id);
+  if(!unitExists) return app.toast.err('الوحدة المحددة غير موجودة أو تم حذفها. يرجى تحديث الصفحة واختيار وحدة أخرى.');
+
+  setBusy(true);
+  try{
+    const cleanForm = {...form};
+    Object.keys(cleanForm).forEach(key => {
+      if (cleanForm[key] === '') cleanForm[key] = null;
+    });
+    const saved=await app.save('lessons',cleanForm);
+    if(editing==='new'){
+      const lesson=saved||form;
+      setForm(lesson);
+      setEditing(lesson.id);
+      setLessonTestTitle(`اختبار ${lesson.title||'الدرس'}`);
+      app.toast.ok('تم حفظ الدرس.');
+    }else{
+      app.toast.ok('تم الحفظ');
+      setEditing(null);
+    }
+  }catch(e){app.toast.err(e.message);}
+  setBusy(false);
+};
   const del=async id=>{const r=await Swal.fire({title:'حذف الدرس؟',text:'لا يمكن التراجع',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{await app.remove('lessons',id);app.toast.warn('تم');}catch(e){app.toast.err(e.message);}};
   const getLessonExams=lessonId=>app.db.exams.filter(e=>(e.lesson_ids||[]).includes(lessonId));
   const sortedLessons=useMemo(()=>[...app.db.lessons].sort((a,b)=>{const ta=new Date(a.created_at||a.createdAt||0).getTime()||0;const tb=new Date(b.created_at||b.createdAt||0).getTime()||0;return ta-tb;}),[app.db.lessons]);
