@@ -315,9 +315,9 @@ function AppProvider({children}){
     try{
       await DB.cleanupExpiredPolls();
       const data=await DB.loadAll();
-      const extra=['xp_shop_items','study_groups','study_group_members','study_plans','study_tasks','daily_challenges','practice_sessions','focus_sessions','flashcards','xp_purchases','video_progress','daily_reward','audit_logs'];
+      const extra=['xp_shop_items','study_groups','study_group_members','study_plans','study_tasks','daily_challenges','practice_sessions','focus_sessions','flashcards','xp_purchases','video_progress','daily_reward','audit_logs', 'questions', 'exams', 'lessons', 'units', 'subjects', 'grades'];
       const sb=await DB.getClient();
-      const extraResults=await Promise.all(extra.map(async(t)=>{try{const res=await sb.from(t).select('*').limit(2000);return{t,data:res.data||[]};}catch(e){return{t,data:[]};}}));
+      const extraResults=await Promise.all(extra.map(async(t)=>{try{const res=await sb.from(t).select('*').limit(5000);return{t,data:res.data||[]};}catch(e){return{t,data:data[t]||[]};}}));
       extraResults.forEach(r=>{data[r.t]=r.data;});
       setDb(data);
       try { localStorage.setItem('admin_db_cache', JSON.stringify(data)); } catch(e) {}
@@ -362,6 +362,7 @@ function AppProvider({children}){
       return r;
     };
     if (orig.remove) DB.remove = async (table, id) => {
+      if(!['admin', 'owner'].includes(currentUser?.role)) throw new Error('غير مصرح لك بالحذف');
       const r = await orig.remove(table, id);
       if (table !== 'audit_logs' && table !== 'activity') {
         logAudit('delete', `${table} — ${id}`, {table, id}).catch(()=>{});
@@ -369,6 +370,7 @@ function AppProvider({children}){
       return r;
     };
     if (orig.removeMany) DB.removeMany = async (table, ids) => {
+      if(!['admin', 'owner'].includes(currentUser?.role)) throw new Error('غير مصرح لك بالحذف');
       const r = await orig.removeMany(table, ids);
       if (table !== 'audit_logs' && table !== 'activity') {
         logAudit('bulk_delete', `${table} — ${ids?.length || 0} عنصر`, {table, count: ids?.length}).catch(()=>{});
@@ -386,6 +388,7 @@ function AppProvider({children}){
       return r;
     };
     if (orig.deleteQuestion) DB.deleteQuestion = async (id) => {
+      if(!['admin', 'owner'].includes(currentUser?.role)) throw new Error('غير مصرح لك بالحذف');
       const r = await orig.deleteQuestion(id);
       logAudit('delete_question', `سؤال ${id}`, {id}).catch(()=>{});
       return r;
@@ -410,6 +413,7 @@ function AppProvider({children}){
   },[logAudit]);
 
   const remove=useCallback(async (table,id)=>{
+    if(!['admin', 'owner'].includes(currentUser?.role)) { toast.err('غير مصرح لك بالحذف'); return; }
     if(!id || typeof id!=='string' || id.trim() === '') throw new Error('معرف غير صالح');
     await DB.remove(table,id);
     setDb(prev => {
@@ -417,9 +421,10 @@ function AppProvider({children}){
       try { localStorage.setItem('admin_db_cache', JSON.stringify(newDb)); } catch(e) {}
       return newDb;
     });
-  },[logAudit]);
+  },[logAudit, currentUser, toast]);
 
   const removeMany=useCallback(async (table,ids)=>{
+    if(!['admin', 'owner'].includes(currentUser?.role)) { toast.err('غير مصرح لك بالحذف'); return; }
     const clean = (ids||[]).filter(x=>typeof x==='string' && x.trim() !== '');
     if(!clean.length) return;
     await DB.removeMany(table,clean);
@@ -428,7 +433,7 @@ function AppProvider({children}){
       try { localStorage.setItem('admin_db_cache', JSON.stringify(newDb)); } catch(e) {}
       return newDb;
     });
-  },[logAudit]);
+  },[logAudit, currentUser, toast]);
 
   const getLevel=useCallback((xp)=>{const ls=[...db.levels].sort((a,b)=>a.xp-b.xp);if(ls.length===0)return {current:{level:1,name:'مبتدئ',xp:0},next:null};let cur=ls[0],next=null;for(let i=0;i<ls.length;i++){if(xp>=ls[i].xp){cur=ls[i];next=ls[i+1]||null;}}return {current:cur,next};},[db.levels]);
 
@@ -543,7 +548,7 @@ function Crud({title,collection,defaultItem,fields,columns}){
     <div className="flex between center mb16 wrap g8"><div className="h2 grad">{title}</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> جديد</button></div>
     <div className="glass" style={{padding:14}}>
       {rows.length===0?<Empty icon="📭" title="لا توجد عناصر" desc="ابدأ بإضافة عنصر جديد"/>:
-      <div className="sx"><table className="tbl"><thead><tr>{columns.map((c,i)=><th key={i}>{c.label}</th>)}<th>إجراءات</th></tr></thead><tbody>{rows.map(it=><tr key={it.id}>{columns.map((c,i)=><td key={i}>{c.render?c.render(it):(it[c.key] ?? '—')}</td>)}<td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(it)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(it.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody></table></div>}
+      <div className="sx"><table className="tbl"><thead><tr>{columns.map((c,i)=><th key={i}>{c.label}</th>)}<th>إجراءات</th></tr></thead><tbody>{rows.map(it=><tr key={it.id}>{columns.map((c,i)=><td key={i}>{c.render?c.render(it):(it[c.key] ?? '—')}</td>)}<td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(it)}><Icon name="edit" size={13}/></button>{['admin', 'owner'].includes(app.currentUser?.role) && <button className="btn btn-dn btn-sm" onClick={()=>del(it.id)}><Icon name="trash" size={13}/></button>}</div></td></tr>)}</tbody></table></div>}
     </div>
     {editing!==null&&<Modal title={editing==='new'?`${title} — جديد`:`${title} — تعديل`} onClose={()=>setEditing(null)} wide>
       {fields.map(f=>{const val=form[f.key]??'';
@@ -998,7 +1003,11 @@ function LessonsPage(){
     setLessonTestBusy(true);
     try {
       const questionIds = [];
-      for(const q of parsed) {const id = DB.uid('q_');await app.save('questions', {id, text: q.text, options: q.options, correct: [q.correct],explanation: q.explanation, lesson_id: lesson.id,unit_id: lesson.unit_id, subject_id: subjectId,difficulty: q.difficulty, xp: Number(q.xp) || Number(lessonTestXp) || 0, type: 'mcq'});questionIds.push(id);}
+      for(const q of parsed) {
+        const id = DB.uid('q_');
+        await app.save('questions', {id, text: q.text, options: q.options, correct: [q.correct],explanation: q.explanation, lesson_id: lesson.id,unit_id: lesson.unit_id, subject_id: subjectId,difficulty: q.difficulty, xp: Number(q.xp) || Number(lessonTestXp) || 0, type: 'mcq'});
+        questionIds.push(id);
+      }
       const exam = {id: DB.uid('exam_'), title: lessonTestTitle.trim(),subject_id: subjectId, unit_id: lesson.unit_id, lesson_ids: [lesson.id],question_ids: questionIds, duration: Number(lessonTestDuration) || 15,pass_score: Number(lessonTestPassScore) || 0, max_attempts: 0,xp: Number(lessonTestXp) || 0, published: true, sort_order: 0,is_free: lessonTestFree};
       await app.save('exams', exam);
       app.toast.ok(`تم إنشاء اختبار بـ ${questionIds.length} سؤال`);
@@ -1018,7 +1027,7 @@ function LessonsPage(){
     <div className="glass" style={{padding:14}}>
       {filteredLessons.length===0?<Empty title="لا دروس"/>:
       <div className="sx"><table className="tbl"><thead><tr><th>الدرس</th><th>الوحدة</th><th>الوصول</th><th>اختبار</th><th>PDF</th><th>XP</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>
-        {filteredLessons.map(l=>{const isFree=!l.video||!l.video.url||l.video.is_free!==false;const exams=getLessonExams(l.id);const totalQs=exams.reduce((s,e)=>s+(e.question_ids||[]).length,0);const hasPdf=!!l.pdf_url;return <tr key={l.id}><td><b>{SEC.esc(l.title)}</b></td><td className="sm">{SEC.esc(app.unit(l.unit_id)?.name||'—')}</td><td><AccessBadge value={isFree}/></td><td>{exams.length>0?<span className="pill pill-g">📝 {totalQs} سؤال</span>:<span className="pill pill-y">—</span>}</td><td>{hasPdf?<a href={SEC.safeUrl(l.pdf_url)} target="_blank" rel="noopener noreferrer" className="pill pill-b" style={{textDecoration:'none'}}>📄 PDF</a>:<span className="pill pill-y">—</span>}</td><td>{l.xp||'—'}</td><td>{l.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>duplicate(l)} title="نسخ"><Icon name="copy" size={13}/></button><button className="btn btn-s btn-sm" onClick={()=>openEdit(l)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(l.id)}><Icon name="trash" size={13}/></button></div></td></tr>;})}
+        {filteredLessons.map(l=>{const isFree=!l.video||!l.video.url||l.video.is_free!==false;const exams=getLessonExams(l.id);const totalQs=exams.reduce((s,e)=>s+(e.question_ids||[]).length,0);const hasPdf=!!l.pdf_url;return <tr key={l.id}><td><b>{SEC.esc(l.title)}</b></td><td className="sm">{SEC.esc(app.unit(l.unit_id)?.name||'—')}</td><td><AccessBadge value={isFree}/></td><td>{exams.length>0?<span className="pill pill-g">📝 {totalQs} سؤال</span>:<span className="pill pill-y">—</span>}</td><td>{hasPdf?<a href={SEC.safeUrl(l.pdf_url)} target="_blank" rel="noopener noreferrer" className="pill pill-b" style={{textDecoration:'none'}}>📄 PDF</a>:<span className="pill pill-y">—</span>}</td><td>{l.xp||'—'}</td><td>{l.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>duplicate(l)} title="نسخ"><Icon name="copy" size={13}/></button><button className="btn btn-s btn-sm" onClick={()=>openEdit(l)}><Icon name="edit" size={13}/></button>{['admin', 'owner'].includes(app.currentUser?.role) && <button className="btn btn-dn btn-sm" onClick={()=>del(l.id)}><Icon name="trash" size={13}/></button>}</div></td></tr>;})}
       </tbody></table></div>}
     </div>
     {editing!==null&&<Modal title={editing==='new'?'درس جديد':'تعديل الدرس'} onClose={()=>setEditing(null)} wide>
@@ -1046,7 +1055,7 @@ function LessonsPage(){
           <div className="flex between center mb12"><div className="sm" style={{fontWeight:800,color:'#6ee7a0'}}>✓ اختبارات ({currentLessonExams.length})</div></div>
           {currentLessonExams.map(e=><div key={e.id} className="flex between center mb6" style={{padding:'8px 12px',background:'rgba(34,197,94,.06)',borderRadius:10,border:'1px solid rgba(34,197,94,.20)'}}>
             <div style={{flex:1,minWidth:0}}><div className="sm" style={{fontWeight:700}}>📋 {SEC.esc(e.title)}</div><div className="xs muted">⏱ {e.duration}د • 🎯 {e.pass_score}% • ❓ {(e.question_ids||[]).length}</div></div>
-            <button className="btn btn-dn btn-sm" onClick={async()=>{const r=await Swal.fire({title:'حذف؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;const qIds=e.question_ids||[];if(qIds.length>0)await DB.removeMany('questions',qIds);await DB.remove('exams',e.id);await app.reload();app.toast.ok('تم');}}><Icon name="trash" size={12}/></button>
+            {['admin', 'owner'].includes(app.currentUser?.role) && <button className="btn btn-dn btn-sm" onClick={async()=>{const r=await Swal.fire({title:'حذف؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;const qIds=e.question_ids||[];if(qIds.length>0)await DB.removeMany('questions',qIds);await DB.remove('exams',e.id);await app.reload();app.toast.ok('تم');}}><Icon name="trash" size={12}/></button>}
           </div>)}
         </div>}
         <div className="grid g2">
@@ -1105,16 +1114,34 @@ function ExamsPage(){
     if(!(form.question_ids||[]).length&&!parsedQuestions.length)return app.toast.warn('اختر سؤالاً أو الصق أسئلة JSON');
     setBusy(true);const createdIds=[];
     try{
-      for(const q of parsedQuestions){const id=DB.uid('q_');createdIds.push(id);await DB.save('questions',{id,text:q.text,options:q.options,correct:[q.correct],explanation:q.explanation,lesson_id:null,unit_id:form.unit_id||null,subject_id:form.subject_id,difficulty:q.difficulty,xp:q.xp,type:'mcq'});}
+      for(const q of parsedQuestions){
+        const id=DB.uid('q_');
+        createdIds.push(id);
+        await app.save('questions',{
+          id,
+          text:q.text,
+          options:q.options,
+          correct:[q.correct],
+          explanation:q.explanation,
+          lesson_id:null,
+          unit_id:form.unit_id||null,
+          subject_id:form.subject_id,
+          difficulty:q.difficulty,
+          xp:q.xp,
+          type:'mcq'
+        });
+      }
       const maxAttempts=form.max_attempts===''||form.max_attempts===null||form.max_attempts===undefined?0:Number(form.max_attempts)||0;
       const exam={...form,title:String(form.title).trim(),max_attempts:maxAttempts,question_ids:[...new Set([...(form.question_ids||[]),...createdIds])]};
-      await DB.save('exams',exam);
-      await app.reload();
+      await app.save('exams',exam);
       app.toast.ok(`تم حفظ الاختبار${createdIds.length?` وإضافة ${createdIds.length} سؤالاً`:''}`);
       setEditing(null);setJsonText('');
-    }catch(e){for(const id of createdIds){try{await DB.remove('questions',id);}catch(_){}}await app.reload();app.toast.err(e.message||'تعذر حفظ الاختبار');}finally{setBusy(false);}
+    }catch(e){
+      for(const id of createdIds){try{await app.remove('questions',id);}catch(_){}}
+      app.toast.err(e.message||'تعذر حفظ الاختبار');
+    }finally{setBusy(false);}
   };
-  const del=async id=>{const exam=app.db.exams.find(e=>e.id===id);if(!exam)return;const qCount=(exam.question_ids||[]).length;const r=await Swal.fire({title:'حذف؟',html:`سيتم حذف الاختبار و ${qCount} سؤال`,icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{const qIds=exam.question_ids||[];if(qIds.length>0)await DB.removeMany('questions',qIds);await DB.remove('exams',id);await app.reload();app.toast.ok('تم');}catch(e){app.toast.err(e.message);}};
+  const del=async id=>{const exam=app.db.exams.find(e=>e.id===id);if(!exam)return;const qCount=(exam.question_ids||[]).length;const r=await Swal.fire({title:'حذف؟',html:`سيتم حذف الاختبار و ${qCount} سؤال`,icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{const qIds=exam.question_ids||[];if(qIds.length>0)await app.removeMany('questions',qIds);await app.remove('exams',id);app.toast.ok('تم');}catch(e){app.toast.err(e.message);}};
   const openEditQ=q=>{const correctRaw=Array.isArray(q.correct)?q.correct[0]:(typeof q.correct==='number'?q.correct:0);const opts=Array.isArray(q.options)?[...q.options]:['','','',''];while(opts.length<4)opts.push('');setQForm({text:q.text||q.question||'',options:opts.slice(0,4),correct:Number(correctRaw)||0,explanation:q.explanation||''});setEditingQ(q.id);};
   const saveQ=async()=>{if(!qForm.text.trim())return app.toast.warn('نص السؤال مطلوب');if(qForm.options.some(o=>!String(o).trim()))return app.toast.warn('جميع الاختيارات مطلوبة');setQBusy(true);try{const existing=app.question(editingQ)||{};await app.save('questions',{...existing,text:qForm.text.trim(),options:qForm.options.map(o=>String(o).trim()),correct:[Number(qForm.correct)],explanation:(qForm.explanation||'').trim()});app.toast.ok('تم');setEditingQ(null);}catch(e){app.toast.err(e.message);}setQBusy(false);};
   const removeQFromExam=async qId=>{const r=await Swal.fire({title:'حذف السؤال؟',icon:'warning',showCancelButton:true,showDenyButton:true,confirmButtonText:'حذف نهائي',denyButtonText:'إزالة فقط',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',denyButtonColor:'#D4AF37',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed&&!r.isDenied)return;try{const updatedIds=(form.question_ids||[]).filter(id=>id!==qId);await app.save('exams',{...form,question_ids:updatedIds});setForm(f=>({...f,question_ids:updatedIds}));if(r.isConfirmed)await app.remove('questions',qId);app.toast.ok('تم');}catch(e){app.toast.err(e.message);}};
@@ -1123,7 +1150,7 @@ function ExamsPage(){
   const attemptsLabel=e=>{const n=Number(e.max_attempts)||0;return n>0?`${n}`:'∞';};
   return <>
     <div className="flex between center mb16 wrap g8"><div className="h2 grad">📝 الاختبارات</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> جديد</button></div>
-    <div className="glass" style={{padding:14}}>{app.db.exams.length===0?<Empty title="لا اختبارات"/>:<div className="sx"><table className="tbl"><thead><tr><th>العنوان</th><th>المادة</th><th>الأسئلة</th><th>المحاولات</th><th>الوصول</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>{app.db.exams.map(e=><tr key={e.id}><td><b>{SEC.esc(e.title)}</b></td><td className="sm">{SEC.esc(app.subject(e.subject_id)?.name||'—')}</td><td>{(e.question_ids||[]).length}</td><td><span className="pill pill-b">{attemptsLabel(e)}</span></td><td><AccessBadge value={e.is_free}/></td><td>{e.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>duplicate(e)} title="نسخ"><Icon name="copy" size={13}/></button><button className="btn btn-s btn-sm" onClick={()=>openEdit(e)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(e.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody></table></div>}</div>
+    <div className="glass" style={{padding:14}}>{app.db.exams.length===0?<Empty title="لا اختبارات"/>:<div className="sx"><table className="tbl"><thead><tr><th>العنوان</th><th>المادة</th><th>الأسئلة</th><th>المحاولات</th><th>الوصول</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>{app.db.exams.map(e=><tr key={e.id}><td><b>{SEC.esc(e.title)}</b></td><td className="sm">{SEC.esc(app.subject(e.subject_id)?.name||'—')}</td><td>{(e.question_ids||[]).length}</td><td><span className="pill pill-b">{attemptsLabel(e)}</span></td><td><AccessBadge value={e.is_free}/></td><td>{e.published!==false?<span className="pill pill-g">منشور</span>:<span className="pill pill-y">مخفي</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>duplicate(e)} title="نسخ"><Icon name="copy" size={13}/></button><button className="btn btn-s btn-sm" onClick={()=>openEdit(e)}><Icon name="edit" size={13}/></button>{['admin', 'owner'].includes(app.currentUser?.role) && <button className="btn btn-dn btn-sm" onClick={()=>del(e.id)}><Icon name="trash" size={13}/></button>}</div></td></tr>)}</tbody></table></div>}</div>
     {editing!==null&&<Modal title={editing==='new'?'جديد':'تعديل'} onClose={()=>setEditing(null)} wide>
       <Field label="الاسم"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
       <div className="grid g2">
@@ -1143,7 +1170,7 @@ function ExamsPage(){
       <Field label={`الأسئلة الحالية (${currentQuestions.length})`}>
         <div className="glass-s" style={{padding:10,maxHeight:400,overflowY:'auto'}}>
           {currentQuestions.length===0?<div className="sm muted">لا أسئلة بعد.</div>:
-          currentQuestions.map((q,idx)=>{const correctArr=Array.isArray(q.correct)?q.correct:[q.correct];const correctIdx=Number(correctArr[0])||0;return <div key={q.id} style={{padding:10,borderBottom:'1px solid var(--border)'}}><div className="flex between center mb6"><span className="pill pill-b" style={{fontSize:10}}>{idx+1}</span><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEditQ(q)}><Icon name="edit" size={12}/></button><button className="btn btn-dn btn-sm" onClick={()=>removeQFromExam(q.id)}><Icon name="trash" size={12}/></button></div></div><div className="sm" style={{fontWeight:700,marginBottom:6}}>{SEC.esc(String(q.text||'').slice(0,100))}</div><div className="flex wrap g6">{(q.options||[]).map((opt,oi)=><span key={oi} className="xs" style={{padding:'2px 8px',borderRadius:20,background:oi===correctIdx?'rgba(34,197,94,.18)':'rgba(255,255,255,.04)',color:oi===correctIdx?'#6ee7a0':'var(--muted)',border:`1px solid ${oi===correctIdx?'rgba(34,197,94,.4)':'var(--border)'}`}}>{['A','B','C','D'][oi]}. {SEC.esc(String(opt).slice(0,30))}</span>)}</div>{q.explanation&&<div className="xs muted mt6">💡 {SEC.esc(String(q.explanation).slice(0,120))}</div>}</div>;})}
+          currentQuestions.map((q,idx)=>{const correctArr=Array.isArray(q.correct)?q.correct:[q.correct];const correctIdx=Number(correctArr[0])||0;return <div key={q.id} style={{padding:10,borderBottom:'1px solid var(--border)'}}><div className="flex between center mb6"><span className="pill pill-b" style={{fontSize:10}}>{idx+1}</span><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEditQ(q)}><Icon name="edit" size={12}/></button>{['admin', 'owner'].includes(app.currentUser?.role) && <button className="btn btn-dn btn-sm" onClick={()=>removeQFromExam(q.id)}><Icon name="trash" size={12}/></button>}</div></div><div className="sm" style={{fontWeight:700,marginBottom:6}}>{SEC.esc(String(q.text||'').slice(0,100))}</div><div className="flex wrap g6">{(q.options||[]).map((opt,oi)=><span key={oi} className="xs" style={{padding:'2px 8px',borderRadius:20,background:oi===correctIdx?'rgba(34,197,94,.18)':'rgba(255,255,255,.04)',color:oi===correctIdx?'#6ee7a0':'var(--muted)',border:`1px solid ${oi===correctIdx?'rgba(34,197,94,.4)':'var(--border)'}`}}>{['A','B','C','D'][oi]}. {SEC.esc(String(opt).slice(0,30))}</span>)}</div>{q.explanation&&<div className="xs muted mt6">💡 {SEC.esc(String(q.explanation).slice(0,120))}</div>}</div>;})}
         </div>
       </Field>
       <Field label={`إضافة من البنك (${availQ.filter(q=>!(form.question_ids||[]).includes(q.id)).length} متاح)`}>
@@ -1172,7 +1199,7 @@ function MissionsPage(){
   const del=async id=>{const r=await Swal.fire({title:'حذف؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{await app.remove('missions',id);app.toast.warn('تم');}catch(e){app.toast.err(e.message);}};
   return <>
     <div className="flex between center mb16"><div className="h2 grad">🎯 المهام</div><button className="btn btn-p" onClick={openNew}><Icon name="plus" size={15}/> جديد</button></div>
-    <div className="glass" style={{padding:14}}>{app.db.missions.length===0?<Empty title="لا مهام"/>:<div className="sx"><table className="tbl"><thead><tr><th>العنوان</th><th>المادة</th><th>XP</th><th>إجراءات</th></tr></thead><tbody>{app.db.missions.map(m=><tr key={m.id}><td>{SEC.esc(m.title)}</td><td className="sm">{SEC.esc(app.subject(m.subject_id)?.name||'—')}</td><td>{m.xp}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(m)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(m.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}</tbody></table></div>}</div>
+    <div className="glass" style={{padding:14}}>{app.db.missions.length===0?<Empty title="لا مهام"/>:<div className="sx"><table className="tbl"><thead><tr><th>العنوان</th><th>المادة</th><th>XP</th><th>إجراءات</th></tr></thead><tbody>{app.db.missions.map(m=><tr key={m.id}><td>{SEC.esc(m.title)}</td><td className="sm">{SEC.esc(app.subject(m.subject_id)?.name||'—')}</td><td>{m.xp}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(m)}><Icon name="edit" size={13}/></button>{['admin', 'owner'].includes(app.currentUser?.role) && <button className="btn btn-dn btn-sm" onClick={()=>del(m.id)}><Icon name="trash" size={13}/></button>}</div></td></tr>)}</tbody></table></div>}</div>
     {editing!==null&&<Modal title={editing==='new'?'جديد':'تعديل'} onClose={()=>setEditing(null)} wide>
       <Field label="العنوان"><input className="input" value={form.title||''} onChange={e=>setForm({...form,title:e.target.value})}/></Field>
       <Field label="الوصف"><textarea className="input" value={form.desc||''} onChange={e=>setForm({...form,desc:e.target.value})}/></Field>
@@ -1190,6 +1217,7 @@ function QuestionsBankPage(){
   const [q,setQ]=useState('');
   const [page,setPage]=useState(1);
   const [attempts,setAttempts]=useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
   const perPage=50;
   useEffect(()=>{(async()=>{
     try{const sb=await DB.getClient();const {data}=await sb.from('exam_attempts').select('answers,total').limit(2000);setAttempts(data||[]);}catch(e){}
@@ -1244,7 +1272,34 @@ function QuestionsBankPage(){
   const paginated=filtered.slice((page-1)*perPage,page*perPage);
   const stats=useMemo(()=>{const total=enriched.length;const orphan=enriched.filter(x=>x.isOrphan).length;const bad=enriched.filter(x=>x.quality==='bad').length;return {total,orphan,used:total-orphan,bad};},[enriched]);
   const deleteOne=async id=>{const r=await Swal.fire({title:'حذف السؤال؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{const result=await DB.deleteQuestion(id);await app.reload();app.toast.ok(`تم${result.examsUpdated?` وتحديث ${result.examsUpdated} امتحان`:''}`);}catch(e){app.toast.err(e.message);}};
+  const toggleSelect = (id) => {setSelectedIds(prev => prev.includes(id) ? prev.filter(x=>x!==id) : [...prev, id]);};
+  const toggleSelectAll = () => {
+    const pageIds = paginated.map(x => x.id);
+    if (pageIds.length > 0 && pageIds.every(id => selectedIds.includes(id))) {
+      setSelectedIds(prev => prev.filter(id => !pageIds.includes(id)));
+    } else {
+      setSelectedIds(prev => [...new Set([...prev, ...pageIds])]);
+    }
+  };
+  const bulkDelete = async () => {
+    if (!selectedIds.length) return;
+    const r = await Swal.fire({
+      title: `حذف ${selectedIds.length} سؤال؟`,
+      text: 'سيتم حذفهم نهائياً من بنك الأسئلة ومن أي اختبارات مرتبطة بهم.',
+      icon: 'warning', showCancelButton: true, confirmButtonText: 'نعم، احذف', cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b',
+      background: 'linear-gradient(180deg,#1c160c,#0f0c07)', color: '#f7f0dd',
+      customClass: {popup:'swal-custom-popup',title:'swal-custom-title'}
+    });
+    if (!r.isConfirmed) return;
+    try {
+      await app.removeMany('questions', selectedIds);
+      app.toast.ok(`تم حذف ${selectedIds.length} سؤال`);
+      setSelectedIds([]);
+    } catch(e) { app.toast.err(e.message); }
+  };
   const availableLessons=useMemo(()=>{if(filterSubject==='all')return app.db.lessons;return app.db.lessons.filter(l=>{const u=app.unit(l.unit_id);return u?.subject_id===filterSubject;});},[filterSubject,app.db.lessons]);
+  useEffect(() => { setSelectedIds([]); }, [page, filterSubject, filterLesson, filterType, q]);
   return <>
     <div className="h2 mb16 grad">🗃️ بنك الأسئلة</div>
     <div className="grid g4 mb16">
@@ -1265,8 +1320,12 @@ function QuestionsBankPage(){
       {filtered.length===0?<Empty icon="🗃️" title="لا أسئلة"/>:<>
         <div className="flex between center mb12"><span className="pill pill-b">{filtered.length} سؤال — صفحة {page} من {totalPages}</span></div>
         <div className="sx"><table className="tbl">
-          <thead><tr><th>السؤال</th><th>المادة</th><th>الجودة</th><th>الحالة</th><th>إجراءات</th></tr></thead>
-          <tbody>{paginated.map(x=><tr key={x.id}>
+          <thead><tr>
+            <th style={{width:40}}><input type="checkbox" checked={paginated.length > 0 && paginated.every(x => selectedIds.includes(x.id))} onChange={toggleSelectAll}/></th>
+            <th>السؤال</th><th>المادة</th><th>الجودة</th><th>الحالة</th><th>إجراءات</th>
+          </tr></thead>
+          <tbody>{paginated.map(x=><tr key={x.id} style={{background: selectedIds.includes(x.id) ? 'var(--border2)' : 'transparent'}}>
+            <td><input type="checkbox" checked={selectedIds.includes(x.id)} onChange={()=>toggleSelect(x.id)}/></td>
             <td style={{maxWidth:400}}><div className="sm" style={{fontWeight:700}}>{SEC.esc(x.text.slice(0,120))}{x.text.length>120?'...':''}</div></td>
             <td>{x.subject?<span className="pill pill-b">{SEC.esc(x.subject.name)}</span>:'—'}</td>
             <td>
@@ -1276,12 +1335,20 @@ function QuestionsBankPage(){
               </div>
             </td>
             <td>{x.usedIn.length>0?<span className="pill qbank-used">✓ {x.usedIn.length}</span>:<span className="pill qbank-orphan">⚠</span>}</td>
-            <td><button className="btn btn-dn btn-sm" onClick={()=>deleteOne(x.id)}><Icon name="trash" size={12}/></button></td>
+            <td>{['admin', 'owner'].includes(app.currentUser?.role) && <button className="btn btn-dn btn-sm" onClick={()=>deleteOne(x.id)}><Icon name="trash" size={12}/></button>}</td>
           </tr>)}</tbody>
         </table></div>
         {totalPages>1&&<div className="flex between center mt16"><button className="btn btn-s btn-sm" onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page===1}>←</button><span className="sm muted">صفحة {page} من {totalPages}</span><button className="btn btn-s btn-sm" onClick={()=>setPage(p=>Math.min(totalPages,p+1))} disabled={page===totalPages}>→</button></div>}
       </>}
     </div>
+    {selectedIds.length > 0 && (
+      <div className="bulk-bar">
+        <span className="sm" style={{fontWeight:700}}>تم تحديد {selectedIds.length} سؤال</span>
+        <div style={{width:1,height:24,background:'var(--border)'}}/>
+        <button className="btn btn-dn btn-sm" onClick={bulkDelete}>🗑️ حذف المحدد</button>
+        <button className="icon-btn" onClick={()=>setSelectedIds([])}><Icon name="close" size={14}/></button>
+      </div>
+    )}
   </>;
 }
 
@@ -1325,7 +1392,7 @@ function XPShopPage(){
     <div className="glass" style={{padding:14}}>
       {items.length===0?<Empty icon="🛒" title="لا منتجات"/>:
         <div className="sx"><table className="tbl"><thead><tr><th></th><th>الاسم</th><th>الوصف</th><th>السعر</th><th>المخزون</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>
-          {items.map(it=><tr key={it.id}><td style={{fontSize:24}}>{SEC.esc(it.icon||'🎁')}</td><td><b>{SEC.esc(it.name)}</b></td><td className="sm muted">{SEC.esc(it.description||'—')}</td><td><b style={{color:'var(--gold-l)'}}>⚡ {it.xp_cost}</b></td><td>{it.stock!=null?it.stock:'∞'}</td><td>{it.active?<span className="pill pill-g">نشط</span>:<span className="pill pill-y">معطّل</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(it)}><Icon name="edit" size={13}/></button><button className="btn btn-dn btn-sm" onClick={()=>del(it.id)}><Icon name="trash" size={13}/></button></div></td></tr>)}
+          {items.map(it=><tr key={it.id}><td style={{fontSize:24}}>{SEC.esc(it.icon||'🎁')}</td><td><b>{SEC.esc(it.name)}</b></td><td className="sm muted">{SEC.esc(it.description||'—')}</td><td><b style={{color:'var(--gold-l)'}}>⚡ {it.xp_cost}</b></td><td>{it.stock!=null?it.stock:'∞'}</td><td>{it.active?<span className="pill pill-g">نشط</span>:<span className="pill pill-y">معطّل</span>}</td><td><div className="flex g6"><button className="btn btn-s btn-sm" onClick={()=>openEdit(it)}><Icon name="edit" size={13}/></button>{['admin', 'owner'].includes(app.currentUser?.role) && <button className="btn btn-dn btn-sm" onClick={()=>del(it.id)}><Icon name="trash" size={13}/></button>}</div></td></tr>)}
         </tbody></table></div>
       }
     </div>
@@ -1349,7 +1416,7 @@ function StudyGroupsPage(){
   return <>
     <div className="h2 mb16 grad">👥 مجموعات الدراسة</div>
     <div className="grid g3 mb16"><Stat label="الجروبات" value={DB.fmt(groups.length)} icon="users" color="var(--gold-l)"/><Stat label="الأعضاء" value={DB.fmt(members.length)} icon="user" color="#22c55e"/><Stat label="نشطة" value={DB.fmt(groups.filter(g=>g.active!==false).length)} icon="check" color="var(--gold-d)"/></div>
-    <div className="glass" style={{padding:14}}>{groups.length===0?<Empty icon="👥" title="لا جروبات"/>:<div className="sx"><table className="tbl"><thead><tr><th>الاسم</th><th>المادة</th><th>الأعضاء</th><th>القائد</th><th>إجراءات</th></tr></thead><tbody>{groups.map(g=>{const gm=members.filter(m=>m.group_id===g.id);const leader=app.db.users.find(u=>u.id===g.leader_id);return <tr key={g.id}><td><b>{SEC.esc(g.name)}</b></td><td className="sm">{g.subject_id?SEC.esc(app.subject(g.subject_id)?.name||'—'):'—'}</td><td><span className="pill pill-b">{gm.length}/{g.max_members}</span></td><td className="sm">{SEC.esc(leader?.name||'—')}</td><td><button className="btn btn-dn btn-sm" onClick={async()=>{const r=await Swal.fire({title:'حذف؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{const sb=await DB.getClient();await sb.from('study_group_members').delete().eq('group_id',g.id);await sb.from('study_groups').delete().eq('id',g.id);await app.reload();app.toast.warn('تم');}catch(e){app.toast.err(e.message);}}}><Icon name="trash" size={13}/></button></td></tr>;})}</tbody></table></div>}</div>
+    <div className="glass" style={{padding:14}}>{groups.length===0?<Empty icon="👥" title="لا جروبات"/>:<div className="sx"><table className="tbl"><thead><tr><th>الاسم</th><th>المادة</th><th>الأعضاء</th><th>القائد</th><th>إجراءات</th></tr></thead><tbody>{groups.map(g=>{const gm=members.filter(m=>m.group_id===g.id);const leader=app.db.users.find(u=>u.id===g.leader_id);return <tr key={g.id}><td><b>{SEC.esc(g.name)}</b></td><td className="sm">{g.subject_id?SEC.esc(app.subject(g.subject_id)?.name||'—'):'—'}</td><td><span className="pill pill-b">{gm.length}/{g.max_members}</span></td><td className="sm">{SEC.esc(leader?.name||'—')}</td><td>{['admin', 'owner'].includes(app.currentUser?.role) && <button className="btn btn-dn btn-sm" onClick={async()=>{const r=await Swal.fire({title:'حذف؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444',cancelButtonColor:'#64748b',background:'linear-gradient(180deg,#1c160c,#0f0c07)',color:'#f7f0dd',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}});if(!r.isConfirmed)return;try{const sb=await DB.getClient();await sb.from('study_group_members').delete().eq('group_id',g.id);await sb.from('study_groups').delete().eq('id',g.id);await app.reload();app.toast.warn('تم');}catch(e){app.toast.err(e.message);}}}><Icon name="trash" size={13}/></button>}</td></tr>;})}</tbody></table></div>}</div>
   </>;
 }
 
@@ -1474,7 +1541,7 @@ function NotificationsPage(){
               <b className="sm" style={{color:'var(--gold-l)'}}>{SEC.esc(t.name)}</b>
               <div className="flex g6">
                 <button className="btn btn-s btn-sm" onClick={()=>applyTemplate(t)}>تطبيق</button>
-                <button className="btn btn-dn btn-sm" onClick={()=>delTemplate(t.id)}><Icon name="trash" size={11}/></button>
+                {['admin', 'owner'].includes(app.currentUser?.role) && <button className="btn btn-dn btn-sm" onClick={()=>delTemplate(t.id)}><Icon name="trash" size={11}/></button>}
               </div>
             </div>
             <div className="xs muted">{SEC.esc(t.title)}</div>
@@ -1484,7 +1551,7 @@ function NotificationsPage(){
     </div>
     <div className="glass" style={{padding:20}}>
       <div className="h4 mb12" style={{color:'var(--gold)'}}>آخر الإشعارات</div>
-      {app.db.notifications.slice(0,10).map(n=><div key={n.id} className="glass-s mb8" style={{padding:12,display:'flex',gap:10}}><div style={{flex:1}}><div className="h4" style={{fontSize:14}}>{SEC.esc(n.title)}</div><div className="xs muted">{SEC.esc(n.body)}</div></div><button className="btn btn-dn btn-sm" onClick={()=>del(n.id)}><Icon name="trash" size={13}/></button></div>)}
+      {app.db.notifications.slice(0,10).map(n=><div key={n.id} className="glass-s mb8" style={{padding:12,display:'flex',gap:10}}><div style={{flex:1}}><div className="h4" style={{fontSize:14}}>{SEC.esc(n.title)}</div><div className="xs muted">{SEC.esc(n.body)}</div></div>{['admin', 'owner'].includes(app.currentUser?.role) && <button className="btn btn-dn btn-sm" onClick={()=>del(n.id)}><Icon name="trash" size={13}/></button>}</div>)}
     </div>
   </>;
 }
@@ -1631,7 +1698,7 @@ function ReportsPage(){
                   </div>
                   <div className="flex g8">
                     <span className="xs muted">{DB.formatDateTime(m.created_at || m.at)}</span>
-                    <button className="btn btn-dn btn-sm" onClick={()=>deleteFooterMsg(m.id)}><Icon name="trash" size={12}/></button>
+                    {['admin', 'owner'].includes(app.currentUser?.role) && <button className="btn btn-dn btn-sm" onClick={()=>deleteFooterMsg(m.id)}><Icon name="trash" size={12}/></button>}
                   </div>
                 </div>
                 <div className="sm txt2" style={{background:'rgba(0,0,0,.25)',padding:12,borderRadius:10,borderInlineStart:'3px solid #00d2ff', marginTop:4}}>
@@ -2176,7 +2243,7 @@ function NotesPage(){
             <span className="xs muted">{DB.formatDateTime(n.created_at)}</span>
           </div>
           <div className="sm">{SEC.esc(n.text)}</div>
-          <button className="btn btn-dn btn-sm mt8" onClick={()=>del(n.id)}><Icon name="trash" size={12}/></button>
+          {['admin', 'owner'].includes(app.currentUser?.role) && <button className="btn btn-dn btn-sm mt8" onClick={()=>del(n.id)}><Icon name="trash" size={12}/></button>}
         </div>;
       })}</div>}
     </div>
@@ -2240,7 +2307,7 @@ function CouponsPage(){
           <td>{c.uses||0}/{c.max_uses||'∞'}</td>
           <td className="xs muted">{c.expires_at?DB.formatDate(c.expires_at):'—'}</td>
           <td>{expired?<span className="pill pill-r">منتهي</span>:c.active!==false?<span className="pill pill-g">نشط</span>:<span className="pill pill-y">معطل</span>}</td>
-          <td><button className="btn btn-dn btn-sm" onClick={()=>del(c.id)}><Icon name="trash" size={12}/></button></td>
+          <td>{['admin', 'owner'].includes(app.currentUser?.role) && <button className="btn btn-dn btn-sm" onClick={()=>del(c.id)}><Icon name="trash" size={12}/></button>}</td>
         </tr>;
       })}</tbody></table></div>}
     </div>
@@ -2324,7 +2391,7 @@ function PollsPage(){
             <div className="flex g6">
               <span className="pill pill-b">{pv.length} تصويت</span>
               <button className="btn btn-s btn-sm" onClick={()=>openEdit(p)}><Icon name="edit" size={12}/></button>
-              <button className="btn btn-dn btn-sm" onClick={()=>del(p.id)}><Icon name="trash" size={12}/></button>
+              {['admin', 'owner'].includes(app.currentUser?.role) && <button className="btn btn-dn btn-sm" onClick={()=>del(p.id)}><Icon name="trash" size={12}/></button>}
             </div>
           </div>
           {(p.options||[]).map((opt,i)=>{
