@@ -294,10 +294,24 @@ function AppProvider({children}){
   const toast=useToast();
   // Data caching is handled safely inside db.js for course-structure tables only.
   // Private/user-specific data is always fetched fresh from Supabase.
+  const reloadMessages=useCallback(async ()=>{
+    if(!currentUser?.id) return;
+    try{
+      const sb = await DB.getClient();
+      const id = currentUser.id;
+      const {data, error} = await sb.from('direct_messages')
+        .select('*')
+        .or(`from_id.eq.${id},to_id.eq.${id}`)
+        .order('created_at',{ascending:true})
+        .limit(500);
+      if(error) throw error;
+      setDb(prev=>({...prev,direct_messages:data||[]}));
+    }catch(e){ console.warn('reloadMessages failed:',e); }
+  },[currentUser?.id]);
   const reload=useCallback(async (forceFresh=false)=>{
     try{
       const data = await DB.loadAll({forceFresh});
-      setDb(data);
+      setDb(prev=>({...data,direct_messages:prev.direct_messages||[]}));
       setCurrentUser(prev => {
         if (!prev) return null;
         const fresh = data.users?.find(u => u.id === prev.id);
@@ -350,7 +364,7 @@ function AppProvider({children}){
       try{ await DB.updateUser(currentUser.id,{theme:newTheme}); setCurrentUser(u=>({...u,theme:newTheme})); }catch(e){}
     }
   },[currentUser]);
-  return <AppCtx.Provider value={{db,currentUser,loading,logout,reload,save,remove,getLevel,toast,toggleTheme,subject:id=>db.subjects.find(s=>s.id===id),unit:id=>db.units.find(u=>u.id===id),lesson:id=>db.lessons.find(l=>l.id===id),exam:id=>db.exams.find(e=>e.id===id),question:id=>db.questions.find(q=>q.id===id),grade:id=>db.grades.find(g=>g.id===id)}}>{children}</AppCtx.Provider>;
+  return <AppCtx.Provider value={{db,currentUser,loading,logout,reload,reloadMessages,save,remove,getLevel,toast,toggleTheme,subject:id=>db.subjects.find(s=>s.id===id),unit:id=>db.units.find(u=>u.id===id),lesson:id=>db.lessons.find(l=>l.id===id),exam:id=>db.exams.find(e=>e.id===id),question:id=>db.questions.find(q=>q.id===id),grade:id=>db.grades.find(g=>g.id===id)}}>{children}</AppCtx.Provider>;
 }
 const Icon=({name,size=18,color='currentColor'})=>{
   const p={width:size,height:size,viewBox:'0 0 24 24',fill:'none',stroke:color,strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round'};
@@ -1532,7 +1546,13 @@ function MessagesPage({initialChat,onClearInitial}){
   const [tab,setTab]=useState('inbox');
   useEffect(()=>{if(initialChat){setChatWith(initialChat);onClearInitial?.();}},[initialChat]);
   const allMsgs=(app.db.direct_messages||[]);
-  const inbox=allMsgs.filter(m=>m.to_id===user.id).sort((a,b)=>b.created_at-a.created_at);
+  useEffect(()=>{
+    if(!user?.id || !app.reloadMessages) return;
+    app.reloadMessages();
+    const timer=setInterval(()=>app.reloadMessages(),5000);
+    return ()=>clearInterval(timer);
+  },[user?.id,app.reloadMessages]);
+  const inbox=allMsgs.filter(m=>m.to_id===user.id).sort((a,b)=>Number(b.created_at)-Number(a.created_at));
   const sent=allMsgs.filter(m=>m.from_id===user.id).sort((a,b)=>b.created_at-a.created_at);
   const conversation=chatWith?allMsgs.filter(m=>(m.from_id===user.id&&m.to_id===chatWith)||(m.from_id===chatWith&&m.to_id===user.id)).sort((a,b)=>a.created_at-b.created_at):[];
   const otherUser=chatWith?app.db.users.find(u=>u.id===chatWith):null;
