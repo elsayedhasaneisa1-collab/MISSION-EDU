@@ -307,11 +307,9 @@ function AppProvider({children}){
           catch(err){ data[t] = []; }
         }));
       }
-      try{
-        const sb = await DB.getClient();
-        const { data: pubQs } = await sb.from('questions_public').select('*').limit(2000);
-        data.questions = pubQs || [];
-      }catch(e){ data.questions = data.questions || []; }
+      // DB.loadAll() already loads questions (including the public fallback).
+      // Avoid issuing the same questions_public request a second time.
+      data.questions = Array.isArray(data.questions) ? data.questions : [];
       const extra=['direct_messages','xp_shop_items','xp_purchases','study_groups','study_group_members','study_plans','study_tasks','daily_challenges','daily_challenge_attempts','flashcards','video_progress','daily_reward','friendships','practice_sessions','focus_sessions'];
       const sb2 = await DB.getClient();
       const extraResults=await Promise.all(extra.map(async(t)=>{try{const res=await sb2.from(t).select('*').limit(2000);return{t,data:res.data||[]};}catch(e){return{t,data:data[t]||[]};}}));
@@ -327,7 +325,11 @@ function AppProvider({children}){
   useEffect(()=>{(async ()=>{try{const sid=DB.getSessionId();if(!sid){window.location.replace('../auth/login.html');return;}const u=await DB.getUser(sid);if(!u||u.active===false){DB.clearSession();window.location.replace('../auth/login.html');return;}if(u.banned===true){DB.clearSession();window.location.replace('../auth/banned.html');return;}setCurrentUser(u);if(u.theme==='light')document.body.classList.add('light-mode');await reload();}catch(e){console.warn(e);}setLoading(false);})();},[]);
   useEffect(()=>{
     if(!currentUser) return;
-    const interval = setInterval(async ()=>{
+    let checking = false;
+    const checkUser = async ()=>{
+      // No need to spend API requests while the tab is in the background.
+      if(document.hidden || checking) return;
+      checking = true;
       try{
         const fresh = await DB.getUser(currentUser.id);
         if(!fresh){ ANTI_TAMPER.lock('المستخدم غير موجود'); return; }
@@ -343,23 +345,37 @@ function AppProvider({children}){
           if(fresh.subscription_until !== prev.subscription_until){ next.subscription_until = fresh.subscription_until; changed = true; }
           return changed ? next : prev;
         });
-      }catch(e){}
-    }, 30000);
-    return ()=>clearInterval(interval);
+      }catch(e){} finally { checking = false; }
+    };
+    const interval = setInterval(checkUser, 60000);
+    const onVisible = ()=>{ if(!document.hidden) checkUser(); };
+    document.addEventListener('visibilitychange', onVisible);
+    return ()=>{ clearInterval(interval); document.removeEventListener('visibilitychange', onVisible); };
   },[currentUser?.id]);
   const logout=useCallback(()=>{Swal.fire({title:'تسجيل الخروج',text:'هل أنت متأكد؟',icon:'question',showCancelButton:true,confirmButtonText:'نعم، خروج',cancelButtonText:'إلغاء',confirmButtonColor:'#00d4ff',cancelButtonColor:'#64748b',background:'linear-gradient(180deg, #0a1220, #050a14)',color:'#e0f7ff',customClass:{popup:'swal-custom-popup',title:'swal-custom-title'}}).then(r=>{if(r.isConfirmed){DB.clearSession();window.location.replace('../auth/login.html');}});},[]);
   const save=useCallback(async (table,item)=>{
     const clean = SEC.sanitizeObject(item);
     if(!clean || typeof clean!=='object') throw new Error('بيانات غير صالحة');
     const saved=await DB.save(table,clean);
-    await reload();
+    // Update only the changed record in React state instead of re-reading every
+    // table from Supabase after each save.
+    setDb(prev=>{
+      const rows=Array.isArray(prev[table])?[...prev[table]]:[];
+      const index=rows.findIndex(row=>row && row.id===saved.id);
+      if(index>=0) rows[index]=saved; else rows.push(saved);
+      return {...prev,[table]:rows};
+    });
+    if(table==='users' && currentUser && saved.id===currentUser.id){
+      setCurrentUser(prev=>prev?({...prev,...saved}):prev);
+    }
     return saved;
-  },[reload]);
+  },[currentUser?.id]);
   const remove=useCallback(async (table,id)=>{
     if(!id || typeof id!=='string' || id.length<3) throw new Error('معرف غير صالح');
     await DB.remove(table,id);
-    await reload();
-  },[reload]);
+    // Reflect the deletion locally without downloading the entire database.
+    setDb(prev=>({...prev,[table]:(Array.isArray(prev[table])?prev[table]:[]).filter(row=>row && row.id!==id)}));
+  },[]);
   const getLevel=useCallback((xp)=>{const ls=[...db.levels].sort((a,b)=>a.xp-b.xp);if(ls.length===0)return {current:{level:1,name:'مبتدئ',xp:0},next:null};let cur=ls[0],next=null;for(let i=0;i<ls.length;i++){if(xp>=ls[i].xp){cur=ls[i];next=ls[i+1]||null;}}return {current:cur,next};},[db.levels]);
   const toggleTheme=useCallback(async ()=>{
     const newTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
@@ -1636,7 +1652,7 @@ function StudentApp(){
   useEffect(()=>{try{localStorage.setItem('student_tab',tab)}catch(e){}},[tab]);
   const unreadMsgs=(app.db.direct_messages||[]).filter(m=>m.to_id===user.id&&!m.read).length;
   const unreadNotifs=(app.db.notifications||[]).filter(n=>{if(n.target!=='all'&&n.target!==user.id)return false;const created=Number(n.created_at)||0;const lastSeen=Number(localStorage.getItem('notif_read_'+user.id)||0);return created>lastSeen;}).length;
-  useEffect(()=>{if(!user) return;const loop=async ()=>{await NOTIF_TRACKER.check(user);};loop();const iv=setInterval(loop,25000);return ()=>clearInterval(iv);},[user?.id]);
+  useEffect(()=>{if(!user) return;const loop=async ()=>{if(!document.hidden) await NOTIF_TRACKER.check(user);};loop();const iv=setInterval(loop,60000);const onVisible=()=>{if(!document.hidden)loop();};document.addEventListener('visibilitychange',onVisible);return ()=>{clearInterval(iv);document.removeEventListener('visibilitychange',onVisible);};},[user?.id]);
   const enablePush=async ()=>{
     const ok = await PUSH_MANAGER.requestPermission();
     if(ok){ setPushEnabled(true); PUSH_MANAGER.show('MISSION EDU','تم تفعيل الإشعارات بنجاح ✅'); app.toast.ok('تم تفعيل الإشعارات'); }
